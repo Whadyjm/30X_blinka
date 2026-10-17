@@ -3,6 +3,7 @@ import { audit, equalSecret, HttpError, id, json, now, readBytes, sha256, stmt }
 import { receiveInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
 import { telegramAction, telegramChat, telegramConnection, telegramContext, telegramParts } from './telegram-chat.js';
+import { invoiceNotice } from './telegram-invoice.js';
 
 const activeConnection = (db, orgId, userId) => stmt(db, `SELECT * FROM telegram_connections
   WHERE org_id = ? AND user_id = ? AND revoked_at IS NULL`, orgId, userId).first();
@@ -220,11 +221,8 @@ async function invoiceReply(env, row, payload, process) {
   await stmt(env.DB, 'UPDATE telegram_conversations SET last_invoice_id = ? WHERE connection_id = ?', source.invoice_id, connection.id).run();
   const result = await process(env, connection.org_id, source.invoice_id);
   const invoice = result.data;
-  const url = new URL(`/app/bills/${encodeURIComponent(source.invoice_id)}`, env.PUBLIC_APP_URL).href;
   if (result.status === 202 || (invoice.status === 'FAILED' && invoice.processingError?.retryable)) throw new Error('retry_processing');
-  if (invoice.status === 'FAILED') return `No pude leer la factura. Revisa el documento en Oli.\n${url}`;
-  const title = { APPROVE: 'Factura aprobada según tus reglas.', BLOCK: 'Factura bloqueada.', ESCALATE: 'La factura necesita revisión.' }[invoice.latestDecision?.action];
-  return `${title ?? 'Factura recibida.'}\n${invoice.latestDecision?.humanExplanation ?? 'Revisa el estado en Oli.'}\n${url}`;
+  return invoiceNotice(env, invoice);
 }
 
 export async function consumeTelegram(batch, env, process = processInvoice) {
@@ -263,6 +261,7 @@ export async function consumeTelegram(batch, env, process = processInvoice) {
         if (row.connection_id && !await authorizedConnection(env, row.connection_id)) break;
         const part = parts[i];
         const sent = await telegram(env, 'sendMessage', { chat_id: payload.chatId, text: part.text,
+          link_preview_options: { is_disabled: true },
           ...(part.reply_markup ? { reply_markup: part.reply_markup } : {}) });
         const mutations = [stmt(env.DB, 'UPDATE telegram_events SET delivered_parts = ?, lease_until = ? WHERE update_id = ? AND lease_token = ?',
           i + 1, new Date(Date.now() + 180000).toISOString(), updateId, lease)];

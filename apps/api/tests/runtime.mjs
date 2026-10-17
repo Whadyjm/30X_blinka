@@ -149,7 +149,10 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   // Force a duplicate delivery to also cover the scheduler's fallback when jobs finish inside the receipt lease.
   await (await runtime.getQueueProducer('EMAIL_QUEUE')).send({ kind: 'EMAIL_MESSAGE', messageId: received.id });
   await waitForReply(3);
-  assert.match(sent.at(-1).text, /Factura runtime email/);
+  assert.match(sent.at(-1).text, /Me llegó por correo/);
+  assert.match(sent.at(-1).text, /Necesito que la revises/);
+  assert.equal(sent.at(-1).reply_markup.inline_keyboard[0][0].url, `${origin}/app/bills/${emailInvoice.id}`);
+  assert.deepEqual(sent.at(-1).link_preview_options, { is_disabled: true });
   const inbox = (await (await runtime.dispatchFetch(`${origin}/api/v1/inbox`, { headers })).json()).data;
   assert.equal(inbox.unreadCount, 1);
   assert.equal(await db.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);

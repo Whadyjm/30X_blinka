@@ -5,7 +5,8 @@ import { audit, HttpError, id, json, now, readBytes, sha256, stmt } from './http
 import { receiveInvoice } from './invoices.js';
 import { getInvoice } from './repository.js';
 import { telegram } from './telegram.js';
-import { money, telegramConnection, telegramContext, telegramParts } from './telegram-chat.js';
+import { telegramConnection, telegramContext } from './telegram-chat.js';
+import { emailNotice } from './telegram-invoice.js';
 
 const MAX_EMAIL_BYTES = 12 * 1024 * 1024;
 const MAX_DOCUMENT_BYTES = 8 * 1024 * 1024;
@@ -166,16 +167,13 @@ const summaryFor = row => row.state === 'NO_DOCUMENT' ? 'Este correo no tiene ad
 async function notifyTelegram(env, row, invoices, lease) {
   const deliveries = (await stmt(env.DB, 'SELECT * FROM email_telegram_deliveries WHERE org_id = ? AND message_id = ? AND delivered_at IS NULL', row.org_id, row.id).all()).results;
   for (const delivery of deliveries) {
-    const parts = delivery.parts_json ? JSON.parse(delivery.parts_json) : telegramParts([
-      'Llegó un correo para Oli.', `De: ${row.sender}`, `Asunto: ${row.subject}`, summaryFor(row),
-      ...invoices.map(i => `${i.invoiceNumber ?? i.file.name}${i.vendorName ? ` · ${i.vendorName}` : ''}${i.amountMinor !== null && i.currency ? ` · ${money(i.amountMinor, i.currency)}` : ''}\n${i.latestDecision?.humanExplanation ?? i.processingError?.message ?? 'Pendiente de revisión.'}\n${new URL(`/app/bills/${encodeURIComponent(i.id)}`, env.PUBLIC_APP_URL).href}`),
-      new URL('/app/inbox', env.PUBLIC_APP_URL).href,
-    ].join('\n\n'));
+    const parts = delivery.parts_json ? JSON.parse(delivery.parts_json) : emailNotice(env, row, invoices);
     if (!delivery.parts_json) await stmt(env.DB, 'UPDATE email_telegram_deliveries SET parts_json = ? WHERE message_id = ? AND connection_id = ?', JSON.stringify(parts), row.id, delivery.connection_id).run();
     for (let index = delivery.delivered_parts; index < parts.length; index++) {
       const connection = await telegramConnection(env, delivery.connection_id);
       if (!connection || connection.org_id !== row.org_id || !(await mailboxFor(env, row.org_id))?.enabled) break;
-      await telegram(env, 'sendMessage', { chat_id: connection.chat_id, text: parts[index].text });
+      await telegram(env, 'sendMessage', { chat_id: connection.chat_id, text: parts[index].text,
+        link_preview_options: { is_disabled: true }, ...(parts[index].reply_markup ? { reply_markup: parts[index].reply_markup } : {}) });
       await env.DB.batch([
         stmt(env.DB, 'UPDATE email_telegram_deliveries SET delivered_parts = ? WHERE message_id = ? AND connection_id = ?', index + 1, row.id, connection.id),
         stmt(env.DB, 'UPDATE email_messages SET lease_until = ? WHERE id = ? AND lease_token = ?', new Date(Date.now() + 180000).toISOString(), row.id, lease),
