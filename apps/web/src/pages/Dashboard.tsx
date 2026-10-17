@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { ArrowRight, Ban, CalendarClock, CheckCircle2, Clock3, Upload } from 'lucide-react';
+import { ArrowRight, Ban, CalendarClock, CheckCircle2, Clock3, Hand, Upload } from 'lucide-react';
 import { OutcomeBadge } from '@/components/Badges';
 import { buttonClass } from '@/components/ui/Button';
+import { Beam } from '@/components/ui/Beam';
 import { Card, CardHeader, EmptyState, ErrorState, PageHeader, Skeleton } from '@/components/ui/Card';
 import type { InvoiceSummary } from '@/contracts';
 import { reasonInfo } from '@/contracts/reasons';
@@ -36,11 +37,18 @@ export function Dashboard() {
       <PageHeader
         title={t('Dashboard')}
         subtitle={invoices.isLoading ? t('Decisions, reviews and available budget.') : buildBriefing(stats)[0]}
-        actions={<Link to="/app/bills" className={buttonClass('secondary', 'md')}><Upload className="size-4" aria-hidden />{t('Upload invoices')}</Link>}
+        actions={<Beam><Link to="/app/bills" className={buttonClass('primary', 'md')}><Upload className="size-4" aria-hidden />{t('Upload invoices')}</Link></Beam>}
       />
 
+      <div id="dashboard-stats" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Stat label={t('Needs your attention')} value={stats.needsYouCount} icon={<Hand className="size-5" />} tone="amber" to="#dashboard-attention" loading={invoices.isLoading} />
+        <Stat label={t('Pending due in 14 days')} value={stats.upcoming.length} icon={<CalendarClock className="size-5" />} tone="indigo" to="#dashboard-attention" loading={invoices.isLoading} />
+        <Stat label={t('Approved invoices')} value={stats.approvedCount} icon={<CheckCircle2 className="size-5" />} tone="emerald" to="/app/bills?outcome=APPROVED" loading={invoices.isLoading} />
+        <Stat label={t('Blocked invoices')} value={stats.blockedCount} icon={<Ban className="size-5" />} tone="rose" to="/app/bills?outcome=BLOCKED" loading={invoices.isLoading} />
+      </div>
+
       <div className="grid items-start gap-6 lg:grid-cols-3">
-        <Card className={`min-w-0 lg:col-span-2 ${stats.needsYouCount > 0 ? 'border-ink' : ''}`}>
+        <Card id="dashboard-attention" tabIndex={-1} className={`min-w-0 scroll-mt-6 lg:col-span-2 ${stats.needsYouCount > 0 ? 'border-ink' : ''}`}>
           <CardHeader
             title={t('Needs your attention')}
             subtitle={t('Earliest due dates first. Review the reason for each case.')}
@@ -114,6 +122,32 @@ export function Dashboard() {
       </div>
     </section>
   );
+}
+
+const TONES = {
+  emerald: 'bg-highlighter text-ink',
+  rose: 'bg-ink text-white',
+  amber: 'bg-white text-ink ring-1 ring-inset ring-ink',
+  indigo: 'bg-bone text-ink',
+} as const;
+
+function Stat({ label, value, icon, tone, to, loading }: {
+  label: string;
+  value: number;
+  icon: ReactNode;
+  tone: keyof typeof TONES;
+  to: string;
+  loading?: boolean;
+}) {
+  const className = 'rounded-2xl border border-hairline bg-white p-4 transition-colors hover:border-ink sm:p-5';
+  const content = <>
+    <div className={`grid size-9 place-items-center rounded-lg ${TONES[tone]}`} aria-hidden>{icon}</div>
+    {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-[28px] leading-none tabular-nums text-ink">{value}</p>}
+    <p className="mt-1 text-sm text-ash">{label}</p>
+  </>;
+  return to.startsWith('#')
+    ? <a href={to} className={className}>{content}</a>
+    : <Link to={to} className={className}>{content}</Link>;
 }
 
 function AttentionRow({ invoice }: { invoice: InvoiceSummary }) {

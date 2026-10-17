@@ -2,6 +2,7 @@
 export const esDashboard: Record<string, string> = {
   'Decisions, reviews and available budget.': 'Decisiones, revisiones y presupuesto disponible.',
   'Needs your attention': 'Necesita tu atención',
+  'Pending due in 14 days': 'Pendientes que vencen en 14 días',
   'Earliest due dates first. Review the reason for each case.': 'Primero los vencimientos más cercanos. Revisa el motivo de cada caso.',
   'Start with your first invoice': 'Comienza con tu primera factura',
   '1 invoice needs your attention.': '1 factura necesita tu atención.',
