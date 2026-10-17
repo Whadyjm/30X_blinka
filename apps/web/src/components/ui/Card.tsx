@@ -1,9 +1,10 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import { AlertTriangle, Inbox, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Inbox, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/cn';
 import { errorMessage } from '@/api/errors';
 import { t } from '@/i18n';
 import { Button } from './Button';
+import { Orb } from './Orb';
 
 export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('rounded-2xl border border-hairline bg-white', className)} {...rest} />;
@@ -40,7 +41,7 @@ export function Skeleton({ className }: { className?: string }) {
 export function Spinner({ label }: { label?: string }) {
   return (
     <span role="status" className="inline-flex items-center gap-2 text-sm text-slate-500">
-      <Loader2 className="size-4 animate-spin" aria-hidden />
+      <Orb size={20} />
       {label ?? t('Loading')}…
     </span>
   );
@@ -48,8 +49,11 @@ export function Spinner({ label }: { label?: string }) {
 
 export function PageLoading({ label }: { label?: string }) {
   return (
-    <div className="grid min-h-[40vh] place-items-center">
-      <Spinner label={label} />
+    <div role="status" className="grid min-h-[40vh] place-items-center">
+      <div className="flex flex-col items-center gap-3 text-sm text-slate-500">
+        <Orb size={64} />
+        <span>{label ?? t('Loading')}…</span>
+      </div>
     </div>
   );
 }

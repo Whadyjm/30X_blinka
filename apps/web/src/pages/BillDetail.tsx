@@ -1,11 +1,12 @@
 import { Link, useParams } from 'react-router';
-import { ArrowLeft, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Check } from 'lucide-react';
 import { ApiError } from '@/api';
 import { OutcomeBadge, ReasonChips, SourceBadge } from '@/components/Badges';
 import { DecisionTrace } from '@/components/DecisionTrace';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { ExtractionPanel } from '@/components/ExtractionPanel';
 import { Card, CardHeader, ErrorState, InlineAlert, PageLoading } from '@/components/ui/Card';
+import { Orb } from '@/components/ui/Orb';
 import { brand } from '@/config/brand';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
@@ -166,7 +167,7 @@ function ProcessingSteps({ status }: { status: string }) {
   return (
     <div role="status" aria-live="polite">
       <p className="mb-3 flex items-center gap-2 text-sm text-slate-600">
-        <Loader2 className="size-4 animate-spin" aria-hidden /> {processingLabel(status)}
+        <Orb size={20} state={status === 'PARSING' ? 'searching' : status === 'PROCESSING' ? 'solving' : 'working'} /> {processingLabel(status)}
       </p>
       <ol className="flex items-center gap-1.5">
         {labels.map((l, i) => (

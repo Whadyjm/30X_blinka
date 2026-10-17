@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/cn';
+import { Orb } from './Orb';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'accent';
 type Size = 'sm' | 'md' | 'lg';
@@ -45,7 +45,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 export function Button({ variant = 'primary', size = 'md', loading, icon, children, className, disabled, type = 'button', ...rest }: Props) {
   return (
     <button type={type} className={buttonClass(variant, size, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
-      {loading ? <Loader2 className="size-4 animate-spin" aria-hidden /> : icon}
+      {loading ? <Orb size={20} theme={variant === 'danger' ? 'dark' : 'light'} className="-mx-0.5" /> : icon}
       {children}
     </button>
   );

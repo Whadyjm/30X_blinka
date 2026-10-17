@@ -1,5 +1,6 @@
-import { AlertCircle, Ban, CheckCircle2, Hand, Loader2, XCircle, type LucideIcon } from 'lucide-react';
+import { AlertCircle, Ban, CheckCircle2, Hand, XCircle, type LucideIcon } from 'lucide-react';
 import { Bot, User } from 'lucide-react';
+import { Orb } from '@/components/ui/Orb';
 import type { InvoiceSource } from '@/contracts';
 import { reasonInfo, type ReasonTone } from '@/contracts/reasons';
 import { t } from '@/i18n';
@@ -17,11 +18,11 @@ import { outcomeLabel, type Outcome } from '@/lib/outcome';
  * Every state also has its own icon + label, so color is never the only signal.
  * `title` values are English i18n keys, translated at render time.
  */
-const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; spin?: boolean; title: string }> = {
+const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> = {
   APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved for simulated payment' },
   BLOCKED: { cls: 'bg-ink text-white', Icon: Ban, title: 'Blocked by your rules' },
   NEEDS_APPROVAL: { cls: 'bg-white text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
-  PROCESSING: { cls: 'bg-bone text-ash', Icon: Loader2, spin: true, title: 'Being processed' },
+  PROCESSING: { cls: 'bg-bone text-ash', Icon: AlertCircle, title: 'Being processed' },
   FAILED: { cls: 'bg-white text-ink border border-dashed border-ink', Icon: AlertCircle, title: 'Processing failed. Nothing was approved.' },
   REJECTED: { cls: 'bg-bone text-ash ring-1 ring-inset ring-smoke', Icon: XCircle, title: 'Rejected by a reviewer' },
 };
@@ -30,7 +31,7 @@ export function OutcomeBadge({ outcome, className }: { outcome: Outcome; classNa
   const s = STYLES[outcome];
   return (
     <span title={t(s.title)} className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs', s.cls, className)}>
-      <s.Icon className={cn('size-3.5', s.spin && 'animate-spin')} aria-hidden />
+      {outcome === 'PROCESSING' ? <Orb size={20} className="-my-1 -ml-1.5" /> : <s.Icon className="size-3.5" aria-hidden />}
       {outcomeLabel(outcome)}
     </span>
   );

@@ -1,8 +1,9 @@
 import { useRef, useState, type DragEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { AlertCircle, CheckCircle2, FileUp, Loader2, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, FileUp, X } from 'lucide-react';
 import { OutcomeBadge } from '@/components/Badges';
 import { Button } from '@/components/ui/Button';
+import { Orb } from '@/components/ui/Orb';
 import { env, UPLOAD } from '@/config/env';
 import type { InvoiceSummary } from '@/contracts';
 import { t } from '@/i18n';
@@ -93,7 +94,7 @@ function Row({ item, invoice }: { item: UploadItem; invoice?: InvoiceSummary }) 
   } else if (item.phase === 'uploading') {
     status = (
       <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
-        <Loader2 className="size-4 animate-spin" aria-hidden /> {t('Uploading…')}
+        <Orb size={20} /> {t('Uploading…')}
       </span>
     );
   } else if (invoice) {
@@ -101,7 +102,7 @@ function Row({ item, invoice }: { item: UploadItem; invoice?: InvoiceSummary }) 
     status =
       o === 'PROCESSING' ? (
         <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
-          <Loader2 className="size-4 animate-spin" aria-hidden /> {processingLabel(invoice.status)}
+          <Orb size={20} state={invoice.status === 'PARSING' ? 'searching' : invoice.status === 'PROCESSING' ? 'solving' : 'working'} /> {processingLabel(invoice.status)}
         </span>
       ) : (
         <OutcomeBadge outcome={o} />
