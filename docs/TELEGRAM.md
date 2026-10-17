@@ -16,11 +16,14 @@ Para probar varias personas como usuarios distintos se necesita habilitar sus cu
 - Secretos `TELEGRAM_BOT_TOKEN` y `TELEGRAM_WEBHOOK_SECRET`; nunca se envían al navegador.
 - `PUBLIC_APP_URL=https://oli30x.ultramare.dev` fija la URL del webhook y los enlaces a facturas.
 - Cola `oli-telegram`, binding `TELEGRAM_QUEUE`, consumidor del mismo Worker.
-- Aplicar la migración `0004_telegram.sql` antes del despliegue.
+- Aplicar las migraciones, incluida `0006_telegram_conversations.sql`, antes del despliegue.
 
 El primer intento de vinculación consulta `getMe` y registra `setWebhook` desde el servidor.
 No necesita que el usuario configure direcciones, pegue credenciales ni conozca el token de BotFather.
-El registro conserva eventos pendientes y solicita únicamente mensajes nuevos (`allowed_updates: ['message']`).
+El registro conserva eventos pendientes y solicita mensajes y pulsaciones de botones
+(`allowed_updates: ['message', 'callback_query']`). En un bot ya conectado, el operador puede
+refrescar el webhook con `POST /api/v1/integrations/telegram/setup` (OWNER, sesión y CSRF);
+no se desconecta a ningún usuario.
 
 ## API autenticada
 
@@ -31,6 +34,7 @@ Los tipos y validadores se encuentran en `@oli/contracts`.
 | --- | --- | --- |
 | GET | `/integrations/telegram` | `{ data: { available, connection: null \| { id, displayName, connectedAt } } }` |
 | POST | `/integrations/telegram/link` | `201 { data: { url, expiresAt } }` |
+| POST | `/integrations/telegram/setup` | `204` (solo OWNER; refresca webhook compartido) |
 | DELETE | `/integrations/telegram` | `204` |
 
 `available` indica que existen secretos y bindings; el POST valida la conexión real con Telegram.
@@ -72,3 +76,27 @@ si la factura ya fue registrada, su estado sigue disponible en la web.
 `apps/api/tests/telegram.test.mjs` usa D1/R2 locales y Telegram/extracción simulados para comprobar autenticación,
 CSRF, códigos vencidos/consumidos, aislamiento de empresas, revocación, límites, duplicados y reintentos.
 Estos tests no miden precisión del extractor ni prueban entrega real desde una cuenta personal de Telegram.
+
+## Conversación
+
+Los mensajes de texto de una conexión activa llaman al mismo `chatMessage` de la web,
+con el rol y empresa obtenidos de D1, no del texto de Telegram. «Hola», preguntas y
+seguimientos usan el modelo y las herramientas acotadas de `chat-tools.js`; no hay SQL libre.
+El prompt común está en `apps/api/worker/chat-prompt.js` (versión `chat-v2`): limita el tema
+a Oli y finanzas de la empresa, exige consultar registros actuales y prohíbe ejecutar pagos.
+Esa instrucción orienta al modelo; el aislamiento de datos y los permisos se aplican en el servidor.
+
+Cada conexión tiene su conversación privada y la última factura enviada como contexto.
+Desconectar y volver a conectar crea un contexto nuevo. Se conservan seis turnos completos
+para el modelo; texto de hasta 4000 caracteres y el mismo límite de 20 intentos por usuario/empresa
+cada 15 minutos que en web. No se interpretan audios. Las respuestas largas se dividen en mensajes.
+
+El modelo solo puede preparar propuestas. Telegram muestra los datos almacenados por el servidor
+y botones **Confirmar / Cancelar**; un «sí» escrito no ejecuta nada. Cada botón está vinculado a
+la conexión y al mensaje concreto que recibió la propuesta. El callback verifica de nuevo identidad,
+rol, vigencia y revisión de datos mediante los mismos servicios `confirmAction` / `cancelAction`.
+Esto no permite aprobar facturas por encima de las reglas ni sustituir revisión de extracción incierta.
+
+La respuesta se guarda antes de enviarla y se registra cada parte entregada: un reintento de
+notificación no vuelve a gastar en el modelo ni repite una mutación. Persiste la limitación de
+Telegram: una caída entre su aceptación y el registro local puede repetir un mensaje.
