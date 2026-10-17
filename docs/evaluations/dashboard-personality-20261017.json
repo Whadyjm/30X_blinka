@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-17T22:39:17.824Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "b0acdd6",
+  "version": "dbdee479-fbf1-4c99-84ae-099451269c32",
+  "scope": "Lecturas en producción; inicio/cierre de sesión únicamente. Sin documentos nuevos, decisiones, mensajes ni llamadas al modelo.",
+  "checks": [
+    "Health API200",
+    "Cuatro tiles originales y botón primario amarillo con Beam animado restaurados",
+    "Dashboard nuevo visible; conteos de pendientes/aprobadas/bloqueadas coinciden con API paginada; enlace de pendiente abre detalle",
+    "Escritorio1440 y móvil390 sin desbordamiento",
+    "Resumen enlaza al filtro correcto",
+    "Oli Skill y archivo descargable preservados"
+  ],
+  "counts": {
+    "invoices": 13,
+    "pending": 6,
+    "approved": 3,
+    "blocked": 4
+  },
+  "mutations": [],
+  "errors": [],
+  "result": "PASS",
+  "request": "Recuperar el botón bonito de subir factura y los cuatro tiles; conservar la personalidad visual con atención primero.",
+  "localChecks": {
+    "fourTilesRestored": true,
+    "primaryUploadRestored": true,
+    "beamAnimated": true,
+    "reducedMotionRespected": true,
+    "attentionAnchorWorks": true,
+    "noOverflow": [
+      1440,
+      390,
+      320
+    ],
+    "errors": []
+  },
+  "regressionTestsPassed": 7,
+  "build": "TypeScript + Vite: PASS, local y release publicado",
+  "wranglerDryRun": "PASS",
+  "preservation": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "21676a21dbf0e93f26234fb465e83fc0581b8e549b5413c4fc9ac065679c1d0d",
+    "deployment": {
+      "id": "fc7d03d6-d355-4e14-ac09-55a899594670",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "tiamat.agency@gmail.com",
+      "annotations": {
+        "workers/message": "Dashboard: recuperar botón Beam y cuatro tiles (b0acdd6)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "dbdee479-fbf1-4c99-84ae-099451269c32",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-17T22:38:57.447061Z"
+    }
+  },
+  "baseVersion": "f1f34ff1-6882-47b6-bc70-fd422cfcc7d9",
+  "screenshots": ".impeccable/review/dashboard-personality-production/"
+}
