@@ -6,8 +6,10 @@
 **Fecha límite:** **domingo 18 de octubre de 2026, 11:00 a. m. UTC−4** (verificar zona horaria oficial del evento).  
 **Freeze de código:** domingo 09:00–09:30; objetivo de envío antes de las 10:00.  
 **Inicio de esta planificación:** viernes ~21:15 (aprox. 37 h 45 min de calendario hasta el cierre; no confundir con horas productivas).  
-**Stack decidido:** React + Vite + TypeScript + Hono + Cloudflare Workers + D1 + R2. Hermes self-hosted para interfaz conversacional y orquestación acotada; LLM multimodal para extracción.  
+**Stack decidido:** React + Vite + TypeScript + Hono + Cloudflare Workers + D1 + R2. El Worker coordina el procesamiento y llama al LLM multimodal mediante OpenRouter para extracción.
 **Status:** fuente de verdad técnica y de producto para iniciar el repo. Reemplaza v2.0. Las bases oficiales de Blinka prevalecen ante cualquier discrepancia.
+
+> **Ajuste de alcance confirmado por Oscar (16 de octubre):** Hermes y su VPS quedan fuera del MVP. La autonomía se implementa en el flujo del Worker: recibir documentos, extraer/corroborar datos, aplicar reglas y registrar decisiones. El chat queda para una fase posterior; no es requisito para el agente financiero.
 
 > **CAMBIO V3:** La promesa central ahora es **«contrata a tu primer empleado financiero de IA»**. Oli se ocupa de facturas y excepciones, y **propone asumir más tareas repetitivas** a partir de evidencia histórica. El dueño decide si amplía su mandato. **Agent Access y Clearance dejan de ser diferenciadores del MVP** y quedan para evolución posterior. El núcleo de facturas y la regla eliminatoria de cero aprobaciones indebidas se mantienen intactos.
 
@@ -23,7 +25,7 @@
 
 **El alcance oficial es una decisión, no una transferencia:** `APPROVE` significa **aprobado para pago simulado**; `BLOCK` y `ESCALATE` significan detenido o pendiente. Ni un céntimo real se transfiere en el hackatón.
 
-**Orden de prioridad:** (1) seguridad + facturas + políticas + registro, (2) experiencia de onboarding/«empleado», (3) una propuesta de autonomía basada en aprobaciones históricas + aprobación humana + reevaluación, (4) Hermes chat y notificaciones si alcanzan. **Una aprobación fuera de reglas descalifica.**
+**Orden de prioridad:** (1) seguridad + facturas + políticas + registro, (2) experiencia de onboarding/«empleado», (3) una propuesta de autonomía basada en aprobaciones históricas + aprobación humana + reevaluación, (4) notificaciones si alcanzan. **Una aprobación fuera de reglas descalifica.**
 
 ---
 
@@ -74,7 +76,7 @@
 2. **Trabajo real:** recibe PDFs e imágenes de facturas ficticias, extrae los datos, comprueba reglas, registra `APPROVE / BLOCK / ESCALATE` y lleva seguimiento de vencimientos.
 3. **Rendición de cuentas:** toda decisión tiene su registro, datos, política aplicable y explicación reconstruible.
 4. **Mejora asistida:** observa un historial **registrado** de aprobaciones humanas de obligaciones recurrentes y propone un mandato más específico. No lo activa solo.
-5. **Interacción natural:** el dueño consulta Oli Web y, si alcanza, le habla al Hermes de Oli y recibe avisos por email o Telegram.
+5. **Supervisión:** el dueño consulta Oli Web y, si alcanza, recibe avisos por email o Telegram. La conversación por chat queda para después del MVP.
 
 ### 2.3 Lo que nos hace diferentes
 
@@ -129,7 +131,7 @@ Priorizar en este orden **solo después de P0 estable**:
 2. [ ] **Suggestion Card:** describir evidencia y regla propuesta **acotada** a proveedor, moneda, acuerdo, monto y periodo; mostrar antes/después.
 3. [ ] **Confirm & Activate:** el owner confirma expresamente; se crea `policy_version N+1`; se registra quién, cuándo y qué cambió.
 4. [ ] **Re-evaluate:** ejecutar nuevamente el motor bajo la versión nueva; demostrar un aumento verificable de autonomía **sin aprobar fuera de las demás reglas**.
-5. [ ] Chat de Hermes sobre hechos reales y estados; una notificación real (Telegram o email) si queda tiempo.
+5. [ ] Una notificación real (Telegram o email) si queda tiempo.
 6. [ ] Vista básica de vencimientos y, si alcanza, un job de reevaluación/aviso con reloj de demo aislado.
 
 **Versión recortada del diferenciador si el tiempo aprieta:** una sola regla sugerida a partir de tres autorizaciones humanas *seed* y una confirmación real que active v2 + reevaluación correcta. No construir un sistema general de recomendaciones ni ML personalizado.
@@ -140,6 +142,7 @@ Priorizar en este orden **solo después de P0 estable**:
 - [ ] **Oli Clearance**: comprobantes verificables de autorizaciones simuladas.
 - [ ] JEV / segunda clasificación especializada si supera una prueba comparativa.
 - [ ] APK / Expo / React Native, email ingestion, ERP conectores, multi-org avanzada.
+- [ ] Chat con Oli sobre hechos registrados; evaluar su implementación cuando exista una necesidad concreta. Hermes queda fuera del alcance actual.
 - [ ] Pagos bancarios reales (fuera del brief; otro nivel de cumplimiento y controles).
 
 **Regla de corte:** si sábado 17 a las 12:00 no hay PDF → extracción → política → decisión → auditoría funcionando, congelar de inmediato P1/P2. La autonomía progresiva jamás puede introducir un solo `APPROVE` inseguro.
@@ -161,7 +164,7 @@ Priorizar en este orden **solo después de P0 estable**:
 | `/app/approvals` | Casos que necesitan a una persona | P0 |
 | `/app/rules` | Reglas, presupuesto, proveedores y acuerdos | P0 |
 | `/app/delegations` | Sugerencias de mayor autonomía; antes/después; confirmar | P1 |
-| `/app/chat` | Chat con Oli/Hermes basado en datos reales | P1 |
+| `/app/chat` | Conversación basada en datos reales, fuera del MVP | P2 |
 | `/app/evaluation` | Pruebas y métricas medibles | P0–P1 |
 
 ### 4.2 Onboarding: «You're hiring Oli» (3–4 pasos)
@@ -241,8 +244,6 @@ React + Vite SPA
                     APPROVE / BLOCK / ESCALATE
                             |
               Decision Ledger / proposals (P1) / notifications
-                            |
-         Hermes (isolated) <-> tools to read/query
 
 P1: Delegation Insights -> evidence query -> proposal draft
     -> owner confirms -> new policy_version -> safe re-evaluation
@@ -257,7 +258,6 @@ P2+: Agent Access / Oli Clearance, NOT on critical path
 - **R2:** documentos *sintéticos*, sin exposición pública por defecto.
 - **LLM:** lee/extrae e interpreta información ambigua; entrega JSON validado; jamás devuelve un `approved=true` definitivo.
 - **Policy Engine TypeScript:** calcula resultado seguro aplicando reglas estructuradas.
-- **Hermes:** responde como asistente y coordina herramientas acotadas. No decide límites por sí mismo ni modifica políticas financieras desde chat.
 - **JEV:** experimento posterior, no parte obligatoria del pipeline.
 
 ### Una sola app desplegable, preparada para móvil
@@ -272,7 +272,7 @@ oli/                                # codename; renombrable
 │       │   ├── app/                 # routes, layouts, providers
 │       │   ├── pages/               # onboarding, bills, approvals...
 │       │   ├── components/          # UI web only
-│       │   ├── features/            # invoice, rules, delegations, chat
+│       │   ├── features/            # invoice, rules, delegations
 │       │   ├── hooks/
 │       │   └── styles/
 │       ├── worker/
@@ -281,7 +281,7 @@ oli/                                # codename; renombrable
 │       │   ├── middleware/          # auth, org, agent tokens
 │       │   ├── services/            # invoice pipeline, storage, orchestration
 │       │   ├── repositories/        # D1 queries
-│       │   ├── adapters/            # llm, hermes, notifications
+│       │   ├── adapters/            # llm, pdf-text/ocr, notifications
 │       │   └── jobs/                # due dates (P1)
 │       ├── migrations/              # numbered D1 migrations
 │       ├── public/
@@ -327,7 +327,7 @@ oli/                                # codename; renombrable
 - Worker API: **Hono**, Zod para request/response, TypeScript.
 - Persistencia: **Cloudflare D1 (SQLite)** con SQL/migraciones versionadas.
 - Objetos: **Cloudflare R2**.
-- Orquestación: **Hermes Agent self-hosted**, separado del Worker. API de Hermes nunca expuesta públicamente sin autenticación y restricción de herramientas.
+- Orquestación: **Cloudflare Worker**, con un flujo acotado de ingesta, extracción/corroboración, evaluación y persistencia. El modelo se invoca desde el backend mediante OpenRouter.
 - Documentos: proveedor multimodal validado con PDF e imágenes; probar el formato antes de comprometerse. Extraer campos con esquema estricto.
 - Testing: **Vitest** y fixtures.
 - Deploy: Cloudflare Workers + assets con plugin oficial de Vite.
@@ -671,7 +671,7 @@ Para el conjunto de pruebas, usar tanto archivos verdaderos (PDF/imagen) como fi
 - Sesiones humanas con `HttpOnly`, `Secure`, `SameSite`; CSRF en mutaciones, restricción por rol y `org_id` derivado de auth validada.
 - **Owner:** puede crear, confirmar, activar y revocar reglas; ve propuestas y su evidencia.
 - **Approver:** puede aprobar excepciones dentro de su autoridad, pero no modificar reglas generales ni activar delegaciones salvo permiso explícito modelado y auditado.
-- **Hermes/service:** permisos mínimos solo para consultar o pedir evaluación; no activar políticas.
+- **Servicios del backend:** permisos mínimos según su función; activar políticas requiere identidad y confirmación del owner.
 - **Documentos/PDF:** datos no confiables, nunca fuente de identidad o nuevas instrucciones.
 - Una frase en chat como «Oli, ya puedes pagar hasta $1.000» **no cambia ningún límite**; requiere edición/versionado/confirmación formal en la web.
 - No login falso, tokens de owner en el navegador, bypass para usuarios demo ni claves en `VITE_*`.
@@ -760,7 +760,7 @@ Si el tiempo aprieta, basta una sola sugerencia basada en seed y un botón real 
 
 ## 13. API REST v1 — contrato Whady ↔ Oscar
 
-Base `/api/v1`. Identidad/roles en servidor y Zod en los bordes. Todas las mutations de policy/delegation requieren owner. Documentar ejemplos de payload JSON. No exponer secretos de Hermes/LLM en browser.
+Base `/api/v1`. Identidad/roles en servidor y Zod en los bordes. Todas las mutations de policy/delegation requieren owner. Documentar ejemplos de payload JSON. No exponer secretos del LLM ni del backend en browser.
 
 | Método | Ruta | Función | Prioridad |
 |---|---|---|---|
@@ -784,7 +784,6 @@ Base `/api/v1`. Identidad/roles en servidor y Zod en los bordes. Todas las mutat
 | POST | `/api/v1/delegations/proposals/:id/reject` | Rechazar borrador (owner) | P1 |
 | POST | `/api/v1/delegations/proposals/:id/activate` | Validar diff y activar nueva política versionada (owner) | P1 |
 | POST | `/api/v1/invoices/:id/reevaluate` | Reevaluar pendientes bajo política activa; idempotente | P1 |
-| POST | `/api/v1/chat` | Proxy controlado Hermes | P1 |
 
 **Ejemplo de decisión real del backend** (datos sintéticos):
 
@@ -827,36 +826,20 @@ Estados de ingesta distintos de la decisión: `RECEIVED`, `PARSING`, `READY`, `P
 
 ---
 
-## 14. Hermes self-hosted — papel exacto
+## 14. Orquestación del agente dentro del Worker
 
-**Hermes es la personalidad de Oli y un orquestador limitado, no la fuente de autoridad financiera.**
+**Hermes queda fuera del MVP por decisión de Oscar.** El Worker ejecuta un flujo financiero autónomo de alcance acotado: recibe una factura, obtiene lecturas del documento, aplica comprobaciones, evalúa las reglas vigentes y registra la decisión con su evidencia.
 
-Herramientas posibles:
+El modelo aporta interpretación del documento; el Policy Engine decide la autorización y D1 confirma la decisión/reserva de forma atómica. Las instrucciones de una factura nunca conceden permisos. Cuando falta información fiable o se necesita una excepción autorizable, el flujo solicita intervención humana.
 
-```text
-list_invoices(organization_context, filters)
-get_invoice(invoice_id)
-get_decision_trace(invoice_id)
-get_active_mandate()
-submit_invoice_for_review(invoice_id)
-list_pending_approvals()
-list_delegation_proposals()       // only reading draft evidence
-```
+La autonomía se demuestra ejecutando ese recorrido sin dirigir manualmente cada paso. Tener un Worker desplegado o un modelo elegido todavía no demuestra que el flujo esté implementado ni probado. El alcance sigue siendo **autorización de pago simulado**, sin transferencias.
 
-Las herramientas solo ejecutan APIs del Worker con una credencial restringida; `get_active_mandate` es lectura. `submit_invoice_for_review` puede invocar análisis, pero la aprobación queda enteramente en el backend. Hermes no dispone de herramientas para activar propuestas, modificar reglas ni conceder autoridad; sí puede explicar la evidencia del borrador.
-
-**Deshabilitar en la instancia Oli** herramientas peligrosas como ejecución arbitraria de terminal/comandos, instalación de plugins no revisados, modificación de secretos/configuración y acceso libre al sistema de archivos. No compartir una sesión Hermes personal con herramientas privilegiadas. La memoria de Hermes puede ayudar con estilo/conversación; nunca define presupuesto ni normas.
-
-**API conocida de Hermes:** servidor compatible con OpenAI (`/v1/chat/completions`), protegido por API key; documentación oficial:  
-https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/api-server.md  
-Plugins: https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/plugins.md
-
-**Conexión:** navegador → Worker (auth) → Hermes VPS (server-to-server). No exponer el puerto Hermes ni la key al navegador. Validar túnel/TLS y timeout. Si Hermes está caído, la web de facturas y el Policy Engine siguen funcionando.
+Si después del MVP se incorpora chat, utilizará las APIs autenticadas del backend para consultar hechos registrados. Conversar no modifica reglas, activa propuestas ni autoriza facturas; esas acciones conservan sus flujos formales de confirmación y revalidación. No se construye ahora un servicio conversacional separado.
 
 ### LLM / JEV
 
 - LLM multimodal: imprescindible para interpretación de PDF/imagen.
-- Hermes: útil si tenemos tiempo para herramientas + chat; el núcleo financiero no depende de él.
+- Chat: posterior al MVP; no es dependencia del procesamiento ni de las decisiones.
 - JEV: NO necesario para cumplir Blinka; añadir solo si se demuestra una mejora medible de clasificación de incertidumbre.
 
 ---
@@ -915,9 +898,9 @@ La UI de métricas debe mostrar **datos calculados por el runner**, con hora y d
 1. **Fail closed:** errores de extracción, DB, timeout, credencial o política => no `APPROVE`.
 2. **No dinero real**, no abrir cuentas, no KYC, no integración de pagos.
 3. **No datos reales de clientes ni empresas**: solo fixtures sintéticas.
-4. **Autoridad controlada:** ni PDFs, ni chat, ni Hermes, ni sugerencias DRAFT amplían permisos; solo un owner confirmado activa política versionada.
+4. **Autoridad controlada:** ni PDFs, ni mensajes, ni sugerencias DRAFT amplían permisos; solo un owner confirmado activa política versionada.
 5. **Mandatos versionados, decisiones append-only**, evidencia verificable.
-6. **Separación de credenciales:** humanos y servicio Hermes con scopes mínimos; agentes externos solo en futura fase.
+6. **Separación de credenciales:** humanos y servicios del backend con permisos mínimos; agentes externos solo en futura fase.
 7. **Backend-only secrets** y R2 privado, nada de llaves en `VITE_*`.
 8. **Idempotencia y atomicidad:** no dos aprobaciones de una factura ni sobregasto por carrera.
 9. **Aprobación humana limitada:** nunca basta para saltar prohibiciones duras.
@@ -941,14 +924,13 @@ La UI de métricas debe mostrar **datos calculados por el runner**, con hora y d
 - [ ] Cuando P0 esté estable, desarrollar `/app/delegations`: evidencia, diff de política y confirmación de nueva versión.
 - [ ] Sustituir mocks por API real; preparar demo y video.
 
-### Oscar — Motor seguro, D1, facturas, delegaciones y Hermes
+### Oscar — Motor seguro, D1, facturas y delegaciones
 
 - [ ] Esquema D1, política v1, modelos, seed y pruebas unitarias.
 - [ ] Extracción PDF/imagen, validación, repositorios, budget reservations atómicas, auditoría.
 - [ ] Aprobaciones humanas con verificación de permisos.
 - [ ] Dataset etiquetado, 40 casos y pruebas de concurrencia.
 - [ ] Servicio `detectDelegationCandidates` / `activateDelegationProposal` con auditoría y tests.
-- [ ] Integración Hermes de lectura/consulta con herramientas restringidas si P0 y delegación esencial están estables.
 - [ ] Un canal de notificación solo si no retrasa tests ni entrega.
 
 ### Contrato de trabajo
@@ -974,7 +956,7 @@ La UI de métricas debe mostrar **datos calculados por el runner**, con hora y d
 | Sáb 17, 12:00–16:00 | UI final P0: reglas, presupuesto, contratos, aprobaciones humanas | Ambos |
 | Sáb 17, 16:00–19:00 | 40 pruebas, concurrencia, seed recurrente, QA de auditoría | Ambos |
 | Sáb 17, 19:00–21:30 | P1: detector de recurrencia + propuesta + confirmación de policy v2 | Ambos |
-| Sáb 17, 21:30–23:00 | Demo antes/después; Hermes/chat o notificación solo si queda margen | Ambos |
+| Sáb 17, 21:30–23:00 | Demo antes/después; notificación solo si queda margen | Ambos |
 | Dom 18, 07:00–08:45 | Regresión, auth, tests en desplegado, preparar cuenta y video | Ambos |
 | **Dom 18, 09:00 — FREEZE** | No se añaden funciones; solo correcciones bloqueantes | Ambos |
 | Dom 18, 09:00–10:00 | README, enlace, pitch y envío | Ambos |
@@ -983,13 +965,12 @@ La UI de métricas debe mostrar **datos calculados por el runner**, con hora y d
 ### Orden de sacrificio, si se acorta el tiempo
 
 1. Eliminar Clearance, Agent Access, APK y JEV. Son roadmap, no MVP.
-2. Eliminar Telegram y chat Hermes antes de tocar tests financieros.
+2. Eliminar notificaciones de Telegram/email antes de tocar tests financieros. El chat ya queda fuera del MVP.
 3. Si aún no alcanza, dejar **una sola sugerencia de delegación** basada en seed auditado y aceptar/rechazar real.
 4. Si P0 no está seguro, eliminar Delegation Insights del pitch, terminar y probar la revisión de facturas.
 
 ### Plan de contingencia
 
-- Hermes indisponible: extracción directa mediante proveedor LLM; UI y Policy Engine siguen.
 - PDF falla: migrar a adaptador con soporte verificado y conservar caso PDF demo.
 - Auth retrasa: cuenta demo segura precreada, sin signup avanzado.
 - Propuesta no lista: no fingir tarjeta «aprendizaje» dinámica; mostrar solo decisión y auditoría.
@@ -1092,7 +1073,7 @@ DoD primer commit: `pnpm install`, `pnpm dev`, `pnpm build`, `/api/health`, Reac
 - El producto central es **un empleado financiero de IA**, no «un San Pedro de otros agentes».
 - Sus capacidades actuales son lectura de facturas, revisión contra políticas, autorización simulada segura, escalamiento y explicación.
 - Su diferencia demostrable es sugerir una delegación basada en hechos y dejar **al humano** activarla mediante una política más específica.
-- Ni Hermes ni el LLM son la autoridad que aprueba gastos.
+- El LLM no es la autoridad que aprueba gastos; el motor aplica las reglas y D1 confirma la reserva.
 - No hacer autoajuste de límites por «aprendizaje», incluso si el patrón se repite 100 veces.
 - No dedicar horas a Agent Access, Clearance, integración bancaria, JEV, mobile o branding antes del domingo.
 - Si hay problemas de seguridad, el producto falla cerrado, se corrige y se vuelve a probar.
@@ -1106,7 +1087,5 @@ DoD primer commit: `pnpm install`, `pnpm dev`, `pnpm build`, `/api/health`, Reac
 - Cloudflare Vite plugin: https://developers.cloudflare.com/workers/vite-plugin/tutorial/
 - Cloudflare D1: https://developers.cloudflare.com/d1/
 - Cloudflare R2: https://developers.cloudflare.com/r2/
-- Hermes API: https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/api-server.md
-- Hermes plugins: https://github.com/NousResearch/hermes-agent/blob/main/website/docs/user-guide/features/plugins.md
 
 **FIN MASTER BRIEF v3.0.**

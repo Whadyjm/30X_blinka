@@ -19,8 +19,9 @@ El núcleo P0 es: reglas configurables → cargar factura ficticia → extraer p
 importe, moneda y vencimiento → decidir → registrar y explicar → revisión humana cuando corresponde.
 `APPROVE` significa aprobado para **pago simulado**. No se mueve dinero.
 
-Delegation Insights y chat son P1. Agent Access, Clearance, registro público y pagos reales
-no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
+Delegation Insights es P1. Hermes y el chat quedan fuera del MVP por decisión de Oscar;
+la orquestación del procesamiento vive en el Worker. Agent Access, Clearance, registro público
+y pagos reales no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
 No se requiere una pantalla de registro.
 
 ## 2. Convenciones comunes
@@ -612,7 +613,7 @@ por ejemplo `rules.hardLimitMinor`. `requestId` permite investigar sin exponer s
 no son errores HTTP. Un `409` al aprobar nunca se interpreta como aprobación exitosa.
 Validar además el MIME/contenido del archivo en servidor, no solo su extensión.
 
-## 9. P1 reservado: delegaciones y chat
+## 9. P1 reservado: delegaciones
 
 No integrar estas pantallas a datos reales hasta que P0 esté probado. Formas reservadas:
 
@@ -645,7 +646,6 @@ type DelegationProposal = {
 | POST | `/delegations/proposals/:id/reject` | `{ comment }` | `200 Envelope<DelegationProposal>` |
 | POST | `/delegations/proposals/:id/activate` | `{ expectedActivePolicyVersionId, confirmed: true }` | `200 Envelope<{ proposal: DelegationProposal; policy: PolicyVersion }>` |
 | POST | `/invoices/:id/reevaluate` | `{ expectedPolicyVersionId }` | Misma forma 200/202 de `process` |
-| POST | `/chat` | `{ message }` | `200 Envelope<{ reply: string }>` |
 
 Mutaciones de propuestas requieren OWNER. Activación y reevaluación llevan `Idempotency-Key`;
 la detección no duplica propuestas equivalentes. Sin evidencia suficiente devuelve `data=[]`.
@@ -658,7 +658,8 @@ Propuesta de versión anterior: `409 POLICY_CHANGED`, estado `STALE`.
 Activar no aprueba facturas ni las reevalúa automáticamente; el owner pide reevaluación explícita.
 Reevaluar solo casos pendientes sin aprobación/reserva previa; si ya están resueltos,
 `409 APPROVAL_NOT_ALLOWED`. Cada resultado nuevo se agrega al historial.
-Chat no modifica políticas, no autoriza facturas y no sustituye formularios de confirmación.
+Chat queda fuera del MVP, sin endpoint que integrar actualmente. Si se incorpora después,
+consultará hechos registrados; no modificará políticas ni sustituirá la autorización formal.
 
 ## 10. Cómo trabajar juntos y compartir este contrato
 
@@ -681,7 +682,7 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 > Yo mantengo el contrato de backend. Si te falta algún dato o acción para una pantalla,
 > dímelo para incorporarlo; no cambies los nombres o formatos por tu cuenta.
 > El norte sigue siendo `master_files/RETO_BLINKA.md`. Primero conectamos reglas,
-> carga/listado/detalle de facturas y aprobaciones. Delegaciones/chat quedan para después.
+> carga/listado/detalle de facturas y aprobaciones. Las delegaciones quedan para P1; Hermes y chat están fuera del MVP.
 
 ### Checklist de integración
 
