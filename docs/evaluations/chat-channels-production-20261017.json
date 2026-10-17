@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-17T20:02:20.546Z",
+  "host": "https://oli30x.ultramare.dev",
+  "webThreads": 4,
+  "telegramThreads": 1,
+  "historyTurnsRead": 10,
+  "channelOverlap": false,
+  "crossChannelWrite": "409 CHAT_CHANNEL_MISMATCH before model or turn creation",
+  "mobileViewport": {
+    "width": 390,
+    "height": 844
+  },
+  "composerInsideViewport": true,
+  "draftPreserved": true,
+  "mutations": "Only login/logout and rejected wrong-channel request. No conversation sent, no proposal confirmed, no Telegram/email notifications sent.",
+  "deploymentVersion": "290e16e1-8e90-4867-bca8-6e8bb6cfe469",
+  "mergedPR": 7,
+  "mainCommit": "1d4c9cc",
+  "migration": "0009_chat_channels.sql",
+  "historicalRowsPreserved": 10,
+  "originalConversationIdsAndReplySnapshotsUnchanged": true,
+  "financialBefore": {
+    "decisions": 19,
+    "reservations": 3
+  },
+  "financialAfter": {
+    "decisions": 19,
+    "reservations": 3
+  },
+  "recoveredWebTurns": 1,
+  "wrongChannelProjection": 0
+}
