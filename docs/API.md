@@ -2,6 +2,11 @@
 
 Estado: **contrato de backend v1 definido por Oscar; validaciones P0 en `packages/contracts`; todavía sin endpoints implementados**.
 
+El [motor puro](../packages/domain/README.md) ya evalúa las reglas del onboarding;
+ver [datos y activación](ONBOARDING_POLICY.md). Su resultado es un candidato interno:
+solo la decisión confirmada junto con la reserva atómica de D1 se expone como aprobación.
+La integración HTTP y el servicio que construye ese contexto siguen pendientes.
+
 Oscar implementa backend, persistencia y reglas. Whady implementa todo el frontend.
 Este documento permite que ambos trabajen con los mismos payloads desde ahora.
 Oscar define y mantiene el contrato; Whady consume estas rutas y formas sin cambiarlas

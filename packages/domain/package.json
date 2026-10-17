@@ -1,0 +1,16 @@
+{
+  "name": "@oli/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "packageManager": "pnpm@12.14.0",
+  "engines": { "node": ">=22.18.0" },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "evaluate": "node --experimental-strip-types ../../scripts/run-policy-evaluation.mts"
+  },
+  "dependencies": { "@oli/contracts": "link:../contracts", "zod": "4.6.7" },
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "7.0.2" }
+}
