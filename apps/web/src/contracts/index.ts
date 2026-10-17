@@ -1,18 +1,6 @@
-/**
- * OLI API contracts (frontend side of the agreement with the Worker).
- *
- * Source: OLI_MASTER_BRIEF §8 (types), §13 (REST v1). Anything NOT spelled out in
- * the brief is marked `ASSUMPTION` and is listed in docs/API.md → "Open points".
- *
- * Move this folder to `packages/contracts/src` when the monorepo is created; it has
- * zero React / browser dependencies on purpose so the Worker can import it too.
- *
- * Rules:
- *  - Money is ALWAYS integer minor units (`amountMinor`), never floats.
- *  - The UI never computes an authorization outcome; it only renders `decision`.
- *  - Unknown enum-ish strings from the server (statuses, reason codes) must not crash
- *    the UI → they are `string` at the schema level and rendered through fallbacks.
- */
+/** UI presentation models and mock-only/P1 schemas.
+ * HTTP payloads are validated exclusively with @oli/contracts; api/view-model.ts
+ * projects them into this existing presentation shape without deciding permissions. */
 import { z } from 'zod';
 
 /* ───────────────────────── primitives ───────────────────────── */
@@ -125,6 +113,7 @@ export type DecisionFacts = z.infer<typeof DecisionFactsSchema>;
  * We accept both and normalize to the §13 shape.
  */
 const decisionRaw = z.object({
+  id: z.string().optional(),
   invoiceId: z.string().optional(),
   decision: DecisionActionSchema.optional(),
   action: DecisionActionSchema.optional(),
@@ -148,6 +137,8 @@ export const PolicyDecisionSchema = decisionRaw.transform((d, ctx) => {
     return z.NEVER;
   }
   return {
+    ...(d.id ? { id: d.id } : {}),
+    ...(d.policyVersionId ? { policyVersionId: d.policyVersionId } : {}),
     invoiceId: d.invoiceId,
     decision,
     status: d.status,
@@ -170,6 +161,9 @@ export const ApprovalStateSchema = z.string(); // PENDING | APPROVED | REJECTED 
 export type ApprovalState = 'PENDING' | 'APPROVED' | 'REJECTED' | 'INVALIDATED' | 'EXPIRED' | (string & {});
 
 export const ApprovalSummarySchema = z.object({
+  decisionId: z.string().optional(),
+  policyVersionId: z.string().optional(),
+  canDecide: z.boolean().optional(),
   id: z.string(),
   state: ApprovalStateSchema,
   reason: z.string().nullable().optional(),
@@ -183,6 +177,8 @@ export type ApprovalSummary = z.infer<typeof ApprovalSummarySchema>;
 /* ───────────────────────── invoices ───────────────────────── */
 
 export const InvoiceSummarySchema = z.object({
+  fileUrl: z.string().optional(),
+  retryable: z.boolean().optional(),
   id: z.string(),
   source: InvoiceSourceSchema.default('HUMAN_UPLOAD'),
   requestingAgentName: z.string().nullable().optional(),
@@ -226,6 +222,9 @@ export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>;
 /* ───────────────────────── mandate / rules ───────────────────────── */
 
 export const FinanceMandateSchema = z.object({
+  revision: z.number().int().optional(),
+  basedOnPolicyVersionId: z.string().nullable().optional(),
+  expectedRevision: z.number().int().nullable().optional(),
   version: z.number().int(),
   currency: CurrencySchema,
   automaticLimitMinor: MinorSchema,
@@ -295,7 +294,7 @@ export const VendorInputSchema = z.object({
 });
 export type VendorInput = z.infer<typeof VendorInputSchema>;
 
-export const AGREEMENT_FREQUENCIES = ['ONE_TIME', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'ANNUAL'] as const;
+export const AGREEMENT_FREQUENCIES = ['ONE_TIME', 'MONTHLY'] as const;
 export const AgreementSchema = z.object({
   id: z.string(),
   vendorId: z.string(),
@@ -323,6 +322,8 @@ export type AgreementInput = z.infer<typeof AgreementInputSchema>;
 /* ───────────────────────── approvals queue ───────────────────────── */
 
 export const ApprovalRequestSchema = z.object({
+  decisionId: z.string().optional(),
+  policyVersionId: z.string().optional(),
   id: z.string(),
   invoiceId: z.string(),
   state: ApprovalStateSchema,
@@ -338,6 +339,8 @@ export const ApprovalRequestSchema = z.object({
 export type ApprovalRequest = z.infer<typeof ApprovalRequestSchema>;
 
 export const ApprovalDecisionInputSchema = z.object({
+  expectedDecisionId: z.string().optional(),
+  expectedPolicyVersionId: z.string().optional(),
   decision: z.enum(['APPROVE', 'REJECT']),
   justification: z.string().min(3).max(1000),
 });

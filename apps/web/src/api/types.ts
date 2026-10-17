@@ -38,14 +38,14 @@ export interface OliApi {
   // mandate & reference data
   getMandate(): Promise<MandateState>;
   saveMandateDraft(input: MandateDraftInput): Promise<FinanceMandate>;
-  activateMandate(input: { draftId?: string; confirm: true }): Promise<FinanceMandate>;
+  activateMandate(input: { draftId?: string; confirm: true; expectedRevision?: number; expectedActivePolicyVersionId?: string | null }): Promise<FinanceMandate>;
   listVendors(): Promise<Vendor[]>;
   saveVendor(input: VendorInput): Promise<Vendor>;
   listAgreements(): Promise<Agreement[]>;
   saveAgreement(input: AgreementInput): Promise<Agreement>;
 
   // invoices
-  uploadInvoice(file: File): Promise<InvoiceSummary>;
+  uploadInvoice(file: File, operationKey?: string): Promise<InvoiceSummary>;
   listInvoices(opts?: { limit?: number }): Promise<InvoiceSummary[]>;
   getInvoice(id: string): Promise<InvoiceDetail>;
   /** Idempotent. Safe to call repeatedly. */
@@ -58,7 +58,7 @@ export interface OliApi {
   decideApproval(id: string, input: ApprovalDecisionInput): Promise<void>;
 
   // evaluation
-  getEvaluationSummary(): Promise<EvaluationSummary>;
+  getEvaluationSummary(): Promise<EvaluationSummary | null>;
 
   // P1 — Agent Access
   listAgents(): Promise<Agent[]>;

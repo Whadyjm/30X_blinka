@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router';
 import { ArrowLeft, Check } from 'lucide-react';
-import { ApiError } from '@/api';
+import { ApiError, errorMessage } from '@/api';
+import { Button } from '@/components/ui/Button';
 import { OutcomeBadge, ReasonChips, SourceBadge } from '@/components/Badges';
 import { DecisionTrace } from '@/components/DecisionTrace';
 import { DocumentViewer } from '@/components/DocumentViewer';
@@ -11,7 +12,7 @@ import { brand } from '@/config/brand';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
-import { useInvoice, useMe } from '@/hooks/queries';
+import { useInvoice, useMe, useProcessInvoice } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { dueLabel, formatDate, formatDateTime } from '@/lib/dates';
@@ -34,6 +35,7 @@ export function BillDetail() {
   const { id = '' } = useParams();
   const q = useInvoice(id);
   const me = useMe();
+  const process = useProcessInvoice();
 
   if (q.isLoading) return <PageLoading label={t('Loading invoice')} />;
   if (q.isError) {
@@ -94,14 +96,17 @@ export function BillDetail() {
             </div>
             <div className="space-y-4 p-5">
               {outcome === 'PROCESSING' && <ProcessingSteps status={inv.status} />}
+              {outcome === 'PROCESSING' && <Button variant="secondary" onClick={() => void q.refresh()} loading={q.isFetching}>{t('Refresh')}</Button>}
 
               {outcome === 'FAILED' && (
                 <InlineAlert>
                   {inv.failureReason
-                    ? t('Processing failed: {reason}. Nothing was approved. Try uploading the document again.', { reason: inv.failureReason })
-                    : t('Processing failed. Nothing was approved. Try uploading the document again.')}
+                    ? inv.failureReason
+                    : t('Processing failed. Nothing was approved.')}
                 </InlineAlert>
               )}
+              {outcome === 'FAILED' && inv.retryable && <Button onClick={() => process.mutate(inv.id)} loading={process.isPending}>{t('Retry processing')}</Button>}
+              {process.isError && <InlineAlert>{errorMessage(process.error)}</InlineAlert>}
 
               {d && (
                 <>
@@ -120,11 +125,12 @@ export function BillDetail() {
                 <div className="rounded-xl bg-white p-4 ring-1 ring-inset ring-ink">
                   <h3 className="mb-1 text-sm text-ink">{t('Oli needs your decision')}</h3>
                   <p className="mb-3 text-sm text-slate-600">{t('Oli doesn’t have the authority to approve this on its own. Your policy lets an owner or approver decide.')}</p>
-                  <ApprovalPanel approvalId={pendingApproval.id} canDecide={canDecide} cannotDecideReason={t('Only an owner or approver can decide exceptions.')} />
+                  <ApprovalPanel approvalId={pendingApproval.id} expectedDecisionId={pendingApproval.decisionId} expectedPolicyVersionId={pendingApproval.policyVersionId}
+                    canDecide={canDecide && pendingApproval.canDecide === true} cannotDecideReason={t('Only an owner or approver can decide exceptions.')} />
                 </div>
               )}
 
-              {outcome === 'NEEDS_APPROVAL' && !pendingApproval && <NotApprovable inv={inv} />}
+              {outcome === 'NEEDS_REVIEW' && !pendingApproval && <NotApprovable inv={inv} />}
             </div>
           </Card>
 
@@ -135,10 +141,10 @@ export function BillDetail() {
             </Card>
           )}
 
-          <Card>
+          {inv.audit.length > 0 && <Card>
             <CardHeader title={t('Audit log')} subtitle={t('Append-only. Past entries are never edited.')} />
             <Timeline events={inv.audit} />
-          </Card>
+          </Card>}
 
           {inv.decisionHistory.length > 0 && (
             <Card>

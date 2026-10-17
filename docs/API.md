@@ -1,7 +1,8 @@
 # Contrato API v1 — Oscar ↔ Whady
 
 Estado: **endpoints P0 implementados en `apps/api`; contratos y motor en `packages/contracts` y `packages/domain`**.
-La UI de Whady consume estas rutas; todavía debe conectarse y verificarse desde el navegador.
+El cliente de `apps/web` consume estas rutas y valida los esquemas compartidos;
+ver [integración y operación del frontend](../apps/web/README.md).
 
 El [motor puro](../packages/domain/README.md) ya evalúa las reglas del onboarding;
 ver [datos y activación](ONBOARDING_POLICY.md). Su resultado es un candidato interno:

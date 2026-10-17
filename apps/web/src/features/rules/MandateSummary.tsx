@@ -1,5 +1,4 @@
 import type { FinanceMandate, MandateDraftInput } from '@/contracts';
-import { reasonInfo } from '@/contracts/reasons';
 import { t } from '@/i18n';
 import { formatMoney } from '@/lib/money';
 
@@ -15,12 +14,7 @@ export const MANDATE_ROWS: Row[] = [
   { key: 'requireAllowedVendor', label: 'Only authorized vendors', show: (m) => yn(m.requireAllowedVendor) },
   { key: 'requireAgreement', label: 'Require an agreement', show: (m) => yn(m.requireAgreement) },
   { key: 'humanApprovalEnabled', label: 'Human approval of exceptions', show: (m) => yn(m.humanApprovalEnabled) },
-  {
-    key: 'humanApprovableReasons',
-    label: 'A person may approve',
-    show: (m) => (m.humanApprovalEnabled && m.humanApprovableReasons?.length ? m.humanApprovableReasons.map((c) => reasonInfo(c).label).join(', ') : '—'),
-  },
-  { key: 'processDaysBeforeDue', label: 'Process before due date', show: (m) => t('{n} days', { n: m.processDaysBeforeDue }) },
+  { key: 'reviewAboveMinor', label: 'Human review above', show: (m) => formatMoney(m.reviewAboveMinor, m.currency) },
 ];
 
 export function MandateSummary({ mandate, compareTo }: { mandate: MandateDraftInput | FinanceMandate; compareTo?: MandateDraftInput | FinanceMandate | null }) {
@@ -52,5 +46,6 @@ export function changedRows(a: MandateDraftInput | FinanceMandate, b: MandateDra
 export function toDraftInput(m: FinanceMandate): MandateDraftInput {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { version: _v, id: _i, status: _s, createdAt: _c, createdByName: _n, ...rest } = m;
-  return rest;
+  return { ...rest, expectedRevision: m.revision ?? null,
+    basedOnPolicyVersionId: m.status === 'DRAFT' ? m.basedOnPolicyVersionId ?? null : m.id ?? null };
 }

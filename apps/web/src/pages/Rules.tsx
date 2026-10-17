@@ -96,13 +96,13 @@ function MandateTab({ isOwner }: { isOwner: boolean }) {
     }
     setError(null);
     save.mutate(draft, {
-      onSuccess: (m) => { setSaved(m); setConfirmed(false); setMode('review'); },
+      onSuccess: (m) => { setSaved(m); setDraft(toDraftInput(m)); setConfirmed(false); setMode('review'); },
       onError: (e) => setError(errorMessage(e)),
     });
   };
 
   const doActivate = () => {
-    activate.mutate(saved?.id, {
+    activate.mutate(saved ?? undefined, {
       onSuccess: (m) => { toast.success(t('Rules v{n} are now active.', { n: m.version })); setMode('view'); setDraft(null); setSaved(null); },
       onError: (e) => setError(errorMessage(e)),
     });

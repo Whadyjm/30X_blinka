@@ -176,3 +176,12 @@ reutiliza la factura y la decisión, sin nuevas reservas. Los informes quedan en
 Fuentes: [PDF en OpenRouter](https://openrouter.ai/docs/guides/overview/multimodal/pdfs),
 [lectura PDF de Cloudflare](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/how-it-works/),
 [binding toMarkdown](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/usage/binding/).
+
+## Web y API en el mismo origen
+
+`ASSETS` sirve el build Vite de `apps/web/dist`. El comando `pnpm deploy` construye
+primero el frontend (instalar antes sus dependencias con `npm --prefix ../web ci`).
+Las rutas `/api/*` ejecutan el Worker antes del fallback SPA, incluyendo errores 401/404.
+La web usa cookies privadas y CSRF en memoria; no se abre CORS ni se reescribe Origin.
+Para desarrollo: `npm --prefix ../web run dev:live` junto con `pnpm dev`, bindings locales
+y el origen explícito `DEV_WEB_ORIGIN` de `.dev.vars`. Ver `apps/web/README.md`.

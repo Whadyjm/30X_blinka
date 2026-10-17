@@ -1,9 +1,11 @@
-# Conectar el frontend de Whady
+# Integración del frontend de Whady
 
 Backend desplegado: `https://oli-api.tiamat-agency.workers.dev`.
 Contrato canónico: [API.md](API.md), esquemas en `packages/contracts`.
-El frontend publicado en `main` como `24fab85` todavía usa formas distintas;
-integrar este PR no cambia automáticamente el cliente HTTP ni sus mocks.
+El cliente de `apps/web` ya implementa este contrato. Valida DTOs compartidos y los
+proyecta a los componentes existentes mediante `src/api/view-model.ts`; esa proyección
+no concede permisos ni calcula decisiones. Ver [operación y tests](../apps/web/README.md).
+El listado siguiente documenta los cambios aplicados al cliente original.
 
 ## Ajustes concretos en el cliente
 
@@ -62,3 +64,17 @@ smoke tests vivos registrados aparte en `docs/evaluations/integration-*.json`. L
 lectura PDF viva escaló por texto concatenado; su decisión se conserva. Tras corregir
 el parser se confirmó APPROVE de USD 200 y ESCALATE de USD 450, seguido de autorización
 OWNER simulada; reserva total USD 650. Ninguna transferencia de dinero.
+
+## Integración aplicada
+
+- Login/logout por `/session`, CSRF en memoria y errores HTTP tipados.
+- Envelopes y paginación canónicos, PATCH de proveedores/acuerdos, presupuesto real.
+- Revisión/borrador/política de la configuración que la persona revisó; activación explícita.
+- Claves de reintento por acción, process con timeout de 90s, polling limitado y actualización manual.
+- Aprobaciones con IDs esperados y permiso del servidor; correcciones sin botón de aprobación.
+- PDF privado y decisiones previas conservadas; evaluación sin resultados devuelve null.
+- Formulario P0 sin programación ni excepciones de acuerdo que el backend no permite.
+- Assets de Vite y API en el mismo Worker/origen HTTPS; mock solo al seleccionarlo explícitamente.
+
+La tabla anterior de tests del backend es su referencia original. El cliente añade seis tests,
+incluyendo un recorrido contra el Worker con D1/R2 reales y proveedores simulados.

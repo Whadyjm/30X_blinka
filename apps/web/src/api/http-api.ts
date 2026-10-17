@@ -1,225 +1,177 @@
 import { z } from 'zod';
 import {
-  AgentSchema,
-  AgreementSchema,
-  ApiErrorBodySchema,
-  ApprovalRequestSchema,
-  ClearanceVerificationSchema,
-  CreatedAgentSchema,
-  EvaluationSummarySchema,
-  HealthSchema,
-  InvoiceDetailSchema,
-  InvoiceSummarySchema,
-  MandateStateSchema,
-  MeSchema,
-  VendorSchema,
-  listOf,
-} from '@/contracts';
+  ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
+  CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
+  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema,
+  SaveMandateDraftSchema, SessionSchema,
+} from '@oli/contracts';
+import { HealthSchema } from '@/contracts';
 import { ApiError, ContractError } from './errors';
-import { getLang, t } from '@/i18n';
-import { camelize, flattenInvoice } from './normalize';
+import { t } from '@/i18n';
+import { detailView, draftView, invoiceView, policyView, requestView, sessionView } from './view-model';
 import type { OliApi } from './types';
 
-export type HttpApiOptions = {
-  /** e.g. "/api/v1" or "https://x.workers.dev/api/v1" */
-  base: string;
-  /** Inject for tests / Node. Defaults to global fetch. */
-  fetchImpl?: typeof fetch;
-  /** Extra headers on every call (tests: Cookie). */
-  headers?: Record<string, string>;
-  /** Called on any 401 except GET /me. */
-  onUnauthorized?: () => void;
-};
-
-const JSON_TIMEOUT_MS = 30_000;
-const UPLOAD_TIMEOUT_MS = 120_000; // extraction through a multimodal model can be slow
+type HttpApiOptions = { base: string; fetchImpl?: typeof fetch; headers?: Record<string, string>; onUnauthorized?: () => void };
+const envelope = <S extends z.ZodType>(schema: S) => z.strictObject({ data: schema });
+const mandateSchema = z.strictObject({ active: PolicyVersionSchema.nullable(), draft: MandateDraftSchema.nullable() });
 
 export function createHttpApi(opts: HttpApiOptions): OliApi {
-  const { base } = opts;
-  const doFetch: typeof fetch = opts.fetchImpl ?? ((...a) => fetch(...a));
-
-  async function raw(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    path: string,
-    init: { json?: unknown; form?: FormData; timeoutMs?: number; allow401?: boolean } = {},
-  ): Promise<unknown> {
-    const headers: Record<string, string> = { Accept: 'application/json', 'Accept-Language': getLang(), ...(opts.headers ?? {}) };
-    let body: BodyInit | undefined;
-    if (init.json !== undefined) {
-      headers['Content-Type'] = 'application/json';
-      body = JSON.stringify(init.json);
-    } else if (init.form) {
-      body = init.form; // browser sets multipart boundary
-    }
-    // CSRF defence for cookie sessions: a custom header cannot be set by a cross-site <form>.
-    if (method !== 'GET') headers['X-Requested-With'] = 'oli-web';
-
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), init.timeoutMs ?? JSON_TIMEOUT_MS);
-    let res: Response;
-    try {
-      res = await doFetch(`${base}${path}`, { method, headers, body, credentials: 'include', signal: ctrl.signal });
-    } catch (e) {
-      const aborted = e instanceof DOMException && e.name === 'AbortError';
-      throw new ApiError({
-        status: 0,
-        code: aborted ? 'TIMEOUT' : 'NETWORK',
-        message: aborted ? t('The request took too long. Please try again.') : t('Network error'),
-      });
-    } finally {
-      clearTimeout(timer);
-    }
-
-    const text = await res.text();
-    let parsed: unknown = undefined;
-    if (text) {
-      try {
-        parsed = JSON.parse(text);
-      } catch {
-        parsed = undefined;
-      }
-    }
-
-    if (!res.ok) {
-      if (res.status === 401 && !init.allow401) opts.onUnauthorized?.();
-      const err = ApiErrorBodySchema.safeParse(parsed);
-      if (err.success) {
-        throw new ApiError({ status: res.status, ...err.data.error });
-      }
-      throw new ApiError({
-        status: res.status,
-        code: `HTTP_${res.status}`,
-        message: defaultMessage(res.status),
-      });
-    }
-    return parsed;
-  }
-
+  const doFetch = opts.fetchImpl ?? ((...args: Parameters<typeof fetch>) => fetch(...args));
+  let csrf: string | null = null;
+  // Retain a command's key after an ambiguous transport/5xx failure, until a definite response.
+  const pendingKeys = new Map<string, string>();
   function parse<S extends z.ZodType>(endpoint: string, schema: S, data: unknown): z.output<S> {
-    const r = schema.safeParse(data);
-    if (!r.success) {
-      const e = new ContractError(endpoint, r.error.issues);
-      if (import.meta.env?.DEV) console.error(e.message, r.error.issues, data);
-      throw e;
-    }
-    return r.data;
+    const result = schema.safeParse(data);
+    if (!result.success) throw new ContractError(endpoint, result.error.issues);
+    return result.data;
   }
-
-  const get = <S extends z.ZodType>(path: string, schema: S) =>
-    raw('GET', path).then((d) => parse(`GET ${path}`, schema, camelize(d)));
-
-  const send = (method: 'POST' | 'PUT', path: string, json?: unknown) => raw(method, path, { json });
-
-  const api: OliApi = {
-    health: () => doFetch(base.replace(/\/v1$/, '') + '/health').then(async (r) => parse('GET /api/health', HealthSchema, await r.json())),
-
-    async me() {
-      try {
-        const d = await raw('GET', '/me', { allow401: true });
-        return parse('GET /me', MeSchema, camelize(d));
-      } catch (e) {
-        if (e instanceof ApiError && e.status === 401) return null;
-        throw e;
+  async function raw(method: string, path: string, init: { data?: unknown; form?: FormData; key?: string; timeoutMs?: number; sessionless?: boolean; allow401?: boolean } = {}): Promise<unknown> {
+    if (!['GET', 'HEAD'].includes(method) && !init.sessionless && !csrf) {
+      if (!await api.me()) throw new ApiError({ status: 401, code: 'UNAUTHENTICATED', message: t('Please sign in again.') });
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), init.timeoutMs ?? 30000);
+    try {
+      const response = await doFetch(`${opts.base}${path}`, { method, credentials: 'include', signal: controller.signal,
+        headers: { Accept: 'application/json', ...opts.headers,
+          ...(init.data !== undefined ? { 'Content-Type': 'application/json' } : {}),
+          ...(!['GET', 'HEAD'].includes(method) && csrf && !init.sessionless ? { 'X-CSRF-Token': csrf } : {}),
+          ...(init.key ? { 'Idempotency-Key': init.key } : {}) },
+        body: init.form ?? (init.data !== undefined ? JSON.stringify(init.data) : undefined) });
+      const text = await response.text();
+      let value: unknown;
+      try { value = text ? JSON.parse(text) : undefined; } catch { value = undefined; }
+      if (!response.ok) {
+        if (response.status === 401) { csrf = null; pendingKeys.clear(); if (!init.allow401) opts.onUnauthorized?.(); }
+        const error = ApiErrorSchema.safeParse(value);
+        throw new ApiError({ status: response.status, code: error.success ? error.data.error.code : `HTTP_${response.status}`,
+          message: error.success ? error.data.error.message : defaultMessage(response.status),
+          details: error.success ? error.data.error.fieldErrors : undefined,
+          requestId: error.success ? error.data.error.requestId : undefined });
       }
+      return value;
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      throw new ApiError({ status: 0, code: controller.signal.aborted ? 'TIMEOUT' : 'NETWORK',
+        message: controller.signal.aborted ? t('The request took too long. Please try again.') : t('Network error') });
+    } finally { clearTimeout(timer); }
+  }
+  const get = async <S extends z.ZodType>(path: string, schema: S): Promise<z.output<S>> => {
+    const payload = parse(path, z.strictObject({ data: z.unknown() }), await raw('GET', path));
+    return parse(path, schema, payload.data);
+  };
+  async function command(path: string, data: unknown) {
+    const identity = `${path}:${JSON.stringify(data)}`;
+    const key = pendingKeys.get(identity) ?? crypto.randomUUID(); pendingKeys.set(identity, key);
+    try { const value = await raw('POST', path, { data, key }); pendingKeys.delete(identity); return value; }
+    catch (error) {
+      if (error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 429) pendingKeys.delete(identity);
+      throw error;
+    }
+  }
+  async function list<S extends z.ZodType>(path: string, schema: S, limit = Infinity): Promise<z.output<S>[]> {
+    const result: z.output<S>[] = [];
+    for (let page = 1; ; page++) {
+      const separator = path.includes('?') ? '&' : '?';
+      const payload = parse(path, z.strictObject({ data: z.array(schema), pagination: PaginationSchema }),
+        await raw('GET', `${path}${separator}page=${page}&pageSize=100`));
+      result.push(...payload.data);
+      if (page * payload.pagination.pageSize >= payload.pagination.total || result.length >= limit || !payload.data.length) return result.slice(0, limit);
+    }
+  }
+  const unavailable = () => Promise.reject(new ApiError({ status: 404, code: 'NOT_AVAILABLE', message: t('This feature is not available yet.') }));
+  const api: OliApi = {
+    async health() {
+      const response = await doFetch(`${opts.base.replace(/\/v1$/, '')}/health`);
+      if (!response.ok) throw new ApiError({ status: response.status, code: 'SERVICE_UNAVAILABLE', message: defaultMessage(response.status) });
+      return parse('/health', HealthSchema, await response.json());
+    },
+    async me() {
+      try { const session = await get('/me', SessionSchema); csrf = session.csrfToken; return sessionView(session); }
+      catch (error) { if (error instanceof ApiError && error.status === 401) return null; throw error; }
     },
     async login(input) {
-      await send('POST', '/auth/login', input);
-      const me = await api.me();
-      if (!me) throw new ApiError({ status: 401, code: 'UNAUTHENTICATED', message: 'Sign-in did not create a session.' });
-      return me;
+      const session = parse('/session', envelope(SessionSchema), await raw('POST', '/session', { data: input, sessionless: true })).data;
+      csrf = session.csrfToken; pendingKeys.clear(); return sessionView(session);
     },
-    async loginDemo() {
-      await send('POST', '/auth/demo');
-      const me = await api.me();
-      if (!me) throw new ApiError({ status: 401, code: 'UNAUTHENTICATED', message: 'Demo sign-in did not create a session.' });
-      return me;
+    loginDemo: unavailable,
+    async logout() { await raw('DELETE', '/session'); csrf = null; pendingKeys.clear(); },
+    createOrg: unavailable,
+    async getMandate() {
+      const state = await get('/mandate', mandateSchema);
+      const budgets = await get('/budgets', z.array(BudgetPeriodSchema));
+      return { active: state.active ? policyView(state.active) : null,
+        draft: state.draft ? draftView(state.draft, state.active) : null,
+        budget: budgets.find(b => b.currency === state.active?.rules.currency) ?? null };
     },
-    async logout() {
-      await send('POST', '/auth/logout');
-    },
-    async createOrg(input) {
-      await send('POST', '/orgs', input);
-      const me = await api.me();
-      if (!me) throw new ApiError({ status: 401, code: 'UNAUTHENTICATED', message: 'Session lost after creating the organization.' });
-      return me;
-    },
-
-    getMandate: () => get('/mandate', MandateStateSchema),
     async saveMandateDraft(input) {
-      await send('PUT', '/mandate/draft', input);
-      const s = await api.getMandate();
-      if (!s.draft) throw new ContractError('PUT /mandate/draft', [{ path: ['draft'], message: 'draft missing after save' }]);
-      return s.draft;
+      const data = SaveMandateDraftSchema.parse({ expectedRevision: input.expectedRevision ?? null,
+        basedOnPolicyVersionId: input.basedOnPolicyVersionId ?? null,
+        rules: { currency: input.currency, automaticLimitMinor: input.automaticLimitMinor, hardLimitMinor: input.hardLimitMinor,
+          monthlyBudgetMinor: input.monthlyBudgetMinor, requireAllowedVendor: input.requireAllowedVendor, requireAgreement: input.requireAgreement,
+          humanApprovalEnabled: input.humanApprovalEnabled, reviewAboveMinor: input.reviewAboveMinor,
+          processDaysBeforeDue: input.processDaysBeforeDue, scopedDelegations: [] } });
+      const draft = parse('/mandate/draft', envelope(MandateDraftSchema), await raw('PUT', '/mandate/draft', { data })).data;
+      // The visible version is descriptive; activation authority is the saved revision and policy ID.
+      const active = (await get('/mandate', mandateSchema)).active;
+      return draftView(draft, active);
     },
     async activateMandate(input) {
-      await send('POST', '/mandate/activate', input);
-      const s = await api.getMandate();
-      if (!s.active) throw new ContractError('POST /mandate/activate', [{ path: ['active'], message: 'active policy missing after activation' }]);
-      return s.active;
+      const data = ActivateMandateSchema.parse({ draftId: input.draftId, expectedRevision: input.expectedRevision,
+        expectedActivePolicyVersionId: input.expectedActivePolicyVersionId, confirmed: input.confirm });
+      return policyView(parse('/mandate/activate', envelope(PolicyVersionSchema), await command('/mandate/activate', data)).data);
     },
-    listVendors: () => get('/vendors', listOf(VendorSchema)),
-    saveVendor: (input) => send('POST', '/vendors', input).then((d) => parse('POST /vendors', VendorSchema, camelize(d))),
-    listAgreements: () => get('/agreements', listOf(AgreementSchema)),
-    saveAgreement: (input) => send('POST', '/agreements', input).then((d) => parse('POST /agreements', AgreementSchema, camelize(d))),
-
-    async uploadInvoice(file) {
-      const form = new FormData();
-      form.append('file', file, file.name);
-      const d = await raw('POST', '/invoices', { form, timeoutMs: UPLOAD_TIMEOUT_MS });
-      return parse('POST /invoices', InvoiceSummarySchema, flattenInvoice(camelize(d)));
+    listVendors: () => list('/vendors', VendorSchema),
+    async saveVendor(input) {
+      const { id, ...fields } = input; const data = CreateVendorSchema.parse({ ...fields, externalRef: fields.externalRef ?? null });
+      return parse('/vendors', envelope(VendorSchema),
+        await raw(id ? 'PATCH' : 'POST', id ? `/vendors/${encodeURIComponent(id)}` : '/vendors', { data })).data;
     },
-    async listInvoices(o) {
-      const q = o?.limit ? `?limit=${encodeURIComponent(String(o.limit))}` : '';
-      const d = await raw('GET', `/invoices${q}`);
-      const flat = camelize<unknown>(d);
-      const envelope = flat as { items?: unknown; data?: unknown } | null;
-      const list = Array.isArray(flat) ? flat : (envelope?.items ?? envelope?.data ?? flat);
-      return parse('GET /invoices', z.array(InvoiceSummarySchema), Array.isArray(list) ? list.map(flattenInvoice) : list);
+    listAgreements: () => list('/agreements', AgreementSchema),
+    async saveAgreement(input) {
+      const { id, ...fields } = input; const data = CreateAgreementSchema.parse(fields);
+      return parse('/agreements', envelope(AgreementSchema), await raw(id ? 'PATCH' : 'POST', id ? `/agreements/${encodeURIComponent(id)}` : '/agreements', { data })).data;
     },
-    async getInvoice(id) {
-      const d = await raw('GET', `/invoices/${encodeURIComponent(id)}`);
-      return parse(`GET /invoices/${id}`, InvoiceDetailSchema, flattenInvoice(camelize(d)));
+    async uploadInvoice(file, operationKey) {
+      const identity = operationKey ?? `file:${file.name}:${file.size}:${file.lastModified}`;
+      const key = pendingKeys.get(identity) ?? crypto.randomUUID(); pendingKeys.set(identity, key);
+      const form = new FormData(); form.append('file', file, file.name);
+      try {
+        const result = parse('/invoices', envelope(InvoiceSchema), await raw('POST', '/invoices', { form, key, timeoutMs: 120000 })).data;
+        pendingKeys.delete(identity); return invoiceView(result);
+      } catch (error) {
+        if (error instanceof ApiError && error.status >= 400 && error.status < 500 && error.status !== 429) pendingKeys.delete(identity);
+        throw error;
+      }
     },
+    async listInvoices(options) { return (await list('/invoices', InvoiceSchema, options?.limit)).map(invoiceView); },
+    async getInvoice(id) { return detailView(await get(`/invoices/${encodeURIComponent(id)}`, InvoiceDetailSchema)); },
     async processInvoice(id) {
-      await send('POST', `/invoices/${encodeURIComponent(id)}/process`);
+      // A timeout is ambiguous: the server may still be working. Callers keep polling this same invoice.
+      parse('/process', envelope(z.union([InvoiceDetailSchema, InvoiceSchema])), await raw('POST', `/invoices/${encodeURIComponent(id)}/process`, { timeoutMs: 90000 }));
     },
-    invoiceFileUrl: (inv) => inv.fileUrl ?? `${base}/invoices/${encodeURIComponent(inv.id)}/file`,
-
-    listApprovals: () => get('/approvals', listOf(ApprovalRequestSchema)),
+    invoiceFileUrl: invoice => invoice.fileUrl ?? `${opts.base}/invoices/${encodeURIComponent(invoice.id)}/file`,
+    async listApprovals() {
+      const states = ['PENDING', 'APPROVED', 'REJECTED', 'INVALIDATED'];
+      const pages = await Promise.all(states.map(state => list(`/approvals?state=${state}`, z.strictObject({ approval: ApprovalRequestSchema, invoice: InvoiceSchema }))));
+      return pages.flat().map(row => requestView(row.approval, row.invoice)).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    },
     async decideApproval(id, input) {
-      await send('POST', `/approvals/${encodeURIComponent(id)}/decision`, input);
+      const data = ReviewApprovalSchema.parse({ action: input.decision, comment: input.justification,
+        expectedDecisionId: input.expectedDecisionId, expectedPolicyVersionId: input.expectedPolicyVersionId });
+      parse('/approval/decision', envelope(z.strictObject({ approval: ApprovalRequestSchema, invoice: InvoiceDetailSchema })),
+        await command(`/approvals/${encodeURIComponent(id)}/decision`, data));
     },
-
-    getEvaluationSummary: () => get('/evaluation/summary', EvaluationSummarySchema),
-
-    listAgents: () => get('/agents', listOf(AgentSchema)),
-    createAgent: (input) => send('POST', '/agents', input).then((d) => parse('POST /agents', CreatedAgentSchema, camelize(d))),
-    revokeAgent: (id) => send('POST', `/agents/${encodeURIComponent(id)}/revoke`).then((d) => parse('POST /agents/:id/revoke', AgentSchema, camelize(d))),
-
-    verifyClearance: (handle) => get(`/clearances/${encodeURIComponent(handle)}/verify`, ClearanceVerificationSchema),
+    async getEvaluationSummary() {
+      const summary = await get('/evaluation/summary', EvaluationSummarySchema.nullable());
+      return summary ? { ...summary, runAt: summary.evaluatedAt, groups: [], cases: [] } : null;
+    },
+    listAgents: unavailable, createAgent: unavailable, revokeAgent: unavailable, verifyClearance: unavailable,
   };
-
   return api;
 }
 
-function defaultMessage(status: number): string {
-  switch (status) {
-    case 400:
-    case 422:
-      return t('The request was not valid.');
-    case 401:
-      return t('Please sign in again.');
-    case 403:
-      return t('You don’t have permission to do that.');
-    case 404:
-      return t('Not found.');
-    case 409:
-      return t('This conflicts with the current state. Refresh and try again.');
-    case 413:
-      return t('That file is too large.');
-    case 429:
-      return t('Too many requests. Please wait a moment.');
-    default:
-      return status >= 500 ? t('The server had a problem. Nothing was approved.') : t('Request failed.');
-  }
+function defaultMessage(status: number) {
+  return status === 401 ? t('Please sign in again.') : status === 403 ? t('You don’t have permission to do that.')
+    : status === 429 ? t('Too many requests. Please wait a moment.') : t('The server had a problem. Nothing was approved.');
 }

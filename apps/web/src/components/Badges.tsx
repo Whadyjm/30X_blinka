@@ -22,6 +22,7 @@ const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> 
   APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved for simulated payment' },
   BLOCKED: { cls: 'bg-ink text-white', Icon: Ban, title: 'Blocked by your rules' },
   NEEDS_APPROVAL: { cls: 'bg-white text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
+  NEEDS_REVIEW: { cls: 'bg-bone text-ink ring-1 ring-inset ring-smoke', Icon: AlertCircle, title: 'Needs correction or clarification' },
   PROCESSING: { cls: 'bg-bone text-ash', Icon: AlertCircle, title: 'Being processed' },
   FAILED: { cls: 'bg-white text-ink border border-dashed border-ink', Icon: AlertCircle, title: 'Processing failed. Nothing was approved.' },
   REJECTED: { cls: 'bg-bone text-ash ring-1 ring-inset ring-smoke', Icon: XCircle, title: 'Rejected by a reviewer' },

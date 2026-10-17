@@ -102,7 +102,7 @@ export function AgreementsPanel({ currency, readOnly }: { currency: string; read
     setError(null);
     if (!vendorId || !amount) return;
     save.mutate(
-      { vendorId, currency, amountMinor: amount, toleranceMinor: tolerance ?? 0, frequency, concept: concept.trim() || null, active: true },
+      { vendorId, currency, amountMinor: amount, toleranceMinor: tolerance ?? 0, frequency, concept: concept.trim(), active: true },
       {
         onSuccess: () => { toast.success(t('Agreement saved.')); setAmount(null); setTolerance(0); setConcept(''); setFormKey((k) => k + 1); },
         onError: (err) => setError(errorMessage(err)),
@@ -149,11 +149,11 @@ export function AgreementsPanel({ currency, readOnly }: { currency: string; read
           <MoneyField label={t('Agreed amount')} currency={currency} valueMinor={amount} onChange={setAmount} />
           <MoneyField label={t('Tolerance')} currency={currency} valueMinor={tolerance} onChange={setTolerance} hint={t('How far an invoice may differ and still match.')} />
           <div className="sm:col-span-2">
-            <TextField label={t('Concept')} optional value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={200} placeholder={t('e.g. Cloud hosting')} />
+            <TextField label={t('Concept')} required value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={200} placeholder={t('e.g. Cloud hosting')} />
           </div>
           {error && <div className="sm:col-span-2"><InlineAlert>{error}</InlineAlert></div>}
           <div className="sm:col-span-2">
-            <Button type="submit" icon={<Plus className="size-4" aria-hidden />} disabled={!vendorId || !amount} loading={save.isPending && !save.variables?.id}>
+            <Button type="submit" icon={<Plus className="size-4" aria-hidden />} disabled={!vendorId || !amount || !concept.trim()} loading={save.isPending && !save.variables?.id}>
               {t('Save agreement')}
             </Button>
           </div>
@@ -174,9 +174,12 @@ export function SampleSetButton({ currency, onDone }: { currency: string; onDone
     setBusy(true);
     try {
       const existing = await api.listVendors();
+      const agreements = await api.listAgreements();
       for (const s of SAMPLE_VENDOR_SET) {
         const vendor = existing.find((v) => v.name === s.name) ?? (await api.saveVendor({ name: s.name, allowed: s.allowed }));
-        await api.saveAgreement({ vendorId: vendor.id, currency, ...s.agreement, active: true });
+        if (!agreements.some(a => a.vendorId === vendor.id && a.currency === currency && a.concept === s.agreement.concept && a.frequency === s.agreement.frequency)) {
+          await api.saveAgreement({ vendorId: vendor.id, currency, ...s.agreement, active: true });
+        }
       }
       await Promise.all([qc.invalidateQueries({ queryKey: qk.vendors }), qc.invalidateQueries({ queryKey: qk.agreements })]);
       toast.success(t('Sample vendors and agreements loaded.'));

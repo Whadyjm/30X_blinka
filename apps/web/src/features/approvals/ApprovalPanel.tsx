@@ -12,7 +12,9 @@ import { t } from '@/i18n';
  * Human decision on an ESCALATE. The server re-validates invoice, permissions, duplicates,
  * budget and policy version before confirming (§4.5) — if it refuses, we show why and nothing is approved.
  */
-export function ApprovalPanel({ approvalId, canDecide = true, cannotDecideReason }: { approvalId: string; canDecide?: boolean; cannotDecideReason?: string | null }) {
+export function ApprovalPanel({ approvalId, expectedDecisionId, expectedPolicyVersionId, canDecide = false, cannotDecideReason }: {
+  approvalId: string; expectedDecisionId?: string; expectedPolicyVersionId?: string; canDecide?: boolean; cannotDecideReason?: string | null;
+}) {
   const [justification, setJustification] = useState('');
   const [error, setError] = useState<string | null>(null);
   const decide = useDecideApproval();
@@ -22,7 +24,7 @@ export function ApprovalPanel({ approvalId, canDecide = true, cannotDecideReason
   const run = (decision: 'APPROVE' | 'REJECT') => {
     setError(null);
     decide.mutate(
-      { id: approvalId, input: { decision, justification: justification.trim() } },
+      { id: approvalId, input: { decision, justification: justification.trim(), expectedDecisionId, expectedPolicyVersionId } },
       {
         onSuccess: () => {
           toast.success(decision === 'APPROVE' ? t('Approved for simulated payment.') : t('Invoice rejected.'));

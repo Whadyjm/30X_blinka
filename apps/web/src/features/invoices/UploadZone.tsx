@@ -14,7 +14,7 @@ import { useUploadQueue, type UploadItem } from './useUploadQueue';
 const MOCK_KEYWORDS = ['ok', 'over-limit', 'contract-mismatch', 'duplicate', 'unknown-vendor', 'hard-limit', 'injection', 'unreadable'];
 
 export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
-  const { items, add, clearFinished } = useUploadQueue();
+  const { items, add, clearFinished, retry } = useUploadQueue();
   const [over, setOver] = useState(false);
   const input = useRef<HTMLInputElement>(null);
 
@@ -72,7 +72,7 @@ export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
           </div>
           <ul className="divide-y divide-hairline">
             {items.map((it) => (
-              <Row key={it.key} item={it} invoice={invoices.find((i) => i.id === it.invoiceId)} />
+              <Row key={it.key} item={it} onRetry={() => retry(it.key)} invoice={invoices.find((i) => i.id === it.invoiceId)} />
             ))}
           </ul>
         </div>
@@ -81,7 +81,7 @@ export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
   );
 }
 
-function Row({ item, invoice }: { item: UploadItem; invoice?: InvoiceSummary }) {
+function Row({ item, invoice, onRetry }: { item: UploadItem; invoice?: InvoiceSummary; onRetry: () => void }) {
   let status: ReactNode;
   if (item.phase === 'error') {
     status = (
@@ -131,7 +131,10 @@ function Row({ item, invoice }: { item: UploadItem; invoice?: InvoiceSummary }) 
           </span>
         )}
       </div>
-      {status}
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {status}
+        {item.phase === 'error' && item.retryable && <Button variant="secondary" onClick={onRetry}>{t('Retry upload')}</Button>}
+      </div>
     </li>
   );
 }
