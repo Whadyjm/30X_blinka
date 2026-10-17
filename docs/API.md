@@ -1,6 +1,6 @@
 # Contrato API v1 — Oscar ↔ Whady
 
-Estado: **contrato de backend v1 definido por Oscar; todavía sin endpoints implementados**.
+Estado: **contrato de backend v1 definido por Oscar; validaciones P0 en `packages/contracts`; todavía sin endpoints implementados**.
 
 Oscar implementa backend, persistencia y reglas. Whady implementa todo el frontend.
 Este documento permite que ambos trabajen con los mismos payloads desde ahora.
@@ -93,9 +93,10 @@ Otros permisos se incorporarán explícitamente si fueran necesarios.
 
 ## 4. Modelos que consume el frontend
 
-Estos son DTOs HTTP, no filas SQL. Oscar implementará sus validaciones compartidas en
-`packages/contracts`; Whady puede crear mocks con estas formas mientras existe el scaffold.
-No mantener una segunda definición divergente cuando el paquete esté disponible.
+Estos son DTOs HTTP, no filas SQL. Las validaciones y tipos compartidos P0 están en
+[`packages/contracts`](../packages/contracts/README.md); Whady debe importar sus tipos
+para los mocks. Los bloques de este documento sirven de referencia; los tipos de código
+se infieren de los esquemas compartidos, sin mantener una segunda definición divergente.
 
 ```ts
 type DecisionAction = 'APPROVE' | 'BLOCK' | 'ESCALATE';
@@ -346,6 +347,8 @@ La demo empieza con `requireAllowedVendor=true`, `requireAgreement=true`,
 Desactivar un requisito solo se hace mediante activación explícita del OWNER; no por chat.
 `processDaysBeforeDue=0` en P0: se evalúa al procesar, sin scheduler. No mostrar controles de
 programación hasta implementar P1. Fechas futuras/vencidas se muestran; no se simulan pagos futuros.
+El esquema de entrada P0 rechaza `processDaysBeforeDue` distinto de cero y delegaciones no vacías
+hasta que se implementen esas funciones; no acepta configuraciones que el sistema todavía no aplica.
 
 El presupuesto se modifica activando mandato, no escribiendo reservas desde el navegador.
 Actualizar el límite del mes conserva las reservas existentes; no puede quedar por debajo
@@ -684,5 +687,6 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 - [ ] Se integra el contrato a `main`; cada uno continúa su implementación en su rama.
 - [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
 
-Estado actual: este archivo especifica comportamiento futuro. No demuestra que login,
-endpoints, base de datos, extracción o pruebas estén implementados.
+Estado actual: los tipos y validaciones P0 sí tienen código y pruebas de contrato.
+Este documento no demuestra que login, endpoints, base de datos, extracción ni el motor financiero
+estén implementados o probados. Los tipos P1 de delegaciones siguen reservados en esta especificación.
