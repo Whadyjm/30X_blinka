@@ -167,26 +167,17 @@ export function buildTrace(d: PolicyDecision): TraceStep[] {
       } else if (ruleUpper === 'VENDOR' || ruleUpper === 'ALLOWED_VENDOR' || ruleUpper === 'UNKNOWN_VENDOR') {
         copy.field = copy.field ?? t('Vendor status');
         copy.expected = copy.expected ?? t('Allowed vendor registry');
-      } else if (ruleUpper === 'AMOUNT_LIMIT' || ruleUpper === 'AMOUNT_ABOVE_AUTO_LIMIT') {
+      } else if (ruleUpper === 'AUTO_LIMIT' || ruleUpper === 'AMOUNT_LIMIT' || ruleUpper === 'AMOUNT_ABOVE_AUTO_LIMIT') {
         copy.field = copy.field ?? t('Automatic limit');
-        if (!copy.observed || !copy.observed.includes('$')) {
-          copy.observed = money(f.amountMinor);
-        }
         copy.expected = copy.expected ?? (f.autoLimitMinor != null ? `≤ ${money(f.autoLimitMinor)}` : undefined);
-      } else if (ruleUpper === 'AMOUNT_ABOVE_HARD_LIMIT') {
+      } else if (ruleUpper === 'HARD_LIMIT' || ruleUpper === 'AMOUNT_ABOVE_HARD_LIMIT') {
         copy.field = copy.field ?? t('Absolute ceiling');
-        if (!copy.observed || !copy.observed.includes('$')) {
-          copy.observed = money(f.amountMinor);
-        }
         copy.expected = copy.expected ?? (f.hardLimitMinor != null ? `≤ ${money(f.hardLimitMinor)}` : undefined);
       } else if (ruleUpper === 'AGREEMENT' || ruleUpper === 'AGREEMENT_MISMATCH' || ruleUpper === 'MISSING_AGREEMENT') {
         copy.field = copy.field ?? t('Vendor agreement');
         copy.expected = copy.expected ?? t('Active matching agreement');
       } else if (ruleUpper === 'BUDGET' || ruleUpper === 'BUDGET_EXCEEDED' || ruleUpper === 'MISSING_BUDGET') {
         copy.field = copy.field ?? t('Monthly budget');
-        if (!copy.observed || !copy.observed.includes('$')) {
-          copy.observed = money(f.amountMinor);
-        }
         copy.expected = copy.expected ?? (f.budgetRemainingMinor != null ? `≤ ${money(f.budgetRemainingMinor)} ${t('left')}` : undefined);
       } else if (ruleUpper === 'INVOICE_DATES') {
         copy.field = copy.field ?? t('Invoice dates');

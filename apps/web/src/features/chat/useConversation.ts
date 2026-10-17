@@ -1,0 +1,94 @@
+import { useEffect, useRef, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ChatMessageInputSchema, type ChatReply } from '@oli/contracts';
+import { api, errorMessage } from '@/api';
+import { invalidateMoney } from '@/hooks/queries';
+import { submitChat, type Submission } from './submission';
+
+export function useConversation(scope: string) {
+  const qc = useQueryClient();
+  const [selection, setSelection] = useState<string | null | undefined>();
+  const [pending, setPending] = useState<Submission | null>(null);
+  const operation = useRef<Submission | null>(null);
+  const locked = useRef(false);
+  const [sending, setSending] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const storageKey = `oli.chat.pending:${scope}`;
+  const conversations = useQuery({ queryKey: ['chat-conversations', scope], queryFn: () => api.listChatConversations(), retry: false, enabled: !!scope });
+  const id = selection === undefined ? conversations.data?.[0]?.id ?? null : selection;
+  const historyKey = ['chat-history', scope, id];
+  const history = useQuery({ queryKey: historyKey, queryFn: () => api.getChatHistory(id!), enabled: !!id, retry: false,
+    refetchInterval: q => q.state.data?.turns.some(turn => turn.state === 'PROCESSING') ? 2000 : false });
+
+  // Persist only a fully prepared command; file bytes and credentials never enter browser storage.
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(storageKey) ?? 'null');
+      const input = ChatMessageInputSchema.safeParse(saved?.input);
+      if (input.success && typeof saved.key === 'string' && /^[\da-f-]{36}$/i.test(saved.key)) {
+        const restored: Submission = { key: saved.key, input: input.data, text: input.data.text, conversationId: input.data.conversationId, files: [] };
+        operation.current = restored; setPending(restored);
+      }
+    } catch { /* Browser storage is optional; in-memory retries still retain the same command. */ }
+  }, [storageKey]);
+
+  const checkpoint = () => {
+    const current = operation.current;
+    if (!current) return;
+    setPending({ ...current, files: [...current.files] });
+    if (current.input) {
+      try { sessionStorage.setItem(storageKey, JSON.stringify({ key: current.key, input: current.input })); } catch { /* Optional storage. */ }
+    }
+  };
+
+  const deliver = async () => {
+    if (locked.current || !operation.current) return;
+    locked.current = true; setSending(true); setFailure(null);
+    try {
+      const current = operation.current;
+      const reply = await submitChat(api, current, checkpoint);
+      rememberReply(reply, current);
+      try { sessionStorage.removeItem(storageKey); } catch { /* Optional storage. */ }
+      operation.current = null; setPending(null);
+    } catch (error) {
+      setFailure(errorMessage(error));
+    } finally {
+      locked.current = false; setSending(false);
+      void invalidateMoney(qc);
+    }
+  };
+
+  function rememberReply(reply: ChatReply, current: Submission) {
+    setSelection(reply.conversationId);
+    qc.setQueryData(['chat-history', scope, reply.conversationId], (old: typeof history.data) => ({ id: reply.conversationId,
+      turns: [...(old?.turns ?? []).filter(turn => turn.id !== reply.turnId), {
+        id: reply.turnId, text: current.input!.text, invoiceIds: current.input!.invoiceIds,
+        state: 'COMPLETED' as const, reply, errorCode: null, createdAt: reply.createdAt,
+      }].slice(-20) }));
+    void qc.invalidateQueries({ queryKey: ['chat-conversations', scope] });
+    void qc.invalidateQueries({ queryKey: ['chat-history', scope, reply.conversationId] });
+  }
+
+  const processing = history.data?.turns.some(turn => turn.state === 'PROCESSING') ?? false;
+  const loading = conversations.isLoading || (!!id && history.isLoading);
+  return {
+    turns: history.data?.turns ?? [], pending, sending, loading, processing,
+    error: failure ?? (conversations.error ? errorMessage(conversations.error) : history.error ? errorMessage(history.error) : null),
+    canSend: !loading && !sending && !processing && !pending && !conversations.isError && !history.isError,
+    async send(text: string, files: File[]) {
+      if (locked.current || operation.current) return;
+      operation.current = { key: crypto.randomUUID(), text: text.trim(), conversationId: id,
+        files: files.map(file => ({ file, key: crypto.randomUUID() })) };
+      checkpoint(); await deliver();
+    },
+    dismiss() {
+      if (locked.current) return;
+      operation.current = null; setPending(null); setFailure(null);
+      try { sessionStorage.removeItem(storageKey); } catch { /* Optional storage. */ }
+      if (id) void history.refetch();
+      void conversations.refetch();
+    },
+    retry: () => operation.current ? deliver() : conversations.isError || !id ? conversations.refetch() : history.refetch(),
+    newConversation() { if (!locked.current && !operation.current) { setSelection(null); setFailure(null); } },
+  };
+}

@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { api, errorMessage } from '@/api';
+import sampleInvoiceUrl from '../../../../examples/invoices/hosting.pdf?url';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
@@ -27,6 +28,7 @@ import type { InvoiceSummary, MandateDraftInput } from '@/contracts';
 import { AgreementsPanel, SampleSetButton, VendorsPanel } from '@/features/rules/ReferenceData';
 import { emptyMandate, hasErrors, MandateForm, validateMandate } from '@/features/rules/MandateForm';
 import { MandateSummary, toDraftInput } from '@/features/rules/MandateSummary';
+import { validateFile } from '@/features/invoices/useUploadQueue';
 import { qk, useActivateMandate, useAgreements, useMandate, useMe, useSaveMandateDraft, useVendors } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
@@ -100,7 +102,7 @@ export function Onboarding() {
     setBusy(true);
     try {
       if (step === 0) {
-        if (!org || (owner.trim() && owner.trim() !== me.data?.user.name)) {
+        if (!org) {
           const m = await api.createOrg({ name: company.trim(), defaultCurrency: currency, ownerName: owner.trim() });
           qc.setQueryData(qk.me, m);
         }
@@ -129,6 +131,8 @@ export function Onboarding() {
   };
 
   const handleFileUpload = async (file: File) => {
+    const problem = validateFile(file);
+    if (problem) { setError(problem); return; }
     setError(null);
     setUploading(true);
     setOliState('thinking');
@@ -147,9 +151,15 @@ export function Onboarding() {
   };
 
   const handleLoadSample = async () => {
-    const blob = new Blob(['%PDF-1.4 sample invoice dummy for Acme Cloud Services'], { type: 'application/pdf' });
-    const sample = new File([blob], 'acme-cloud-services-1038.pdf', { type: 'application/pdf' });
-    await handleFileUpload(sample);
+    if (uploading) return;
+    setError(null); setUploading(true);
+    try {
+      const response = await fetch(sampleInvoiceUrl);
+      if (!response.ok) throw new Error(t('The sample invoice could not be loaded. Please try again.'));
+      await handleFileUpload(new File([await response.blob()], 'demo-hosting.pdf', { type: 'application/pdf', lastModified: 0 }));
+    } catch (e) {
+      setError(errorMessage(e));
+    } finally { setUploading(false); }
   };
 
   const finish = (skip = false) => {
@@ -161,7 +171,7 @@ export function Onboarding() {
     nav('/app', { replace: true });
   };
 
-  const step0Valid = company.trim().length >= 2 && owner.trim().length >= 2;
+  const step0Valid = company.trim().length >= 2 && (!!org || owner.trim().length >= 2);
   const cur = draft?.currency ?? currency;
   const vendorCount = vendors.data?.filter((v) => v.allowed).length ?? 0;
   const activeAgreements = agreements.data?.filter((a) => a.active).length ?? 0;
@@ -275,6 +285,7 @@ export function Onboarding() {
                 </SelectField>
                 <TextField
                   label={t('Your name')}
+                  disabled={!!org}
                   value={owner}
                   onChange={(e) => setOwner(e.target.value)}
                   onFocus={() => setOliState('listening')}
@@ -419,7 +430,7 @@ export function Onboarding() {
                       loading={uploading}
                       onClick={() => void handleLoadSample()}
                     >
-                      {t('Load sample invoice (Acme Cloud Services · $320)')}
+                      {t('Load sample invoice (Demo Cloud Hosting · USD 200)')}
                     </Button>
                   </div>
                 </div>
@@ -439,7 +450,7 @@ export function Onboarding() {
                           </span>
                         </div>
                         <p className="text-xs text-slate-600 mt-0.5">
-                          {uploadedInvoice.vendorName || 'Acme Cloud Services'}
+                          {uploadedInvoice.vendorName || t('Vendor pending extraction')}
                           {uploadedInvoice.amountMinor != null && ` · ${formatMoney(uploadedInvoice.amountMinor, uploadedInvoice.currency)}`}
                         </p>
                       </div>

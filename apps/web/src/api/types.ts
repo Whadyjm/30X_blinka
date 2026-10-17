@@ -18,6 +18,8 @@ import type {
   Vendor,
   VendorInput,
 } from '@/contracts';
+import type { z } from 'zod';
+import type { ChatMessageInputSchema, ChatHistorySchema, ChatConversationsSchema, ChatReply, ChatCard, ChatAction, ChatActionResult } from '@oli/contracts';
 import type { EmailIntegration, Inbox, TelegramIntegration, TelegramLink } from '@oli/contracts';
 
 /**
@@ -43,6 +45,15 @@ export interface OliApi {
   disableEmail(): Promise<void>;
   getInbox(): Promise<Inbox>;
   readInboxMessage(id: string): Promise<void>;
+
+  // Server-owned conversation and changes; sending a message never confirms a proposal.
+  sendChatMessage(input: z.infer<typeof ChatMessageInputSchema>, operationKey: string): Promise<ChatReply>;
+  listChatConversations(): Promise<z.infer<typeof ChatConversationsSchema>>;
+  getChatHistory(id: string): Promise<z.infer<typeof ChatHistorySchema>>;
+  getInvoiceIntake(id: string): Promise<Extract<ChatCard, { type: 'INVOICE' }>>;
+  getChatAction(id: string): Promise<ChatAction>;
+  confirmChatAction(id: string): Promise<ChatActionResult>;
+  cancelChatAction(id: string): Promise<ChatAction>;
 
   // mandate & reference data
   getMandate(): Promise<MandateState>;

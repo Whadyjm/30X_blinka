@@ -4,7 +4,8 @@ import {
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
   MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema,
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
-  EmailIntegrationSchema, InboxSchema,
+  EmailIntegrationSchema, InboxSchema, ChatMessageInputSchema, ChatReplySchema, ChatHistorySchema,
+  ChatConversationsSchema, ChatActionSchema, ChatActionResultSchema, ConfirmChatActionSchema, ChatCardSchema,
 } from '@oli/contracts';
 import { HealthSchema } from '@/contracts';
 import { ApiError, ContractError } from './errors';
@@ -98,6 +99,28 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     loginDemo: unavailable,
     async logout() { await raw('DELETE', '/session'); csrf = null; pendingKeys.clear(); },
     createOrg: unavailable,
+    async sendChatMessage(input, operationKey) {
+      const data = ChatMessageInputSchema.parse(input);
+      z.uuid().parse(operationKey);
+      return parse('/chat/messages', envelope(ChatReplySchema), await raw('POST', '/chat/messages', { data, key: operationKey, timeoutMs: 60000 })).data;
+    },
+    listChatConversations: () => get('/chat/conversations', ChatConversationsSchema),
+    getChatHistory: id => get(`/chat/conversations/${encodeURIComponent(id)}`, ChatHistorySchema),
+    async getInvoiceIntake(id) {
+      const path = `/invoices/${encodeURIComponent(id)}/intake`;
+      const card = await get(path, ChatCardSchema);
+      if (card.type !== 'INVOICE') throw new ContractError(path, [{ path: ['type'], message: 'Expected INVOICE card' }]);
+      return card;
+    },
+    getChatAction: id => get(`/chat/actions/${encodeURIComponent(id)}`, ChatActionSchema),
+    async confirmChatAction(id) {
+      const path = `/chat/actions/${encodeURIComponent(id)}/confirm`;
+      return parse(path, envelope(ChatActionResultSchema), await command(path, ConfirmChatActionSchema.parse({ confirmed: true }))).data;
+    },
+    async cancelChatAction(id) {
+      const path = `/chat/actions/${encodeURIComponent(id)}/cancel`;
+      return parse(path, envelope(ChatActionSchema), await command(path, undefined)).data;
+    },
     getTelegramIntegration: () => get('/integrations/telegram', TelegramIntegrationSchema),
     async createTelegramLink() {
       return parse('/integrations/telegram/link', envelope(TelegramLinkSchema), await raw('POST', '/integrations/telegram/link')).data;

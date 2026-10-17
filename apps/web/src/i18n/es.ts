@@ -9,6 +9,7 @@ import { esBills } from './es.bills';
 import { esRules } from './es.rules';
 import { esIntegrations } from './es.integrations';
 import { esEmail } from './es.email';
+import { esChat } from './es.chat';
 
 export const es: Record<string, string> = {
   ...esCore,
@@ -17,4 +18,5 @@ export const es: Record<string, string> = {
   ...esRules,
   ...esIntegrations,
   ...esEmail,
+  ...esChat,
 };

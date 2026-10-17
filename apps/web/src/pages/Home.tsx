@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import {
-  ArrowRight,
   ArrowUp,
   Ban,
   CalendarClock,
@@ -23,7 +22,7 @@ import { Beam } from '@/components/ui/Beam';
 import { Card, CardHeader, EmptyState, ErrorState, Skeleton } from '@/components/ui/Card';
 import { brand } from '@/config/brand';
 import { UPLOAD } from '@/config/env';
-import { useApprovals, useInvoices, useMandate, useMe } from '@/hooks/queries';
+import { useInvoices, useMandate, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { buildBriefing, computeStats } from '@/lib/briefing';
 import { dueLabel, isOverdue } from '@/lib/dates';
@@ -31,7 +30,8 @@ import { formatMoney } from '@/lib/money';
 import { getOutcome } from '@/lib/outcome';
 import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
 import { InboxPreview } from '@/features/integrations/InboxPreview';
-import { useUploadQueue } from '@/features/invoices/useUploadQueue';
+import { useConversation } from '@/features/chat/useConversation';
+import { ChatReply } from '@/features/chat/ChatReply';
 import { cn } from '@/lib/cn';
 
 interface ChatTurn {
@@ -58,28 +58,31 @@ const SUGGESTIONS = [
   { label: 'Facturas bloqueadas', icon: Ban, query: '¿Hay facturas bloqueadas o rechazadas?' },
 ];
 
-function intentFor(text: string) {
-  const s = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  if (/\b(atencion|pendiente|revis|aproba|aprobar|autoriza)\b/.test(s)) return 'review';
-  if (/\b(presupuesto|budget|gaste|saldo|limite|disponible)\b/.test(s)) return 'budget';
-  if (/\b(vence|vencen|vencimiento|proximas|fechas|dias)\b/.test(s)) return 'due';
-  if (/\b(bloquead|duplicad|rechazad|invalida|rechazo)\b/.test(s)) return 'blocked';
-  if (/\b(subir|cargar|factura|adjunt|nueva)\b/.test(s)) return 'upload';
-  return 'help';
-}
-
 export function Home() {
   const me = useMe();
   const invoices = useInvoices();
   const mandate = useMandate();
-  const approvals = useApprovals();
-  const uploadQueue = useUploadQueue();
+  const conversation = useConversation(me.data?.org ? `${me.data.org.id}:${me.data.user.id}` : '');
 
   const [promptText, setPromptText] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
-  const [messages, setMessages] = useState<ChatTurn[]>([]);
   const [oliState, setOliState] = useState<OliState>('idle');
-  const [busy, setBusy] = useState(false);
+  const busy = conversation.sending || conversation.processing || conversation.loading;
+  const messages: ChatTurn[] = conversation.turns.flatMap(turn => [
+    { id: `${turn.id}-user`, kind: 'user', text: turn.text || undefined,
+      contentNode: turn.invoiceIds.length > 0 ? <div className="mt-2 flex flex-wrap gap-2">{turn.invoiceIds.map(id =>
+        <Link key={id} to={`/app/bills/${encodeURIComponent(id)}`} className="underline">{t('View invoice')}</Link>)}</div> : undefined },
+    { id: turn.id, kind: 'assistant', contentNode: turn.reply ? <ChatReply reply={turn.reply} /> : undefined,
+      text: turn.reply ? undefined : t(turn.state === 'FAILED' ? 'This message failed. Please try again.' : 'Reviewing...') },
+  ]);
+  if (conversation.pending) {
+    const pending = conversation.pending;
+    messages.push({ id: pending.key, kind: 'user', text: pending.text || undefined,
+      files: pending.files.map(item => ({ name: item.file.name, size: item.file.size })),
+      contentNode: <div className="mt-2 space-y-1">{pending.files.filter(item => item.invoiceId).map(item =>
+        <p key={item.key}><Link to={`/app/bills/${encodeURIComponent(item.invoiceId!)}`} className="underline">{t('Invoice received')}: {item.file.name}</Link></p>)}</div> });
+    if (conversation.sending) messages.push({ id: `${pending.key}-pending`, kind: 'assistant', text: t('Uploading files and consulting Oli...'), isPending: true });
+  }
   const [inputError, setInputError] = useState<string | null>(null);
   const [hintIndex, setHintIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -105,7 +108,7 @@ export function Home() {
     if (messages.length > 0 && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages.length, conversation.sending]);
 
   if (invoices.isError) {
     return <ErrorState error={invoices.error} onRetry={() => void invoices.refetch()} />;
@@ -121,8 +124,8 @@ export function Home() {
       : null;
   const userName = me.data?.user.name?.trim();
 
-  const validateFiles = (filesList: File[]): string | null => {
-    if (attachedFiles.length + filesList.length > 4) {
+  const validateFiles = (filesList: File[], existing = 0): string | null => {
+    if (existing + filesList.length > 4) {
       return t('You can attach up to 4 files at a time.');
     }
     for (const f of filesList) {
@@ -139,7 +142,7 @@ export function Home() {
   const handleFilesSelected = (filesList: FileList | null) => {
     if (!filesList || filesList.length === 0) return;
     const additions = Array.from(filesList);
-    const err = validateFiles(additions);
+    const err = validateFiles(additions, attachedFiles.length);
     if (err) {
       setInputError(err);
       return;
@@ -182,301 +185,18 @@ export function Home() {
 
   const ask = async (userQuery: string, filesToSubmit: File[] = attachedFiles) => {
     const trimmed = userQuery.trim();
-    if (!trimmed && filesToSubmit.length === 0) return;
-
+    if (!conversation.canSend || (!trimmed && filesToSubmit.length === 0)) return;
+    const problem = validateFiles(filesToSubmit);
+    if (problem || trimmed.length > 4000) {
+      setInputError(problem ?? t('Messages can contain up to 4000 characters.'));
+      return;
+    }
     setInputError(null);
-    setBusy(true);
     setPromptText('');
     setAttachedFiles([]);
-
-    const userTurnId = 'user-' + Date.now();
-    const userFiles = filesToSubmit.map((f) => ({ name: f.name, size: f.size }));
-    setMessages((prev) => [
-      ...prev,
-      { id: userTurnId, kind: 'user', text: trimmed || undefined, files: userFiles },
-    ]);
-
     setOliState('thinking');
-
-    // Add pending assistant bubble
-    const pendingTurnId = 'pending-' + Date.now();
-    setMessages((prev) => [
-      ...prev,
-      { id: pendingTurnId, kind: 'assistant', text: t('Reviewing...'), isPending: true },
-    ]);
-
-    // Handle real file uploads if attached
-    if (filesToSubmit.length > 0) {
-      uploadQueue.add(filesToSubmit);
-    }
-
-    await new Promise((r) => setTimeout(r, 600));
-
-    const replyTurnId = 'assistant-' + Date.now();
-    const content = renderAssistantReply(trimmed, filesToSubmit);
-
-    setMessages((prev) =>
-      prev.filter((m) => m.id !== pendingTurnId).concat({
-        id: replyTurnId,
-        kind: 'assistant',
-        contentNode: content,
-      }),
-    );
-
-    setBusy(false);
-    setOliState(filesToSubmit.length > 0 ? 'happy' : 'understanding');
-  };
-
-  const renderAssistantReply = (text: string, files: File[]): ReactNode => {
-    // 1. If files were attached, confirm real upload
-    if (files.length > 0) {
-      return (
-        <div className="space-y-3">
-          <p className="text-sm text-ink">
-            {files.length === 1
-              ? t('I received your invoice and started automated analysis.')
-              : t('I received {n} invoices and started automated analysis.', { n: files.length })}
-          </p>
-          <div className="space-y-1.5">
-            {files.map((file, idx) => (
-              <div
-                key={idx}
-                className="flex items-center justify-between rounded-lg border border-hairline bg-bone/70 px-3 py-2 text-xs"
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <FileText className="size-4 shrink-0 text-slate-500" aria-hidden />
-                  <span className="truncate text-ink">{file.name}</span>
-                </div>
-                <span className="shrink-0 text-slate-400">{Math.ceil(file.size / 1024)} KB</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-slate-500">
-            {t('The engine is extracting data, matching agreements, and checking policy limits.')}
-          </p>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
-              {t('View bills progress')} <ArrowRight className="size-3.5" aria-hidden />
-            </Link>
-          </div>
-        </div>
-      );
-    }
-
-    const intent = intentFor(text);
-
-    // 2. Intent: Review / Approvals
-    if (intent === 'review') {
-      const pendingList = approvals.data?.filter((a) => a.state === 'PENDING') ?? [];
-      const needsReviewCount = stats.needsYouCount;
-
-      if (needsReviewCount > 0) {
-        return (
-          <div className="space-y-3">
-            <p className="text-sm text-ink">
-              {t('You have {n} invoices that need your review and decision.', { n: needsReviewCount })}
-            </p>
-            {pendingList.length > 0 && (
-              <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-bone/50 text-xs">
-                {pendingList.slice(0, 3).map((a) => (
-                  <li key={a.id} className="flex items-center justify-between p-2.5">
-                    <div className="min-w-0">
-                      <p className="truncate font-normal text-ink">{a.reason || t('Approval required')}</p>
-                      <p className="text-slate-500">{new Date(a.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    <span className="rounded bg-white px-2 py-0.5 text-xs ring-1 ring-inset ring-ink">
-                      {t('Pending')}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Link to="/app/approvals" className={buttonClass('primary', 'sm')}>
-                {t('Go to Approvals ({n})', { n: needsReviewCount })} <ArrowRight className="size-3.5" aria-hidden />
-              </Link>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-2">
-          <p className="text-sm text-ink">
-            {t('Everything is up to date! There are no invoices waiting for your review right now.')}
-          </p>
-          <p className="text-xs text-slate-500">
-            {t('Oli will notify you if an invoice exceeds automatic limits or has agreement mismatches.')}
-          </p>
-        </div>
-      );
-    }
-
-    // 3. Intent: Budget
-    if (intent === 'budget') {
-      if (budget) {
-        const remaining = Math.max(0, budget.limitMinor - budget.reservedMinor);
-        const percent = budget.limitMinor > 0 ? Math.round((budget.reservedMinor / budget.limitMinor) * 100) : 0;
-        return (
-          <div className="space-y-3">
-            <p className="text-sm text-ink">
-              {t('Here is your budget status for period {period}:', { period: budget.periodKey })}
-            </p>
-            <div className="rounded-lg border border-hairline bg-bone/60 p-3.5">
-              <div className="flex items-baseline justify-between text-xs">
-                <span className="text-slate-600">{t('Reserved / Limit')}</span>
-                <span className="tabular-nums text-ink">{percent}% {t('reserved')}</span>
-              </div>
-              <div className="mt-2 h-2 overflow-hidden rounded-sm bg-smoke">
-                <div
-                  className={percent >= 70 ? 'h-full bg-ink' : 'h-full bg-highlighter'}
-                  style={{ width: `${Math.min(100, percent)}%` }}
-                />
-              </div>
-              <div className="mt-2 flex items-baseline justify-between text-xs">
-                <span className="text-slate-500">{t('Available to spend:')}</span>
-                <span className="text-sm font-normal tabular-nums text-ink">{formatMoney(remaining, budget.currency)}</span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Link to="/app/rules" className={buttonClass('secondary', 'sm')}>
-                {t('View rules and limits')} <ArrowRight className="size-3.5" aria-hidden />
-              </Link>
-            </div>
-          </div>
-        );
-      }
-      return (
-        <p className="text-sm text-ink">
-          {t('No active budget policy is configured yet. You can set limits under Rules.')}
-        </p>
-      );
-    }
-
-    // 4. Intent: Due
-    if (intent === 'due') {
-      const upcoming = stats.upcoming;
-      const overdue = stats.overdue;
-      const totalDue = upcoming.length + overdue.length;
-
-      if (totalDue > 0) {
-        return (
-          <div className="space-y-3">
-            <p className="text-sm text-ink">
-              {overdue.length > 0
-                ? t('{o} overdue and {u} invoices due in the next 14 days.', { o: overdue.length, u: upcoming.length })
-                : t('{u} invoices due in the next 14 days.', { u: upcoming.length })}
-            </p>
-            <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-bone/50 text-xs">
-              {[...overdue, ...upcoming].slice(0, 3).map((inv) => (
-                <li key={inv.id} className="flex items-center justify-between p-2.5">
-                  <div className="min-w-0">
-                    <p className="truncate text-ink">{invoiceTitle(inv)}</p>
-                    <p className={isOverdue(inv.dueDate) ? 'text-ink font-normal' : 'text-slate-500'}>
-                      {dueLabel(inv.dueDate)}
-                    </p>
-                  </div>
-                  <span className="tabular-nums text-ink">{formatMoney(inv.amountMinor, inv.currency)}</span>
-                </li>
-              ))}
-            </ul>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
-                {t('View all bills')} <ArrowRight className="size-3.5" aria-hidden />
-              </Link>
-            </div>
-          </div>
-        );
-      }
-
-      return (
-        <p className="text-sm text-ink">
-          {t('Nothing due in the next two weeks. All payments are clear!')}
-        </p>
-      );
-    }
-
-    // 5. Intent: Blocked
-    if (intent === 'blocked') {
-      const blockedCount = stats.blockedCount;
-      if (blockedCount > 0) {
-        return (
-          <div className="space-y-3">
-            <p className="text-sm text-ink">
-              {t('Oli has blocked {n} invoices due to policy rules.', { n: blockedCount })}
-            </p>
-            <p className="text-xs text-slate-500">
-              {t('Invoices are blocked when vendors are unauthorized, duplicate invoice numbers appear, or amounts exceed the hard ceiling.')}
-            </p>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <Link to="/app/bills?outcome=BLOCKED" className={buttonClass('secondary', 'sm')}>
-                {t('View blocked invoices')} <ArrowRight className="size-3.5" aria-hidden />
-              </Link>
-            </div>
-          </div>
-        );
-      }
-      return (
-        <p className="text-sm text-ink">
-          {t('Great news: you have zero blocked invoices in your organization.')}
-        </p>
-      );
-    }
-
-    // 6. Intent: Upload
-    if (intent === 'upload') {
-      return (
-        <div className="space-y-3">
-          <p className="text-sm text-ink">
-            {t('You can upload invoices right here by attaching files or dropping them into the composer.')}
-          </p>
-          <div className="flex flex-wrap gap-2 pt-1">
-            <button
-              type="button"
-              className={buttonClass('primary', 'sm')}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="size-3.5" aria-hidden /> {t('Choose invoice file')}
-            </button>
-            <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
-              {t('Open full bills uploader')} <ArrowRight className="size-3.5" aria-hidden />
-            </Link>
-          </div>
-        </div>
-      );
-    }
-
-    // 7. General help
-    return (
-      <div className="space-y-3">
-        <p className="text-sm text-ink">
-          {t('I am Oli, your AP copilot. I review invoices against your policies, monitor budget reservations, and ask you whenever an exception requires human authorization.')}
-        </p>
-        <div className="flex flex-wrap gap-1.5 pt-1">
-          <button
-            type="button"
-            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
-            onClick={() => void ask(t('¿Qué facturas necesitan mi revisión?'))}
-          >
-            {t('Needs approval')}
-          </button>
-          <button
-            type="button"
-            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
-            onClick={() => void ask(t('¿Cómo va el presupuesto de este mes?'))}
-          >
-            {t('Budget status')}
-          </button>
-          <button
-            type="button"
-            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
-            onClick={() => void ask(t('¿Qué facturas vencen en los próximos 14 días?'))}
-          >
-            {t('Coming due')}
-          </button>
-        </div>
-      </div>
-    );
+    await conversation.send(trimmed, filesToSubmit);
+    setOliState('idle');
   };
 
   const handleFormSubmit = (e: FormEvent) => {
@@ -528,17 +248,18 @@ export function Home() {
                 </span>
                 <button
                   type="button"
+                  disabled={busy || !!conversation.pending}
                   onClick={() => {
-                    setMessages([]);
+                    conversation.newConversation();
                     setOliState('idle');
                   }}
                   className="flex items-center gap-1 text-xs text-slate-400 hover:text-ink"
                 >
-                  <RotateCcw className="size-3" /> {t('Clear')}
+                  <RotateCcw className="size-3" /> {t('New conversation')}
                 </button>
               </div>
 
-              <div className="max-h-[320px] space-y-3 overflow-y-auto pr-1">
+              <div className="max-h-[480px] space-y-3 overflow-y-auto pr-1" role="log" aria-label={t('Conversation with Oli')}>
                 {messages.map((turn) => (
                   <div
                     key={turn.id}
@@ -555,7 +276,7 @@ export function Home() {
                           : 'border border-hairline bg-bone text-ink',
                       )}
                     >
-                      {turn.text && <p className="whitespace-pre-wrap">{turn.text}</p>}
+                      {turn.text && <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{turn.text}</p>}
 
                       {turn.files && turn.files.length > 0 && (
                         <div className="mt-2 space-y-1">
@@ -625,7 +346,9 @@ export function Home() {
                 }}
                 placeholder={HINTS[hintIndex]}
                 rows={2}
-                className="w-full resize-none border-0 bg-transparent p-1 text-sm leading-relaxed text-ink placeholder:text-slate-400 focus:outline-none"
+                maxLength={4000}
+                aria-label={t('Message to Oli')}
+                className="w-full resize-none border-0 bg-transparent p-1 text-base sm:text-sm leading-relaxed text-ink placeholder:text-slate-400 focus:outline-none"
               />
 
               {/* Action bar inside textfield */}
@@ -658,7 +381,7 @@ export function Home() {
 
                 <button
                   type="submit"
-                  disabled={busy || (!promptText.trim() && attachedFiles.length === 0)}
+                  disabled={!conversation.canSend || (!promptText.trim() && attachedFiles.length === 0)}
                   className={cn(
                     'grid size-8 place-items-center rounded-lg transition-colors',
                     promptText.trim() || attachedFiles.length > 0
@@ -672,6 +395,19 @@ export function Home() {
               </div>
             </div>
 
+            {conversation.error && (
+              <div role="alert" className="mt-3 space-y-2 text-sm">
+                <p>{conversation.error}</p>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" className={buttonClass('secondary', 'sm')} disabled={busy} onClick={() => void conversation.retry()}>{t('Retry')}</button>
+                  {conversation.pending && <button type="button" className={buttonClass('ghost', 'sm')} disabled={busy} onClick={conversation.dismiss}>{t('Dismiss failed message')}</button>}
+                </div>
+              </div>
+            )}
+            {conversation.pending && !conversation.sending && !conversation.error && (
+              <button type="button" className={buttonClass('secondary', 'sm', 'mt-3')} disabled={busy} onClick={() => void conversation.retry()}>{t('Resume pending message')}</button>
+            )}
+            {conversation.loading && <p role="status" className="mt-2 text-sm">{t('Loading conversation...')}</p>}
             {inputError && (
               <p className="mt-2 text-xs text-rose-600">{inputError}</p>
             )}
@@ -684,6 +420,7 @@ export function Home() {
                   <button
                     key={idx}
                     type="button"
+                    disabled={!conversation.canSend}
                     onClick={() => void ask(s.query)}
                     className="inline-flex items-center gap-2 rounded-full border border-hairline bg-bone px-3.5 py-1.5 text-xs text-slate-700 transition-all hover:border-ink hover:bg-white hover:text-ink hover:shadow-xs active:scale-[0.98]"
                   >

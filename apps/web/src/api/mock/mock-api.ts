@@ -352,7 +352,16 @@ function meOf(d: Db): Me {
   return { user: { ...SEED_USER, name }, org: d.org, role: d.org ? d.role : null, demo: true };
 }
 
+// Chat is available through the real Worker only; never simulate successful changes.
+const chatUnavailable = () => Promise.reject(new ApiError({ status: 404, code: 'NOT_AVAILABLE', message: 'Chat requires the live API.' }));
 export const mockApi: OliApi = {
+  sendChatMessage: chatUnavailable,
+  listChatConversations: chatUnavailable,
+  getChatHistory: chatUnavailable,
+  getChatAction: chatUnavailable,
+  getInvoiceIntake: chatUnavailable,
+  confirmChatAction: chatUnavailable,
+  cancelChatAction: chatUnavailable,
   async getEmailIntegration() { return { available: false, mailbox: null }; },
   async enableEmail() { throw new ApiError({ status: 503, code: 'EMAIL_NOT_CONFIGURED', message: 'Email is temporarily unavailable.' }); },
   async disableEmail() {},

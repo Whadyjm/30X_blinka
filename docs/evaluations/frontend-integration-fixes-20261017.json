@@ -1,0 +1,49 @@
+{
+  "evaluatedAt": "2026-10-17",
+  "baseCommit": "4107761",
+  "scope": "Frontend integration regression checks. No live model calls or financial accuracy measurement.",
+  "frontend": {
+    "build": "PASS",
+    "tests": 22,
+    "passed": 22,
+    "i18n": "PASS (633 keys)"
+  },
+  "browser": {
+    "engine": "Chrome (Playwright, headless)",
+    "api": "Mocked HTTP responses matching shared contracts; actual browser rendering and requests",
+    "viewports": [
+      {
+        "width": 1365,
+        "height": 1000
+      },
+      {
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "pageErrors": [],
+    "checks": [
+      "Dismiss a failed initial upload without trapping the composer",
+      "Both previously broken suggestions reach the real chat endpoint with their exact text.",
+      "Failed upload is visible, no success/chat message emitted; retry sends the received invoice ID.",
+      "Lost reply survives reload and replays the same body, conversation ID, invoice IDs and UUID.",
+      "A proposal does not execute automatically; confirmation sends only confirmed:true after showing real values.",
+      "Reloaded historical proposal refreshes to CANCELLED with no confirm control; mobile390px has no page overflow.",
+      "Existing organization completes onboarding without unavailable org update; sample upload contains a real PDF."
+    ]
+  },
+  "sample": {
+    "path": "examples/invoices/hosting.pdf",
+    "validation": "Native PDFKit opened one page; multipart upload contains identical PDF bytes",
+    "data": "Fictional demo invoice"
+  },
+  "packagedRuntime": {
+    "passed": 1,
+    "scope": "Real local workerd, D1 and R2; OpenRouter responses simulated"
+  },
+  "limits": [
+    "No production deployment or live-provider request performed.",
+    "Browser API is mocked; no physical-device testing.",
+    "Existing Qwen/PDF changes remain separate and unpublished."
+  ]
+}
