@@ -159,7 +159,7 @@ function MandateTab({ isOwner }: { isOwner: boolean }) {
           <Checkbox checked={confirmed} onChange={setConfirmed} label={t('I confirm these rules and understand Oli will apply them from now on.')} />
           {error && <InlineAlert>{error}</InlineAlert>}
           <div className="flex flex-wrap gap-2">
-            <Button icon={<ShieldCheck className="size-4" aria-hidden />} disabled={!confirmed} loading={activate.isPending} onClick={doActivate}>
+            <Button beam icon={<ShieldCheck className="size-4" aria-hidden />} disabled={!confirmed} loading={activate.isPending} onClick={doActivate}>
               {t('Activate v{n}', { n: saved.version })}
             </Button>
             <Button variant="ghost" onClick={() => setMode('edit')} disabled={activate.isPending}>{t('Back to editing')}</Button>

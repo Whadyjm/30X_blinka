@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/lib/cn';
+import { Beam } from './Beam';
 import { Orb } from './Orb';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success' | 'accent';
@@ -40,13 +41,21 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: Size;
   loading?: boolean;
   icon?: ReactNode;
+  /** Wrap in the animated Beam glow. Use only for a page's primary CTA. */
+  beam?: boolean;
 };
 
-export function Button({ variant = 'primary', size = 'md', loading, icon, children, className, disabled, type = 'button', ...rest }: Props) {
-  return (
+export function Button({ variant = 'primary', size = 'md', loading, icon, beam, children, className, disabled, type = 'button', ...rest }: Props) {
+  const button = (
     <button type={type} className={buttonClass(variant, size, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
       {loading ? <Orb size={20} theme={variant === 'danger' ? 'dark' : 'light'} className="-mx-0.5" /> : icon}
       {children}
     </button>
+  );
+  if (!beam) return button;
+  return (
+    <Beam active={!disabled && !loading} block={/\bw-full\b/.test(className ?? '')}>
+      {button}
+    </Beam>
   );
 }

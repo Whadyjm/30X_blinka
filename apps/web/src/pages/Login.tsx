@@ -58,7 +58,7 @@ export function Login() {
             <p className="text-sm text-ash">{brand.tagline}</p>
           </div>
           <Card className="p-6">
-            <Button size="lg" className="w-full" loading={busy === 'demo'} disabled={busy !== null} onClick={() => void run('demo')}>
+            <Button size="lg" beam className="w-full" loading={busy === 'demo'} disabled={busy !== null} onClick={() => void run('demo')}>
               {t('Enter the demo organization')}
             </Button>
             <p className="mt-2 text-xs text-slate-500">{t('A fictitious company with sample invoices. No sign-up needed.')}</p>

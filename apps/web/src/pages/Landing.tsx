@@ -4,6 +4,7 @@ import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { buttonClass } from '@/components/ui/Button';
+import { Beam } from '@/components/ui/Beam';
 import { brand } from '@/config/brand';
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
@@ -41,9 +42,11 @@ export function Landing() {
             {t('Give Oli your invoices and tell it what it may approve. It reviews each one against your rules and only interrupts you when it truly needs permission.')}
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
-            <Link to={cta} className={buttonClass('primary', 'lg')}>
-              {brand.cta}
-            </Link>
+            <Beam>
+              <Link to={cta} className={buttonClass('primary', 'lg')}>
+                {brand.cta}
+              </Link>
+            </Beam>
             <a href="#outcomes" className={buttonClass('secondary', 'lg')}>
               {t('See how it decides')}
             </a>

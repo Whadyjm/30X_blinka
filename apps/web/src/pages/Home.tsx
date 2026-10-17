@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { CalendarClock, CheckCircle2, Hand, Ban, Upload } from 'lucide-react';
 import { OutcomeBadge } from '@/components/Badges';
 import { buttonClass } from '@/components/ui/Button';
+import { Beam } from '@/components/ui/Beam';
 import { Card, CardHeader, EmptyState, ErrorState, Skeleton } from '@/components/ui/Card';
 import { brand } from '@/config/brand';
 import { useInvoices, useMandate, useMe } from '@/hooks/queries';
@@ -34,9 +35,11 @@ export function Home() {
           <p className="text-sm text-slate-500">{firstName ? t('Hi {name}', { name: firstName }) : t('Hi there')}</p>
           <h1 className="text-[40px] leading-[1.05] text-ink">{brand.tagline}</h1>
         </div>
-        <Link to="/app/bills" className={buttonClass('primary', 'lg')}>
-          <Upload className="size-5" aria-hidden /> {t('Upload invoices')}
-        </Link>
+        <Beam>
+          <Link to="/app/bills" className={buttonClass('primary', 'lg')}>
+            <Upload className="size-5" aria-hidden /> {t('Upload invoices')}
+          </Link>
+        </Beam>
       </div>
 
       <section aria-label={t('Summary')} className="grid grid-cols-2 gap-3 lg:grid-cols-4">

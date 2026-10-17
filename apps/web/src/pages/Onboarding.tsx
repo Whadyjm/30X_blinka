@@ -195,7 +195,7 @@ export function Onboarding() {
                 {t('Continue')} <ArrowRight className="size-4" aria-hidden />
               </Button>
             ) : (
-              <Button icon={confirmed ? <ShieldCheck className="size-4" aria-hidden /> : <Check className="size-4" aria-hidden />} disabled={!confirmed} loading={activate.isPending} onClick={() => void finish()}>
+              <Button beam icon={confirmed ? <ShieldCheck className="size-4" aria-hidden /> : <Check className="size-4" aria-hidden />} disabled={!confirmed} loading={activate.isPending} onClick={() => void finish()}>
                 {t('Activate Oli')}
               </Button>
             )}

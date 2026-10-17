@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { ThinkingOrb, type OrbState } from 'thinking-orbs';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /**
  * Loading indicator (Libraries.dev "thinking orb"). Replaces the generic spinner everywhere.
@@ -13,16 +13,4 @@ import { ThinkingOrb, type OrbState } from 'thinking-orbs';
 export function Orb({ size = 20, state = 'working', theme = 'light', className }: { size?: 20 | 64; state?: OrbState; theme?: 'light' | 'dark'; className?: string }) {
   const reduced = usePrefersReducedMotion();
   return <ThinkingOrb state={state} size={size} theme={theme} paused={reduced} className={className} aria-hidden="true" role="presentation" />;
-}
-
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(() => (typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false));
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const on = () => setReduced(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
-  return reduced;
 }
