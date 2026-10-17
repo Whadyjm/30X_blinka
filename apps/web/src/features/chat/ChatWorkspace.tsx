@@ -2,13 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 're
 import { Link } from 'react-router';
 import { ArrowDown, ArrowUp, FileText, History, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
 import type { ChatChannel } from '@oli/contracts';
-import { Oli } from '@/components/Oli';
 import { buttonClass } from '@/components/ui/Button';
 import { UPLOAD } from '@/config/env';
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { ChatReply } from './ChatReply';
+import { ChatMascot } from './ChatMascot';
 import { useConversation } from './useConversation';
 import { useTelegramHistoryPreference } from './useTelegramHistoryPreference';
 
@@ -34,6 +34,8 @@ export function ChatWorkspace() {
   const shouldFollow = useRef(true);
   const busy = web.sending || web.processing || web.loading;
   const empty = conversation.turns.length === 0 && !conversation.pending && !conversation.loading;
+  const emptyRef = useRef(empty);
+  emptyRef.current = empty;
   const webTabs = web.id === null ? [{ id: null, title: t('New conversation') }, ...openThreads] : openThreads;
   const webTabId = (id: string | null) => `web-thread-${id ?? 'new'}`;
   const selectWebConversation = (id: string | null) => {
@@ -83,7 +85,7 @@ export function ChatWorkspace() {
       const viewport = window.visualViewport;
       const top = Math.max(0, root.current.getBoundingClientRect().top - (viewport?.offsetTop ?? 0));
       root.current.style.setProperty('--chat-height', `${Math.max(240, (viewport?.height ?? innerHeight) - top)}px`);
-      if (shouldFollow.current && log.current) log.current.scrollTop = log.current.scrollHeight;
+      if (shouldFollow.current && log.current) log.current.scrollTop = emptyRef.current ? 0 : log.current.scrollHeight;
     };
     update(); window.addEventListener('resize', update); window.visualViewport?.addEventListener('resize', update);
     return () => { window.removeEventListener('resize', update); window.visualViewport?.removeEventListener('resize', update); };
@@ -94,7 +96,7 @@ export function ChatWorkspace() {
     if (log.current) log.current.scrollTop = log.current.scrollHeight;
   }, [channel, conversation.id]);
   useLayoutEffect(() => {
-    if (shouldFollow.current && log.current) { log.current.scrollTop = log.current.scrollHeight; setNearBottom(true); }
+    if (shouldFollow.current && log.current) { log.current.scrollTop = empty ? 0 : log.current.scrollHeight; setNearBottom(true); }
   }, [conversation.turns, conversation.pending, conversation.sending, conversation.loading]);
   useEffect(() => {
     if (textarea.current) { textarea.current.style.height = 'auto'; textarea.current.style.height = `${Math.min(textarea.current.scrollHeight, 144)}px`; }
@@ -170,8 +172,8 @@ export function ChatWorkspace() {
       <div ref={log} className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-y-contain px-4 py-5 md:px-6" role="log" aria-label={t(channel === 'WEB' ? 'Web conversation' : 'Telegram conversation')}
         aria-live="polite" aria-relevant="additions" onScroll={() => { const el = log.current!; const close = el.scrollHeight - el.clientHeight - el.scrollTop < 80; shouldFollow.current = close; setNearBottom(close); }}>
         {conversation.loading && <p role="status" className="text-sm text-slate-600">{t('Loading conversation...')}</p>}
-        {empty && <div className="mx-auto flex h-full max-w-md flex-col items-center justify-center pb-4 text-center">
-          {channel === 'WEB' ? <><Oli size={84} particles={500} speed={0.6} label={t('Oli Assistant')} />
+        {empty && <div className="mx-auto flex min-h-full max-w-md flex-col items-center justify-center py-4 text-center">
+          {channel === 'WEB' ? <><ChatMascot />
             <h2 className="mt-4 text-xl text-ink">{t('What can we sort out today?')}</h2>
             <p className="mt-2 text-base leading-relaxed text-slate-600">{t('Ask me about an invoice, a supplier or your budget. We’ll take it one step at a time.')}</p>
             <div className="mt-5 flex flex-wrap justify-center gap-2">{suggestions.map(text => <button key={text} type="button" disabled={!web.canSend} onClick={() => void send(text)} className="min-h-11 rounded-md border border-hairline px-3 py-2 text-sm text-ink hover:bg-bone">{text}</button>)}</div>

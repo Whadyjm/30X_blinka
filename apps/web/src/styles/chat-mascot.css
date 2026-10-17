@@ -1,0 +1,31 @@
+.ask-oli-mascot {
+  display: block;
+  width: 176px;
+  height: 176px;
+  flex: none;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.ask-oli-float {
+  display: block;
+  width: 100%;
+  animation: ask-oli-float 6.4s ease-in-out infinite;
+}
+
+@keyframes ask-oli-float {
+  0%, 100% { transform: translateY(2px) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@media (min-width: 640px) {
+  .ask-oli-mascot { width: 224px; height: 224px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-oli-float { animation: none; }
+}
