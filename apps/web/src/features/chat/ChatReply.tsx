@@ -10,12 +10,13 @@ import { invalidateMoney, qk, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { formatDateTime } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
+import { ChatText } from './ChatText';
 
-export function ChatReply({ reply }: { reply: Reply }) {
+export function ChatReply({ reply, readOnly = false }: { reply: Reply; readOnly?: boolean }) {
   return <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-    <p className="whitespace-pre-wrap">{reply.text}</p>
+    <ChatText text={reply.text} />
     {reply.cards.map((card, i) => <ChatCardView key={i} card={card} />)}
-    {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} />)}
+    {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} readOnly={readOnly} />)}
   </div>;
 }
 
@@ -96,7 +97,7 @@ const actionLabels = {
   CREATE_VENDOR: 'Register vendor', UPDATE_VENDOR: 'Update vendor', CREATE_AGREEMENT: 'Create agreement',
   UPDATE_AGREEMENT: 'Update agreement', ONBOARD_INVOICE_VENDOR: 'Register vendor and review invoice', RESUME_INVOICE: 'Review invoice again',
 };
-function ActionReview({ snapshot }: { snapshot: ChatAction }) {
+function ActionReview({ snapshot, readOnly }: { snapshot: ChatAction; readOnly: boolean }) {
   const me = useMe();
   const qc = useQueryClient();
   const current = useQuery({ queryKey: ['chat-action', snapshot.id], queryFn: () => api.getChatAction(snapshot.id), retry: false,
@@ -106,7 +107,7 @@ function ActionReview({ snapshot }: { snapshot: ChatAction }) {
   const [result, setResult] = useState<ChatActionResult | null>(null);
   const action = current.data ?? snapshot;
   const p = action.proposal;
-  const actionable = me.data?.role === 'owner' && !!current.data && !current.isError && !current.isFetching && !busy
+  const actionable = !readOnly && me.data?.role === 'owner' && !!current.data && !current.isError && !current.isFetching && !busy
     && action.status === 'PENDING' && Date.parse(action.expiresAt) > Date.now();
   const mutate = async (confirm: boolean) => {
     if (!actionable) return;
@@ -130,7 +131,8 @@ function ActionReview({ snapshot }: { snapshot: ChatAction }) {
     </div>
     <p className="text-xs">{t(action.status)} · {t('Expires')}: {formatDateTime(action.expiresAt)}</p>
     {action.status === 'PENDING' && <p className="text-xs">{t('Review the proposed values. Nothing changes until you confirm.')}</p>}
-    {me.data?.role === 'owner' && action.status === 'PENDING' && <div className="flex flex-wrap gap-2">
+    {readOnly && action.status === 'PENDING' && <p className="text-sm">{t('Review and confirm this proposal in Telegram.')}</p>}
+    {!readOnly && me.data?.role === 'owner' && action.status === 'PENDING' && <div className="flex flex-wrap gap-2">
       <Button size="sm" disabled={!actionable} loading={busy} onClick={() => void mutate(true)}>{t('Confirm change')}</Button>
       <Button size="sm" variant="secondary" disabled={!actionable} onClick={() => void mutate(false)}>{t('Cancel')}</Button>
     </div>}

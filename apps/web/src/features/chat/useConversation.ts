@@ -1,27 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChatMessageInputSchema, type ChatReply } from '@oli/contracts';
+import { ChatMessageInputSchema, type ChatChannel, type ChatReply } from '@oli/contracts';
 import { api, errorMessage } from '@/api';
 import { invalidateMoney } from '@/hooks/queries';
 import { submitChat, type Submission } from './submission';
 
-export function useConversation(scope: string) {
+export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   const qc = useQueryClient();
-  const [selection, setSelection] = useState<string | null | undefined>();
+  const [selection, setSelection] = useState<{ scope: string; id: string | null }>();
   const [pending, setPending] = useState<Submission | null>(null);
   const operation = useRef<Submission | null>(null);
   const locked = useRef(false);
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
-  const storageKey = `oli.chat.pending:${scope}`;
-  const conversations = useQuery({ queryKey: ['chat-conversations', scope], queryFn: () => api.listChatConversations(), retry: false, enabled: !!scope });
-  const id = selection === undefined ? conversations.data?.[0]?.id ?? null : selection;
-  const historyKey = ['chat-history', scope, id];
+  const storageKey = `oli.chat.pending:${scope}:${channel}`;
+  const conversations = useQuery({ queryKey: ['chat-conversations', scope, channel], queryFn: () => api.listChatConversations(channel), retry: false, enabled: !!scope,
+    refetchInterval: channel === 'TELEGRAM' ? 5000 : false });
+  const selected = selection?.scope === scope ? selection.id : undefined;
+  const id = selected === undefined ? conversations.data?.[0]?.id ?? null : selected;
+  const historyKey = ['chat-history', scope, channel, id];
   const history = useQuery({ queryKey: historyKey, queryFn: () => api.getChatHistory(id!), enabled: !!id, retry: false,
-    refetchInterval: q => q.state.data?.turns.some(turn => turn.state === 'PROCESSING') ? 2000 : false });
+    refetchInterval: q => channel === 'TELEGRAM' ? 5000 : q.state.data?.turns.some(turn => turn.state === 'PROCESSING') ? 2000 : false });
 
   // Persist only a fully prepared command; file bytes and credentials never enter browser storage.
   useEffect(() => {
+    if (!scope || channel !== 'WEB') return;
     try {
       const saved = JSON.parse(sessionStorage.getItem(storageKey) ?? 'null');
       const input = ChatMessageInputSchema.safeParse(saved?.input);
@@ -30,7 +33,7 @@ export function useConversation(scope: string) {
         operation.current = restored; setPending(restored);
       }
     } catch { /* Browser storage is optional; in-memory retries still retain the same command. */ }
-  }, [storageKey]);
+  }, [storageKey, scope, channel]);
 
   const checkpoint = () => {
     const current = operation.current;
@@ -59,24 +62,25 @@ export function useConversation(scope: string) {
   };
 
   function rememberReply(reply: ChatReply, current: Submission) {
-    setSelection(reply.conversationId);
-    qc.setQueryData(['chat-history', scope, reply.conversationId], (old: typeof history.data) => ({ id: reply.conversationId,
+    setSelection({ scope, id: reply.conversationId });
+    qc.setQueryData(['chat-history', scope, channel, reply.conversationId], (old: typeof history.data) => ({ id: reply.conversationId, channel,
       turns: [...(old?.turns ?? []).filter(turn => turn.id !== reply.turnId), {
         id: reply.turnId, text: current.input!.text, invoiceIds: current.input!.invoiceIds,
         state: 'COMPLETED' as const, reply, errorCode: null, createdAt: reply.createdAt,
       }].slice(-20) }));
-    void qc.invalidateQueries({ queryKey: ['chat-conversations', scope] });
-    void qc.invalidateQueries({ queryKey: ['chat-history', scope, reply.conversationId] });
+    void qc.invalidateQueries({ queryKey: ['chat-conversations', scope, channel] });
+    void qc.invalidateQueries({ queryKey: ['chat-history', scope, channel, reply.conversationId] });
   }
 
   const processing = history.data?.turns.some(turn => turn.state === 'PROCESSING') ?? false;
   const loading = conversations.isLoading || (!!id && history.isLoading);
   return {
+    id, conversations: conversations.data ?? [],
     turns: history.data?.turns ?? [], pending, sending, loading, processing,
     error: failure ?? (conversations.error ? errorMessage(conversations.error) : history.error ? errorMessage(history.error) : null),
-    canSend: !loading && !sending && !processing && !pending && !conversations.isError && !history.isError,
+    canSend: channel === 'WEB' && !!scope && !loading && !sending && !processing && !pending && !conversations.isError && !history.isError,
     async send(text: string, files: File[]) {
-      if (locked.current || operation.current) return;
+      if (channel !== 'WEB' || locked.current || operation.current) return;
       operation.current = { key: crypto.randomUUID(), text: text.trim(), conversationId: id,
         files: files.map(file => ({ file, key: crypto.randomUUID() })) };
       checkpoint(); await deliver();
@@ -89,6 +93,7 @@ export function useConversation(scope: string) {
       void conversations.refetch();
     },
     retry: () => operation.current ? deliver() : conversations.isError || !id ? conversations.refetch() : history.refetch(),
-    newConversation() { if (!locked.current && !operation.current) { setSelection(null); setFailure(null); } },
+    selectConversation(next: string) { if (!locked.current && !operation.current && conversations.data?.some(c => c.id === next && c.channel === channel)) { setSelection({ scope, id: next }); setFailure(null); } },
+    newConversation() { if (channel === 'WEB' && !locked.current && !operation.current) { setSelection({ scope, id: null }); setFailure(null); } },
   };
 }

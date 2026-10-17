@@ -470,11 +470,13 @@ export const ChatReplySchema = z.strictObject({
 export const ConfirmChatActionSchema = z.strictObject({ confirmed: z.literal(true) });
 export const ChatActionResultSchema = z.strictObject({ action: ChatActionSchema,
   vendor: VendorSchema.nullable(), agreement: AgreementSchema.nullable(), invoice: InvoiceDetailSchema.nullable() });
-export const ChatHistorySchema = z.strictObject({ id: ChatIdSchema,
+export const ChatChannelSchema = z.enum(['WEB', 'TELEGRAM']);
+export const ChatHistorySchema = z.strictObject({ id: ChatIdSchema, channel: ChatChannelSchema,
   turns: z.array(z.strictObject({ id: ChatIdSchema, text: z.string(), invoiceIds: z.array(ChatIdSchema),
     state: z.enum(['PROCESSING', 'COMPLETED', 'FAILED']), reply: ChatReplySchema.nullable(), errorCode: z.string().nullable(), createdAt: TimestampSchema })).max(20),
 });
-export const ChatConversationsSchema = z.array(z.strictObject({ id: ChatIdSchema, createdAt: TimestampSchema, updatedAt: TimestampSchema })).max(20);
+export const ChatConversationsSchema = z.array(z.strictObject({ id: ChatIdSchema, channel: ChatChannelSchema, title: z.string().max(100), createdAt: TimestampSchema, updatedAt: TimestampSchema })).max(20);
+export type ChatChannel = z.infer<typeof ChatChannelSchema>;
 export type ChatReply = z.infer<typeof ChatReplySchema>;
 export type ChatAction = z.infer<typeof ChatActionSchema>;
 export type ChatActionInput = z.infer<typeof ChatActionInputSchema>;

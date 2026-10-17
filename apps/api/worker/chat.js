@@ -1,4 +1,4 @@
-import { ChatConversationsSchema, ChatHistorySchema, ChatMessageInputSchema, ChatReplySchema } from '@oli/contracts';
+import { ChatChannelSchema, ChatConversationsSchema, ChatHistorySchema, ChatMessageInputSchema, ChatReplySchema } from '@oli/contracts';
 import { audit, body, clearGuard, HttpError, id, json, now, readBytes, sha256, stmt } from './http.js';
 import { idempotency } from './repository.js';
 import { actionInsert, inspectInvoice } from './chat-actions.js';
@@ -76,23 +76,30 @@ export async function completeChat(env, session, history, input, channel = 'web'
   throw new HttpError(502, 'CHAT_TOOL_LIMIT');
 }
 
-async function conversation(env, session, conversationId) {
+async function conversation(env, session, conversationId, channel = null) {
   const row = await stmt(env.DB, 'SELECT * FROM chat_conversations WHERE org_id = ? AND user_id = ? AND id = ?', session.organization.id, session.user.id, conversationId).first();
   if (!row) throw new HttpError(404, 'NOT_FOUND');
+  if (channel && row.channel !== channel) throw new HttpError(409, 'CHAT_CHANNEL_MISMATCH', 'Esta conversación continúa en otro canal. Abre una conversación web para escribir aquí.');
   return row;
 }
 export async function chatHistory(env, session, conversationId) {
-  await conversation(env, session, conversationId);
-  const rows = (await stmt(env.DB, 'SELECT * FROM chat_turns WHERE org_id = ? AND user_id = ? AND conversation_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 20',
-    session.organization.id, session.user.id, conversationId).all()).results.reverse();
+  const current = await conversation(env, session, conversationId);
+  const rows = (await stmt(env.DB, 'SELECT * FROM chat_channel_turns WHERE org_id = ? AND user_id = ? AND history_conversation_id = ? AND channel = ? ORDER BY created_at DESC, history_order DESC LIMIT 20',
+    session.organization.id, session.user.id, conversationId, current.channel).all()).results.reverse();
   // Replies are historical snapshots. Clients refresh pending action status through GET /chat/actions/:id.
-  return json({ data: ChatHistorySchema.parse({ id: conversationId, turns: rows.map(r => ({ id: r.id, text: r.user_text,
+  return json({ data: ChatHistorySchema.parse({ id: conversationId, channel: current.channel, turns: rows.map(r => ({ id: r.id, text: r.user_text,
     invoiceIds: JSON.parse(r.invoice_ids_json), state: r.state, reply: r.response_json ? JSON.parse(r.response_json).data : null,
     errorCode: r.error_code, createdAt: r.created_at })) }) });
 }
-export async function listConversations(env, session) {
-  const rows = (await stmt(env.DB, 'SELECT id, created_at AS createdAt, updated_at AS updatedAt FROM chat_conversations WHERE org_id = ? AND user_id = ? ORDER BY updated_at DESC, id DESC LIMIT 20',
-    session.organization.id, session.user.id).all()).results;
+export async function listConversations(env, session, request) {
+  const parsed = ChatChannelSchema.safeParse(new URL(request.url).searchParams.get('channel') ?? 'WEB');
+  if (!parsed.success) throw new HttpError(400, 'INVALID_CHANNEL');
+  const rows = (await stmt(env.DB, `SELECT c.id,c.channel,c.created_at AS createdAt,c.updated_at AS updatedAt,
+    (SELECT t.user_text FROM chat_channel_turns t WHERE t.org_id = c.org_id AND t.user_id = c.user_id
+      AND t.history_conversation_id = c.id AND t.channel = c.channel ORDER BY t.created_at,t.history_order LIMIT 1) AS title
+    FROM chat_conversations c WHERE c.org_id = ? AND c.user_id = ? AND c.channel = ? ORDER BY c.updated_at DESC,c.id DESC LIMIT 20`,
+    session.organization.id, session.user.id, parsed.data).all()).results;
+  for (const row of rows) row.title = Array.from(row.title ?? '').slice(0, 40).join('');
   return json({ data: ChatConversationsSchema.parse(rows) });
 }
 
@@ -101,14 +108,16 @@ export async function chatMessage(request, env, session, channel = 'web') {
   const hash = await sha256(JSON.stringify(input));
   // Reuse the public UUID validation; turns persist the claim before any provider spend.
   const idem = await idempotency(request, env.DB, session, hash);
-  if (idem.cached) return json(idem.cached.body, idem.cached.status);
   const key = request.headers.get('Idempotency-Key'), org = session.organization.id, actor = session.user.id;
   let turn = await stmt(env.DB, 'SELECT * FROM chat_turns WHERE org_id = ? AND user_id = ? AND client_key = ?', org, actor, key).first();
+  const source = channel === 'telegram' ? 'TELEGRAM' : 'WEB';
+  if (input.conversationId) await conversation(env, session, input.conversationId, source);
+  if (turn && turn.channel !== source) throw new HttpError(409, 'CHAT_CHANNEL_MISMATCH');
+  if (idem.cached) return json(idem.cached.body, idem.cached.status);
   if (turn && turn.request_hash !== hash) throw new HttpError(409, 'IDEMPOTENCY_CONFLICT');
   if (turn?.state === 'COMPLETED') return json(JSON.parse(turn.response_json));
   if (turn?.state === 'PROCESSING' && turn.started_at > new Date(Date.now() - 90_000).toISOString()) throw new HttpError(409, 'CHAT_IN_PROGRESS');
   if (turn?.attempts >= 3) throw new HttpError(409, 'CHAT_RETRY_LIMIT');
-  if (input.conversationId) await conversation(env, session, input.conversationId);
   // Validate private attachments before saving a turn or making a model call.
   for (const invoiceId of new Set(input.invoiceIds)) await inspectInvoice(env, session, invoiceId);
   const count = await stmt(env.DB, 'SELECT coalesce(sum(attempts), 0) AS n FROM chat_turns WHERE org_id = ? AND user_id = ? AND created_at > ?', org, actor, new Date(Date.now() - 15 * 60_000).toISOString()).first('n');
@@ -118,12 +127,12 @@ export async function chatMessage(request, env, session, channel = 'web') {
   try {
     const rateGuard = id('guard');
     const batch = [stmt(env.DB, 'INSERT INTO commit_guards(id, valid) VALUES (?, (SELECT coalesce(sum(attempts), 0) < 20 FROM chat_turns WHERE org_id = ? AND user_id = ? AND created_at > ?))', rateGuard, org, actor, new Date(Date.now() - 15 * 60_000).toISOString())];
-    if (!turn && !input.conversationId) batch.push(stmt(env.DB, 'INSERT INTO chat_conversations(id, org_id, user_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?)', conversationId, org, actor, time, time));
+    if (!turn && !input.conversationId) batch.push(stmt(env.DB, 'INSERT INTO chat_conversations(id, org_id, user_id, created_at, updated_at, channel) VALUES (?, ?, ?, ?, ?, ?)', conversationId, org, actor, time, time, source));
     batch.push(stmt(env.DB, "UPDATE chat_turns SET state = 'FAILED', lease_token = NULL, error_code = 'CHAT_INTERRUPTED' WHERE conversation_id = ? AND state = 'PROCESSING' AND started_at <= ?", conversationId, new Date(Date.now() - 90_000).toISOString()));
     if (turn) batch.push(stmt(env.DB, "UPDATE chat_turns SET state = 'PROCESSING', lease_token = ?, started_at = ?, error_code = NULL, attempts = attempts + 1 WHERE id = ? AND state = 'FAILED' AND attempts < 3", token, time, turn.id));
     else batch.push(stmt(env.DB, `INSERT INTO chat_turns(id, org_id, user_id, conversation_id, client_key, request_hash,
-      user_text, invoice_ids_json, state, lease_token, started_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PROCESSING', ?, ?, ?)`,
-      id('turn'), org, actor, conversationId, key, hash, input.text, JSON.stringify(input.invoiceIds), token, time, time));
+      user_text, invoice_ids_json, state, lease_token, started_at, created_at, channel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PROCESSING', ?, ?, ?, ?)`,
+      id('turn'), org, actor, conversationId, key, hash, input.text, JSON.stringify(input.invoiceIds), token, time, time, source));
     batch.push(clearGuard(env.DB, rateGuard));
     await env.DB.batch(batch);
   } catch (error) {
@@ -134,7 +143,7 @@ export async function chatMessage(request, env, session, channel = 'web') {
   turn = await stmt(env.DB, 'SELECT * FROM chat_turns WHERE org_id = ? AND user_id = ? AND client_key = ?', org, actor, key).first();
   if (turn.lease_token !== token) throw new HttpError(409, 'CHAT_IN_PROGRESS');
   try {
-    const previous = (await stmt(env.DB, "SELECT user_text, response_json FROM chat_turns WHERE conversation_id = ? AND state = 'COMPLETED' ORDER BY created_at DESC, rowid DESC LIMIT 6", conversationId).all()).results.reverse();
+    const previous = (await stmt(env.DB, "SELECT user_text, response_json FROM chat_channel_turns WHERE org_id = ? AND user_id = ? AND history_conversation_id = ? AND channel = ? AND state = 'COMPLETED' ORDER BY created_at DESC, history_order DESC LIMIT 6", org, actor, conversationId, source).all()).results.reverse();
     const history = previous.flatMap(r => [{ role: 'user', content: r.user_text }, { role: 'assistant', content: JSON.parse(r.response_json).data.text }]);
     const result = await completeChat(env, session, history, input, channel);
     const response = { data: ChatReplySchema.parse({ conversationId, turnId: turn.id, text: result.text,
