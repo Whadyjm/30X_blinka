@@ -1,6 +1,6 @@
 # Whady: conectar el inicio conversacional de Oli
 
-Home ya consume el chat real con este contrato: historial privado, adjuntos recibidos antes del mensaje, tarjetas del servidor y propuestas que requieren confirmación explícita. El prototipo [/propuesta/](https://oli30x.ultramare.dev/propuesta/) sigue como referencia visual independiente. Las correcciones están implementadas localmente; no se desplegaron en esta revisión. [Comprobaciones y límites](evaluations/frontend-integration-fixes-20261017.json).
+Home ya consume el chat real con este contrato: historial privado, adjuntos recibidos antes del mensaje, tarjetas del servidor y propuestas que requieren confirmación explícita. El prototipo [/propuesta/](https://oli30x.ultramare.dev/propuesta/) sigue como referencia visual independiente. La versión unificada está publicada en `main` y desplegada en `oli30x.ultramare.dev`; la consulta real de presupuesto desde Home respondió con una tarjeta del servidor. [Comprobación de producción](evaluations/unified-release-production-20261017.json) y [regresiones locales y límites](evaluations/frontend-integration-fixes-20261017.json).
 
 Backend: `/api/v1`, misma sesión/cookie y `X-CSRF-Token` en memoria. Modelo fijo `deepseek/deepseek-v4.1-flash`, clave exclusivamente en el Worker. Las reglas, lecturas y cambios de D1 son responsabilidad del servidor.
 

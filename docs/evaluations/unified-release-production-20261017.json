@@ -1,0 +1,53 @@
+{
+  "releaseCommit": "37c1f303dfe4332cd15002f0a3fa1603b06343d7",
+  "worker": "oli-api",
+  "account": "Tiamat",
+  "workerVersion": "bf731b58-ac0e-4cfb-98ce-3a6f02dcc508",
+  "deploymentId": "f3b2b6d0-ede1-4a0a-b708-bb5ff34c5b94",
+  "trafficPercentage": 100,
+  "tests": {
+    "api": 115,
+    "domain": 78,
+    "contracts": 28,
+    "extraction": 26,
+    "frontend": 22,
+    "packagedRuntime": 1,
+    "totalPassed": 270
+  },
+  "buildAndTypechecks": "PASS",
+  "remoteMigrationsPending": 0,
+  "productionSmoke": {
+    "origin": "https://oli30x.ultramare.dev",
+    "checkedAt": "2026-10-17T19:39:50.923Z",
+    "health": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "service": "oli-api"
+      }
+    },
+    "session": {
+      "status": 200
+    },
+    "frontendAsset": "/assets/index-Dw5r2_8w.js",
+    "chat": {
+      "status": 200,
+      "conversationId": "chat_49fe1eaa-729c-490d-988f-9529d34f4526",
+      "turnId": "turn_453660ee-f8a1-4256-8537-30a7fc1c37d7",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "cardTypes": [
+        "BUDGET"
+      ],
+      "actions": 0,
+      "visibleReply": true,
+      "confirmationSent": false
+    },
+    "pageErrors": []
+  },
+  "scope": "Live Chrome UI with real session, Worker, D1 read tools and DeepSeek. Only a read-only budget conversation was requested; no invoice upload or approval.",
+  "limits": [
+    "This production smoke is not an OCR accuracy evaluation.",
+    "The live check used Chrome desktop; mobile rendering was checked separately with mocked HTTP."
+  ],
+  "publication": "Application code published to main; this report and documentation are a subsequent documentation-only commit."
+}
