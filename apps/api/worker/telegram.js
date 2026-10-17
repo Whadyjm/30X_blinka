@@ -2,6 +2,7 @@ import { MAX_INVOICE_BYTES, TelegramIntegrationSchema, TelegramLinkSchema } from
 import { audit, equalSecret, HttpError, id, json, now, readBytes, sha256, stmt } from './http.js';
 import { receiveInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
+import { telegramAction, telegramChat, telegramConnection, telegramContext, telegramParts } from './telegram-chat.js';
 
 const activeConnection = (db, orgId, userId) => stmt(db, `SELECT * FROM telegram_connections
   WHERE org_id = ? AND user_id = ? AND revoked_at IS NULL`, orgId, userId).first();
@@ -54,16 +55,7 @@ export async function createTelegramLink(env, session) {
   if (await activeConnection(env.DB, session.organization.id, session.user.id)) {
     throw new HttpError(409, 'TELEGRAM_ALREADY_CONNECTED', 'Tu cuenta ya tiene Telegram conectado.');
   }
-  const bot = await telegram(env, 'getMe', {});
-  if (!/^[A-Za-z0-9_]+$/.test(bot.username ?? '')) throw new HttpError(503, 'TELEGRAM_UNAVAILABLE');
-  const webhookSecret = env.TELEGRAM_WEBHOOK_SECRET.trim();
-  if (!/^[A-Za-z0-9_-]{1,256}$/.test(webhookSecret)) {
-    throw new HttpError(503, 'TELEGRAM_WEBHOOK_SECRET_INVALID', 'El secreto del webhook no es válido. Genera uno con openssl rand -hex 32.');
-  }
-  await telegram(env, 'setWebhook', {
-    url: new URL('/api/channels/telegram/webhook', env.PUBLIC_APP_URL).href,
-    secret_token: webhookSecret, allowed_updates: ['message'],
-  });
+  const bot = await configureTelegram(env);
   const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), b => b.toString(16).padStart(2, '0')).join('');
   const expiresAt = new Date(Date.now() + 5 * 60000).toISOString();
   await env.DB.batch([
@@ -72,6 +64,21 @@ export async function createTelegramLink(env, session) {
       await sha256(token), session.organization.id, session.user.id, expiresAt),
   ]);
   return json({ data: TelegramLinkSchema.parse({ url: `https://t.me/${bot.username}?start=${token}`, expiresAt }) }, 201);
+}
+
+export async function configureTelegram(env) {
+  if (!available(env)) throw new HttpError(503, 'TELEGRAM_NOT_CONFIGURED');
+  const bot = await telegram(env, 'getMe', {});
+  if (!/^[A-Za-z0-9_]+$/.test(bot.username ?? '')) throw new HttpError(503, 'TELEGRAM_UNAVAILABLE');
+  const webhookSecret = env.TELEGRAM_WEBHOOK_SECRET.trim();
+  if (!/^[A-Za-z0-9_-]{1,256}$/.test(webhookSecret)) {
+    throw new HttpError(503, 'TELEGRAM_WEBHOOK_SECRET_INVALID', 'El secreto del webhook no es válido. Genera uno con openssl rand -hex 32.');
+  }
+  await telegram(env, 'setWebhook', {
+    url: new URL('/api/channels/telegram/webhook', env.PUBLIC_APP_URL).href,
+    secret_token: webhookSecret, allowed_updates: ['message', 'callback_query'],
+  });
+  return bot;
 }
 
 export async function disconnectTelegram(env, session) {
@@ -96,20 +103,27 @@ export async function telegramWebhook(request, env) {
     try { update = JSON.parse(new TextDecoder().decode(await readBytes(request, 64 * 1024))); }
     catch (error) { if (error instanceof HttpError) throw error; throw new HttpError(400, 'VALIDATION_ERROR'); }
     if (!Number.isSafeInteger(update?.update_id) || update.update_id < 0) throw new HttpError(400, 'VALIDATION_ERROR');
-    const m = update.message;
+    const callback = update.callback_query;
+    const m = callback?.message ?? update.message;
+    const sender = callback?.from ?? m?.from;
     // MVP accepts private conversations only; forwarded names never identify the Oli member.
-    if (!m || m.chat?.type !== 'private' || !Number.isSafeInteger(m.from?.id) || m.from.id <= 0
-      || m.from.is_bot || m.chat.id !== m.from.id) return json({ ok: true });
-    const userId = String(m.from.id);
+    if (!m || m.chat?.type !== 'private' || !Number.isSafeInteger(sender?.id) || sender.id <= 0
+      || sender.is_bot || m.chat.id !== sender.id) return json({ ok: true });
+    const choice = typeof callback?.data === 'string' ? callback.data.match(/^([cx]):([a-f0-9-]{36})$/) : null;
+    if (callback && (!choice || m.from?.is_bot !== true || !Number.isSafeInteger(m.message_id)
+      || typeof callback.id !== 'string' || callback.id.length > 200)) return json({ ok: true });
+    const userId = String(sender.id);
     const connection = await stmt(env.DB, `SELECT c.id FROM telegram_connections c JOIN memberships m
       ON m.org_id = c.org_id AND m.user_id = c.user_id
       WHERE c.telegram_user_id = ? AND c.revoked_at IS NULL`, userId).first();
-    const start = typeof m.text === 'string' ? m.text.match(/^\/(?:start|login)(?:@[A-Za-z0-9_]+)?\s+([a-f0-9]{64})$/) : null;
+    const start = !callback && typeof m.text === 'string' ? m.text.match(/^\/(?:start|login)(?:@[A-Za-z0-9_]+)?\s+([a-f0-9]{64})$/) : null;
     const photo = Array.isArray(m.photo) ? m.photo.at(-1) : null;
     const file = m.document ?? photo;
-    const payload = { userId, chatId: userId, displayName: String(m.from.first_name ?? 'Telegram').slice(0, 100),
+    const payload = { userId, chatId: userId, displayName: String(sender.first_name ?? 'Telegram').slice(0, 100),
       tokenHash: start ? await sha256(start[1]) : null,
-      file: file && typeof file.file_id === 'string' && file.file_id.length <= 512 ? {
+      text: start || callback ? null : typeof m.text === 'string' ? m.text.slice(0, 4001) : null,
+      callback: callback ? { id: callback.id, offerId: choice[2], confirm: choice[1] === 'c', messageId: m.message_id } : null,
+      file: !callback && file && typeof file.file_id === 'string' && file.file_id.length <= 512 ? {
         id: file.file_id, name: typeof file.file_name === 'string' ? file.file_name.slice(0, 200) : 'factura.jpg',
         mimeType: photo && !m.document ? 'image/jpeg' : String(file.mime_type ?? ''),
         size: Number.isSafeInteger(file.file_size) ? file.file_size : null,
@@ -119,6 +133,10 @@ export async function telegramWebhook(request, env) {
       connection?.id ?? null, JSON.stringify(payload), now()).run();
     // A failed enqueue returns 503 so Telegram retries. The receipt and financial effects are idempotent.
     await env.TELEGRAM_QUEUE.send({ updateId: update.update_id });
+    if (callback) {
+      try { await telegram(env, 'answerCallbackQuery', { callback_query_id: callback.id, text: 'Revisando propuesta…' }); }
+      catch { /* The durable event can still complete if Telegram's short-lived callback expired. */ }
+    }
     return json({ ok: true });
   } catch (error) {
     const known = error instanceof HttpError;
@@ -145,22 +163,25 @@ async function linkAccount(env, payload) {
     JOIN memberships m ON m.org_id = c.org_id AND m.user_id = c.user_id
     WHERE t.token_hash = ? AND c.telegram_user_id = ? AND c.revoked_at IS NULL`, payload.tokenHash, payload.userId).first();
   if (!connection) return 'No pude vincular tu cuenta. El enlace venció o ya existe una conexión. Genera uno nuevo en Integraciones de Oli.';
-  return `Conectado a ${connection.org_name}. Envíame una factura en PDF, JPG o PNG de hasta 5 MB.`;
+  return `Conectado a ${connection.org_name}. ¡Hola! Soy Oli. Puedes preguntarme por tus facturas, proveedores o presupuesto, o enviarme una factura en PDF, JPG o PNG de hasta 5 MB.`;
 }
 
 async function authorizedConnection(env, connectionId) {
-  return stmt(env.DB, `SELECT c.* FROM telegram_connections c JOIN memberships m
-    ON m.org_id = c.org_id AND m.user_id = c.user_id WHERE c.id = ? AND c.revoked_at IS NULL`, connectionId).first();
+  return telegramConnection(env, connectionId);
 }
 
-async function textReply(env, payload) {
+async function textReply(env, row, payload) {
   // A text greeting may have arrived while its preceding /start was still being consumed.
-  const connection = await stmt(env.DB, `SELECT c.id FROM telegram_connections c JOIN memberships m
+  const found = row.connection_id ? null : await stmt(env.DB, `SELECT c.id FROM telegram_connections c JOIN memberships m
     ON m.org_id = c.org_id AND m.user_id = c.user_id
     WHERE c.telegram_user_id = ? AND c.chat_id = ? AND c.revoked_at IS NULL`, payload.userId, payload.chatId).first();
-  return connection
-    ? 'Ya estás conectado con Oli. Envíame una factura en PDF, JPG o PNG de hasta 5 MB y la revisaré según las reglas de tu empresa.'
-    : `Conecta tu cuenta en Integraciones de Oli y envíame una factura en PDF, JPG o PNG.\n${env.PUBLIC_APP_URL}/app/integrations`;
+  if (found) {
+    await stmt(env.DB, 'UPDATE telegram_events SET connection_id = ? WHERE update_id = ? AND connection_id IS NULL', found.id, row.update_id).run();
+    row.connection_id = found.id;
+  }
+  const connection = row.connection_id && await authorizedConnection(env, row.connection_id);
+  return connection ? telegramChat(env, row, payload, connection)
+    : [{ text: `Conecta tu cuenta en Integraciones de Oli para conversar conmigo o enviarme una factura.\n${env.PUBLIC_APP_URL}/app/integrations` }];
 }
 
 async function invoiceReply(env, row, payload, process) {
@@ -195,6 +216,8 @@ async function invoiceReply(env, row, payload, process) {
     source = { invoice_id: (await response.json()).data.id };
   }
   if (!await authorizedConnection(env, row.connection_id)) return null;
+  await telegramContext(env, connection);
+  await stmt(env.DB, 'UPDATE telegram_conversations SET last_invoice_id = ? WHERE connection_id = ?', source.invoice_id, connection.id).run();
   const result = await process(env, connection.org_id, source.invoice_id);
   const invoice = result.data;
   const url = new URL(`/app/bills/${encodeURIComponent(source.invoice_id)}`, env.PUBLIC_APP_URL).href;
@@ -219,30 +242,43 @@ export async function consumeTelegram(batch, env, process = processInvoice) {
     }
     const payload = JSON.parse(row.payload_json);
     try {
-      let reply = row.reply_text;
-      if (reply === null || (!payload.tokenHash && !payload.file)) {
+      let parts = row.reply_json ? JSON.parse(row.reply_json) : null;
+      if (!parts) {
+        let reply = payload.tokenHash || payload.file ? row.reply_text : null;
         try {
-          reply = payload.tokenHash ? await linkAccount(env, payload)
+          if (reply === null) reply = payload.tokenHash ? await linkAccount(env, payload)
+            : payload.callback ? await telegramAction(env, row, payload)
             : payload.file ? await invoiceReply(env, row, payload, process)
-              : await textReply(env, payload);
+              : await textReply(env, row, payload);
         } catch (error) {
           if (error instanceof HttpError && [400, 413, 415].includes(error.status)) reply = 'No pude aceptar el archivo. Revisa que sea un PDF, JPG o PNG válido de hasta 5 MB.';
           else if (error instanceof HttpError && error.code === 'MANDATE_REQUIRED') reply = 'Activa las reglas de tu empresa en Oli antes de procesar facturas.';
           else throw error;
         }
-        await stmt(env.DB, 'UPDATE telegram_events SET reply_text = ? WHERE update_id = ? AND lease_token = ?', reply, updateId, lease).run();
+        parts = Array.isArray(reply) ? reply : reply ? telegramParts(reply) : [];
+        await stmt(env.DB, 'UPDATE telegram_events SET reply_json = ? WHERE update_id = ? AND lease_token = ?', JSON.stringify(parts), updateId, lease).run();
       }
-      // Revocation also prevents delayed financial replies reaching a previously linked account.
-      if (reply && (!payload.file || !row.connection_id || await authorizedConnection(env, row.connection_id))) {
-        await telegram(env, 'sendMessage', { chat_id: payload.chatId, text: reply.slice(0, 4000) });
+      // Re-check even cached model replies; a revoked connection must never receive private data.
+      for (let i = row.delivered_parts; i < parts.length; i++) {
+        if (row.connection_id && !await authorizedConnection(env, row.connection_id)) break;
+        const part = parts[i];
+        const sent = await telegram(env, 'sendMessage', { chat_id: payload.chatId, text: part.text,
+          ...(part.reply_markup ? { reply_markup: part.reply_markup } : {}) });
+        const mutations = [stmt(env.DB, 'UPDATE telegram_events SET delivered_parts = ?, lease_until = ? WHERE update_id = ? AND lease_token = ?',
+          i + 1, new Date(Date.now() + 180000).toISOString(), updateId, lease)];
+        if (part.offerId) {
+          if (!Number.isSafeInteger(sent?.message_id)) throw new Error('telegram_message_id_missing');
+          mutations.push(stmt(env.DB, 'UPDATE telegram_action_offers SET message_id = ? WHERE id = ? AND connection_id = ?', sent.message_id, part.offerId, row.connection_id));
+        }
+        await env.DB.batch(mutations);
       }
       await stmt(env.DB, "UPDATE telegram_events SET state = 'DONE', completed_at = ?, lease_token = NULL, lease_until = NULL WHERE update_id = ? AND lease_token = ?", now(), updateId, lease).run();
       message.ack();
-    } catch {
+    } catch (error) {
       const exhausted = message.attempts >= 5;
       await stmt(env.DB, 'UPDATE telegram_events SET state = ?, lease_token = NULL, lease_until = NULL WHERE update_id = ? AND lease_token = ?', exhausted ? 'FAILED' : 'PENDING', updateId, lease).run();
       console.error(JSON.stringify({ event: 'telegram_event_failed', updateId, exhausted }));
-      if (exhausted) message.ack(); else message.retry({ delaySeconds: 30 });
+      if (exhausted) message.ack(); else message.retry({ delaySeconds: error?.code === 'CHAT_IN_PROGRESS' ? 15 : env.INVOICE_QUEUE ? 120 : 30 });
     }
   }
 }

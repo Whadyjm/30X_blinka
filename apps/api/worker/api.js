@@ -1,6 +1,6 @@
 import { AgreementQuerySchema, ApprovalQuerySchema, BudgetQuerySchema, DashboardSchema,
   InvoiceQuerySchema, PaginationQuerySchema } from '@oli/contracts';
-import { authenticate, login, logout } from './auth.js';
+import { authenticate, login, logout, owner } from './auth.js';
 import { activateMandate, budgets, mandateState, mutateDirectory, saveDraft } from './configuration.js';
 import { HttpError, id, json, now, periodKey, readBytes, stmt } from './http.js';
 import { agreementDto, approvalDto, decisionDto, getInvoice, invoiceRows, vendorDto } from './repository.js';
@@ -8,7 +8,7 @@ import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
 import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
-import { createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
+import { configureTelegram, createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -29,6 +29,9 @@ export async function handleApi(request, env) {
     if (path === '/me' && method === 'GET') { const { tokenHash, ...data } = session; return json({ data }); }
     if (path === '/session' && method === 'DELETE') return await logout(request, env, session);
     if (path === '/integrations/telegram' && method === 'GET') return await telegramStatus(env, session);
+    if (path === '/integrations/telegram/setup' && method === 'POST') {
+      owner(session); await configureTelegram(env); return new Response(null, { status: 204 });
+    }
     if (path === '/integrations/telegram/link' && method === 'POST') return await createTelegramLink(env, session);
     if (path === '/integrations/telegram' && method === 'DELETE') return await disconnectTelegram(env, session);
     if (path === '/chat/messages' && method === 'POST') return await chatMessage(request, env, session);

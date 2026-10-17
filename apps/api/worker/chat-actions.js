@@ -114,7 +114,7 @@ export async function getAction(env, session, actionId) {
   if (!row) throw new HttpError(404, 'NOT_FOUND');
   return row;
 }
-export async function confirmAction(request, env, session, actionId) {
+export async function confirmAction(request, env, session, actionId, telegramConnectionId = null) {
   owner(session);
   const input = await body(request, ConfirmChatActionSchema);
   const idem = await idempotency(request, env.DB, session, await sha256(JSON.stringify(input)));
@@ -130,7 +130,9 @@ export async function confirmAction(request, env, session, actionId) {
   const statements = [guard(env.DB, org, row.base_revision, guardId),
     stmt(env.DB, `INSERT INTO commit_guards(id, valid) VALUES (?, EXISTS(SELECT 1 FROM chat_actions a JOIN memberships m
       ON m.org_id = a.org_id AND m.user_id = a.user_id WHERE a.id = ? AND a.org_id = ? AND a.user_id = ?
-      AND a.state = 'PENDING' AND a.expires_at > ? AND m.role = 'OWNER'))`, actionGuard, actionId, org, session.user.id, now()), ...change.mutations];
+      AND a.state = 'PENDING' AND a.expires_at > ? AND m.role = 'OWNER'
+      AND (? IS NULL OR EXISTS(SELECT 1 FROM telegram_connections c WHERE c.id = ? AND c.org_id = a.org_id
+        AND c.user_id = a.user_id AND c.revoked_at IS NULL))))`, actionGuard, actionId, org, session.user.id, now(), telegramConnectionId, telegramConnectionId), ...change.mutations];
   let invoice = null;
   if (change.reevaluation) {
     const { state, stored, evaluation } = change.reevaluation;

@@ -3,6 +3,13 @@ import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { Miniflare, createFetchMock } from 'miniflare';
 
+async function mockBody(body) {
+  if (typeof body === 'string') return JSON.parse(body);
+  const chunks = [];
+  for await (const chunk of body) chunks.push(Buffer.from(chunk));
+  return JSON.parse(Buffer.concat(chunks).toString());
+}
+
 test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D1', async t => {
   const fetchMock = createFetchMock(); fetchMock.disableNetConnect();
   const extraction = { vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'RUNTIME-1', amountMinor: 20000,
@@ -12,7 +19,8 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }] });
   const runtime = new Miniflare({ modules: true, scriptPath: new URL('../.wrangler/runtime/index.js', import.meta.url).pathname,
     compatibilityDate: '2026-07-30', d1Databases: { DB: 'runtime' }, r2Buckets: ['INVOICES'], fetchMock,
-    queueProducers: { TELEGRAM_QUEUE: 'telegram-runtime' },
+    queueProducers: { TELEGRAM_QUEUE: 'oli-telegram' },
+    queueConsumers: { 'oli-telegram': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 5 } },
     bindings: { DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner', DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only',
       PUBLIC_APP_URL: 'https://oli.invalid', TELEGRAM_BOT_TOKEN: '123456:runtime-test-token', TELEGRAM_WEBHOOK_SECRET: 'runtime-webhook-secret' } });
   t.after(() => runtime.dispose());
@@ -58,5 +66,28 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   const reply = await chat.json(); assert.equal(chat.status, 200, JSON.stringify(reply));
   assert.equal(reply.data.cards[0].type, 'BUDGET');
   assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 1);
+  const sent = [];
+  fetchMock.get('https://api.telegram.org').intercept({ path: '/bot123456:runtime-test-token/sendMessage', method: 'POST' })
+    .reply(200, async options => { sent.push(await mockBody(options.body)); return { ok: true, result: { message_id: sent.length } }; }).times(2);
+  const webhook = text => runtime.dispatchFetch(`${origin}/api/channels/telegram/webhook`, { method: 'POST',
+    headers: { 'X-Telegram-Bot-Api-Secret-Token': 'runtime-webhook-secret' },
+    body: JSON.stringify({ update_id: sent.length + 100, message: { text, from: { id: 101, is_bot: false, first_name: 'Oscar' }, chat: { id: 101, type: 'private' } } }) });
+  const waitForReply = async count => {
+    for (let poll = 0; poll < 100 && sent.length < count; poll++) await new Promise(resolve => setTimeout(resolve, 50));
+    assert.equal(sent.length, count);
+  };
+  assert.equal((await webhook(`/start ${new URL(linked.data.url).searchParams.get('start')}`)).status, 200);
+  await waitForReply(1);
+  fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
+    .reply(200, async options => {
+      const messages = (await mockBody(options.body)).messages;
+      assert.match(messages[0].content, /Estás en Telegram/);
+      assert.equal(JSON.parse(messages.at(-1).content).message, 'hola');
+      return { choices: [{ finish_reason: 'stop', message: { content: '¡Hola! Podemos revisar tu presupuesto.' } }] };
+    });
+  assert.equal((await webhook('hola')).status, 200);
+  await waitForReply(2);
+  assert.match(sent.at(-1).text, /¡Hola!/);
+  assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 2);
   fetchMock.assertNoPendingInterceptors();
 });
