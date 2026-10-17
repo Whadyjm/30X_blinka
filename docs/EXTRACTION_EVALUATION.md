@@ -1,3 +1,5 @@
+> Estado actualizado: la [evaluación completa del 17 de octubre](INVOICE_CORPUS_EVALUATION.md) registra50 decisiones correctas de50, cero aprobaciones indebidas y49 extracciones con ocho campos exactos. Incluye el conjunto reservado de ocho documentos y sus límites; las muestras históricas siguientes se conservan como evidencia.
+
 # Evaluación real de extracción PNG
 
 La evaluación posterior de los 50 PDF con decisiones y D1 locales se documenta en

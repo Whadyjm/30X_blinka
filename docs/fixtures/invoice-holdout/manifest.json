@@ -1,5 +1,6 @@
 {
-  "datasetVersion": "oli-invoice-holdout-v1",
+  "datasetVersion": "oli-invoice-holdout-v1.1",
+  "previousDatasetVersion": "oli-invoice-holdout-v1",
   "synthetic": true,
   "createdAt": "2026-10-17T00:00:00Z",
   "purpose": "New-layout robustness holdout, separate from the original 50 documents.",
@@ -147,7 +148,7 @@
         "vendorName": "Brisa Support Demo",
         "invoiceNumber": "BS-4381",
         "amountMinor": null,
-        "currency": "USD",
+        "currency": null,
         "issuedAt": "2026-10-08",
         "dueDate": "2026-10-28",
         "servicePeriod": "2026-10",

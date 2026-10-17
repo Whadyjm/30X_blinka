@@ -25,7 +25,7 @@ async function run() {
   // Reader-only hazards differ from policy prohibitions: a correctly read high total may be CROSS_CHECKED.
   const readingReviewCases = new Set(['holdout_004', 'holdout_005', 'holdout_006', 'holdout_007']);
   assert.equal(manifest.synthetic, true);
-  assert.equal(manifest.datasetVersion, 'oli-invoice-holdout-v1');
+  assert.equal(manifest.datasetVersion, 'oli-invoice-holdout-v1.1');
   assert.equal(manifest.cases.length, 8);
   assert.equal(new Set(manifest.cases.map(c => c.id)).size, 8);
   const documents = new Map();

@@ -1,0 +1,368 @@
+{
+  "auditVersion": "holdout-reference-audit-v1",
+  "createdAt": "2026-10-17T15:53:10.508085Z",
+  "scope": "POST_HOC_REFERENCE_AUDIT_OF_CAPTURED_READS_ONLY",
+  "sourceReport": {
+    "path": "docs/evaluations/invoices-holdout-2026-10-17T15-49-27-178Z.json",
+    "sha256": "e88408e9c512af343b04a5e13a467f934cb76269da9d24e492d7ae829e28710f",
+    "runId": "2026-10-17T15-49-27-178Z",
+    "unchanged": true
+  },
+  "originalManifest": {
+    "path": "docs/fixtures/invoice-holdout/reference/manifest-v1.json",
+    "datasetVersion": "oli-invoice-holdout-v1",
+    "sha256": "d87bd730777d61964c59b45d4b4b07cfed43a6e6fcfb0d14e179a7754e4c4952"
+  },
+  "correctedManifest": {
+    "path": "docs/fixtures/invoice-holdout/manifest.json",
+    "datasetVersion": "oli-invoice-holdout-v1.1",
+    "sha256": "d5eacbb81c20b8dd4649096325c518160b487af7331203034da8f24fb8f9f5f7"
+  },
+  "correction": {
+    "caseId": "holdout_005",
+    "field": "currency",
+    "previousExpected": "USD",
+    "correctedExpected": null,
+    "basis": "Visual source audit: opaque mask covers the complete only amount/currency line; no currency appears elsewhere.",
+    "documentsChanged": false,
+    "allEightDocumentHashesUnchanged": true,
+    "remainingRealError": "holdout_004 visibly says Faro Translation Demo and ISO issue/due/service dates; captured model read misnames vendor and abstains on dates."
+  },
+  "method": {
+    "actualReads": "Unchanged extraction objects copied from sourceReport.results[*].read.extraction.",
+    "comparison": "Strict equality for all eight fields against old and corrected manifests.",
+    "newReaderRequests": 0,
+    "newModelCalls": 0,
+    "additionalReportedCostUsd": 0,
+    "policyEngineEvaluated": false,
+    "financialContextSeeded": false,
+    "trainingOrPromptChanges": false,
+    "limitations": "This relabeling audit is not a new extraction run, proof of OCR independence, financial safety or generalization."
+  },
+  "summary": {
+    "capturedDocuments": 8,
+    "originalAllEightFieldsExact": 6,
+    "correctedAllEightFieldsExact": 7,
+    "originalExactFieldMatches": 59,
+    "correctedExactFieldMatches": 60,
+    "comparedFields": 64,
+    "originalReviewRequired": 8,
+    "originalIndependentCrossChecked": 0,
+    "readerGateViolations": 0,
+    "automaticApprovals": "NOT_EVALUATED",
+    "financialDecisions": "NOT_EVALUATED"
+  },
+  "cases": [
+    {
+      "caseId": "holdout_001",
+      "documentSha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_002",
+      "documentSha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_003",
+      "documentSha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_004",
+      "documentSha256": "99a4aec918a0eb6e43d16b9d4bb75aab33da92ef6982273008223088803897dd",
+      "originalReference": {
+        "matchingFields": [
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "description"
+        ],
+        "allEightFieldsExact": false,
+        "mismatches": [
+          {
+            "field": "vendorName",
+            "expected": "Faro Translation Demo",
+            "actual": "Faro Transmision Demo"
+          },
+          {
+            "field": "issuedAt",
+            "expected": "2026-10-08",
+            "actual": null
+          },
+          {
+            "field": "dueDate",
+            "expected": "2026-10-28",
+            "actual": null
+          },
+          {
+            "field": "servicePeriod",
+            "expected": "2026-10",
+            "actual": null
+          }
+        ]
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "description"
+        ],
+        "allEightFieldsExact": false,
+        "mismatches": [
+          {
+            "field": "vendorName",
+            "expected": "Faro Translation Demo",
+            "actual": "Faro Transmision Demo"
+          },
+          {
+            "field": "issuedAt",
+            "expected": "2026-10-08",
+            "actual": null
+          },
+          {
+            "field": "dueDate",
+            "expected": "2026-10-28",
+            "actual": null
+          },
+          {
+            "field": "servicePeriod",
+            "expected": "2026-10",
+            "actual": null
+          }
+        ]
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_005",
+      "documentSha256": "3f9fd9a8b5698fa348cb60055fe6403d935ae6efaafa15e7fe487da4e04a0d48",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": false,
+        "mismatches": [
+          {
+            "field": "currency",
+            "expected": "USD",
+            "actual": null
+          }
+        ]
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_006",
+      "documentSha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_007",
+      "documentSha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    },
+    {
+      "caseId": "holdout_008",
+      "documentSha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+      "originalReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "correctedReference": {
+        "matchingFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "allEightFieldsExact": true,
+        "mismatches": []
+      },
+      "originalExtractionCheckStatus": "REVIEW_REQUIRED",
+      "originalReaderGateViolation": false
+    }
+  ]
+}

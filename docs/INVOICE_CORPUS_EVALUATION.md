@@ -1,6 +1,81 @@
 # Evaluación real de las 50 facturas PDF
 
-Corrida inicial del 17 de octubre de 2026, contra los archivos originales de `oli-invoices-v1`. El resultado incluye fallos; no se seleccionó la mejor respuesta de cada documento.
+Se conservan todas las corridas del 17 de octubre de 2026, incluidas las fallidas y la aprobación indebida original. La nueva ejecución completa se presenta por separado.
+
+## Nueva corrida completa después de las correcciones
+
+[Reporte de las 50 facturas](evaluations/invoices-pdf-2026-10-17T15-49-27-321Z.json).
+Código desplegado: commit `2b0cc02dccfd971e869e0d7b7f61bcc7f67662b2`, Worker
+`9061818e-cfbf-4851-89ff-02e77dfa09a9`, lector `labelled-v3:invoice-json-v2-20261017`.
+El despliegue siguió activo al consultar versiones después de la evaluación.
+
+| Medida | Inicial | Nueva corrida |
+| --- | --- | --- |
+| Documentos intentados | 50 | 50 |
+| Lecturas válidas | 16 | 50 |
+| Fallos técnicos | 34 | 0 |
+| Ocho campos exactos frente a referencia | 16 | 49 |
+| Acción, motivos y necesidad de aprobación correctos | 12 | 50 |
+| APPROVE / BLOCK / ESCALATE | 10 / 0 / 6 | 17 / 14 / 19 |
+| Aprobaciones indebidas observadas | 0 entre 10 aprobaciones | 0 entre 17 aprobaciones |
+| Replays y documentos privados verificados | 16 / 50 | 50 / 50 |
+
+La corrida de reintento histórica que descubrió una aprobación indebida en 037 permanece abajo;
+es distinta de la inicial de esta tabla. Ahora **037 bloquea con presupuesto ausente**, 032 conserva
+la referencia de acuerdo y devuelve el motivo esperado, y 040 reconoce USD 9,999.00 y bloquea.
+017 vuelve a ofrecer la autorización humana conforme a política. No se eliminaron advertencias
+recibidas: las observaciones informativas son etiquetas separadas en el contrato del extractor.
+
+El único desacuerdo de campo es 038: la referencia espera `amountMinor=20000` con `currency=null`,
+pero el prompt exige importe desconocido si no se conoce la moneda. El modelo devolvió ambos
+`null`, advirtió la moneda ausente y escaló correctamente sin autorización. Se conserva la referencia
+y se informa la abstención; no se cambia el reporte para llamarlo 50/50 de extracción exacta.
+
+Los 50 documentos usaron una llamada a DeepSeek cada uno, sin reintentos externos ni respaldo.
+La mediana de lectura fue **3,095 s** y la de procesamiento aislado completo **3,6425 s** (máximo
+6,061 s). La lectura exitosa inicial tenía mediana de 29,547 s entre solo 16 éxitos: cambian la cobertura
+y las condiciones del proveedor, por lo que no es un benchmark controlado de aceleración.
+Coste reportado exitoso USD 0,11289967, sin prometer incluir conversiones o costes interrumpidos.
+Autonomía correcta 31/50 (62%); las otras 19 escalaciones son el resultado esperado, no aprobaciones.
+Todas las decisiones tienen explicación y traza. Los 17 APPROVE coinciden con los ocho campos
+esperados y reservaron una vez; los otros 33 no reservaron.
+
+Se conservó el aislamiento D1/R2 por escenario y el servicio original de procesamiento. Esto
+mide lectores reales y decisión/persistencia local; **no son 50 subidas por el navegador ni 50
+procesamientos remotos por Queues**. El nuevo pipeline de cola tiene pruebas de fallos independientes.
+
+### Prueba del dominio y consultas
+
+[Prueba HTTP pública con cola](evaluations/invoices-production-queue-20261017.json): subida201,
+process202, resultado ESCALATE de una nota de entrega, una decisión y cero reservas. Recibo 1,328 s;
+recorrido completo 9,971 s. Replay devuelve la misma decisión. D1 remoto confirmó trabajoDONE,
+un intento y dos artefactos cacheados. Es una sola prueba de integración, no una distribución de latencias.
+
+[Consultas autenticadas de producción](evaluations/invoices-api-latency-20261017.json), cinco
+muestras por endpoint: mediana dashboard 190 ms, lista de facturas 147 ms y aprobaciones 124 ms.
+Incluyen red, D1 y serialización; se midieron con ocho facturas, sin prueba de carga ni comparativa
+antes/después. La paginación SQL y los candidatos selectivos tienen pruebas de equivalencia;
+los candidatos financieros nunca se truncan con LIMIT.
+
+### Documentos nuevos y límites restantes
+
+[Reporte original de ocho documentos reservados](evaluations/invoices-holdout-2026-10-17T15-49-27-178Z.json):
+8/8 lecturas válidas, 6/8 con ocho campos exactos frente a la primera referencia, todos en revisión
+y cero vulneraciones del gate de lectura en los cuatro casos que exigen revisión. Es una prueba
+de lectores/comparación, **sin decisiones financieras medidas**. La mediana fue 2,5565 s.
+
+La auditoría visual encontró una etiqueta errónea en005: la máscara también oculta la moneda,
+por lo que `currency=null` es correcto. La corrección versionada y el recálculo sin nuevas llamadas
+están en [la auditoría de referencia](evaluations/invoices-holdout-reference-audit-20261017.json).
+Se conserva el 6/8 original y se separa el 7/8 frente a la referencia corregida. En004 el modelo
+confundió el nombre y se abstuvo sobre fechas legibles: es un error real, no una etiqueta ajustada.
+
+Los diseños nuevos no fueron corroborados suficientemente por el parser de etiquetas y quedaron
+en revisión. Falta ampliar/verificar esa cobertura, añadir OCR independiente para imágenes,
+validar aritmética de subtotal/impuestos/descuentos y limitar páginas PDF antes del OCR. También
+faltan pruebas de carga y alertas automáticas externas; hay logs estructurados, recuperación y
+consultas operativas documentadas. El resultado 50/50 de decisiones en el corpus original no acredita
+precisión universal, disponibilidad futura ni preparación para pagos reales.
 
 ## Corrida inicial
 
@@ -117,9 +192,9 @@ Se corrigió la apertura: la activación inicializa el primer presupuesto; el pr
 
 La corrección se publicó en el Worker `9000e01b-2606-40aa-8f49-7c2e29f4a330`. Una [lectura nueva de 037](evaluations/invoices-pdf-2026-10-17T15-19-52-815Z.json) volvió a fallar por `INVALID_OUTPUT / FINISH_length`: no se presenta como verificación OCR exitosa.
 
-Se comprobó entonces el servicio corregido con la lectura real y corroboración guardadas del mismo PDF, verificando SHA-256 y usando otra D1/R2 limpia: **BLOCK / MISSING_BUDGET, cero presupuestos creados, cero reservas y una decisión**. El replay idempotente tampoco llamó al lector. [Evidencia del replay](evaluations/invoices-budget-fix-replay-20261017.json), sin nuevas llamadas al modelo. Esto valida la corrección del procesamiento ante esa lectura; no es una nueva medición del extractor ni elimina la aprobación indebida anterior. No se repitieron los 50 después del cambio.
+Se comprobó entonces el servicio corregido con la lectura real y corroboración guardadas del mismo PDF, verificando SHA-256 y usando otra D1/R2 limpia: **BLOCK / MISSING_BUDGET, cero presupuestos creados, cero reservas y una decisión**. El replay idempotente tampoco llamó al lector. [Evidencia del replay](evaluations/invoices-budget-fix-replay-20261017.json), sin nuevas llamadas al modelo. Esto valida la corrección del procesamiento ante esa lectura; no es una nueva medición del extractor ni elimina la aprobación indebida anterior. En ese momento no se habían repetido los 50; la ejecución completa posterior se documenta al principio.
 
-### Otros problemas que permanecen
+### Problemas observados antes de la nueva corrida
 
 - **Advertencias innecesarias:** 020/021 impiden la autorización humana esperada y 041 escala una factura que debía aprobarse; se suman a 001/002/005/017 de la primera corrida. No se filtraron advertencias para obtener un resultado mejor.
 - **Acuerdo indicado en el documento:** 032 escala con `MISSING_AGREEMENT` en vez de `AGREEMENT_MISMATCH`. El servicio no conserva la referencia de acuerdo del PDF y busca por concepto; al ser precisamente el concepto discrepante, no identifica el acuerdo. No hubo aprobación.
@@ -131,3 +206,6 @@ Se comprobó entonces el servicio corregido con la lectura real y corroboración
 `npm --prefix apps/api run test:invoices:corpus` inicia una nueva evaluación pagada. La selección explícita `--cases=case_010,case_014` produce otra corrida separada y serial. El token privado se lee del archivo local ignorado, nunca de parámetros. El runner exige que el mes actual coincida con el mes de los contextos; no adapta etiquetas silenciosamente.
 
 Las 41 pruebas API y 17 del extractor aprobadas son controles locales distintos de esta medición real.
+
+
+La release archivada del commit desplegado pasó 73 pruebas de API (incluidas 10 de trabajos y 10 de documentos), 74 de dominio, 28 de contratos y 22 del extractor, además de typecheck del extractor, build del frontend y una prueba workerd con cola real de Miniflare. Los chequeos no equivalen a una prueba de carga ni a exactitud del modelo sobre documentos futuros.
