@@ -1,0 +1,218 @@
+@import 'tailwindcss';
+
+/*
+ * OLI visual system — "Ramp" style reference.
+ * Editorial finance desk: near-monochrome warm neutrals + ONE chromatic accent
+ * (Highlighter Yellow #e4f222) used only where money moves (primary actions, active states).
+ * Single weight (400), hairline borders instead of shadows, radii 6 / 10 / 12 / 16.
+ *
+ * Strategy: components use Tailwind's slate/indigo/emerald/amber/rose scales. We remap them all
+ * onto the warm-neutral ramp so any un-migrated class degrades to monochrome instead of reintroducing
+ * extra hues. Status meaning is carried by shape + fill hierarchy (see Badges.tsx), never by hue.
+ */
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Inter', ui-sans-serif, system-ui, sans-serif; /* single typeface system */
+
+  /* Single weight: hierarchy comes from size, not boldness. */
+  --font-weight-medium: 400;
+  --font-weight-semibold: 400;
+  --font-weight-bold: 400;
+
+  /* Named Ramp tokens */
+  --color-highlighter: #e4f222;
+  --color-ink: #0c0a08;
+  --color-obsidian: #1a1919;
+  --color-paper: #ffffff;
+  --color-bone: #f4f2f0;
+  --color-ash: #6d6c6b;
+  --color-hairline: #e5e7eb;
+  --color-smoke: #d3d3d3;
+  --color-canvas: #f4f2f0;
+
+  /* Radii: tags/buttons 6, inputs 10, wash 12, cards 16. No pills on UI elements. */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  /* No drop shadows anywhere — elevation is a hairline border. */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+
+  /* slate-* → warm neutral ramp */
+  --color-slate-50: #f4f2f0;
+  --color-slate-100: #ece9e6;
+  --color-slate-200: #e5e7eb;
+  --color-slate-300: #d3d3d3;
+  --color-slate-400: #a3a19f;
+  --color-slate-500: #6d6c6b;
+  --color-slate-600: #55534f;
+  --color-slate-700: #2b2928;
+  --color-slate-800: #1a1919;
+  --color-slate-900: #0c0a08;
+
+  /* indigo-* → ink (brand structure is black, not blue) */
+  --color-indigo-50: #f4f2f0;
+  --color-indigo-100: #ece9e6;
+  --color-indigo-200: #d3d3d3;
+  --color-indigo-300: #a3a19f;
+  --color-indigo-400: #6d6c6b;
+  --color-indigo-500: #2b2928;
+  --color-indigo-600: #0c0a08;
+  --color-indigo-700: #0c0a08;
+  --color-indigo-800: #0c0a08;
+  --color-indigo-900: #0c0a08;
+
+  /* emerald / amber / rose / sky → monochrome. Meaning must never rely on these hues. */
+  --color-emerald-50: #f4f2f0;
+  --color-emerald-100: #ece9e6;
+  --color-emerald-200: #d3d3d3;
+  --color-emerald-300: #a3a19f;
+  --color-emerald-400: #6d6c6b;
+  --color-emerald-500: #1a1919;
+  --color-emerald-600: #0c0a08;
+  --color-emerald-700: #0c0a08;
+  --color-emerald-800: #0c0a08;
+  --color-emerald-900: #0c0a08;
+
+  --color-amber-50: #f4f2f0;
+  --color-amber-100: #ece9e6;
+  --color-amber-200: #d3d3d3;
+  --color-amber-300: #a3a19f;
+  --color-amber-400: #6d6c6b;
+  --color-amber-500: #1a1919;
+  --color-amber-600: #0c0a08;
+  --color-amber-700: #0c0a08;
+  --color-amber-800: #0c0a08;
+  --color-amber-900: #0c0a08;
+
+  --color-rose-50: #f4f2f0;
+  --color-rose-100: #ece9e6;
+  --color-rose-200: #d3d3d3;
+  --color-rose-300: #a3a19f;
+  --color-rose-400: #6d6c6b;
+  --color-rose-500: #1a1919;
+  --color-rose-600: #0c0a08;
+  --color-rose-700: #0c0a08;
+  --color-rose-800: #0c0a08;
+  --color-rose-900: #0c0a08;
+
+  --color-sky-50: #f4f2f0;
+  --color-sky-100: #ece9e6;
+  --color-sky-200: #d3d3d3;
+  --color-sky-600: #0c0a08;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    @apply bg-bone text-ink antialiased;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-feature-settings: 'ss01' on;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-ink);
+    font-weight: 400;
+    font-feature-settings: 'ss01' on;
+  }
+  h1 {
+    line-height: 1.05;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  [role='button'],
+  summary {
+    cursor: pointer;
+  }
+  input,
+  select,
+  textarea,
+  button {
+    font-feature-settings: 'ss01' on;
+  }
+  code,
+  kbd,
+  samp {
+    font-family: var(--font-mono);
+    background: var(--color-bone);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-size: 0.92em;
+  }
+}
+
+@layer components {
+  /* Elevation = 1px hairline, never a blur. Class names kept so components don't churn. */
+  .shadow-card {
+    box-shadow: 0 0 0 1px var(--color-hairline);
+  }
+  .shadow-float {
+    box-shadow: 0 0 0 1px var(--color-ink);
+  }
+  .shadow-widget {
+    box-shadow: 0 0 0 1px var(--color-hairline);
+  }
+  .shadow-navy {
+    box-shadow: none;
+  }
+  /* Identifiers and figures: same typeface, tabular numerals. */
+  .text-data {
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  /* 10px uppercase micro-label with open tracking (Ramp caption). */
+  .caption {
+    font-size: 10px;
+    line-height: 2.2;
+    letter-spacing: 0.018em;
+    text-transform: uppercase;
+    color: var(--color-ash);
+  }
+}
+
+/* Moderate, utility-focused motion: color/background/border only. */
+button,
+a {
+  transition-property: color, background-color, border-color, fill, stroke, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes oli-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, #ece9e6 25%, #f4f2f0 50%, #ece9e6 75%);
+  background-size: 200% 100%;
+  animation: oli-shimmer 1.4s infinite linear;
+}

@@ -1,0 +1,1 @@
+import{d as e,o as t,r as n,t as r}from"./Card-CDXQugjl.js";var i=e();function a({title:e}){return(0,i.jsxs)(i.Fragment,{children:[(0,i.jsx)(t,{title:e}),(0,i.jsx)(r,{children:(0,i.jsx)(n,{title:`Not built yet`,body:`This is a P1 feature. It stays hidden until the core invoice flow is solid.`})})]})}export{a as ComingSoon};
