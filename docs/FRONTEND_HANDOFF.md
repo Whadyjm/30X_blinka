@@ -37,6 +37,24 @@ La referencia visual `/propuesta/` sigue siendo independiente y demostrativa.
   Agent Access, Clearance y delegaciones no tienen endpoints P0. Chat es una extensión
   separada documentada en el handoff conversacional, no una ruta de los mocks originales.
 
+## Configuración y reinicio del onboarding
+
+El menú de escritorio y móvil incluye **Settings / Configuración** en `/app/settings`.
+Un OWNER puede abrir **Reiniciar onboarding**, que lleva a `/onboarding?restart=1`.
+El wizard existente se precarga con las reglas activas; usa la revisión del borrador existente
+para guardar cambios sin saltarse los controles de concurrencia. Los APPROVER no pueden editar.
+El acceso normal a `/onboarding` sigue redirigiendo al dashboard cuando ya hay reglas activas.
+
+Guardar en la revisión final reemplaza las reglas vigentes mediante la activación existente:
+queda una sola versión activa, se conservan las anteriores y no se reinician facturas, decisiones
+ni reservas. Se puede volver a Configuración antes de activar; guardar un borrador no lo activa.
+El resumen muestra los valores anteriores junto a los nuevos y requiere confirmar los cambios.
+
+[Prueba de navegador con API/D1/R2 locales](evaluations/settings-onboarding-20261017.json):
+recorrido completo en escritorio/inglés y entrada móvil/español, reemplazo de reglas v1→v2,
+reservas e historial preservados, salida sin activar y reentrada con los valores actualizados.
+Incluye una prueba con borrador previo para verificar su revisión; no cambia datos productivos.
+
 ## Desarrollo y acceso
 
 El proxy Vite ya apunta a `http://localhost:8787`; arrancar `apps/api` con Wrangler,

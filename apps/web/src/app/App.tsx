@@ -15,6 +15,7 @@ const Bills = lazy(() => import('@/pages/Bills').then((m) => ({ default: m.Bills
 const BillDetail = lazy(() => import('@/pages/BillDetail').then((m) => ({ default: m.BillDetail })));
 const Approvals = lazy(() => import('@/pages/Approvals').then((m) => ({ default: m.Approvals })));
 const Rules = lazy(() => import('@/pages/Rules').then((m) => ({ default: m.Rules })));
+const Settings = lazy(() => import('@/pages/Settings').then((m) => ({ default: m.Settings })));
 const Integrations = lazy(() => import('@/pages/Integrations').then((m) => ({ default: m.Integrations })));
 const Inbox = lazy(() => import('@/pages/Inbox').then((m) => ({ default: m.Inbox })));
 const Evaluation = lazy(() => import('@/pages/Evaluation').then((m) => ({ default: m.Evaluation })));
@@ -38,6 +39,7 @@ export function App() {
                   <Route path="bills/:id" element={<BillDetail />} />
                   <Route path="approvals" element={<Approvals />} />
                   <Route path="rules" element={<Rules />} />
+                  <Route path="settings" element={<Settings />} />
                   <Route path="integrations" element={<Integrations />} />
                   <Route path="inbox" element={<Inbox />} />
                   <Route path="evaluation" element={<Evaluation />} />

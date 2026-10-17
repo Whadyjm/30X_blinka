@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
@@ -21,7 +21,7 @@ import { Logo } from '@/components/Logo';
 import { Oli, type OliState } from '@/components/Oli';
 import { Beam } from '@/components/ui/Beam';
 import { Button } from '@/components/ui/Button';
-import { Card, InlineAlert, PageLoading } from '@/components/ui/Card';
+import { Card, ErrorState, InlineAlert, PageLoading } from '@/components/ui/Card';
 import { Checkbox, SelectField, TextField } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/Toast';
 import type { InvoiceSummary, MandateDraftInput } from '@/contracts';
@@ -39,6 +39,8 @@ const STEPS = ['Meet Oli', 'Your mandate', 'Who can be paid', 'Review & activate
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'MXN', 'COP'];
 
 export function Onboarding() {
+  const [params] = useSearchParams();
+  const restart = params.get('restart') === '1';
   const me = useMe();
   const mandate = useMandate(!!me.data?.org);
   const qc = useQueryClient();
@@ -78,11 +80,14 @@ export function Onboarding() {
   }, [org, me.data]);
 
   useEffect(() => {
-    if (mandate.data?.draft && !draft) {
-      setDraft(toDraftInput(mandate.data.draft));
+    const source = restart ? mandate.data?.active ?? mandate.data?.draft : mandate.data?.draft;
+    if (source && !draft) {
+      const input = toDraftInput(source);
+      if (restart && mandate.data?.active) input.expectedRevision = mandate.data.draft?.revision ?? null;
+      setDraft(input);
       setFormKey((k) => k + 1);
     }
-  }, [mandate.data, draft]);
+  }, [mandate.data, draft, restart]);
 
   // Scroll to the top of the page when changing steps (clicking Continue or Back)
   useEffect(() => {
@@ -91,11 +96,12 @@ export function Onboarding() {
     document.body.scrollTo?.({ top: 0, left: 0, behavior: 'smooth' });
   }, [step]);
 
-  if (me.isLoading) return <PageLoading />;
+  if (me.isLoading || mandate.isLoading) return <PageLoading />;
   if (!me.data) return <Navigate to="/login" replace />;
   if (me.data.role === 'approver') return <Navigate to="/app" replace />;
+  if (mandate.isError) return <ErrorState error={mandate.error} onRetry={() => void mandate.refetch()} />;
   // Only redirect if active AND not currently going through the onboarding wizard steps 3 or 4
-  if (mandate.data?.active && step < 3) return <Navigate to="/app" replace />;
+  if (mandate.data?.active && !restart && step < 3) return <Navigate to="/app" replace />;
 
   const next = async () => {
     setError(null);
@@ -113,6 +119,7 @@ export function Onboarding() {
         if (hasErrors(validateMandate(draft))) return;
         const saved = await save.mutateAsync(draft);
         setDraft(toDraftInput(saved));
+        setConfirmed(false);
         setStep(2);
       } else if (step === 2) {
         setStep(3);
@@ -164,7 +171,7 @@ export function Onboarding() {
 
   const finish = (skip = false) => {
     if (skip || !uploadedInvoice) {
-      toast.success(t('Oli is ready. Welcome aboard!'));
+      toast.success(t(restart ? 'Your updated rules are active.' : 'Oli is ready. Welcome aboard!'));
     } else {
       toast.success(t('Invoice uploaded! Oli is reviewing it.'));
     }
@@ -180,6 +187,11 @@ export function Onboarding() {
     <div className="flex min-h-screen flex-col bg-bone/30">
       <DemoBanner />
       <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:py-10">
+        {restart && (
+          <Link to="/app/settings" className="mb-5 inline-flex items-center gap-2 text-sm text-slate-600 hover:text-ink">
+            <ArrowLeft className="size-4" aria-hidden /> {t('Back to Settings')}
+          </Link>
+        )}
         <div className="mb-6 flex items-center justify-between sm:mb-8">
           <Logo />
           <div className="flex items-center gap-3">
@@ -226,10 +238,10 @@ export function Onboarding() {
                 </div>
 
                 <h1 className="text-3xl font-medium tracking-tight text-ink sm:text-[38px] leading-tight">
-                  {t('Meet Oli')}
+                  {t(restart ? 'Update your setup' : 'Meet Oli')}
                 </h1>
                 <p className="mt-2 max-w-md text-sm text-slate-500 sm:text-base leading-relaxed">
-                  {t('Tell Oli about your company and set up autonomous financial governance in minutes.')}
+                  {t(restart ? 'Review your company setup and update the rules Oli uses for your invoices.' : 'Tell Oli about your company and set up autonomous financial governance in minutes.')}
                 </p>
               </div>
 
@@ -329,15 +341,15 @@ export function Onboarding() {
             <div className="space-y-5">
               <div>
                 <h1 className="text-[34px] sm:text-[40px] leading-[1.05] tracking-tight">{t('Review & activate')}</h1>
-                <p className="mt-2 text-base text-ash">{t('These are the exact rules Oli will follow. Nothing is active until you confirm.')}</p>
+                <p className="mt-2 text-base text-ash">{t(restart ? 'Your current rules stay active until you confirm these changes.' : 'These are the exact rules Oli will follow. Nothing is active until you confirm.')}</p>
               </div>
-              <MandateSummary mandate={draft} />
+              <MandateSummary mandate={draft} compareTo={restart ? mandate.data?.active : null} />
               <p className="text-sm text-ash">
                 {vendorCount === 1
                   ? t('1 authorized vendor · {a} active agreements', { a: activeAgreements })
                   : t('{v} authorized vendors · {a} active agreements', { v: vendorCount, a: activeAgreements })}
               </p>
-              <Checkbox checked={confirmed} onChange={setConfirmed} label={t('I confirm these rules.')} description={t('This creates policy version 1. You can change it later; old versions are kept for the audit trail.')} />
+              <Checkbox checked={confirmed} onChange={setConfirmed} label={t('I confirm these rules.')} description={t(restart ? 'These rules will replace your current rules. Previous decisions keep their history.' : 'This creates policy version 1. You can change it later; old versions are kept for the audit trail.')} />
             </div>
           )}
 
@@ -363,7 +375,7 @@ export function Onboarding() {
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-ink">
-                  {t('Upload your first invoice (optional)')}
+                  {t(restart ? 'Upload an invoice (optional)' : 'Upload your first invoice (optional)')}
                 </h1>
                 <p className="mt-1.5 max-w-md text-sm text-slate-500">
                   {t('Test Oli right away with an invoice, or skip and do it later.')}
@@ -491,7 +503,7 @@ export function Onboarding() {
 
           {/* Navigation Bar for Steps 0 to 3 */}
           {step < 4 && (
-            <div className="mt-8 flex items-center justify-between border-t border-hairline pt-6">
+            <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-6">
               <Button
                 variant="ghost"
                 icon={<ArrowLeft className="size-4" aria-hidden />}
@@ -521,7 +533,7 @@ export function Onboarding() {
                   loading={activate.isPending}
                   onClick={() => void next()}
                 >
-                  {t('Activate & continue')}
+                  {t(restart ? 'Save rules & continue' : 'Activate & continue')}
                 </Button>
               )}
             </div>
