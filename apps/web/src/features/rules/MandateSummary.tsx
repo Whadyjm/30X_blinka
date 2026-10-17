@@ -8,12 +8,14 @@ type Row = { key: keyof MandateDraftInput; label: string; show: (m: MandateDraft
 const yn = (b: boolean) => (b ? t('Yes') : t('No'));
 
 export const MANDATE_ROWS: Row[] = [
+  { key: 'currency', label: 'Currency', show: (m) => m.currency },
   { key: 'automaticLimitMinor', label: 'Automatic approval limit', show: (m) => formatMoney(m.automaticLimitMinor, m.currency) },
   { key: 'hardLimitMinor', label: 'Absolute ceiling', show: (m) => formatMoney(m.hardLimitMinor, m.currency) },
   { key: 'monthlyBudgetMinor', label: 'Monthly budget', show: (m) => formatMoney(m.monthlyBudgetMinor, m.currency) },
   { key: 'requireAllowedVendor', label: 'Only authorized vendors', show: (m) => yn(m.requireAllowedVendor) },
   { key: 'requireAgreement', label: 'Require an agreement', show: (m) => yn(m.requireAgreement) },
   { key: 'humanApprovalEnabled', label: 'Human approval of exceptions', show: (m) => yn(m.humanApprovalEnabled) },
+  { key: 'processDaysBeforeDue', label: 'Process days before due date', show: (m) => String(m.processDaysBeforeDue) },
   { key: 'reviewAboveMinor', label: 'Human review above', show: (m) => formatMoney(m.reviewAboveMinor, m.currency) },
 ];
 

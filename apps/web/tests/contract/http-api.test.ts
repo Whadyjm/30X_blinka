@@ -147,6 +147,21 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
       .rejects.toMatchObject({ status: 409, code: 'DRAFT_CHANGED' });
     const active = await api.activateMandate({ draftId: second.id, expectedRevision: second.revision, expectedActivePolicyVersionId: second.basedOnPolicyVersionId, confirm: true });
     expect(active.version).toBe(2);
+    await DB.batch([
+      DB.prepare("INSERT INTO organizations(id,name,default_currency,timezone) VALUES ('org_history_other','Other fictitious company','USD','UTC')"),
+      DB.prepare("INSERT INTO memberships(org_id,user_id,role) VALUES ('org_history_other','user_demo_owner','OWNER')"),
+      DB.prepare("INSERT INTO policy_versions(id,org_id,version,status,policy_json,created_by) SELECT 'pol_history_other','org_history_other',1,'ACTIVE',policy_json,'user_demo_owner' FROM policy_versions WHERE id = ?").bind(original.id),
+    ]);
+    const versions = await api.listMandateVersions();
+    expect(versions.map(version => [version.version, version.status])).toEqual([[2, 'ACTIVE'], [1, 'SUPERSEDED']]);
+    expect(versions[1]!.automaticLimitMinor).toBe(original.automaticLimitMinor);
+    expect(versions.every(version => version.id !== 'pol_history_other')).toBe(true);
+    const firstPage = await fetchImpl('/api/v1/mandate/versions?page=1&pageSize=1');
+    const historyPage = await firstPage.json();
+    expect(historyPage.pagination.total).toBe(2);
+    expect(historyPage.data).toHaveLength(1);
+    expect((await api.getMandate()).active?.id).toBe(active.id);
+
     const file = new File([readFileSync(new URL('../../../../examples/invoices/hosting.pdf', import.meta.url))], 'hosting.pdf', { type: 'application/pdf' });
     loseUpload = true; await expect(api.uploadInvoice(file, 'first')).rejects.toMatchObject({ code: 'NETWORK' });
     const uploaded = await api.uploadInvoice(file, 'first');
@@ -167,5 +182,6 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
     expect((await api.getMandate()).budget?.reservedMinor).toBe(65000);
     expect(await DB.prepare('SELECT count(*) AS n FROM budget_reservations').first('n')).toBe(2);
     await api.logout(); expect(await api.me()).toBeNull();
+    await expect(api.listMandateVersions()).rejects.toMatchObject({ status: 401 });
   } finally { await runtime.dispose(); }
 });

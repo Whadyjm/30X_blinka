@@ -9,13 +9,13 @@ import type { FinanceMandate, MandateDraftInput } from '@/contracts';
 import { AgreementsPanel, VendorsPanel } from '@/features/rules/ReferenceData';
 import { hasErrors, MandateForm, validateMandate } from '@/features/rules/MandateForm';
 import { changedRows, MandateSummary, toDraftInput } from '@/features/rules/MandateSummary';
-import { useActivateMandate, useMandate, useMe, useSaveMandateDraft } from '@/hooks/queries';
+import { useActivateMandate, useMandate, useMandateVersions, useMe, useSaveMandateDraft } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { formatDateTime } from '@/lib/dates';
 
 // English source labels (i18n keys) — translated at render time.
-const TABS = ['Mandate', 'Vendors', 'Agreements'] as const;
+const TABS = ['Mandate', 'Vendors', 'Agreements', 'Rule history'] as const;
 
 export function Rules() {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mandate');
@@ -25,7 +25,7 @@ export function Rules() {
   return (
     <>
       <PageHeader title={t('Rules')} subtitle={t('What Oli may approve on its own, and who it may pay. Changes create a new, auditable version.')} />
-      <div role="tablist" aria-label={t('Rules sections')} className="mb-5 flex gap-1 border-b border-hairline">
+      <div role="tablist" aria-label={t('Rules sections')} className="mb-5 grid grid-cols-2 gap-1 border-b border-hairline sm:flex">
         {TABS.map((tabId) => (
           <button
             key={tabId}
@@ -33,7 +33,7 @@ export function Rules() {
             type="button"
             aria-selected={tab === tabId}
             onClick={() => setTab(tabId)}
-            className={cn('-mb-px border-b-2 px-4 py-2 text-sm', tab === tabId ? 'border-ink text-ink' : 'border-transparent text-ash hover:text-ink')}
+            className={cn('-mb-px shrink-0 border-b-2 px-4 py-2 text-sm', tab === tabId ? 'border-ink text-ink' : 'border-transparent text-ash hover:text-ink')}
           >
             {t(tabId)}
           </button>
@@ -43,6 +43,7 @@ export function Rules() {
       {!isOwner && <div className="mb-4"><InlineAlert tone="info">{t('You can view the rules. Only an owner can change them.')}</InlineAlert></div>}
 
       {tab === 'Mandate' && <MandateTab isOwner={isOwner} />}
+      {tab === 'Rule history' && <MandateHistory />}
       {tab === 'Vendors' && (
         <Card>
           <CardHeader title={t('Authorized vendors')} subtitle={t('Vendors not on this list are blocked.')} />
@@ -169,4 +170,24 @@ function MandateTab({ isOwner }: { isOwner: boolean }) {
     );
   }
   return null;
+}
+
+function MandateHistory() {
+  const history = useMandateVersions();
+  if (history.isLoading) return <Skeleton className="h-64" />;
+  if (history.isError) return <ErrorState error={history.error} onRetry={() => void history.refetch()} />;
+  const versions = history.data ?? [];
+  return <Card>
+    <CardHeader title={t('Rule history')} subtitle={t('Every activated version is kept. Open a version to see its rules and changes from the previous one.')} />
+    {versions.length === 0 ? <p className="p-5 text-sm text-ash">{t('No activated versions yet.')}</p> : <div className="divide-y divide-hairline">{versions.map((version, index) => <details key={version.id ?? version.version} className="p-5" open={index === 0}>
+      <summary className="cursor-pointer text-sm text-ink">
+        <span className="ml-2">{t('Version {n}', { n: version.version })} · {t(version.status === 'ACTIVE' ? 'Active' : 'Previous version')}</span>
+        {version.createdAt && <span className="ml-3 inline-block text-xs text-ash">{formatDateTime(version.createdAt)}</span>}
+      </summary>
+      <div className="mt-4 space-y-3">
+        <p className="text-xs text-ash">{t('Highlighted values changed from the previous version. Viewing history does not activate or change rules.')}</p>
+        <MandateSummary mandate={version} compareTo={versions[index + 1]} />
+      </div>
+    </details>)}</div>}
+  </Card>;
 }

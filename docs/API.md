@@ -914,3 +914,12 @@ Antes de desplegar esta versión, aplicar la migración **0010_oli_skill.sql** e
 reconstruir la web para distribuir el paquete actualizado. No aplicar un seed sobre
 los datos existentes. Las pruebas de esta integración verifican permisos,
 idempotencia y persistencia; no son métricas del extractor ni de decisiones end-to-end.
+
+
+### Historial de reglas
+
+`GET /api/v1/mandate/versions?page=1&pageSize=100` requiere sesión y devuelve
+`Envelope<PolicyVersion[]>` con `pagination`. Orden: versión descendente. Incluye
+la activa y las anteriores `SUPERSEDED`, con reglas, fecha e identidad de activación.
+Solo expone versiones de la organización autenticada. Consultarlo no cambia el mandato,
+no reactiva versiones ni afecta decisiones previas. Los borradores se consultan en `/mandate`.

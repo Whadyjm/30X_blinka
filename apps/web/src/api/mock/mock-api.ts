@@ -57,6 +57,7 @@ type Db = {
   org: { id: string; name: string; defaultCurrency: string } | null;
   role: Role;
   mandateActive: FinanceMandate | null;
+  mandateHistory?: FinanceMandate[];
   mandateDraft: FinanceMandate | null;
   vendors: Vendor[];
   agreements: Agreement[];
@@ -422,6 +423,11 @@ export const mockApi: OliApi = {
     return meOf(d);
   },
 
+  async listMandateVersions() {
+    await lag();
+    const d = auth();
+    return [...(d.mandateActive ? [d.mandateActive] : []), ...(d.mandateHistory ?? [])];
+  },
   async getMandate(): Promise<MandateState> {
     await lag();
     const d = auth();
@@ -455,6 +461,7 @@ export const mockApi: OliApi = {
     const d = auth();
     requireOwner(d);
     if (!d.mandateDraft) throw new ApiError({ status: 409, code: 'NO_DRAFT', message: 'There is no draft to activate.' });
+    if (d.mandateActive) d.mandateHistory = [{ ...d.mandateActive, status: 'SUPERSEDED' }, ...(d.mandateHistory ?? [])];
     d.mandateActive = { ...d.mandateDraft, status: 'ACTIVE', id: `pol_${d.mandateDraft.version}`, createdAt: nowIso() };
     d.mandateDraft = null;
     persist();

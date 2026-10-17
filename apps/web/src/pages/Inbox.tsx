@@ -14,6 +14,7 @@ export function Inbox() {
       <Button variant="ghost" loading={query.isFetching} onClick={() => void query.refetch()} icon={<RefreshCw className="size-4" aria-hidden />}>{t('Refresh')}</Button>
       <Link to="/app/integrations" className={buttonClass('secondary')}>{t('Oli’s email')}</Link>
     </>} />
+    <p role="status" className="mb-4 text-xs text-ash">{t(query.isError ? 'Could not check for new email. Retrying automatically.' : 'Checking for new email every 5 seconds while the app is open.')}</p>
     {read.isError && <div className="mb-4"><InlineAlert>{errorMessage(read.error)}</InlineAlert></div>}
     {query.isLoading ? <Skeleton className="h-60" /> : query.isError ? <Card><ErrorState error={query.error} onRetry={() => void query.refetch()} /></Card>
       : !query.data?.messages.length ? <Card><EmptyState icon={<Mail className="size-6" aria-hidden />} title={t('Ready for your first email')}

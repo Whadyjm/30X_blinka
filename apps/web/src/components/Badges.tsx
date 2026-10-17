@@ -31,7 +31,7 @@ const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> 
 export function OutcomeBadge({ outcome, className }: { outcome: Outcome; className?: string }) {
   const s = STYLES[outcome];
   return (
-    <span title={t(s.title)} className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs', s.cls, className)}>
+    <span data-outcome={outcome} title={t(s.title)} className={cn('inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 text-xs', s.cls, className)}>
       {outcome === 'PROCESSING' ? <Orb size={20} className="-my-1 -ml-1.5" /> : <s.Icon className="size-3.5" aria-hidden />}
       {outcomeLabel(outcome)}
     </span>

@@ -16,13 +16,13 @@ const actionLabel = (a: Decision) => t(ACTION_LABEL[a]);
 export function Evaluation() {
   const q = useEvaluation();
 
-  if (q.isLoading) return <><PageHeader title={t('Evaluation')} /><Skeleton className="h-64" /></>;
+  if (q.isLoading) return <><PageHeader title={t('Oli quality checks')} /><Skeleton className="h-64" /></>;
   if (q.isError) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   const s = q.data;
   if (!s || s.totalCases === 0) {
     return (
       <>
-        <PageHeader title={t('Evaluation')} />
+        <PageHeader title={t('Oli quality checks')} />
         <Card><EmptyState title={t('No evaluation run yet')} body={t('Results appear here after the labelled dataset has been run.')} /></Card>
       </>
     );
@@ -33,9 +33,10 @@ export function Evaluation() {
   return (
     <>
       <PageHeader
-        title={t('Evaluation')}
+        title={t('Oli quality checks')}
         subtitle={t('Dataset {dataset} · run {when} · {n} labelled cases', { dataset: s.datasetVersion, when: formatDateTime(s.runAt), n: s.totalCases })}
       />
+      <Card className="mb-5 p-5"><h2 className="text-base text-ink">{t('How reliably did Oli handle the test invoices?')}</h2><p className="mt-2 max-w-prose text-sm leading-relaxed text-slate-600">{t('This page shows a recorded quality test using fictitious invoices with known expected results. It checks decisions, autonomy and explanations. It does not summarize your company’s invoices or run a new test when you open it.')}</p><p className="mt-2 text-xs text-ash">{t('The date and dataset below identify the measured run. These results do not guarantee accuracy for every document.')}</p></Card>
       {isMock && <div className="mb-4"><InlineAlert tone="warn">{t('These numbers come from the mock API, not the real policy engine.')}</InlineAlert></div>}
 
       <section aria-label={t('Key metrics')} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -56,8 +57,8 @@ export function Evaluation() {
           <CardHeader title={t('By group')} />
           <ul className="divide-y divide-hairline">
             {s.groups.map((g) => (
-              <li key={g.group} className="flex items-center gap-4 px-5 py-3 text-sm">
-                <span className="w-56 shrink-0 truncate text-ink">{g.group}</span>
+              <li key={g.group} className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm">
+                <span className="w-full break-words text-ink sm:w-56 sm:shrink-0">{g.group}</span>
                 <div className="h-2 flex-1 overflow-hidden rounded-sm bg-bone" aria-hidden>
                   <div className={cn('h-full', g.correct === g.total ? 'bg-highlighter' : 'bg-ink')} style={{ width: `${g.total ? (g.correct / g.total) * 100 : 0}%` }} />
                 </div>

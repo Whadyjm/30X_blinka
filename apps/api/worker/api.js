@@ -3,7 +3,7 @@ import { AgreementQuerySchema, ApprovalQuerySchema, BudgetQuerySchema, Dashboard
 import { authenticate, login, logout, owner } from './auth.js';
 import { activateMandate, budgets, mandateState, mutateDirectory, saveDraft } from './configuration.js';
 import { HttpError, id, json, now, periodKey, readBytes, stmt } from './http.js';
-import { agreementDto, approvalPage, dashboardInvoiceData, getInvoice, invoicePage, vendorDto } from './repository.js';
+import { agreementDto, approvalPage, dashboardInvoiceData, getInvoice, invoicePage, policyDto, vendorDto } from './repository.js';
 import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
 import { reevaluateInvoice } from './reevaluation.js';
@@ -64,6 +64,11 @@ export async function handleApi(request, env) {
     }
     const intake = path.match(/^\/invoices\/([^/]+)\/intake$/);
     if (intake && method === 'GET') return json({ data: await inspectInvoice(env, session, intake[1]) });
+    if (path === '/mandate/versions' && method === 'GET') {
+      const q = query(url, PaginationQuerySchema);
+      const rows = (await stmt(env.DB, 'SELECT * FROM policy_versions WHERE org_id = ? ORDER BY version DESC', orgId).all()).results;
+      return page(rows.map(policyDto), q);
+    }
     if (path === '/mandate' && method === 'GET') {
       const { active, draft } = await mandateState(env.DB, orgId); return json({ data: { active, draft } });
     }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Bot, CheckSquare, FileText, Inbox, LayoutDashboard, LogOut, Menu, MessageCircle, Plug, Settings, SlidersHorizontal, Trophy, X } from 'lucide-react';
@@ -6,8 +6,9 @@ import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
+import { useToast } from '@/components/ui/Toast';
 import { env } from '@/config/env';
-import { useApprovals, useInbox, useMe } from '@/hooks/queries';
+import { invalidateMoney, useApprovals, useInbox, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 
@@ -22,6 +23,22 @@ export function AppLayout() {
   const { data: me } = useMe();
   const approvals = useApprovals();
   const inbox = useInbox();
+  const toast = useToast();
+  const seenMail = useRef<{ scope: string; ids: Set<string> } | null>(null);
+  const mailScope = me?.org ? `${me.org.id}:${me.user.id}` : '';
+  useEffect(() => {
+    if (!mailScope || !inbox.data) return;
+    const messages = inbox.data.messages;
+    if (seenMail.current?.scope !== mailScope) {
+      seenMail.current = { scope: mailScope, ids: new Set(messages.map(message => message.id)) };
+      return;
+    }
+    const fresh = messages.filter(message => !seenMail.current!.ids.has(message.id));
+    seenMail.current.ids = new Set([...seenMail.current.ids, ...messages.map(message => message.id)].slice(-200));
+    if (!fresh.length) return;
+    toast.notify(fresh.length === 1 ? t('New email from {sender}: {subject}', { sender: fresh[0]!.sender, subject: fresh[0]!.subject }) : t('{n} new emails arrived for Oli.', { n: fresh.length }), '/app/inbox');
+    void invalidateMoney(qc);
+  }, [mailScope, inbox.data, toast, qc]);
   const pending = approvals.data?.filter((a) => a.state === 'PENDING').length ?? 0;
   const [open, setOpen] = useState(false);
 
@@ -42,7 +59,7 @@ export function AppLayout() {
     { to: '/app/approvals', label: 'Approvals', icon: CheckSquare, badge: pending },
     { to: '/app/rules', label: 'Rules', icon: SlidersHorizontal },
     { to: '/app/integrations', label: 'Integrations', icon: Plug },
-    { to: '/app/evaluation', label: 'Evaluation', icon: Trophy },
+    { to: '/app/evaluation', label: 'Oli quality checks', icon: Trophy },
     { to: '/app/settings', label: 'Settings', icon: Settings },
     ...(env.features.agentAccess ? [{ to: '/app/agent-access', label: 'Agent access', icon: Bot }] : []),
   ];

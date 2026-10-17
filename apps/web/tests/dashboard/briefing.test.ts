@@ -16,14 +16,15 @@ const escalated = (id: string, canDecide: boolean, data: Partial<InvoiceSummary>
 afterEach(() => applyLang('en'));
 
 describe('dashboard attention', () => {
-  it('includes approvals, corrections and failures, excluding completed decisions and processing', () => {
+  it('includes blocked invoices with approvals, corrections and failures, excluding approvals already granted and processing', () => {
     const stats = computeStats([
       escalated('approval', true), escalated('review', false), invoice('failure', { status: 'FAILED' }),
       invoice('approved', { status: 'APPROVED' }), invoice('blocked', { status: 'BLOCKED' }),
       invoice('rejected', { status: 'REJECTED' }), invoice('working'),
     ], today);
-    expect(stats.attention.map(i => i.id)).toEqual(['approval', 'review', 'failure']);
-    expect(stats.needsYouCount).toBe(3);
+    expect(stats.attention.map(i => i.id)).toEqual(['approval', 'review', 'failure', 'blocked']);
+    expect(stats.needsYouCount).toBe(4);
+    expect(stats.needsApprovalCount + stats.needsReviewCount + stats.failedCount + stats.blockedCount).toBe(stats.needsYouCount);
     expect(stats.approvedCount).toBe(1);
     expect(stats.blockedCount).toBe(1);
     expect(stats.processingCount).toBe(1);
@@ -80,4 +81,12 @@ describe('dashboard attention', () => {
     applyLang('es');
     expect(buildBriefing(stats, today)[0]).toBe('1 factura necesita tu atención.');
   });
+});
+
+it('explains a total of seven as four blocked and three requiring approval, without counting blocked as due for approval', () => {
+  const stats = computeStats([...Array.from({ length: 4 }, (_, n) => invoice(`blocked-${n}`, { status: 'BLOCKED', dueDate: '2026-10-18' })), ...Array.from({ length: 3 }, (_, n) => escalated(`approval-${n}`, true))], today);
+  expect(stats.needsYouCount).toBe(7);
+  expect(stats.blockedCount).toBe(4);
+  expect(stats.needsApprovalCount).toBe(3);
+  expect(stats.upcoming).toHaveLength(0);
 });

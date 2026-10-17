@@ -142,6 +142,7 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     async disableEmail() { await raw('DELETE', '/integrations/email'); },
     getInbox: () => get('/inbox', InboxSchema),
     async readInboxMessage(id) { await raw('POST', `/inbox/${encodeURIComponent(id)}/read`); },
+    async listMandateVersions() { return (await list('/mandate/versions', PolicyVersionSchema)).map(policyView); },
     async getMandate() {
       const state = await get('/mandate', mandateSchema);
       const budgets = await get('/budgets', z.array(BudgetPeriodSchema));

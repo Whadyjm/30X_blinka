@@ -62,6 +62,7 @@ export interface OliApi {
 
   // mandate & reference data
   getMandate(): Promise<MandateState>;
+  listMandateVersions(): Promise<FinanceMandate[]>;
   saveMandateDraft(input: MandateDraftInput): Promise<FinanceMandate>;
   activateMandate(input: { draftId?: string; confirm: true; expectedRevision?: number; expectedActivePolicyVersionId?: string | null }): Promise<FinanceMandate>;
   listVendors(): Promise<Vendor[]>;

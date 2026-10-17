@@ -15,6 +15,7 @@ import { buildBriefing, computeStats } from '@/lib/briefing';
 import { daysUntil, dueLabel } from '@/lib/dates';
 import { formatMoneyWithCode } from '@/lib/money';
 import { getOutcome } from '@/lib/outcome';
+import '@/styles/dashboard-status.css';
 
 export function Dashboard() {
   const invoices = useInvoices();
@@ -29,7 +30,7 @@ export function Dashboard() {
     : budget && budget.reservedMinor > 0 ? 100 : 0;
   const urgent = stats.attention.filter(inv => {
     const days = daysUntil(inv.dueDate);
-    return days != null && days <= 2;
+    return getOutcome(inv) !== 'BLOCKED' && days != null && days <= 2;
   }).length;
 
   return (
@@ -41,7 +42,12 @@ export function Dashboard() {
       />
 
       <div id="dashboard-stats" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat label={t('Needs your attention')} value={stats.needsYouCount} icon={<Hand className="size-5" />} tone="amber" to="#dashboard-attention" loading={invoices.isLoading} />
+        <Stat label={t('Needs your attention')} value={stats.needsYouCount} icon={<Hand className="size-5" />} tone="amber" to="#dashboard-attention" loading={invoices.isLoading} breakdown={[
+          { label: t('Awaiting your approval'), count: stats.needsApprovalCount, tone: 'NEEDS_APPROVAL' },
+          { label: t('Blocked — review the reason'), count: stats.blockedCount, tone: 'BLOCKED' },
+          { label: t('Needs clarification'), count: stats.needsReviewCount, tone: 'NEEDS_REVIEW' },
+          { label: t('Processing errors'), count: stats.failedCount, tone: 'FAILED' },
+        ]} />
         <Stat label={t('Pending due in 14 days')} value={stats.upcoming.length} icon={<CalendarClock className="size-5" />} tone="indigo" to="#dashboard-attention" loading={invoices.isLoading} />
         <Stat label={t('Approved invoices')} value={stats.approvedCount} icon={<CheckCircle2 className="size-5" />} tone="emerald" to="/app/bills?outcome=APPROVED" loading={invoices.isLoading} />
         <Stat label={t('Blocked invoices')} value={stats.blockedCount} icon={<Ban className="size-5" />} tone="rose" to="/app/bills?outcome=BLOCKED" loading={invoices.isLoading} />
@@ -51,7 +57,7 @@ export function Dashboard() {
         <Card id="dashboard-attention" tabIndex={-1} className={`min-w-0 scroll-mt-6 lg:col-span-2 ${stats.needsYouCount > 0 ? 'border-ink' : ''}`}>
           <CardHeader
             title={t('Needs your attention')}
-            subtitle={t('Earliest due dates first. Review the reason for each case.')}
+            subtitle={t('Approval requests, blocked invoices and corrections. Each label explains the next step.')}
             action={!invoices.isLoading && stats.needsYouCount > 0 ? <span className="shrink-0 rounded-md bg-ink px-2.5 py-1 text-sm tabular-nums text-white">{stats.needsYouCount}</span> : undefined}
           />
           {invoices.isLoading ? <LoadingRows /> : list.length === 0 ? (
@@ -104,7 +110,7 @@ export function Dashboard() {
                     <span className="flex items-center gap-2 text-sm"><CheckCircle2 className="size-4" aria-hidden />{t('Approved invoices')}</span><span className="text-xl tabular-nums">{stats.approvedCount}</span>
                   </Link>
                   <Link to="/app/bills?outcome=BLOCKED" className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 hover:bg-bone">
-                    <span className="flex items-center gap-2 text-sm"><Ban className="size-4" aria-hidden />{t('Blocked invoices')}</span><span className="text-xl tabular-nums">{stats.blockedCount}</span>
+                    <span className="dashboard-status-BLOCKED flex items-center gap-2 rounded-md px-2 py-1 text-sm"><Ban className="size-4" aria-hidden />{t('Blocked invoices')}</span><span className="text-xl tabular-nums">{stats.blockedCount}</span>
                   </Link>
                   {stats.processingCount > 0 && <Link to="/app/bills?outcome=PROCESSING" className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 hover:bg-bone"><span className="flex items-center gap-2 text-sm"><Clock3 className="size-4" aria-hidden />{t('Processing')}</span><span className="text-xl tabular-nums">{stats.processingCount}</span></Link>}
                 </div>
@@ -131,19 +137,23 @@ const TONES = {
   indigo: 'bg-bone text-ink',
 } as const;
 
-function Stat({ label, value, icon, tone, to, loading }: {
+function Stat({ label, value, icon, tone, to, loading, breakdown }: {
   label: string;
   value: number;
   icon: ReactNode;
   tone: keyof typeof TONES;
   to: string;
   loading?: boolean;
+  breakdown?: { label: string; count: number; tone: string }[];
 }) {
   const className = 'rounded-2xl border border-hairline bg-white p-4 transition-colors hover:border-ink sm:p-5';
   const content = <>
     <div className={`grid size-9 place-items-center rounded-lg ${TONES[tone]}`} aria-hidden>{icon}</div>
     {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-[28px] leading-none tabular-nums text-ink">{value}</p>}
     <p className="mt-1 text-sm text-ash">{label}</p>
+    {!loading && breakdown && <dl className="mt-3 space-y-2 border-t border-hairline pt-3">{breakdown.filter(item => item.count > 0).map(item => <div key={item.tone} className="flex items-start justify-between gap-2 text-xs">
+      <dt className="flex items-start gap-1.5"><span aria-hidden className={`dashboard-dot dashboard-dot-${item.tone}`} />{item.label}</dt><dd className="tabular-nums text-ink">{item.count}</dd>
+    </div>)}</dl>}
   </>;
   return to.startsWith('#')
     ? <a href={to} className={className}>{content}</a>
@@ -170,7 +180,7 @@ function AttentionRow({ invoice }: { invoice: InvoiceSummary }) {
         </div>
         <p className="mt-2 break-words text-sm leading-relaxed text-slate-600">{reason}</p>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-2"><OutcomeBadge outcome={outcome} /><span className={`text-xs ${urgent ? 'text-ink underline decoration-dotted underline-offset-4' : 'text-ash'}`}>{dueLabel(invoice.dueDate)}</span></div>
+          <div className="flex flex-wrap items-center gap-2"><OutcomeBadge outcome={outcome} className={`dashboard-status-${outcome}`} /><span className={`text-xs ${urgent ? 'text-ink underline decoration-dotted underline-offset-4' : 'text-ash'}`}>{dueLabel(invoice.dueDate)}</span></div>
           <span className="inline-flex items-center gap-1.5 text-sm text-ink">{action}<ArrowRight className="size-4" aria-hidden /></span>
         </div>
       </Link>

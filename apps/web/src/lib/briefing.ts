@@ -8,6 +8,9 @@ export type Stats = {
   approvedCount: number;
   approvedMinor: Record<string, number>;
   blockedCount: number;
+  needsApprovalCount: number;
+  needsReviewCount: number;
+  failedCount: number;
   needsYouCount: number;
   attention: InvoiceSummary[];
   processingCount: number;
@@ -17,7 +20,7 @@ export type Stats = {
 
 /** Counts derived from the server's invoice list. The "briefing" below reads these — never invented text. */
 export function computeStats(invoices: InvoiceSummary[], today: Date = new Date()): Stats {
-  const stats: Stats = { approvedCount: 0, approvedMinor: {}, blockedCount: 0, needsYouCount: 0, attention: [], processingCount: 0, upcoming: [], overdue: [] };
+  const stats: Stats = { approvedCount: 0, approvedMinor: {}, blockedCount: 0, needsApprovalCount: 0, needsReviewCount: 0, failedCount: 0, needsYouCount: 0, attention: [], processingCount: 0, upcoming: [], overdue: [] };
   for (const inv of invoices) {
     const o = getOutcome(inv);
     if (o === 'APPROVED') {
@@ -28,7 +31,11 @@ export function computeStats(invoices: InvoiceSummary[], today: Date = new Date(
     } else if (o === 'BLOCKED') stats.blockedCount++;
     else if (o === 'PROCESSING') stats.processingCount++;
 
-    // Attention is distinct from a completed decision, including a correct block.
+    if (o === 'NEEDS_APPROVAL') stats.needsApprovalCount++;
+    if (o === 'NEEDS_REVIEW') stats.needsReviewCount++;
+    if (o === 'FAILED') stats.failedCount++;
+    // A block needs its reason reviewed, never permission to bypass the rules.
+    if (o === 'BLOCKED') stats.attention.push(inv);
     if (o === 'NEEDS_APPROVAL' || o === 'NEEDS_REVIEW' || o === 'FAILED') {
       stats.attention.push(inv);
       const n = daysUntil(inv.dueDate, today);

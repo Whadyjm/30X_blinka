@@ -9,6 +9,7 @@ export const qk = {
   inbox: ['inbox'] as const,
   me: ['me'] as const,
   mandate: ['mandate'] as const,
+  mandateVersions: ['mandate-versions'] as const,
   vendors: ['vendors'] as const,
   agreements: ['agreements'] as const,
   invoices: ['invoices'] as const,
@@ -22,7 +23,7 @@ const POLL_MS = 2000;
 const POLL_WINDOW_MS = 60000;
 
 export function useInbox() {
-  return useQuery({ queryKey: qk.inbox, queryFn: () => api.getInbox(), refetchInterval: 5000, retry: false });
+  return useQuery({ queryKey: qk.inbox, queryFn: () => api.getInbox(), refetchInterval: 5000, refetchIntervalInBackground: true, refetchOnWindowFocus: true, retry: false });
 }
 
 export function useReadInboxMessage() {
@@ -37,6 +38,10 @@ export function useMe() {
 
 export function useMandate(enabled = true) {
   return useQuery({ queryKey: qk.mandate, queryFn: () => api.getMandate(), enabled });
+}
+
+export function useMandateVersions() {
+  return useQuery({ queryKey: qk.mandateVersions, queryFn: () => api.listMandateVersions() });
 }
 
 export function useVendors(enabled = true) {
@@ -103,6 +108,7 @@ export function invalidateMoney(qc: QueryClient) {
     qc.invalidateQueries({ queryKey: ['invoice'] }),
     qc.invalidateQueries({ queryKey: qk.approvals }),
     qc.invalidateQueries({ queryKey: qk.mandate }),
+    qc.invalidateQueries({ queryKey: qk.mandateVersions }),
     qc.invalidateQueries({ queryKey: qk.evaluation }),
   ]);
 }
