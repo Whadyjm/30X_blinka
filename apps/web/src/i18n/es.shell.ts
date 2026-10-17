@@ -93,4 +93,9 @@ export const esShell: Record<string, string> = {
   Back: 'Atrás',
   Continue: 'Continuar',
   'Activate Oli': 'Activar a Oli',
+
+  // session gate (no sign-in screen)
+  'No active session': 'Sin sesión activa',
+  'The API requires a session and this build has no sign-in screen. Start the API with a session, or run the UI on the mock data (npm run dev:mock).':
+    'La API exige una sesión y esta versión no tiene pantalla de inicio de sesión. Inicia la API con una sesión, o usa la interfaz con datos simulados (npm run dev:mock).',
 };

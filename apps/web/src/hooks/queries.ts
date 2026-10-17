@@ -88,8 +88,8 @@ export function useReevaluateInvoice() {
     onSettled: () => invalidateMoney(qc) });
 }
 
-export function useApprovals() {
-  return useQuery({ queryKey: qk.approvals, queryFn: () => api.listApprovals(), staleTime: 10_000 });
+export function useApprovals(enabled = true) {
+  return useQuery({ queryKey: qk.approvals, queryFn: () => api.listApprovals(), staleTime: 10_000, enabled });
 }
 
 export function useEvaluation() {

@@ -16,7 +16,10 @@
     "resolveJsonModule": true,
     "noEmit": true,
     "types": ["vite/client", "node"],
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@oli/mascot": ["./src/components/Oli.tsx"]
+    }
   },
   "include": ["src", "tests", "vite.config.ts", "vite-env.d.ts"]
 }
