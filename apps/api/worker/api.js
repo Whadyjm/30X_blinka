@@ -102,6 +102,6 @@ export async function handleApi(request, env) {
     if (!known) console.error(JSON.stringify({ event: 'api_request_failed', requestId }));
     return json({ error: { code: known ? error.code : 'INTERNAL_ERROR', message: known ? error.message : 'No se pudo completar la solicitud.',
       fieldErrors: known ? error.fieldErrors : {}, requestId } }, known ? error.status : 500,
-    known && error.status === 429 ? { 'Retry-After': '900' } : {});
+    known && error.status === 429 ? { 'Retry-After': String(error.retryAfter ?? 900) } : {});
   }
 }

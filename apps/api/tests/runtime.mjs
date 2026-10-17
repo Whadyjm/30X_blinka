@@ -99,5 +99,18 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   await waitForReply(2);
   assert.match(sent.at(-1).text, /¡Hola!/);
   assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 2);
+  const reevaluate = (current, key) => runtime.dispatchFetch(`${origin}/api/v1/invoices/${invoice.id}/reevaluate`, {
+    method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Idempotency-Key': key },
+    body: JSON.stringify({ expectedDecisionId: current.latestDecision.id, expectedPolicyVersionId: current.latestDecision.policyVersionId }),
+  });
+  const reanalysisKey = crypto.randomUUID();
+  const updated = await reevaluate(detail, reanalysisKey);
+  const result = await updated.json(); assert.equal(updated.status, 200, JSON.stringify(result));
+  const limited = await reevaluate(result.data, crypto.randomUUID());
+  assert.equal(limited.status, 429); assert.equal((await limited.json()).error.code, 'REANALYSIS_COOLDOWN');
+  assert.ok(Number(limited.headers.get('Retry-After')) > 0 && Number(limited.headers.get('Retry-After')) <= 60);
+  assert.deepEqual((await (await reevaluate(detail, reanalysisKey)).json()).data, result.data);
+  assert.equal(await db.prepare('SELECT count(*) n FROM decisions WHERE invoice_id=?').bind(invoice.id).first('n'), 2);
+  assert.equal(await db.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
   fetchMock.assertNoPendingInterceptors();
 });

@@ -6,7 +6,7 @@ import { InvoiceDetailSchema, SessionSchema } from '@oli/contracts';
 import worker from '../worker/index.js';
 import { processInvoice, snapshot } from '../worker/processing.js';
 import { corroboratePdfText, READER_VERSION } from '../worker/document.js';
-import { clearGuard, guard, id, now, originCheck, periodKey, stmt } from '../worker/http.js';
+import { audit, clearGuard, guard, id, now, originCheck, periodKey, stmt } from '../worker/http.js';
 
 const origin = 'https://oli.invalid';
 const pdf = new TextEncoder().encode('%PDF-1.4\nsynthetic integration fixture, provider is mocked');
@@ -352,6 +352,84 @@ test('un checkpoint pendiente del lector anterior se relee y no autoriza con con
 });
 
 const reanalysisInput = detail => ({ expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId });
+
+test('reanálisis impone cooldown por hash, conserva replay y no bloquea documentos distintos', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  await DB.prepare("UPDATE vendors SET allowed=0 WHERE id='vendor_demo_cloud'").run();
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read())).data;
+  const path = `/invoices/${invoice.id}/reevaluate`;
+  const options = { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(first) };
+  const updated = await api(path, options); assert.equal(updated.status, 200, JSON.stringify(updated));
+  const before = await ledger();
+  const limited = await api(path, { ...options, key: crypto.randomUUID(), data: reanalysisInput(updated.data) });
+  assert.equal(limited.status, 429); assert.equal(limited.error.code, 'REANALYSIS_COOLDOWN');
+  assert.ok(Number(limited.headers.get('Retry-After')) > 0 && Number(limited.headers.get('Retry-After')) <= 60);
+  assert.deepEqual((await api(path, options)).data, updated.data);
+  assert.deepEqual(await ledger(), before);
+  const copy = await upload({ file: { name: 'same-bytes-renamed.pdf' } });
+  const copyDetail = (await processInvoice(env, 'org_demo', copy.id, read())).data;
+  const copyLimit = await api(`/invoices/${copy.id}/reevaluate`, { ...options, key: crypto.randomUUID(), data: reanalysisInput(copyDetail) });
+  assert.equal(copyLimit.status, 429); assert.equal(copyLimit.error.code, 'REANALYSIS_COOLDOWN');
+  const other = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4 different document') } });
+  const otherDetail = (await processInvoice(env, 'org_demo', other.id, read())).data;
+  assert.equal((await api(`/invoices/${other.id}/reevaluate`, { ...options, key: crypto.randomUUID(), data: reanalysisInput(otherDetail) })).status, 200);
+  assert.equal(await DB.prepare("SELECT count(*) n FROM audit_events WHERE type='INVOICE_REEVALUATED'").first('n'), 2);
+  assert.equal(await DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+});
+
+test('reanálisis admite el tercero y agota cuota persistente sin reiniciarla por copia o replay', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  await DB.prepare("UPDATE vendors SET allowed=0 WHERE id='vendor_demo_cloud'").run();
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read())).data;
+  // Synthetic historical successful requests establish usage before this process/session.
+  for (let n = 1; n <= 2; n++) await audit(DB, 'org_demo', 'user_demo_owner', 'INVOICE_REEVALUATED',
+    invoice.id, { syntheticHistoricalContext: true }, `2000-01-0${n}T00:00:00.000Z`).run();
+  const path = `/invoices/${invoice.id}/reevaluate`;
+  const options = { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(first) };
+  const third = await api(path, options); assert.equal(third.status, 200, JSON.stringify(third));
+  const before = await ledger();
+  const fourth = await api(path, { ...options, key: crypto.randomUUID(), data: reanalysisInput(third.data) });
+  assert.equal(fourth.status, 409); assert.equal(fourth.error.code, 'REANALYSIS_LIMIT_REACHED');
+  assert.equal(fourth.headers.get('Retry-After'), null);
+  assert.deepEqual((await api(path, options)).data, third.data);
+  assert.deepEqual(await ledger(), before);
+  const copy = await upload();
+  const copyDetail = (await processInvoice(env, 'org_demo', copy.id, read())).data;
+  const copyLimit = await api(`/invoices/${copy.id}/reevaluate`, { ...options, key: crypto.randomUUID(), data: reanalysisInput(copyDetail) });
+  assert.equal(copyLimit.status, 409); assert.equal(copyLimit.error.code, 'REANALYSIS_LIMIT_REACHED');
+  assert.equal(await DB.prepare("SELECT count(*) n FROM audit_events WHERE type='INVOICE_REEVALUATED'").first('n'), 3);
+  assert.equal(await DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+});
+
+test('D1 aplica cooldown y cuota atómicos entre copias, aísla empresas y revierte efectos previos', async t => {
+  const { DB, upload } = await setup(t);
+  const first = await upload(), copy = await upload();
+  const write = invoice => DB.batch([
+    audit(DB, 'org_demo', null, 'PRECEDING_TRANSACTION_EFFECT', invoice.id, {}),
+    audit(DB, 'org_demo', 'user_demo_owner', 'INVOICE_REEVALUATED', invoice.id, {}),
+  ]);
+  const results = await Promise.allSettled([write(first), write(copy)]);
+  assert.equal(results.filter(r => r.status === 'fulfilled').length, 1);
+  assert.match(String(results.find(r => r.status === 'rejected').reason), /REANALYSIS_COOLDOWN/);
+  assert.equal(await DB.prepare("SELECT count(*) n FROM audit_events WHERE type='PRECEDING_TRANSACTION_EFFECT'").first('n'), 1);
+  await stmt(DB, "INSERT INTO organizations(id,name,default_currency,timezone) VALUES ('other','Other','USD','UTC')").run();
+  const source = await stmt(DB, 'SELECT * FROM invoices WHERE id=?', first.id).first();
+  await stmt(DB, `INSERT INTO invoices(id,org_id,file_key,file_name,file_mime_type,file_size_bytes,file_sha256)
+    VALUES ('other-copy','other','other-key','other.pdf','application/pdf',?,?)`, source.file_size_bytes, source.file_sha256).run();
+  await audit(DB, 'other', null, 'INVOICE_REEVALUATED', 'other-copy', {}).run();
+
+  const next = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4 fresh quota race') } });
+  const nextCopy = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4 fresh quota race') } });
+  for (let n = 1; n <= 2; n++) await audit(DB, 'org_demo', null, 'INVOICE_REEVALUATED',
+    next.id, { syntheticHistoricalContext: true }, `2000-01-0${n}T00:00:00.000Z`).run();
+  const exhausted = await Promise.allSettled([write(next), write(nextCopy)]);
+  assert.equal(exhausted.filter(r => r.status === 'fulfilled').length, 1);
+  assert.match(String(exhausted.find(r => r.status === 'rejected').reason), /REANALYSIS_LIMIT_REACHED/);
+  assert.equal(await DB.prepare("SELECT count(*) n FROM audit_events WHERE type='PRECEDING_TRANSACTION_EFFECT'").first('n'), 2);
+  await assert.rejects(DB.prepare("DELETE FROM audit_events WHERE type='INVOICE_REEVALUATED'").run(), /AUDIT_IMMUTABLE/);
+});
 
 test('reanálisis usa reglas actuales, conserva extracción/historial y solo reserva una vez con replay', async t => {
   const { env, DB, api, upload, read, ledger } = await setup(t);

@@ -5,6 +5,7 @@ import { audit, body, clearGuard, guard, HttpError, id, json, now, sha256, stmt 
 import { decisionStatements, evaluateStored, snapshot } from './processing.js';
 import { getInvoice, idempotency } from './repository.js';
 import { legacyNegativeDocumentType } from './legacy-document-type.js';
+import { checkReanalysisLimit } from './reanalysis-limits.js';
 
 export async function reevaluateInvoice(request, env, session, invoiceId) {
   owner(session);
@@ -23,6 +24,7 @@ export async function reevaluateInvoice(request, env, session, invoiceId) {
   if (detail.status !== 'DECIDED' || !state.invoice.extracted_json) {
     throw new HttpError(409, 'INVOICE_NOT_READY', 'La factura necesita una lectura completa antes de reevaluar sus reglas.');
   }
+  await checkReanalysisLimit(env.DB, org, state.invoice.file_sha256);
   const read = JSON.parse(state.invoice.extracted_json);
   const legacyClassification = legacyNegativeDocumentType(read, state.invoice.file_sha256);
   if (legacyClassification) {
@@ -67,6 +69,13 @@ export async function reevaluateInvoice(request, env, session, invoiceId) {
   } catch (error) {
     const replay = await idempotency(request, env.DB, session, await sha256(JSON.stringify(input)));
     if (replay.cached) return json(replay.cached.body, replay.cached.status);
+    // D1 enforces the same allowance atomically with the decision, including concurrent copies.
+    if (/REANALYSIS_LIMIT_REACHED|REANALYSIS_COOLDOWN/.test(String(error))) {
+      await checkReanalysisLimit(env.DB, org, state.invoice.file_sha256);
+      const limited = new HttpError(429, 'REANALYSIS_COOLDOWN', 'Espera un minuto entre reanálisis de este documento.');
+      limited.retryAfter = 1;
+      throw limited;
+    }
     if (/CHECK constraint|UNIQUE constraint|BUDGET_EXCEEDED|POLICY_CHANGED/.test(String(error))) {
       throw new HttpError(409, 'DECISION_CHANGED', 'Los datos cambiaron. Actualiza la factura antes de reanalizarla.');
     }

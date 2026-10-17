@@ -454,6 +454,23 @@ proveedor/acuerdo requiere el flujo de alta/confirmación (`409 INVOICE_IDENTITY
 y cambios concurrentes devuelven `409 DECISION_CHANGED`/`POLICY_CHANGED` para actualizar la pantalla.
 El botón del detalle explica que reanaliza reglas y deshabilita los casos protegidos.
 
+El backend permite **tres reanálisis exitosos en total por empresa y SHA-256 del documento**,
+con **60 segundos entre ellos**. El primer procesamiento no consume esta cuota; los reintentos
+técnicos del trabajo conservan su límite independiente de tres intentos y su backoff.
+Se cuenta el historial `INVOICE_REEVALUATED` existente: ni otro usuario, otra sesión, otra clave,
+un cambio de política ni subir los mismos bytes con otro nombre reinician la cuota de reanálisis.
+Un replay con la misma clave devuelve la respuesta original y no consume otro intento.
+
+- `429 REANALYSIS_COOLDOWN`: incluye `Retry-After` con los segundos que faltan. Whady puede
+  deshabilitar temporalmente el botón y mostrar el mensaje del servidor.
+- `409 REANALYSIS_LIMIT_REACHED`: se agotó la cuota de este documento; no se debe reintentar
+  automáticamente ni presentar una cuenta regresiva. No hay reinicio automático de la cuota.
+
+Las validaciones rechazadas y las transacciones fallidas no consumen cuota ni generan una decisión.
+Un trigger D1 aplica ambos límites dentro de la misma transacción: un exceso concurrente revierte
+la decisión, las solicitudes humanas, cualquier reserva y los eventos asociados. Esto limita
+los reanálisis efectivos; no reemplaza un límite general de tráfico HTTP ni de nuevas cargas.
+
 Filtros de `GET /invoices`: `status?`, `action?`, `vendorId?`, `needsHumanApproval?` y paginación.
 Los filtros se combinan con AND; `action` consulta la última decisión.
 `needsHumanApproval=true` selecciona solicitudes `PENDING` autorizables, no todos los `ESCALATE`.
