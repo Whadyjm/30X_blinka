@@ -8,7 +8,6 @@ import { UPLOAD } from '@/config/env';
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
-import { formatDateTime } from '@/lib/dates';
 import { ChatReply } from './ChatReply';
 import { useConversation } from './useConversation';
 
@@ -20,12 +19,25 @@ export function ChatWorkspace() {
   const [channel, setChannel] = useState<ChatChannel>('WEB');
   const conversation = channel === 'WEB' ? web : telegram;
   const [draft, setDraft] = useState(''), [files, setFiles] = useState<File[]>([]);
+  const drafts = useRef(new Map<string | null, { text: string; files: File[] }>());
   const [inputError, setInputError] = useState<string | null>(null);
   const [nearBottom, setNearBottom] = useState(true), [dragging, setDragging] = useState(false);
   const root = useRef<HTMLElement>(null), log = useRef<HTMLDivElement>(null), textarea = useRef<HTMLTextAreaElement>(null), fileInput = useRef<HTMLInputElement>(null);
   const shouldFollow = useRef(true);
   const busy = web.sending || web.processing || web.loading;
   const empty = conversation.turns.length === 0 && !conversation.pending && !conversation.loading;
+  const webTabs = web.id === null ? [{ id: null, title: t('New conversation') }, ...web.conversations] : web.conversations;
+  const webTabId = (id: string | null) => `web-thread-${id ?? 'new'}`;
+  const selectWebConversation = (id: string | null) => {
+    if (busy || web.pending || id === web.id) return;
+    drafts.current.set(web.id, { text: draft, files });
+    const saved = drafts.current.get(id);
+    setDraft(saved?.text ?? ''); setFiles(saved?.files ?? []); setInputError(null);
+    if (id === null) web.newConversation(); else web.selectConversation(id);
+  };
+  useEffect(() => {
+    if (channel === 'WEB') document.getElementById(webTabId(web.id))?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [channel, web.id, web.conversations]);
 
   // visualViewport includes the space actually left above the mobile keyboard.
   useEffect(() => {
@@ -60,6 +72,7 @@ export function ChatWorkspace() {
   };
   const send = async (text = draft) => {
     if (!web.canSend || channel !== 'WEB' || (!text.trim() && !files.length)) return;
+    drafts.current.delete(web.id);
     shouldFollow.current = true; setInputError(null); setDraft(''); setFiles([]);
     await web.send(text.trim(), files);
   };
@@ -74,7 +87,7 @@ export function ChatWorkspace() {
         <h1 className="text-lg leading-normal text-ink">{t('Chat with Oli')}</h1>
         <div className="flex items-center gap-1">
           <a href="#organization-overview" className="inline-flex min-h-11 items-center px-3 text-sm text-slate-600 hover:text-ink">{t('Overview')}</a>
-          {channel === 'WEB' && <button type="button" disabled={busy || !!web.pending} onClick={() => { web.newConversation(); setInputError(null); }}
+          {channel === 'WEB' && <button type="button" disabled={busy || !!web.pending} onClick={() => selectWebConversation(null)}
             className="grid size-11 place-items-center rounded-md text-ink hover:bg-bone disabled:opacity-40" aria-label={t('New conversation')} title={t('New conversation')}><Plus className="size-5" aria-hidden /></button>}
         </div>
       </div>
@@ -89,13 +102,20 @@ export function ChatWorkspace() {
       </div>
     </header>
     <div id="chat-panel" role="tabpanel" aria-labelledby={`chat-tab-${channel}`} className="flex min-h-0 flex-1 flex-col">
-      {conversation.conversations.length > 0 && <div className="shrink-0 px-4 py-2 md:px-6">
-        <select aria-label={t('Conversation history')} value={conversation.id ?? ''} disabled={conversation.sending || !!conversation.pending} onChange={e => conversation.selectConversation(e.target.value)}
-          className="min-h-11 w-full max-w-lg truncate rounded-md border border-hairline bg-white px-3 text-sm text-slate-600">
-          {!conversation.id && <option value="">{t('New conversation')}</option>}
-          {conversation.conversations.map(c => <option key={c.id} value={c.id}>{c.title || t('Invoice conversation')} · {formatDateTime(c.updatedAt)}</option>)}
-        </select>
+      {channel === 'WEB' && <div role="tablist" aria-label={t('Conversation history')} className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline px-4 pt-2 md:px-6">
+        {webTabs.map((thread, index) => <button key={thread.id ?? 'new'} id={webTabId(thread.id)} type="button" role="tab" aria-selected={web.id === thread.id}
+          aria-controls="web-thread-panel" tabIndex={web.id === thread.id ? 0 : -1} disabled={busy || !!web.pending}
+          title={thread.title || t('Invoice conversation')} onClick={() => selectWebConversation(thread.id)}
+          onKeyDown={e => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
+            e.preventDefault(); const next = e.key === 'Home' ? 0 : e.key === 'End' ? webTabs.length - 1 : (index + (e.key === 'ArrowRight' ? 1 : -1) + webTabs.length) % webTabs.length;
+            const target = webTabs[next]!; selectWebConversation(target.id); document.getElementById(webTabId(target.id))?.focus();
+          } }} className={cn('min-h-11 max-w-52 shrink-0 truncate rounded-t-md border border-b-0 px-4 text-sm disabled:opacity-40',
+            web.id === thread.id ? 'border-hairline bg-bone text-ink' : 'border-transparent text-slate-600 hover:bg-bone')}>
+          {thread.title || t('Invoice conversation')}
+        </button>)}
       </div>}
+      <div id={channel === 'WEB' ? 'web-thread-panel' : undefined} role={channel === 'WEB' ? 'tabpanel' : undefined}
+        aria-labelledby={channel === 'WEB' ? webTabId(web.id) : undefined} className="flex min-h-0 flex-1 flex-col">
       <div ref={log} className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-y-contain px-4 py-5 md:px-6" role="log" aria-label={t(channel === 'WEB' ? 'Web conversation' : 'Telegram conversation')}
         aria-live="polite" aria-relevant="additions" onScroll={() => { const el = log.current!; const close = el.scrollHeight - el.clientHeight - el.scrollTop < 80; shouldFollow.current = close; setNearBottom(close); }}>
         {conversation.loading && <p role="status" className="text-sm text-slate-600">{t('Loading conversation...')}</p>}
@@ -122,6 +142,7 @@ export function ChatWorkspace() {
           </div></div>
           {conversation.sending && <p role="status" className="text-base text-slate-600">{t('Oli is thinking...')}</p>}
         </div>}
+      </div>
       </div>
       {!nearBottom && !empty && <button type="button" onClick={() => { shouldFollow.current = true; log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }); }} aria-label={t('Go to latest message')}
         className="absolute bottom-40 right-5 grid size-11 place-items-center rounded-full border border-hairline bg-white text-ink"><ArrowDown className="size-5" aria-hidden /></button>}

@@ -1,0 +1,33 @@
+{
+  "scope": "Navegador local, D1 efímero y modelo simulado, sin mensajes externos",
+  "checks": [
+    "Web muestra una subpestaña por conversación y no selector",
+    "Borrador y adjunto separados por conversación",
+    "Flechas del teclado cambian conversación",
+    "Crear y enviar conversación agrega su subpestaña persistida",
+    "Telegram no tiene subpestañas ni selector",
+    "Fila móvil deslizable sin desbordar la página"
+  ],
+  "webTests": {
+    "passed": 24,
+    "total": 24
+  },
+  "build": "PASS",
+  "detector": [],
+  "screenshots": [
+    "desktop1440x1000",
+    "mobile390x844",
+    "Telegramdesktop",
+    "Telegrammobile"
+  ],
+  "limitations": [
+    "Respuestas de modelo simuladas; sin mensajes externos",
+    "Borradores y archivos en memoria; recargar la página los descarta",
+    "Listado conserva límite API existente de20conversaciones"
+  ],
+  "independentReview": {
+    "disposition": "ship",
+    "materialFixes": [],
+    "scope": "Subpestañas Web y contexto único Telegram"
+  }
+}

@@ -42,6 +42,10 @@ Home mantiene dos pestañas con selección y queries independientes. `ChatHistor
 incluye `channel`; Web conserva borrador y adjuntos al consultar Telegram. Telegram es
 una vista del historial con enlace al bot y sin botones de confirmar/cancelar. El servidor
 rechaza escribir o reutilizar una clave Telegram desde Web con `CHAT_CHANNEL_MISMATCH`409.
+Web presenta las conversaciones como subpestañas debajo de los canales; en móvil la fila
+se desplaza horizontalmente. El botón + abre una conversación nueva, persistida al enviar
+su primer mensaje. Cada hilo conserva su borrador y adjuntos en memoria mientras Home
+permanece abierto. Telegram abre su conversación más reciente sin subpestañas ni selector.
 La migración0009 separa el legado mezclado mediante una proyección append-only; conserva
 los snapshots originales y el contexto al modelo usa exclusivamente el canal del hilo.
 
