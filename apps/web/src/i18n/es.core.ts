@@ -2,6 +2,7 @@
 export const esCore: Record<string, string> = {
   // language switcher
   Language: 'Idioma',
+  'Email or username': 'Correo o usuario',
 
   // brand
   'Your bills, handled.': 'Tus facturas, resueltas.',

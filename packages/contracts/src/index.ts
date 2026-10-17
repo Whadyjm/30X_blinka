@@ -34,7 +34,10 @@ export const SessionSchema = z.strictObject({
   role: RoleSchema,
   csrfToken: z.string().min(1),
 });
-export const LoginInputSchema = z.strictObject({ email: z.email(), password: z.string().min(1) });
+export const LoginInputSchema = z.strictObject({
+  email: z.union([z.email(), z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/)]),
+  password: z.string().min(1),
+});
 
 export const CreateVendorSchema = z.strictObject({
   name: NameSchema,
