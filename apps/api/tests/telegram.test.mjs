@@ -135,6 +135,34 @@ test('Telegram: detecta credenciales inválidas sin exponer secretos y admite es
   assert.match(payload, /TELEGRAM_BOT_TOKEN_INVALID/); assert.ok(!payload.includes(s.env.TELEGRAM_BOT_TOKEN));
 });
 
+test('Telegram: saludar o /start sin código reconoce el vínculo y no pide conectarse otra vez', async t => {
+  const s = await setup(t);
+  await s.webhook(s.update({ text: 'hola' })); await s.drain();
+  assert.match(s.sent.at(-1).text, /Conecta tu cuenta en Integraciones/);
+  await s.connect();
+  for (const text of ['hola', '/start', '/help']) {
+    await s.webhook(s.update({ text })); await s.drain();
+    assert.match(s.sent.at(-1).text, /Ya estás conectado con Oli/);
+    assert.match(s.sent.at(-1).text, /PDF, JPG o PNG/);
+    assert.ok(!s.sent.at(-1).text.includes('/app/integrations'));
+  }
+  assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM invoices').first('n'), 0);
+});
+
+test('Telegram: texto encolado durante la vinculación y reintentos consultan la conexión vigente', async t => {
+  const s = await setup(t);
+  const token = new URL((await s.link()).url).searchParams.get('start');
+  await s.webhook(s.update({ text: `/start ${token}` }));
+  await s.webhook(s.update({ text: 'hola' }));
+  await s.drain();
+  assert.match(s.sent.at(-1).text, /Ya estás conectado con Oli/);
+  await s.webhook(s.update({ text: '/start' }));
+  s.failNextSend(); await s.drain();
+  await s.api('/integrations/telegram', 'DELETE');
+  await s.drain(undefined, 2);
+  assert.match(s.sent.at(-1).text, /Conecta tu cuenta en Integraciones/);
+});
+
 test('Telegram: reintentos no duplican documento/decisión/reserva; otro envío del mismo PDF se bloquea', async t => {
   const s = await setup(t); await s.connect();
   const event = s.update({ document: { file_id: 'file-1', file_name: 'factura.pdf', mime_type: 'application/pdf', file_size: pdf.length } });

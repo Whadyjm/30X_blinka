@@ -153,6 +153,16 @@ async function authorizedConnection(env, connectionId) {
     ON m.org_id = c.org_id AND m.user_id = c.user_id WHERE c.id = ? AND c.revoked_at IS NULL`, connectionId).first();
 }
 
+async function textReply(env, payload) {
+  // A text greeting may have arrived while its preceding /start was still being consumed.
+  const connection = await stmt(env.DB, `SELECT c.id FROM telegram_connections c JOIN memberships m
+    ON m.org_id = c.org_id AND m.user_id = c.user_id
+    WHERE c.telegram_user_id = ? AND c.chat_id = ? AND c.revoked_at IS NULL`, payload.userId, payload.chatId).first();
+  return connection
+    ? 'Ya estás conectado con Oli. Envíame una factura en PDF, JPG o PNG de hasta 5 MB y la revisaré según las reglas de tu empresa.'
+    : `Conecta tu cuenta en Integraciones de Oli y envíame una factura en PDF, JPG o PNG.\n${env.PUBLIC_APP_URL}/app/integrations`;
+}
+
 async function invoiceReply(env, row, payload, process) {
   const connection = await authorizedConnection(env, row.connection_id);
   if (!connection) return 'Conecta tu cuenta desde Integraciones en Oli antes de enviar facturas.';
@@ -210,11 +220,11 @@ export async function consumeTelegram(batch, env, process = processInvoice) {
     const payload = JSON.parse(row.payload_json);
     try {
       let reply = row.reply_text;
-      if (reply === null) {
+      if (reply === null || (!payload.tokenHash && !payload.file)) {
         try {
           reply = payload.tokenHash ? await linkAccount(env, payload)
             : payload.file ? await invoiceReply(env, row, payload, process)
-              : `Conecta tu cuenta en Integraciones de Oli y envíame una factura en PDF, JPG o PNG.\n${env.PUBLIC_APP_URL}/app/integrations`;
+              : await textReply(env, payload);
         } catch (error) {
           if (error instanceof HttpError && [400, 413, 415].includes(error.status)) reply = 'No pude aceptar el archivo. Revisa que sea un PDF, JPG o PNG válido de hasta 5 MB.';
           else if (error instanceof HttpError && error.code === 'MANDATE_REQUIRED') reply = 'Activa las reglas de tu empresa en Oli antes de procesar facturas.';
