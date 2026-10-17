@@ -1,6 +1,7 @@
 minimumReleaseAgeExclude:
   - miniflare@5.20261012.1-beta
   - wrangler@4.151.1
+  - postal-mime@4.0.8
 allowBuilds:
   esbuild: true
   workerd: true

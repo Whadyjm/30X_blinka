@@ -18,7 +18,7 @@ import type {
   Vendor,
   VendorInput,
 } from '@/contracts';
-import type { TelegramIntegration, TelegramLink } from '@oli/contracts';
+import type { EmailIntegration, Inbox, TelegramIntegration, TelegramLink } from '@oli/contracts';
 
 /**
  * The ONE interface the UI talks to. Two implementations:
@@ -38,6 +38,11 @@ export interface OliApi {
   getTelegramIntegration(): Promise<TelegramIntegration>;
   createTelegramLink(): Promise<TelegramLink>;
   disconnectTelegram(): Promise<void>;
+  getEmailIntegration(): Promise<EmailIntegration>;
+  enableEmail(): Promise<EmailIntegration>;
+  disableEmail(): Promise<void>;
+  getInbox(): Promise<Inbox>;
+  readInboxMessage(id: string): Promise<void>;
 
   // mandate & reference data
   getMandate(): Promise<MandateState>;

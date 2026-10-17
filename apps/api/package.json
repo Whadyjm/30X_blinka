@@ -25,12 +25,13 @@
     "build:web": "npm --prefix ../web run build"
   },
   "dependencies": {
-    "@oli/extraction": "link:../../packages/extraction",
     "@oli/contracts": "link:../../packages/contracts",
-    "@oli/domain": "link:../../packages/domain"
+    "@oli/domain": "link:../../packages/domain",
+    "@oli/extraction": "link:../../packages/extraction",
+    "postal-mime": "4.0.8"
   },
   "devDependencies": {
-    "wrangler": "4.151.1",
-    "miniflare": "4.20260730.0"
+    "miniflare": "4.20260730.0",
+    "wrangler": "4.151.1"
   }
 }

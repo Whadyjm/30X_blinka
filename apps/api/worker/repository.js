@@ -35,7 +35,7 @@ export function invoiceDto(row, decisions, approvals, activePolicyId, detail = f
 }
 export async function getInvoice(db, orgId, invoiceId, detail = true) {
   const result = await db.batch([
-    stmt(db, `SELECT i.*, s.kind AS channel_kind FROM invoices i LEFT JOIN invoice_sources s
+    stmt(db, `SELECT i.*, s.kind AS channel_kind FROM invoices i LEFT JOIN invoice_channel_sources s
       ON s.org_id = i.org_id AND s.invoice_id = i.id WHERE i.org_id = ? AND i.id = ?`, orgId, invoiceId),
     stmt(db, 'SELECT * FROM decisions WHERE org_id = ? AND invoice_id = ? ORDER BY created_at, rowid', orgId, invoiceId),
     stmt(db, 'SELECT * FROM approval_requests WHERE org_id = ? AND invoice_id = ? ORDER BY created_at, rowid', orgId, invoiceId),
@@ -52,7 +52,7 @@ export async function invoiceRows(db, orgId) {
 }
 
 // Insertion order breaks timestamp ties, matching getInvoice's append-only history.
-const invoiceJoins = `LEFT JOIN invoice_sources s ON s.org_id = i.org_id AND s.invoice_id = i.id
+const invoiceJoins = `LEFT JOIN invoice_channel_sources s ON s.org_id = i.org_id AND s.invoice_id = i.id
   LEFT JOIN decisions d ON d.rowid = (SELECT rowid FROM decisions
     WHERE org_id = i.org_id AND invoice_id = i.id ORDER BY created_at DESC, rowid DESC LIMIT 1)
   LEFT JOIN approval_requests a ON a.rowid = (SELECT rowid FROM approval_requests

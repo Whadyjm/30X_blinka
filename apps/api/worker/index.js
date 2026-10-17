@@ -2,8 +2,10 @@ import { handleExtractionProbe, handleDocumentProbe } from "./extraction-probe.j
 import { handleApi } from "./api.js";
 import { consumeTelegram, telegramWebhook } from './telegram.js';
 import { consumeInvoiceJobs, enqueueInvoice, recoverInvoiceJobs } from './jobs.js';
+import { consumeEmails, receiveEmail, recoverEmails, wakeEmailInvoices } from './email.js';
 
 export default {
+  async email(message, env) { await receiveEmail(message, env); },
   async fetch(request, env) {
     if (new URL(request.url).pathname === '/api/channels/telegram/webhook') return telegramWebhook(request, env);
     if (new URL(request.url).pathname.startsWith('/api/v1/')) return handleApi(request, env);
@@ -28,10 +30,17 @@ export default {
   },
   async scheduled(_controller, env) {
     const result = await recoverInvoiceJobs(env);
+    await recoverEmails(env);
     console.log(JSON.stringify({ event: 'invoice_jobs_recovered', ...result }));
   },
   async queue(batch, env) {
-    if (batch.queue === 'oli-invoices') return consumeInvoiceJobs(batch, env);
+    if (batch.queue === 'oli-email') return consumeEmails(batch, env);
+    if (batch.queue === 'oli-invoices') {
+      await consumeInvoiceJobs(batch, env);
+      try { await wakeEmailInvoices(batch, env); }
+      catch { console.error(JSON.stringify({ event: 'email_notification_wake_deferred' })); }
+      return;
+    }
     if (batch.queue === 'oli-telegram') return consumeTelegram(batch, env, enqueueInvoice);
     throw new Error('UNKNOWN_QUEUE');
   },

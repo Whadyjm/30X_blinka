@@ -250,7 +250,7 @@ type ApprovalRequest = {
 type Invoice = {
   id: string;
   status: InvoiceStatus;
-  source: 'HUMAN_UPLOAD' | 'TELEGRAM';
+  source: 'HUMAN_UPLOAD' | 'TELEGRAM' | 'EMAIL';
   file: { name: string; mimeType: string; sizeBytes: number; url: string };
   vendorId: string | null;
   vendorName: string | null;
@@ -794,3 +794,13 @@ La sección `/app/integrations` permite vincular y desconectar la cuenta de Tele
 devuelve `201 TelegramLink` con un enlace temporal; `DELETE /integrations/telegram` responde `204`.
 Las rutas mantienen sesión y CSRF. El usuario no envía claves de BotFather ni IDs de empresa.
 El origen de factura también acepta `TELEGRAM`. Ver [flujo, configuración y garantías](TELEGRAM.md).
+
+## Correo de Oli y bandeja de entrada
+
+`GET /integrations/email` devuelve `EmailIntegration`; `POST` habilita una dirección estable
+por empresa y `DELETE` pausa recepción. Habilitar/pausar requiere OWNER, sesión y CSRF.
+`GET /inbox` devuelve `Inbox` con últimos 50 mensajes y `unreadCount`; `POST /inbox/:id/read`
+marca lectura personal con respuesta `204`. Mensajes de otra empresa devuelven `404`.
+Los tipos compartidos son `EmailIntegrationSchema`, `InboxSchema` e `InboxMessageSchema`.
+El origen de factura acepta `EMAIL`. Los documentos siguen usando detalle y procesamiento
+existentes. Ver [configuración, estados y garantías de correo](EMAIL.md).
