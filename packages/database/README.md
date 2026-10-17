@@ -5,8 +5,12 @@ datos ficticios, decisiones dentro de las reglas, registro explicable y cero pag
 Los DTOs HTTP están en [docs/API.md](../../docs/API.md) y `packages/contracts`.
 
 Este paquete contiene una migración SQL, un seed y pruebas sobre **D1 local con Miniflare/workerd**.
-No crea recursos en una cuenta Cloudflare, no despliega un Worker y no implementa aún
-el Policy Engine, autenticación, extracción o endpoints.
+La base remota **`oli-demo`** (`349afff1-8b3b-4673-929b-ce6936c68d3a`) ya existe en
+**tiamat.agency** (`fbaa64f96579f93b2db32a1eb12ff6c9`), con migración y seed aplicados.
+El Worker `oli-api` la usa mediante el binding `DB`; la configuración y los comandos
+locales/remotos viven en [apps/api](../../apps/api/README.md).
+El motor de decisiones está en [packages/domain](../domain/README.md); su integración
+con la persistencia y los endpoints públicos sigue pendiente.
 
 ## Ejecutar las comprobaciones
 
@@ -100,13 +104,14 @@ El presupuesto del siguiente mes lo creará el servicio según mandato y zona ho
 
 ## Conectar con el scaffold de Whady
 
-Las migraciones viven aquí mientras no exista el scaffold. En la configuración D1 de la futura
-app `apps/web`, usar `migrations_dir: "../../packages/database/migrations"` y el binding `DB`.
-No duplicar el SQL en otra carpeta. El `database_id` debe provenir del recurso creado realmente.
+Las migraciones viven aquí. `apps/api/wrangler.jsonc` configura la base real con
+`migrations_dir: "../../packages/database/migrations"` y el binding `DB`.
+No duplicar el SQL en otra carpeta ni reemplazar el ID real por un placeholder.
 
-Cuando exista la configuración y Wrangler local de la app, aplicar con sus scripts primero en
-local. La publicación/migración remota se hará con la cuenta, recurso y entorno identificados;
-este paquete no contiene IDs ficticios de recursos desplegables ni ejecuta operaciones remotas.
+Aplicar los cambios futuros primero en local con los scripts de `apps/api` y después
+en la base remota de Tiamat identificada en su configuración. El seed demo remoto ya
+está cargado; no repetirlo ni usarlo para reiniciar datos existentes. La configuración
+local y las pruebas continúan usando bases aisladas de la base remota.
 
 Las versiones publicadas no se editan: activar v2 requiere un batch que superseda v1 y crea v2,
 manteniendo `policy_json` anterior. Antes de activación, validar el JSON con los contratos compartidos,
