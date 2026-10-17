@@ -106,7 +106,7 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
     let current = { vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'WEB-1', amountMinor: 20000, currency: 'USD',
       issuedAt: '2026-10-17', dueDate: '2026-10-31', servicePeriod: '2026-10', description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [] };
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => Response.json({ model: JSON.parse(String(init?.body)).model,
-      choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(current) } }] }));
+      choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...current, documentType: 'INVOICE' }) } }] }));
     const env = { DB, INVOICES: await runtime.getR2Bucket('INVOICES'), DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner',
       DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: async () => ({ format: 'markdown',
         data: `EMISOR / SUPPLIER\n${current.vendorName}\nNúmero / Number\n${current.invoiceNumber}\nEmisión / Issued\n${current.issuedAt}\nPeriodo de servicio\n${current.servicePeriod}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nCONCEPTO / DESCRIPTION\n${current.description}\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };

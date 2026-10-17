@@ -4,6 +4,7 @@ import { READER_VERSION } from './document.js';
 import { audit, body, clearGuard, guard, HttpError, id, json, now, sha256, stmt } from './http.js';
 import { decisionStatements, evaluateStored, snapshot } from './processing.js';
 import { getInvoice, idempotency } from './repository.js';
+import { legacyNegativeDocumentType } from './legacy-document-type.js';
 
 export async function reevaluateInvoice(request, env, session, invoiceId) {
   owner(session);
@@ -23,12 +24,18 @@ export async function reevaluateInvoice(request, env, session, invoiceId) {
     throw new HttpError(409, 'INVOICE_NOT_READY', 'La factura necesita una lectura completa antes de reevaluar sus reglas.');
   }
   const read = JSON.parse(state.invoice.extracted_json);
+  const legacyClassification = legacyNegativeDocumentType(read, state.invoice.file_sha256);
+  if (legacyClassification) {
+    read.documentType = legacyClassification.documentType;
+    read.provenance = { ...read.provenance, documentClassification: legacyClassification };
+  }
   // Reusing old facts must not bypass newer extraction safeguards or erase model uncertainty.
   if (read.provenance?.configVersion !== READER_VERSION) {
     read.extraction.extractionWarnings.push('LEGACY_EXTRACTION_REQUIRES_NEW_READ');
   }
   const evaluation = evaluateStored(read, state);
-  if (evaluation.vendorId !== state.invoice.vendor_id || evaluation.agreementId !== state.invoice.agreement_id) {
+  if (read.documentType === 'INVOICE'
+    && (evaluation.vendorId !== state.invoice.vendor_id || evaluation.agreementId !== state.invoice.agreement_id)) {
     throw new HttpError(409, 'INVOICE_IDENTITY_CHANGED', 'Confirma el proveedor y el acuerdo desde el flujo de alta antes de reevaluar esta factura.');
   }
   const at = now(), approvalId = id('apr'), guardId = id('guard'), roleGuard = id('guard');
@@ -52,6 +59,8 @@ export async function reevaluateInvoice(request, env, session, invoiceId) {
       audit(env.DB, org, session.user.id, 'INVOICE_REEVALUATED', invoiceId, {
         previousDecisionId: input.expectedDecisionId, decisionId: evaluation.candidate.id,
         mode: 'CURRENT_RULES_STORED_EXTRACTION',
+        documentType: read.documentType ?? null,
+        documentClassificationSource: read.provenance?.documentClassification?.source ?? null,
       }),
       idem.save(response), clearGuard(env.DB, guardId), clearGuard(env.DB, roleGuard),
     ]);

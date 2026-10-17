@@ -41,7 +41,7 @@ async function setup(t) {
     reservations: await DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'),
     reserved: await DB.prepare('SELECT sum(reserved_minor) n FROM budget_periods').first('n') });
   const read = async (_env, _file, _bytes, documentSha256) => ({
-    extraction: ex, primaryReadId: 'synthetic-primary', documentSha256,
+    extraction: ex, documentType: 'INVOICE', primaryReadId: 'synthetic-primary', documentSha256,
     corroboration: { documentSha256, readId: 'synthetic-secondary', method: 'PDF_TEXT',
       fields: { vendorName: ex.vendorName, amountMinor: ex.amountMinor, currency: ex.currency, dueDate: ex.dueDate } },
   });
@@ -148,7 +148,7 @@ test('Jobs: fallo de D1 al finalizar no confirma mensaje y el lease sigue recupe
 test('Jobs: artefactos privados por empresa/hash/versión/canal, inmutables y acotados', async t => {
   const s = await setup(t); const invoice = await s.upload();
   const hash = await stmt(s.DB, 'SELECT file_sha256 FROM invoices WHERE id=?', invoice.id).first('file_sha256');
-  const artifact = { extraction: ex, primaryReadId: 'primary-1' };
+  const artifact = { extraction: ex, documentType: 'INVOICE', primaryReadId: 'primary-1' };
   assert.equal(await getReadArtifact(s.DB, 'org_demo', hash, 'v1', 'PRIMARY'), null);
   await putReadArtifact(s.DB, 'org_demo', hash, 'v1', 'PRIMARY', artifact);
   await putReadArtifact(s.DB, 'org_demo', hash, 'v1', 'PRIMARY', { forged: true });

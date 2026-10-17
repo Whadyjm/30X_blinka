@@ -73,6 +73,72 @@ test('la misma factura cambia de decisión al cambiar los datos del onboarding, 
   assert.equal(forbidden.candidate.needsHumanApproval, false);
 });
 
+test('un documento identificado como no factura se bloquea aunque sus datos coincidan con todas las reglas', () => {
+  const { invoice, context } = example();
+  assert.equal(evaluateInvoice(invoice, context).candidate.action, 'APPROVE');
+  for (const documentType of ['PAYMENT_RECEIPT', 'DELIVERY_NOTE', 'QUOTE', 'CREDIT_NOTE', 'OTHER'] as const) {
+    const result = evaluateInvoice({ ...invoice, documentType }, context);
+    assert.equal(result.candidate.action, 'BLOCK', documentType);
+    assert.deepEqual(result.candidate.reasons, ['NOT_AN_INVOICE']);
+    assert.equal(result.candidate.needsHumanApproval, false);
+    assert.equal(result.requiresBudgetReservation, false);
+    assert.equal(result.budgetPeriodId, null);
+    assert.equal(result.vendorId, null);
+    assert.equal(result.agreementId, null);
+    assert.deepEqual(result.candidate.trace.map(step => [step.rule, step.outcome]), [['DOCUMENT_TYPE', 'BLOCK'], ['EXTRACTION', 'PASS']]);
+    assert.match(result.candidate.humanExplanation, /El lector identificó/);
+  }
+});
+
+test('un tipo incierto pide revisión antes de ejecutar reglas financieras, sin ofrecer excepción de pago', () => {
+  const { invoice, context } = example();
+  invoice.documentType = 'UNKNOWN';
+  let result = evaluateInvoice(invoice, context);
+  assert.equal(result.candidate.action, 'ESCALATE');
+  assert.deepEqual(result.candidate.reasons, ['DOCUMENT_TYPE_UNCERTAIN']);
+  assert.equal(result.candidate.needsHumanApproval, false);
+  assert.equal(result.requiresBudgetReservation, false);
+  changeExtraction(invoice, { vendorName: 'No registrado', amountMinor: context.policy.rules.hardLimitMinor + 1, currency: 'EUR' });
+  result = evaluateInvoice(invoice, context);
+  assert.equal(result.candidate.action, 'ESCALATE', 'no aplicar reglas de facturas a un documento aún no identificado');
+  assert.deepEqual(result.candidate.reasons, ['DOCUMENT_TYPE_UNCERTAIN']);
+  assert.equal(result.candidate.trace.some(step => step.rule === 'VENDOR' || step.rule === 'BUDGET'), false);
+});
+
+test('identificar una factura no sustituye la corroboración, los campos legibles ni las advertencias', () => {
+  const { invoice, context } = example();
+  invoice.documentType = 'INVOICE';
+  assert.equal(evaluateInvoice(invoice, context).candidate.action, 'APPROVE');
+  changeExtraction(invoice, { vendorName: null, amountMinor: null, currency: null, dueDate: null });
+  let result = evaluateInvoice(invoice, context);
+  assert.equal(result.candidate.action, 'ESCALATE');
+  assert.ok(result.candidate.reasons.includes('INVALID_OR_MISSING_DATA'));
+  assert.equal(result.requiresBudgetReservation, false);
+  assert.equal(result.candidate.needsHumanApproval, false);
+  const known = example(); known.invoice.documentType = 'INVOICE'; known.invoice.corroboration = null;
+  assert.equal(evaluateInvoice(known.invoice, known.context).candidate.action, 'ESCALATE');
+  const warned = example(); warned.invoice.documentType = 'INVOICE';
+  changeExtraction(warned.invoice, { extractionWarnings: ['El importe requiere aclaración'] });
+  result = evaluateInvoice(warned.invoice, warned.context);
+  assert.equal(result.candidate.action, 'ESCALATE');
+  assert.equal(result.requiresBudgetReservation, false);
+});
+
+test('la clasificación no oculta duplicados de hash y omitirla conserva decisiones históricas', () => {
+  const { invoice, context } = example();
+  const previous = evaluateInvoice(invoice, context);
+  assert.equal(previous.candidate.action, 'APPROVE');
+  assert.deepEqual(evaluateInvoice({ ...invoice, documentType: null }, context), previous);
+  context.priorInvoices.push({ ...priorFor(invoice, context), documentSha256: invoice.documentSha256 });
+  for (const documentType of ['UNKNOWN', 'PAYMENT_RECEIPT', 'INVOICE'] as const) {
+    const result = evaluateInvoice({ ...invoice, documentType }, context);
+    assert.equal(result.candidate.action, 'BLOCK');
+    assert.ok(result.candidate.reasons.includes('DUPLICATE_INVOICE'));
+    assert.equal(result.requiresBudgetReservation, false);
+    assert.equal(result.candidate.trace.some(step => step.rule === 'DUPLICATE_HASH'), true);
+  }
+});
+
 test('proveedores, acuerdos y límites no dependen de los nombres/IDs del seed', () => {
   const { invoice, context } = example();
   const vendor = { ...context.vendors[0]!, id: 'custom_vendor', name: 'Otro proveedor ficticio' };

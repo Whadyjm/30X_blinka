@@ -217,6 +217,7 @@ try {
   const times = rows.map(r => r.durationMs).sort((a,b) => a-b);
   report.finishedAt = new Date().toISOString();
   report.summary = { attempted: rows.length, returnedExtractions: returned.length, technicalFailures: rows.filter(r => r.detail?.status === 'FAILED').length,
+    documentTypes: Object.fromEntries(['INVOICE','PAYMENT_RECEIPT','DELIVERY_NOTE','QUOTE','CREDIT_NOTE','OTHER','UNKNOWN'].map(kind => [kind, returned.filter(r => r.read.documentType === kind).length])),
     harnessErrors: rows.filter(r => r.error).length, decided: decided.length, actions: Object.fromEntries(['APPROVE','BLOCK','ESCALATE'].map(a => [a, decided.filter(r => r.detail.latestDecision.action === a).length])),
     allEightFieldsExact: returned.filter(r => r.matchingFields.length === fields.length).length,
     criticalFieldsExact: returned.filter(r => r.criticalExact).length,
@@ -233,5 +234,5 @@ try {
     successfulResponsesReportedCostUsd: returned.reduce((sum,r) => sum + (r.read.provenance.usage?.costUsd ?? 0),0),
     successfulModels: Object.fromEntries([...new Set(returned.map(r => r.read.provenance.model))].map(m => [m, returned.filter(r => r.read.provenance.model === m).length])) };
   save(); console.log(JSON.stringify({ output: output.pathname, summary: report.summary }, null, 2));
-  if(report.summary.harnessErrors || report.summary.unsafeApprovals || report.summary.fullyCorrect !== scenarios.length)process.exitCode=1;
+  if(report.summary.harnessErrors || report.summary.unsafeApprovals || report.summary.fullyCorrect !== scenarios.length || returned.some(r => r.read.documentType !== 'INVOICE'))process.exitCode=1;
 } finally { await runtime.dispose(); }

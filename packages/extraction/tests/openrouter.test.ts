@@ -11,7 +11,7 @@ const candidate = {
   description: 'Servicio ficticio', extractionWarnings: [], evidence: [],
 };
 const success = (model: string, extraction: unknown = candidate) => Response.json({
-  model, provider: 'test-provider', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }],
+  model, provider: 'test-provider', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction && typeof extraction === 'object' && !Array.isArray(extraction) ? { documentType: 'INVOICE', ...extraction } : extraction) } }],
   usage: { prompt_tokens: 1000, completion_tokens: 200, cost: 0.0001 },
 });
 const modelOf = (init?: RequestInit) => (JSON.parse(String(init?.body)) as { model: string }).model;
@@ -340,5 +340,24 @@ test('clasifica errores anidados del proveedor y no reintenta un 400 con prose a
       return true;
     });
     assert.equal(calls, 1);
+  }
+});
+
+test('clasificación tipada separa comprobante, factura ambigua y factura; nunca autoriza', async () => {
+  for (const documentType of ['PAYMENT_RECEIPT', 'DELIVERY_NOTE', 'INVOICE', 'UNKNOWN'] as const) {
+    const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => {
+      const body = JSON.parse(String(init?.body));
+      assert.ok(body.response_format.json_schema.schema.required.includes('documentType'));
+      return success(body.model, { ...candidate, documentType });
+    } });
+    assert.equal(result.documentType, documentType);
+    assert.equal('documentType' in result.extraction, false);
+    assert.equal('action' in result, false);
+  }
+  for (const value of [undefined, 'APPROVED', { verified: true }]) {
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) =>
+      Response.json({ model: modelOf(init), choices: [{ finish_reason: 'stop', message: {
+        content: JSON.stringify({ ...candidate, ...(value === undefined ? {} : { documentType: value }) }),
+      } }] }) }), /INVALID_OUTPUT/);
   }
 });

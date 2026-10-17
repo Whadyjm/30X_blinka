@@ -69,6 +69,7 @@ export function decisionStatements(db, orgId, evaluation, storedRead, actorId = 
 export function evaluateStored(read, state) {
   return evaluateInvoice({ id: state.invoice.id, documentSha256: state.invoice.file_sha256,
     primaryReadId: read.primaryReadId, extraction: read.extraction, corroboration: read.corroboration,
+    documentType: read.documentType ?? 'UNKNOWN',
     agreementReference: read.agreementReference ?? null }, state.context);
 }
 

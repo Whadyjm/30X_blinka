@@ -63,7 +63,7 @@ async function setup(t) {
     assert.equal(result.status, 201, JSON.stringify(result)); return result.data;
   };
   const read = (ex = extraction(), changes = {}) => async (_env, _file, _bytes, documentSha256) => ({
-    extraction: ex, primaryReadId: crypto.randomUUID(), documentSha256,
+    extraction: ex, documentType: 'INVOICE', primaryReadId: crypto.randomUUID(), documentSha256,
     corroboration: corroboratePdfText(text(ex), documentSha256), provenance: { model: 'synthetic-test-only' }, ...changes });
   const ledger = async () => ({
     reserved: await DB.prepare('SELECT coalesce(sum(reserved_minor), 0) AS n FROM budget_periods').first('n'),
@@ -238,7 +238,7 @@ test('ruta pública process usa adapter PDF real con HTTP/AI simulados, sin etiq
     assert.equal(payload.plugins[0].pdf.engine, 'mistral-ocr');
     assert.ok(payload.messages[1].content.some(c => c.type === 'file'));
     assert.equal(options.body.includes('Demo Cloud Hosting'), false);
-    return Response.json({ model: payload.model, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction()) } }] });
+    return Response.json({ model: payload.model, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction(), documentType: 'INVOICE' }) } }] });
   });
   const result = await api(`/invoices/${invoice.id}/process`, { method: 'POST' });
   assert.equal(result.status, 200); assert.equal(result.data.latestDecision.action, 'APPROVE'); assert.equal(calls, 1);
@@ -422,4 +422,44 @@ test('reanálisis no revierte un rechazo humano ni resuelve otra identidad por s
   const changed = await api(`/invoices/${unknown.id}/reevaluate`, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(blocked) });
   assert.equal(changed.status, 409); assert.equal(changed.error.code, 'INVOICE_IDENTITY_CHANGED');
   assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 3 });
+});
+
+test('comprobante legado categórico se bloquea al reanalizar sin reescribir su lectura ni reservar', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  const invoice = await upload();
+  const incomplete = extraction({ vendorName: null, invoiceNumber: null, amountMinor: null, currency: null,
+    issuedAt: null, dueDate: null, servicePeriod: null, description: null,
+    extractionWarnings: ['Document is a mobile payment receipt, not an invoice; no invoice number, vendor, or due date present.'] });
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read(incomplete, { documentType: undefined, corroboration: null,
+    provenance: { model: 'deepseek/deepseek-v4.1-flash', configVersion: 'labelled-v3:invoice-json-v2-20261017' } }))).data;
+  assert.equal(first.latestDecision.action, 'ESCALATE');
+  const original = await stmt(DB, 'SELECT extracted_json FROM invoices WHERE id=?', invoice.id).first('extracted_json');
+  const result = await api(`/invoices/${invoice.id}/reevaluate`, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(first) });
+  assert.equal(result.status, 200, JSON.stringify(result));
+  assert.equal(result.data.latestDecision.action, 'BLOCK');
+  assert.ok(result.data.latestDecision.reasons.includes('NOT_AN_INVOICE'));
+  assert.equal(result.data.latestDecision.trace[0].rule, 'DOCUMENT_TYPE');
+  assert.equal(result.data.latestDecision.needsHumanApproval, false);
+  assert.equal(result.data.approvalRequest, null); assert.equal(result.data.decisions.length, 2);
+  assert.deepEqual(result.data.decisions[0], first.decisions[0]);
+  assert.equal(await stmt(DB, 'SELECT extracted_json FROM invoices WHERE id=?', invoice.id).first('extracted_json'), original);
+  assert.equal(await stmt(DB, "SELECT json_extract(evidence_json,'$.provenance.documentClassification.source') source FROM decisions WHERE id=?", result.data.latestDecision.id).first('source'), 'LEGACY_NEGATIVE_WARNING');
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+});
+
+test('tipo no factura bloquea y tipo incierto escala aun con datos financieros completos, sin reservas', async t => {
+  const { env, api, upload, read, ledger } = await setup(t);
+  for (const documentType of ['PAYMENT_RECEIPT', 'UNKNOWN']) {
+    const invoice = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4 synthetic type gate ' + documentType) } });
+    const result = (await processInvoice(env, 'org_demo', invoice.id,
+      read(extraction(), { documentType, provenance: { configVersion: READER_VERSION } }))).data;
+    assert.equal(result.latestDecision.action, documentType === 'PAYMENT_RECEIPT' ? 'BLOCK' : 'ESCALATE');
+    assert.ok(result.latestDecision.reasons.includes(documentType === 'PAYMENT_RECEIPT' ? 'NOT_AN_INVOICE' : 'DOCUMENT_TYPE_UNCERTAIN'));
+    assert.equal(result.latestDecision.trace[0].rule, 'DOCUMENT_TYPE');
+    assert.equal(result.latestDecision.needsHumanApproval, false);
+    assert.equal(result.approvalRequest, null);
+    assert.equal(result.vendorId, null); assert.equal(result.agreementId, null);
+    const stored = await api(`/invoices/${invoice.id}`); assert.equal(stored.status, 200);
+  }
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
 });

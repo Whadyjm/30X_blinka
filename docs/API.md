@@ -412,6 +412,30 @@ Subir el mismo documento como factura nueva debe producir un registro auditable 
 duplicado cuando se confirme. Repetir la misma solicitud HTTP con la misma clave de idempotencia
 devuelve el mismo registro original; son dos situaciones distintas.
 
+### Tipo de documento y documentos que no son factura
+
+El lector clasifica el original como `INVOICE`, `PAYMENT_RECEIPT`, `DELIVERY_NOTE`, `QUOTE`,
+`CREDIT_NOTE`, `OTHER` o `UNKNOWN`. El tipo se guarda como metadata de la lectura del servidor,
+no como una entrada editable por el navegador ni como un permiso para aprobar.
+
+- Un documento identificado como comprobante, nota de entrega, cotización, nota de crédito u
+  otro tipo ajeno a una factura produce `BLOCK / NOT_AN_INVOICE`, sin solicitud humana ni reserva.
+- Un tipo `UNKNOWN` produce `ESCALATE / DOCUMENT_TYPE_UNCERTAIN`. Que falten datos, por sí solo, no
+  prueba que el documento no sea una factura. Una factura ilegible sigue en revisión.
+- `INVOICE` no sustituye la corroboración independiente ni las comprobaciones financieras.
+
+La traza registra `DOCUMENT_TYPE` y su explicación antes del control de extracción. No ejecutar
+las reglas de proveedor/acuerdo/presupuesto sobre un documento que no se identificó como factura.
+El hash duplicado puede bloquear independientemente del tipo. El texto del archivo no concede
+instrucciones ni autoridad para aprobar o cambiar su clasificación.
+
+El reanálisis explícito admite una compatibilidad negativa acotada para lecturas históricas sin
+campo de tipo: una advertencia categórica exacta conocida de comprobante de pago móvil, cuatro
+campos críticos desconocidos, hash/identidad de lectura del servidor y modelo permitido. Solo
+puede agregar un bloqueo, nunca acreditar una factura ni habilitar aprobación. La nueva evidencia
+registra `LEGACY_NEGATIVE_WARNING`; no se modifica la extracción ni la decisión histórica ni se
+pretende haber ejecutado OCR nuevo.
+
 ### Reanalizar con las reglas actuales
 
 `POST /invoices/:id/reevaluate` requiere OWNER, sesión/CSRF, `Idempotency-Key` y body

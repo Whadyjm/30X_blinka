@@ -86,6 +86,24 @@ const CATALOG: Record<string, ReasonInfo> = {
     tone: 'warn',
     humanApprovable: false,
   },
+  NOT_AN_INVOICE: {
+    label: 'Not an invoice',
+    rule: 'Only invoices can enter payment authorization',
+    tone: 'block',
+    humanApprovable: false,
+  },
+  DOCUMENT_TYPE_UNCERTAIN: {
+    label: 'Document type needs review',
+    rule: 'A clear invoice document is required before authorization',
+    tone: 'warn',
+    humanApprovable: false,
+  },
+  DOCUMENT_TYPE: {
+    label: 'Document type',
+    rule: 'Only invoices can enter payment authorization',
+    tone: 'info',
+    humanApprovable: false,
+  },
   INVALID_CURRENCY: {
     label: 'Unsupported currency',
     rule: 'Currency must be valid and have a configured budget',
@@ -135,7 +153,7 @@ export function reasonInfo(code: string): ReasonInfo {
 
 /** Reasons a human "yes" can NEVER override, regardless of mandate config. Shown on the Rules page. */
 export const HARD_STOP_REASONS = Object.entries(CATALOG)
-  .filter(([, v]) => v.tone === 'block' || v.label === 'Unreadable or missing data')
+  .filter(([code, v]) => v.tone === 'block' || v.label === 'Unreadable or missing data' || code === 'DOCUMENT_TYPE_UNCERTAIN')
   .map(([k]) => k);
 
 /** Reasons the mandate editor may mark as human-approvable (§4.2). */

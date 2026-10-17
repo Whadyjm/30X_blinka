@@ -30,6 +30,13 @@ inmutables por empresa/hash/versión/canal, nunca decisiones: la política y el 
 a consultar en el commit financiero. El primer presupuesto debe haberse inicializado; solo se permite
 renovación automática de una moneda que ya tenga un periodo anterior.
 
+La clasificación del tipo de documento también es explícita y separada de los campos extraídos.
+Comprobantes de pago, notas de entrega/crédito, cotizaciones y otros documentos identificados
+como ajenos a una factura producen `BLOCK / NOT_AN_INVOICE`. Un tipo incierto produce revisión;
+no se deduce «no factura» solo porque falten datos. Que el modelo diga `INVOICE` no acredita
+exactitud y nunca sustituye la corroboración y los controles del motor. Las respuestas del lector
+requieren el tipo en un enum cerrado; el nuevo prompt/schema invalida la caché anterior.
+
 ## 1. Decisión de arquitectura
 
 Usar extracción híbrida y verificaciones deterministas. No considerar una respuesta JSON,

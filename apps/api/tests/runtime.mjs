@@ -16,7 +16,7 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     currency: 'USD', issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10',
     description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [] };
   fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
-    .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }] });
+    .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction, documentType: 'INVOICE' }) } }] });
   const runtime = new Miniflare({ modules: true, scriptPath: new URL('../.wrangler/runtime/index.js', import.meta.url).pathname,
     compatibilityDate: '2026-07-30', d1Databases: { DB: 'runtime' }, r2Buckets: ['INVOICES'], fetchMock,
     queueProducers: { TELEGRAM_QUEUE: 'oli-telegram', INVOICE_QUEUE: 'oli-invoices' },

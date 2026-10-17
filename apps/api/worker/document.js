@@ -1,5 +1,5 @@
 import { EXTRACTION_CONFIG_VERSION, ExtractionError, extractInvoiceWithOpenRouter } from '@oli/extraction';
-import { CurrencySchema, DateSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
+import { CurrencySchema, DateSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
 import { normalizeInvoiceNumber } from '@oli/domain';
 import { HttpError, id } from './http.js';
 
@@ -12,7 +12,7 @@ export function validateDocument(bytes, mimeType) {
   }
 }
 
-export const READER_VERSION = `labelled-v3:${EXTRACTION_CONFIG_VERSION}`;
+export const READER_VERSION = `labelled-v4:${EXTRACTION_CONFIG_VERSION}`;
 const MAX_TEXT_BYTES = 128 * 1024;
 const referenceIssue = 'INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN';
 const fieldNames = ['vendorName', 'invoiceNumber', 'amountMinor', 'currency', 'issuedAt', 'dueDate', 'servicePeriod', 'description'];
@@ -116,6 +116,7 @@ function validArtifact(artifact, kind, documentSha256, mimeType) {
   if (!artifact || artifact.readerVersion !== READER_VERSION || artifact.documentSha256 !== documentSha256 || artifact.mimeType !== mimeType) return null;
   if (kind === 'PRIMARY') {
     if (artifact.result?.documentSha256 !== documentSha256 || artifact.result?.configVersion !== EXTRACTION_CONFIG_VERSION
+      || !DocumentTypeSchema.safeParse(artifact.result?.documentType).success
       || !IdSchema.safeParse(artifact.result?.readId).success || !ExtractedInvoiceSchema.safeParse(artifact.result?.extraction).success) return null;
   } else {
     if (!IdSchema.safeParse(artifact.readId).success || !ExtractedInvoiceSchema.safeParse({ ...artifact.fields, extractionWarnings: [], evidence: [] }).success
@@ -186,9 +187,11 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     return primaryValue !== separateValue;
   }) : [];
   extraction.extractionWarnings.push(...(secondary?.issues ?? []), ...discrepancies.map(field => `INDEPENDENT_READ_MISMATCH:${field}`));
-  return { extraction, primaryReadId: primary.readId, documentSha256, corroboration: secondary ? corroborationFor(secondary, documentSha256) : null,
+  return { extraction, documentType: DocumentTypeSchema.parse(primary.documentType), primaryReadId: primary.readId, documentSha256, corroboration: secondary ? corroborationFor(secondary, documentSha256) : null,
     agreementReference: secondary?.agreementReference ?? null,
-    provenance: { model: primary.model, provider: primary.provider, pdfTextParser: pdf ? 'labelled-v3' : null,
+    provenance: { model: primary.model, provider: primary.provider, pdfTextParser: pdf ? 'labelled-v4' : null,
+      documentClassification: { documentType: primary.documentType, source: 'PRIMARY_READER',
+        documentSha256, primaryReadId: primary.readId, version: READER_VERSION },
       configVersion: READER_VERSION, attempts: primary.attempts, usage: primary.usage, advisories: primary.advisories ?? [],
       corroborationError: secondary ? null : secondaryResult.value?.error ?? (pdf ? 'PDF_TEXT_UNAVAILABLE' : 'INDEPENDENT_IMAGE_OCR_UNAVAILABLE'),
       independentDisagreements: discrepancies, independentIssues: secondary?.issues ?? [], cache: { PRIMARY: !!cached.PRIMARY, SECONDARY: !!cached.SECONDARY },

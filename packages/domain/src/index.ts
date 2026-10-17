@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import {
-  AgreementSchema, BudgetPeriodSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema,
+  AgreementSchema, BudgetPeriodSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema,
   PolicyDecisionSchema, PolicyVersionSchema, TimestampSchema, VendorSchema, checkExtraction,
 } from '@oli/contracts';
 import type { DecisionAction, DecisionReasonCode, PolicyDecision } from '@oli/contracts';
@@ -13,6 +13,7 @@ export const PolicyInvoiceSchema = z.strictObject({
   corroboration: z.unknown(),
   // A document reference is a lookup hint, never authorization or a trusted vendor ID.
   agreementReference: IdSchema.nullable(),
+  documentType: DocumentTypeSchema.nullable().optional().default(null),
 });
 
 export const PriorInvoiceSchema = z.strictObject({
@@ -37,7 +38,7 @@ export const PolicyContextSchema = z.strictObject({
   priorInvoices: z.array(PriorInvoiceSchema),
 });
 
-export type PolicyInvoice = z.infer<typeof PolicyInvoiceSchema>;
+export type PolicyInvoice = z.input<typeof PolicyInvoiceSchema>;
 export type PolicyContext = z.infer<typeof PolicyContextSchema>;
 export type PolicyEvaluation = {
   candidate: PolicyDecision;
@@ -89,6 +90,22 @@ export function evaluateInvoice(rawInvoice: PolicyInvoice, rawContext: PolicyCon
     if (reason && !reasons.includes(reason)) reasons.push(reason);
   };
 
+  if (invoice.documentType !== null) {
+    const descriptions = {
+      PAYMENT_RECEIPT: 'un comprobante de pago', DELIVERY_NOTE: 'una nota de entrega', QUOTE: 'una cotización',
+      CREDIT_NOTE: 'una nota de crédito', OTHER: 'un documento de otro tipo',
+    };
+    if (invoice.documentType === 'INVOICE') record('DOCUMENT_TYPE', 'PASS',
+      'El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.',
+      { documentType: invoice.documentType });
+    else if (invoice.documentType === 'UNKNOWN') record('DOCUMENT_TYPE', 'ESCALATE',
+      'No se pudo determinar si el documento es una factura; requiere revisión antes de evaluar una autorización.',
+      { documentType: invoice.documentType }, 'DOCUMENT_TYPE_UNCERTAIN');
+    else record('DOCUMENT_TYPE', 'BLOCK',
+      `El lector identificó ${descriptions[invoice.documentType]}; no es una factura por pagar.`,
+      { documentType: invoice.documentType }, 'NOT_AN_INVOICE');
+  }
+
   record('EXTRACTION', check.status === 'CROSS_CHECKED' ? 'PASS' : 'ESCALATE',
     check.status === 'CROSS_CHECKED'
       ? 'Los cuatro campos críticos coinciden con la lectura separada del mismo documento.'
@@ -101,7 +118,8 @@ export function evaluateInvoice(rawInvoice: PolicyInvoice, rawContext: PolicyCon
     { priorInvoiceId: sameFile.id, sha256: invoice.documentSha256 }, 'DUPLICATE_INVOICE');
 
   // Warnings still prohibit APPROVE, but corroborated fields can explain other failures.
-  const usable = ex !== null && check.issues.every((issue) => issue.code === 'EXTRACTION_WARNING');
+  const usable = (invoice.documentType === null || invoice.documentType === 'INVOICE')
+    && ex !== null && check.issues.every((issue) => issue.code === 'EXTRACTION_WARNING');
   const matches = usable ? context.vendors.filter((v) => normalizeText(v.name) === normalizeText(ex.vendorName)) : [];
   const vendor = matches.length === 1 ? matches[0]! : null;
   let agreement = null as z.infer<typeof AgreementSchema> | null;

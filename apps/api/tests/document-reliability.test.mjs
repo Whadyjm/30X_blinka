@@ -15,7 +15,7 @@ const text = (changes = {}) => {
   return `EMISOR / SUPPLIER\n${f.vendorName ?? 'NO INDICADO'}\nCliente: Demo\nNúmero / Number\n${f.invoiceNumber ?? 'NO INDICADO'}\nEmisión / Issued\n${f.issuedAt ?? 'NO INDICADA'}\nVencimiento / Due\n${f.dueDate ?? 'NO INDICADO'}\nPeriodo de servicio\n${f.servicePeriod ?? 'NO INDICADO'}\nAcuerdo / Agreement\n${f.agreementReference ?? 'agr_demo_one'}\nMoneda / Currency\n${f.currency ?? 'NO INDICADA'}\nCONCEPTO / DESCRIPTION\n${f.description ?? 'NO INDICADO'}\nTOTAL A COBRAR\n${f.total ?? 'USD 9,999.00'}\nImporte final; sin cargos adicionales.`;
 };
 const wire = (extraction = ex()) => Response.json({ model: 'synthetic-test-model', provider: 'test',
-  choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }] });
+  choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ documentType: 'INVOICE', ...extraction }) } }] });
 const envFor = source => ({ OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: async () => ({ format: 'markdown', data: source }) } });
 const checked = result => checkExtraction({ documentSha256: hash, primaryReadId: result.primaryReadId,
   candidate: result.extraction, corroboration: result.corroboration });

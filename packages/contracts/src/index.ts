@@ -10,6 +10,9 @@ export const PositiveMinorUnitsSchema = MinorUnitsSchema.min(1);
 const NameSchema = z.string().trim().min(1);
 
 export const DecisionActionSchema = z.enum(['APPROVE', 'BLOCK', 'ESCALATE']);
+export const DocumentTypeSchema = z.enum([
+  'INVOICE', 'PAYMENT_RECEIPT', 'DELIVERY_NOTE', 'QUOTE', 'CREDIT_NOTE', 'OTHER', 'UNKNOWN',
+]);
 export const InvoiceStatusSchema = z.enum([
   'RECEIVED', 'PARSING', 'READY', 'PROCESSING', 'DECIDED', 'FAILED',
 ]);
@@ -168,6 +171,7 @@ export const DecisionReasonCodeSchema = z.enum([
   'AMOUNT_ABOVE_HARD_LIMIT', 'BUDGET_EXCEEDED', 'MISSING_BUDGET',
   'INVALID_OR_MISSING_DATA', 'INVALID_CURRENCY', 'HUMAN_APPROVAL_REQUIRED',
   'POLICY_ALLOWED', 'HUMAN_APPROVED', 'HUMAN_REJECTED',
+  'NOT_AN_INVOICE', 'DOCUMENT_TYPE_UNCERTAIN',
 ]);
 export const PolicyDecisionSchema = z.strictObject({
   id: IdSchema,

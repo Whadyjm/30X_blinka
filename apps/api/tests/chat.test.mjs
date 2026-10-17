@@ -43,7 +43,7 @@ async function setup(t) {
     const ex = { vendorName: vendor.name, invoiceNumber: 'CHAT-' + crypto.randomUUID(), amountMinor: 8900, currency: 'USD',
       issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10', description: 'Internet ficticio', extractionWarnings: warnings, evidence: [], ...overrides };
     const result = await processInvoice(env, 'org_demo', uploaded.data.id, async (_env, _file, _bytes, documentSha256) => ({
-      extraction: ex, documentSha256, primaryReadId: 'read-' + crypto.randomUUID(),
+      extraction: ex, documentType: 'INVOICE', documentSha256, primaryReadId: 'read-' + crypto.randomUUID(),
       corroboration: corroboratePdfText(`Proveedor: ${ex.vendorName}\nMoneda: ${ex.currency}\nVencimiento: ${ex.dueDate}\nTotal: ${ex.currency} ${(ex.amountMinor / 100).toFixed(2)}`, documentSha256),
       provenance: { model: 'test-only' } }));
     return result.data;
