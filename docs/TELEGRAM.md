@@ -1,9 +1,14 @@
 # Telegram en Oli
 
-El usuario abre **Integraciones → Conectar Telegram → Abrir Telegram** y pulsa **Iniciar**
-en el bot. La pantalla consulta el estado mientras el enlace siga vigente y se actualiza
+El usuario abre **Integraciones → Conectar Telegram**, escanea el QR con su teléfono
+o pulsa **Abrir Telegram**, y pulsa **Iniciar** en el bot compartido. El QR se genera localmente
+en el navegador con el mismo enlace temporal; no se envía a servicios de imágenes externos.
+Desaparece al vencer el enlace o completar la conexión. La pantalla consulta el estado mientras el enlace siga vigente y se actualiza
 al volver a la pestaña. Permite desconectar con confirmación y conserva las facturas previas.
 Cada usuario vincula una cuenta de Telegram a una empresa activa; para cambiarla debe desconectar primero.
+La misma empresa puede tener varios usuarios vinculados al bot a la vez. El login demo actual
+autentica un único `DEMO_USER_ID`: compartir esas credenciales no crea usuarios independientes.
+Para probar varias personas como usuarios distintos se necesita habilitar sus cuentas en la autenticación de Oli.
 
 ## Configuración del servicio
 

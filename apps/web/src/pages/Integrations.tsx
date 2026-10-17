@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowUpRight, Check, Send, Unplug } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import type { TelegramLink } from '@oli/contracts';
 import { api, ApiError, errorMessage } from '@/api';
 import { Button, buttonClass } from '@/components/ui/Button';
@@ -77,6 +78,14 @@ export function Integrations() {
                 </div>
               </div> : <Button variant="secondary" icon={<Unplug className="size-4" aria-hidden />} onClick={() => setConfirmDisconnect(true)}>{t('Disconnect Telegram')}</Button>
                 : validLink && link ? <div className="space-y-3">
+                  <figure className="w-fit max-w-full">
+                    <QRCodeSVG value={link.url} size={224} level="M" marginSize={4}
+                      title={t('QR code to connect your Telegram account')} role="img"
+                      className="block h-auto max-w-full" aria-describedby="telegram-qr-instructions" />
+                    <figcaption id="telegram-qr-instructions" className="mt-2 max-w-xs text-sm leading-relaxed text-slate-600">
+                      {t('Scan with your phone’s camera, then tap Start in Telegram.')}
+                    </figcaption>
+                  </figure>
                   <a className={buttonClass()} href={link.url} target="_blank" rel="noreferrer">
                     {t('Open Telegram')} <ArrowUpRight className="size-4" aria-hidden />
                   </a>

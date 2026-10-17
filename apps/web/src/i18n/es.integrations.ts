@@ -12,6 +12,8 @@ export const esIntegrations: Record<string, string> = {
   'New invoices from this Telegram account will stop arriving in Oli. Your existing invoices will stay here.': 'Dejarás de recibir facturas de esta cuenta de Telegram. Las facturas que ya tienes se conservarán en Oli.',
   'Disconnect Telegram': 'Desconectar Telegram',
   'Open Telegram': 'Abrir Telegram',
+  'QR code to connect your Telegram account': 'Código QR para conectar tu cuenta de Telegram',
+  'Scan with your phone’s camera, then tap Start in Telegram.': 'Escanea con la cámara de tu teléfono y pulsa Iniciar en Telegram.',
   'Tap Start in Telegram. This page will update when your account is connected.': 'Pulsa Iniciar en Telegram. Esta página se actualizará cuando tu cuenta esté conectada.',
   'Link expires in {minutes}:{seconds}': 'El enlace vence en {minutes}:{seconds}',
   'Your link expired. Generate a new one to continue.': 'Tu enlace venció. Genera uno nuevo para continuar.',
