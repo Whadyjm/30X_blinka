@@ -19,7 +19,7 @@ const freqLabel = (f: string) => (FREQ_LABEL[f] ? t(FREQ_LABEL[f]) : f);
 
 /* ───────────────────────── vendors ───────────────────────── */
 
-export function VendorsPanel({ readOnly }: { readOnly?: boolean }) {
+export function VendorsPanel({ readOnly, compact = false }: { readOnly?: boolean; compact?: boolean }) {
   const q = useVendors();
   const save = useSaveVendor();
   const toast = useToast();
@@ -42,7 +42,7 @@ export function VendorsPanel({ readOnly }: { readOnly?: boolean }) {
   return (
     <div className="space-y-4">
       {vendors.length === 0 ? (
-        <EmptyState title={t('No vendors yet')} body={t('Only vendors on this list can be paid. Add one below, or load the sample set.')} />
+        compact ? <p className="text-sm text-ash">{t('No vendors yet')}</p> : <EmptyState title={t('No vendors yet')} body={t('Only vendors on this list can be paid. Add one below, or load the sample set.')} />
       ) : (
         <ul className="divide-y divide-hairline rounded-lg ring-1 ring-hairline">
           {vendors.map((v) => (
@@ -78,7 +78,7 @@ export function VendorsPanel({ readOnly }: { readOnly?: boolean }) {
 
 /* ───────────────────────── agreements ───────────────────────── */
 
-export function AgreementsPanel({ currency, readOnly }: { currency: string; readOnly?: boolean }) {
+export function AgreementsPanel({ currency, readOnly, compact = false }: { currency: string; readOnly?: boolean; compact?: boolean }) {
   const agreements = useAgreements();
   const vendors = useVendors();
   const save = useSaveAgreement();
@@ -110,11 +110,7 @@ export function AgreementsPanel({ currency, readOnly }: { currency: string; read
     );
   };
 
-  return (
-    <div className="space-y-4">
-      {list.length === 0 ? (
-        <EmptyState title={t('No agreements yet')} body={t('An agreement says what a vendor normally charges, so Oli can spot discrepancies.')} />
-      ) : (
+  const savedList = (
         <ul className="divide-y divide-hairline rounded-lg ring-1 ring-hairline">
           {list.map((a) => (
             <li key={a.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
@@ -134,23 +130,41 @@ export function AgreementsPanel({ currency, readOnly }: { currency: string; read
             </li>
           ))}
         </ul>
+  );
+  const frequencyField = (
+          <SelectField label={t('Frequency')} value={frequency} onChange={(e) => setFrequency(e.target.value as typeof frequency)}>
+            {AGREEMENT_FREQUENCIES.map((f) => <option key={f} value={f}>{freqLabel(f)}</option>)}
+          </SelectField>
+  );
+  const toleranceField = (
+          <MoneyField label={t('Tolerance')} currency={currency} valueMinor={tolerance} onChange={setTolerance} hint={t('How far an invoice may differ and still match.')} />
+  );
+
+  return (
+    <div className="space-y-4">
+      {list.length === 0 ? (
+        compact ? <p className="text-sm text-ash">{t('No agreements yet')}</p> : <EmptyState title={t('No agreements yet')} body={t('An agreement says what a vendor normally charges, so Oli can spot discrepancies.')} />
+      ) : (
+        compact ? <details className="rounded-lg border border-hairline p-3"><summary className="cursor-pointer text-sm">{t('Saved agreements ({n})', { n: list.length })}</summary><div className="mt-3">{savedList}</div></details> : savedList
       )}
 
       {!readOnly && (
-        <form key={formKey} onSubmit={submit} className="grid gap-3 rounded-lg bg-slate-50 p-4 sm:grid-cols-2">
-          <h3 className="text-sm text-ink sm:col-span-2">{t('Add an agreement')}</h3>
+        <form key={formKey} onSubmit={submit} className={compact ? 'grid gap-4 sm:grid-cols-2' : 'grid gap-3 rounded-lg bg-slate-50 p-4 sm:grid-cols-2'}>
+          {!compact && <h3 className="text-sm text-ink sm:col-span-2">{t('Add an agreement')}</h3>}
           <SelectField label={t('Vendor')} value={vendorId} onChange={(e) => setVendorId(e.target.value)} required>
             <option value="">{t('Choose a vendor…')}</option>
             {vs.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
           </SelectField>
-          <SelectField label={t('Frequency')} value={frequency} onChange={(e) => setFrequency(e.target.value as typeof frequency)}>
-            {AGREEMENT_FREQUENCIES.map((f) => <option key={f} value={f}>{freqLabel(f)}</option>)}
-          </SelectField>
+          {!compact && frequencyField}
           <MoneyField label={t('Agreed amount')} currency={currency} valueMinor={amount} onChange={setAmount} />
-          <MoneyField label={t('Tolerance')} currency={currency} valueMinor={tolerance} onChange={setTolerance} hint={t('How far an invoice may differ and still match.')} />
+          {!compact && toleranceField}
           <div className="sm:col-span-2">
             <TextField label={t('Concept')} required value={concept} onChange={(e) => setConcept(e.target.value)} maxLength={200} placeholder={t('e.g. Cloud hosting')} />
           </div>
+          {compact && <details className="sm:col-span-2 text-sm">
+            <summary className="cursor-pointer py-2 text-ink">{freqLabel(frequency)} · {t('Tolerance')} {formatMoney(tolerance ?? 0, currency)}</summary>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">{frequencyField}{toleranceField}</div>
+          </details>}
           {error && <div className="sm:col-span-2"><InlineAlert>{error}</InlineAlert></div>}
           <div className="sm:col-span-2">
             <Button type="submit" icon={<Plus className="size-4" aria-hidden />} disabled={!vendorId || !amount || !concept.trim()} loading={save.isPending && !save.variables?.id}>

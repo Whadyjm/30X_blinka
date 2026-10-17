@@ -1,0 +1,22 @@
+{
+  "desktopSize": 224,
+  "mobileSize": 176,
+  "idleFramesChange": true,
+  "autonomousExpressions": true,
+  "tapAndRepeatedTapReact": true,
+  "keyboardEnterAndSpaceWork": true,
+  "reactionReturnsToRest": true,
+  "draftPreserved": true,
+  "localInteractionsNoApiWrites": true,
+  "reducedMotionStaticUntilInteraction": true,
+  "viewports": [
+    1440,
+    390,
+    320
+  ],
+  "shortMobileComposerVisible": true,
+  "staticHeaderLogoPreserved": true,
+  "unmountOnDashboard": true,
+  "errors": [],
+  "mutations": []
+}

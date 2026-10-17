@@ -6,6 +6,7 @@ import {
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
   EmailIntegrationSchema, InboxSchema, ChatMessageInputSchema, ChatReplySchema, ChatHistorySchema,
   ChatConversationsSchema, ChatActionSchema, ChatActionResultSchema, ConfirmChatActionSchema, ChatCardSchema,
+  SkillIntegrationSchema, CreatedSkillConnectionSchema, SkillConnectionSchema, CreateSkillConnectionSchema, UpdateSkillConnectionSchema,
 } from '@oli/contracts';
 import { HealthSchema } from '@/contracts';
 import { ApiError, ContractError } from './errors';
@@ -122,6 +123,16 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
       return parse(path, envelope(ChatActionSchema), await command(path, undefined)).data;
     },
     getTelegramIntegration: () => get('/integrations/telegram', TelegramIntegrationSchema),
+    getSkillIntegration: () => get('/integrations/skill', SkillIntegrationSchema),
+    async createSkillConnection(name) {
+      const path = '/integrations/skill/connections';
+      return parse(path, envelope(CreatedSkillConnectionSchema), await raw('POST', path, { data: CreateSkillConnectionSchema.parse({ name }) })).data;
+    },
+    async updateSkillConnection(id, expiresAt) {
+      const path = `/integrations/skill/connections/${encodeURIComponent(id)}`;
+      return parse(path, envelope(SkillConnectionSchema), await raw('PATCH', path, { data: UpdateSkillConnectionSchema.parse({ expiresAt }) })).data;
+    },
+    async revokeSkillConnection(id) { await raw('DELETE', `/integrations/skill/connections/${encodeURIComponent(id)}`); },
     async createTelegramLink() {
       return parse('/integrations/telegram/link', envelope(TelegramLinkSchema), await raw('POST', '/integrations/telegram/link')).data;
     },

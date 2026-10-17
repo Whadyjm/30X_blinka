@@ -1,0 +1,27 @@
+{
+  "dataset": "company-journey-v1",
+  "company": "cedro",
+  "status": "FIXED_NOT_MEASURED",
+  "preflight": {
+    "cases": 20,
+    "pdf": 12,
+    "images": 8,
+    "vendors": 18,
+    "agreements": 13,
+    "hashesVerified": 20,
+    "intentionalBinaryDuplicate": ["001", "011"],
+    "canonicalRulesSchema": true,
+    "documentTypeLabels": {"INVOICE": 18, "PAYMENT_RECEIPT": 1, "QUOTE": 1}
+  },
+  "expectedReservationDeltasMinor": {
+    "approvedCases001to008": 80000,
+    "humanApprovedCase009": 60000,
+    "humanRejectedCase010": 0,
+    "availableBeforeCase016": 80000,
+    "case016Requested": 90000,
+    "case016ExpectedDelta": 0
+  },
+  "readerCalls": 0,
+  "decisionMeasurements": 0,
+  "note": "Integrity preflight only; no OCR/reader calls or end-to-end decisions have been measured."
+}

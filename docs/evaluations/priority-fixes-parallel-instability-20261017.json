@@ -1,0 +1,16 @@
+{
+  "scope": "FAILED_ADDITIONAL_LOCAL_PARALLEL_CHECK_NOT_LIVE",
+  "api": {
+    "tests": 128,
+    "passed": 126,
+    "failed": 2,
+    "diagnostic": "ETIMEDOUT connecting to Miniflare on 127.0.0.1:55628; second email test HTTP500",
+    "fullLog": "api-priority-fixes-parallel-failure-20261017.log"
+  },
+  "reports": [
+    "company-journey-brisa-reparse-2026-10-17T22-37-29-083Z.json",
+    "company-journey-cedro-reparse-2026-10-17T22-37-29-085Z.json",
+    "company-journey-lumen-reparse-2026-10-17T22-37-29-083Z.json"
+  ],
+  "correction": "Stop cumulative harness on its first error, guard queued invoice identity, and rerun final validation sequentially with all earlier artifacts preserved."
+}

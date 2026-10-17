@@ -1,0 +1,15 @@
+{
+  "company": "selva",
+  "scope": "FROZEN_BEFORE_FIRST_LIVE_READER_CALL",
+  "manifestSha256": "ca14aeb508c78b5c00d902a6c76ff4334ceab7ff58e27c458133c1cf3b8488ff",
+  "targetedManifestSha256": "41d6c57e52358d80f833123579f635439ab17e7dd256c56e45f81c8f4e5493c9",
+  "documents": 20,
+  "targets": {
+    "unsafeApprovals": 0,
+    "fullyCorrectDecisions": 19,
+    "normalAutoApprovals": 7
+  },
+  "noGoldSentToReaders": true,
+  "note": "New supplier identities, amounts, dates and concepts, same supported labelled layouts and scenario families. This is a new synthetic sample; not a broad real-world generalization measure. Budget trap stays over actual available budget even if one prior normal invoice abstains or human approval fails.",
+  "frozenAt": "2026-10-17T23:30:32.713806+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "scope": "PREDECLARED_TARGETED_P0_REGRESSION_OUTSIDE_20_DOCUMENT_SAMPLE",
+  "file": {
+    "path": "targeted/unresolved-duplicate.pdf",
+    "mimeType": "application/pdf",
+    "sha256": "e16d557099f212f8b8792dffdd1c92537150368830630af1d8f3490e2e2528ce",
+    "sizeBytes": 1078
+  },
+  "antecedentCase": "017",
+  "expectedAction": "ESCALATE",
+  "requiredReason": "POSSIBLE_DUPLICATE",
+  "expectedReservationDeltaMinor": 0,
+  "expectedNeedsHumanApproval": false,
+  "note": "Same supplier and number as uncertain-currency antecedent017; explicit USD now permits extraction but cannot clear duplicate history."
+}

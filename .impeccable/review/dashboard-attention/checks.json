@@ -1,0 +1,17 @@
+{
+  "scope": "Pruebas locales de UI con datos ficticios y API mock; no evaluación del extractor ni del motor",
+  "checks": [
+    "Aprobación, revisión y fallo visibles con motivo y acción; bloqueadas fuera de pendientes; urgencia y orden por fecha",
+    "Acción de error abre el detalle de la factura, sin ejecutar cambios",
+    "Estado empty verificado",
+    "Estado processing verificado",
+    "Estado settled verificado",
+    "Estado blocked-only verificado",
+    "Estado review-only verificado",
+    "Estado failed-only verificado",
+    "Inglés, expansión y colapso con teclado, sin fecha al final, texto largo y presupuesto cero"
+  ],
+  "errors": [],
+  "mutations": [],
+  "missingTranslations": []
+}

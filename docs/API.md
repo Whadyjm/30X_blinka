@@ -31,8 +31,10 @@ importe, moneda y vencimiento → decidir → registrar y explicar → revisión
 
 Delegation Insights es P1. Hermes queda fuera del MVP. Oscar autorizó la extensión
 conversacional con herramientas acotadas y confirmación de cambios; la orquestación vive
-en el Worker. Agent Access, Clearance, registro público
-y pagos reales no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
+en el Worker. Oscar también autorizó **Oli Skill**, una integración acotada para que
+agentes externos envíen facturas y consulten sus propias decisiones. El resto de Agent Access,
+Clearance, registro público y pagos reales no forman parte de este contrato MVP.
+Se comienza con una empresa ficticia y una cuenta demo.
 No se requiere una pantalla de registro.
 
 ## 2. Convenciones comunes
@@ -311,6 +313,7 @@ excepto health. Se devuelve `404` tanto para recurso inexistente como para recur
 | POST | `/approvals/:id/decision` | Ver abajo | `200 Envelope<{ approval: ApprovalRequest; invoice: InvoiceDetail }>` |
 | GET | `/dashboard` | — | `200 Envelope<Dashboard>` |
 | GET | `/evaluation/summary` | — | `200 Envelope<EvaluationSummary \| null>` |
+| GET | `/evaluation/report` | — | `200 Envelope<PublishedEvaluationReport>` |
 
 `PATCH` de proveedores/acuerdos, `/session`, `/budgets`, `/dashboard` y `/invoices/:id/file`
 completan operaciones que las pantallas necesitan y el mapa del brief no detallaba.
@@ -659,9 +662,21 @@ Las reservas no son transferencias ni importes bancarios pagados.
 
 Sin mandato: `/mandate` devuelve `active=null`; el front muestra configuración inicial.
 Procesar sin mandato activo devuelve `409 MANDATE_REQUIRED`, sin aprobar.
-`/evaluation/summary` devuelve `{ data: null }`: todavía no hay una evaluación end-to-end del corpus
-publicada como métrica del producto. La UI dice «Sin evaluación».
-No mostrar porcentajes o resultados inventados como si fueran mediciones.
+`/evaluation/summary` publica una medición histórica sobre una empresa ficticia y documentos
+etiquetados antes de ejecutar. Los contadores y porcentajes se derivan de sus veinte resultados
+observados; los fallos técnicos permanecen en el denominador. `datasetVersion` identifica la
+muestra ficticia, el alcance real de los lectores/cola y el prefijo de la versión medida. La
+fecha es la del cierre de la corrida, no la hora de esta petición. No describe las facturas de
+la empresa que consulta ni garantiza resultados para todos los formatos.
+
+`/evaluation/report` requiere la misma sesión autenticada y devuelve los metadatos de esa
+medición: `datasetVersion`, `evaluatedAt`, `workerVersion`, `bundleSha256`, `readerVersion`,
+`reportPath`, `reportSha256`, `manifestSha256`, `scope`, `synthetic:true`, `limits`, `cases` y
+`summary`. Cada caso conserva acción esperada, acción inicial/final observada, motivos,
+corrección, autonomía, explicación y fallo técnico. El control adicional P0 queda fuera del
+denominador y se declara con `targetedP0IncludedInDenominator:false`. El detalle no expone
+sesiones, claves ni documentos privados de una organización. Una versión posterior puede
+servir este reporte histórico sin atribuírselo como una nueva corrida.
 
 ## 8. Errores y estados de UI
 
@@ -814,3 +829,88 @@ marca lectura personal con respuesta `204`. Mensajes de otra empresa devuelven `
 Los tipos compartidos son `EmailIntegrationSchema`, `InboxSchema` e `InboxMessageSchema`.
 El origen de factura acepta `EMAIL`. Los documentos siguen usando detalle y procesamiento
 existentes. Ver [configuración, estados y garantías de correo](EMAIL.md).
+
+## Oli Skill — integración autorizada para agentes externos
+
+Esta extensión permite delegar facturas desde Hermes, OpenClaw, Grokbot u otro
+agente con acceso HTTP. El paquete usa el formato `SKILL.md`; la instalación depende
+del entorno consumidor. No introduce Hermes ni un VPS en la orquestación de Oli.
+El panel **Integraciones → Oli Skill → Conectar agente** presenta comandos,
+**Copiar prompt**, descarga y gestión de conexiones. El prompt contiene la URL
+pública y el procedimiento; la key se configura por separado en el gestor de secretos.
+
+### Administración humana
+
+Todas estas rutas requieren sesión humana **OWNER**; las mutaciones exigen CSRF.
+La base sigue siendo `/api/v1`.
+
+| Método | Ruta | Entrada | Respuesta |
+|---|---|---|---|
+| GET | `/integrations/skill` | — | `{data: {connections: SkillConnection[]}}` |
+| POST | `/integrations/skill/connections` | `{name}` (1–80 caracteres) | `201 {data: {connection: SkillConnection, apiKey}}` |
+| PATCH | `/integrations/skill/connections/{id}` | `{expiresAt: ISO8601 \| null}` | `{data: SkillConnection}` |
+| DELETE | `/integrations/skill/connections/{id}` | — | `204`, revocación irreversible |
+
+`SkillConnection`: `id`, `name`, `keyPrefix`, `scopes`, `createdAt`, `expiresAt`,
+`lastUsedAt`, `revokedAt`. **Las keys se crean sin caducidad (`expiresAt: null`)**.
+El propietario puede establecer una fecha, cambiarla o quitarla, incluso si ya
+venció. Cambiar la caducidad no reactiva una conexión revocada. Las fechas del
+contrato son UTC; el editor del panel muestra la hora local de la persona.
+
+La key completa solo se devuelve al crear la conexión; no se conserva en claro.
+El servidor guarda SHA-256 de una credencial aleatoria de 256 bits. Listados,
+auditoría y prompts no incluyen el secreto. El navegador la muestra temporalmente
+sin persistirla en almacenamiento local ni en la caché de consultas.
+
+### Consumo por agentes
+
+Base configurada como `OLI_API_URL`: `https://<host>/api/v1/agent`.
+Todas las llamadas llevan `Authorization: Bearer <OLI_API_KEY>`. No usan cookies ni
+CSRF. Las credenciales de agente **no** autentican las rutas humanas.
+El cliente se identifica con `User-Agent: Oli-Skill/1.0`; usar ese identificador
+también al consumir con otras herramientas HTTP. El dominio puede rechazar el
+identificador genérico de Python antes de que la solicitud llegue al Worker.
+
+| Método | Ruta relativa | Entrada | Respuesta |
+|---|---|---|---|
+| GET | `/me` | — | `{data: {connection, organization: {id,name}, simulated: true}}` |
+| POST | `/invoices` | Multipart `file` únicamente + UUID `Idempotency-Key` | `201 {data: Invoice}` |
+| POST | `/invoices/{id}/process` | Cuerpo vacío | `200/202 {data: InvoiceDetail}` |
+| GET | `/invoices/{id}` | — | `{data: InvoiceDetail}` |
+
+Permisos fijos: `invoices:submit`, `invoices:read-own`, `invoices:process-own`.
+La identidad y empresa proceden del hash de la key y su membresía vigente; no se
+aceptan `orgId`, roles, extracción o decisiones del consumidor. La baja o cambio
+de rol del OWNER emisor también deshabilita el acceso de sus conexiones.
+No hay acceso a listar facturas de la empresa, archivos, proveedores, reglas,
+revisiones humanas o acciones conversacionales. Una factura ajena devuelve `404`;
+una operación fuera del alcance bajo `/agent/` devuelve `403 AGENT_SCOPE_DENIED`.
+`approvalRequest.canApprove` siempre es `false` para el consumidor agente.
+
+PDF/JPG/PNG hasta 5 MB, validación de documento, extracción, evaluación, colas,
+reservas atómicas y revisión humana reutilizan el flujo existente. El canal visible
+es `AGENT_REQUEST`. `agent_invoice_sources` registra la conexión emisora de forma
+append-only y no permite atribuir el mismo documento registrado a varios canales.
+Los eventos de agente se registran como `SYSTEM` con `details.connectionId`,
+separados de las acciones del propietario humano. La carga verifica nuevamente la
+conexión dentro del batch de registro, para rechazar una revocación concurrente.
+
+La idempotencia se separa por conexión: reintentar el mismo archivo, nombre y UUID
+no crea otra factura. Cambiar el documento con el mismo UUID da `409`.
+Límite por conexión: 60 solicitudes/minuto; devuelve `429` con `Retry-After: 60`.
+Una key ausente, incorrecta, revocada o vencida devuelve `401`.
+`DECIDED` describe procesamiento; la autorización es `latestDecision.action` y
+siempre es simulada. No se ejecutan pagos reales.
+
+### Distribución y operación
+
+Fuentes del skill: `apps/web/public/skills/oli/`. El build web empaqueta esa carpeta
+en `/skills/oli-skill.tar.gz`, servido públicamente como asset sin credenciales.
+El cliente `scripts/oli.py` usa Python 3.10+ y solo biblioteca estándar. Lee secretos
+del entorno, rechaza redirecciones y admite HTTP únicamente para localhost.
+Los agentes sin Python pueden consumir el contrato HTTP del propio skill.
+
+Antes de desplegar esta versión, aplicar la migración **0010_oli_skill.sql** en D1;
+reconstruir la web para distribuir el paquete actualizado. No aplicar un seed sobre
+los datos existentes. Las pruebas de esta integración verifican permisos,
+idempotencia y persistencia; no son métricas del extractor ni de decisiones end-to-end.

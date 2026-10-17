@@ -1,0 +1,9 @@
+{
+  "scope": "PREDECLARED_UNRESOLVED_DUPLICATE_REGRESSION_OUTSIDE_HOLDOUT_20",
+  "file": {
+    "path": "targeted/unresolved-duplicate.pdf",
+    "mimeType": "application/pdf",
+    "sha256": "88ec1e40a6052ad903f755c3513e7dfdf4a614a5248dc33449868a13285a9341",
+    "sizeBytes": 1193
+  }
+}

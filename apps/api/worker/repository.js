@@ -137,7 +137,7 @@ export function snapshotInvoicesStatement(db, orgId, invoiceId) {
 export async function idempotency(request, db, session, requestHash) {
   const key = request.headers.get('Idempotency-Key');
   if (!key || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)) throw new HttpError(400, 'IDEMPOTENCY_KEY_REQUIRED');
-  const route = `${request.method} ${new URL(request.url).pathname}`;
+  const route = `${request.method} ${new URL(request.url).pathname}${session.agent ? ` @${session.agent.id}` : ''}`;
   const args = [session.organization.id, session.user.id, route, key];
   const cached = await stmt(db, 'SELECT * FROM idempotency_keys WHERE org_id = ? AND actor_id = ? AND route = ? AND key = ?', ...args).first();
   if (cached && cached.request_hash !== requestHash) throw new HttpError(409, 'IDEMPOTENCY_CONFLICT');

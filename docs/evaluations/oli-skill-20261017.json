@@ -1,0 +1,35 @@
+{
+  "feature": "Oli Skill",
+  "date": "2026-10-17",
+  "environment": "local, isolated D1/R2 and synthetic credentials/documents",
+  "checks": {
+    "api": { "passed": 124, "failed": 0, "command": "node --test --test-concurrency=1 tests/*.test.mjs" },
+    "skillApiAndPythonClient": { "passed": 7, "includedInApiCount": true },
+    "contracts": { "passed": 28, "failed": 0, "typecheck": "passed" },
+    "frontend": { "passed": 26, "failed": 0 },
+    "database": { "passed": 14, "failed": 0 },
+    "productionBuild": "passed",
+    "skillFormatValidation": "passed",
+    "browser": {
+      "desktop": [1440, 1000],
+      "mobile": [390, 844],
+      "copyPromptWithoutCredentials": "passed",
+      "createKeyWithoutExpiration": "passed",
+      "setAndRemoveExpiration": "passed",
+      "revokeKey": "passed",
+      "closeAndEscape": "passed",
+      "archiveDownload": "200 application/gzip",
+      "horizontalPageOverflow": false,
+      "runtimeExceptions": 0
+    }
+  },
+  "notes": [
+    "The initial parallel API run had one Miniflare localhost ETIMEDOUT during test setup; the isolated rerun and full serial suite passed.",
+    "The Python client was executed against the real local API with a stub invoice queue. No live model or financial provider was called.",
+    "These checks are not extractor accuracy or financial end-to-end decision metrics.",
+    "Agent runtimes Hermes, OpenClaw and Grokbot were not launched; the package and prompt expose a vendor-neutral HTTP contract.",
+    "Production database migration and deployment have not been performed."
+  ],
+  "requiredMigration": "0010_oli_skill.sql",
+  "screenshots": ".impeccable/review/oli-skill/"
+}

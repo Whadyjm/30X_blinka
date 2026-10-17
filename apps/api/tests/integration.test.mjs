@@ -7,6 +7,7 @@ import worker from '../worker/index.js';
 import { processInvoice, snapshot } from '../worker/processing.js';
 import { corroboratePdfText, READER_VERSION } from '../worker/document.js';
 import { audit, clearGuard, guard, id, now, originCheck, periodKey, stmt } from '../worker/http.js';
+import { evaluationReport, evaluationSummary } from '../worker/evaluation.js';
 
 const origin = 'https://oli.invalid';
 const pdf = new TextEncoder().encode('%PDF-1.4\nsynthetic integration fixture, provider is mocked');
@@ -72,6 +73,28 @@ async function setup(t) {
   });
   return { env, DB, api, upload, read, ledger, cookie: () => cookie };
 }
+
+test('evaluación publicada: métricas históricas consistentes, procedencia y sesión obligatoria', async t => {
+  const { api, env } = await setup(t);
+  const summary = evaluationSummary(), report = evaluationReport();
+  const source = readFileSync(new URL('../../../' + report.reportPath, import.meta.url));
+  const { createHash } = await import('node:crypto');
+  assert.equal(createHash('sha256').update(source).digest('hex'), report.reportSha256);
+  const run = JSON.parse(source);
+  assert.equal(summary.totalCases, 20);
+  assert.equal(summary.correctDecisions, run.results.filter(row => row.correct).length);
+  assert.equal(summary.unsafeApprovals, run.results.filter(row => row.unsafeApproval).length);
+  assert.equal(summary.correctAutonomy, summary.correctAutonomousCases / 20);
+  assert.equal(summary.explanationCoverage, summary.explainedDecisions / 20);
+  assert.equal(report.workerVersion, run.backendAtStart.version);
+  assert.deepEqual((await api('/evaluation/summary')).data, summary);
+  assert.deepEqual((await api('/evaluation/report')).data.summary, summary);
+  assert.equal(report.targetedP0IncludedInDenominator, false);
+  for (const path of ['/evaluation/summary', '/evaluation/report']) {
+    const denied = await worker.fetch(new Request(origin + '/api/v1' + path), env);
+    assert.equal(denied.status, 401);
+  }
+});
 
 test('sesión protegida, CSRF, origen y logout; no acepta autoridad del navegador', async t => {
   const { api, env } = await setup(t);
@@ -162,6 +185,23 @@ test('sin corroboración o con discrepancia no autoriza ni crea botón humano', 
   const invoice = await upload(); const result = await processInvoice(env, 'org_demo', invoice.id, read(extraction(), { corroboration: null }));
   assert.equal(result.data.latestDecision.action, 'ESCALATE'); assert.equal(result.data.approvalRequest, null);
   assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 1 });
+});
+
+test('antecedente con proveedor sin resolver impide aprobar otro archivo del mismo número', async t => {
+  const { env, DB, upload, read, ledger } = await setup(t);
+  const first = await upload();
+  const uncertain = (await processInvoice(env, 'org_demo', first.id, read(extraction({ amountMinor: 19000 }), { corroboration: null }))).data;
+  assert.equal(uncertain.latestDecision.action, 'ESCALATE');
+  assert.equal(uncertain.vendorId, null);
+  const second = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4\ncorrected representation of prior invoice') } });
+  const result = (await processInvoice(env, 'org_demo', second.id, read())).data;
+  assert.equal(result.latestDecision.action, 'ESCALATE');
+  assert.ok(result.latestDecision.reasons.includes('POSSIBLE_DUPLICATE'));
+  assert.equal(result.approvalRequest, null);
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+  assert.equal((await DB.prepare('SELECT vendor_id FROM invoices WHERE id=?').bind(first.id).first()).vendor_id, null);
+  await processInvoice(env, 'org_demo', second.id, async () => assert.fail('El replay no relee ni elimina el antecedente'));
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
 });
 
 test('revisión humana agrega decisión y reserva; replay y dos revisores no duplican', async t => {

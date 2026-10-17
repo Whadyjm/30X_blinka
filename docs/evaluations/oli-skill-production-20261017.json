@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-17T21:07:21.322Z",
+  "host": "https://oli30x.ultramare.dev",
+  "scope": "Production transport/authentication/asset smoke only; no invoice submitted and no model called",
+  "checks": {
+    "health": 200,
+    "publishedReleaseMatches": true,
+    "archive": {
+      "status": 200,
+      "sha256": "a8f56f4e762d3033ed080e9aa67f293b0f3b436f54aa195c233b0f70a035880e",
+      "bytes": 5001
+    },
+    "keyCreatedWithoutExpiry": true,
+    "secretAbsentFromList": true,
+    "downloadedPythonClientCheck": true,
+    "expiryEnforced": true,
+    "expiryRemoved": true,
+    "humanRoutesDenied": true,
+    "authorityInjectionRejected": 400,
+    "smokeKeyRevoked": true
+  },
+  "connectionId": "agent_3291fc3f-6ca4-4e69-a350-3d2253e3da6c",
+  "result": "PASS",
+  "invoiceSubmissions": 0,
+  "modelCalls": 0,
+  "deploymentVersion": "0907cbaa-d45e-4683-a749-afddebad0133",
+  "previousVersion": "408f86a2-1894-4a26-b69e-1e31dda3aed4",
+  "migration": "0010_oli_skill.sql",
+  "pendingMigrations": 0,
+  "publishedFrontendPreserved": {
+    "apps/web/src/pages/Onboarding.tsx": "5db283aa1c4eb10f0b364d2c4536702cee0d36d2de76af2404be0a6b0f7cc30e",
+    "apps/web/src/components/Oli.tsx": "3d1545089f35af6b6a54e992761f814ef525bfae3e4aabbeb2944c87ed6571df",
+    "apps/web/src/features/rules/MandateForm.tsx": "18213e754ddadadb0c179a989e748fadb068352009cb7a77c826a158cd047326",
+    "apps/web/src/features/rules/ReferenceData.tsx": "38aea3948676c3ee1bba0311270ee2b0eaf9d4374698afbf389168898cf4adcc",
+    "apps/web/src/i18n/es.ts": "dea826dd44051e0956715363a750bed38f6d98a8675782e8deaaa9713faeaeb9",
+    "apps/api/wrangler.jsonc": "b6cecab8b5da2d4a41513c5540673d1d1be1f4b8cfa724741eb6e261cc4eeb25"
+  },
+  "clientCompatibilityFix": "Client sends User-Agent: Oli-Skill/1.0; generic Python-urllib user agent returned HTTP403 at the custom domain. No WAF settings changed.",
+  "featureRegressionAfterFix": {
+    "passed": 7,
+    "failed": 0
+  }
+}

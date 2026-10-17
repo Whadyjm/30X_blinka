@@ -1,0 +1,61 @@
+{
+  "scope": "MANUALLY_STOPPED_FAILED_EVALUATION_FOR_FUTILITY_NOT_A_COMPLETED_20_DOCUMENT_RUN",
+  "stoppedAt": "2026-10-17T23:45:28.001Z",
+  "reason": "Two terminal technical reader failures already make the predeclared minimum19/20 impossible. Preserve raw partial report and stop spending calls on old configuration before publishing transport fix.",
+  "rawPartialReport": "docs/evaluations/candidate-selva-live-2026-10-17T23-30-39-754Z.json",
+  "rawPartialReportSha256": "a90960c6b0680723331101f971b6e9fb36209332d8459933e2505cd503150164",
+  "frozenRunner": "docs/evaluations/runners/candidate-selva-20261017.mjs",
+  "frozenRunnerSha256": "a9155e4c071bb0ad4f55336655731cf9751236a18de83eb49a18af73f1eadac3",
+  "manifestSha256": "ca14aeb508c78b5c00d902a6c76ff4334ceab7ff58e27c458133c1cf3b8488ff",
+  "plannedCases": 20,
+  "completedRows": 12,
+  "uploadedDocuments": 13,
+  "notUploaded": 7,
+  "fullyCorrectCompletedRows": 10,
+  "unsafeApprovalsObservedInCompletedRows": 0,
+  "normalAutoApproved": 7,
+  "terminalTechnicalFailures": [
+    {
+      "caseId": "005",
+      "job": {
+        "state": "DEAD",
+        "attempts": 3,
+        "last_error_json": "{\"code\":\"OPENROUTER_REQUEST_REJECTED\",\"retryable\":true,\"exhausted\":true}"
+      },
+      "error": {
+        "code": "JOB_RETRIES_EXHAUSTED",
+        "message": "No se pudo completar el procesamiento; no se creó una aprobación.",
+        "retryable": false
+      }
+    },
+    {
+      "caseId": "009",
+      "job": {
+        "state": "DEAD",
+        "attempts": 3,
+        "last_error_json": "{\"code\":\"OPENROUTER_REQUEST_REJECTED\",\"retryable\":true,\"exhausted\":true}"
+      },
+      "error": {
+        "code": "JOB_RETRIES_EXHAUSTED",
+        "message": "No se pudo completar el procesamiento; no se creó una aprobación.",
+        "retryable": false
+      }
+    }
+  ],
+  "unscoredInFlight": [
+    {
+      "id": "inv_13c77828-f777-4616-9daa-d311a03c78ea",
+      "status": "RECEIVED",
+      "state": "RETRY",
+      "attempts": 2,
+      "last_error_json": "{\"code\":\"OPENROUTER_REQUEST_REJECTED\",\"retryable\":true,\"exhausted\":false}"
+    }
+  ],
+  "maximumPossibleCorrectOutOf20": 18,
+  "minimumRequired": 19,
+  "acceptanceReady": false,
+  "scopedSessionRevoked": true,
+  "scopedSessionsRemoved": 1,
+  "rawFinancialHistoryModified": false,
+  "note": "Background processing for the unscored in-flight document may finish normally, including after deployment; it is excluded from original-version outcome claims. Unrun cases are not counted as successful. No completed reads repeated."
+}

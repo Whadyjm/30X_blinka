@@ -8,6 +8,7 @@
     "node": ">=20.19.0"
   },
   "scripts": {
+    "prebuild": "tar -czf public/skills/oli-skill.tar.gz -C public/skills oli",
     "dev": "vite",
     "dev:mock": "vite --mode mock",
     "dev:live": "vite --mode live",

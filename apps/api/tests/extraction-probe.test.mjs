@@ -62,3 +62,22 @@ test('document probe is private, bounded and validates bytes before production r
   assert.equal('action' in (await response.json()).data, false);
   assert.equal((await handleDocumentProbe(pdfRequest(), env, async () => { throw new ExtractionError('ALL_MODELS_UNAVAILABLE'); })).status, 502);
 });
+
+test('provider details require explicit private diagnostic; bounded values redact both secrets', async () => {
+  const { handleDocumentProbe } = await import('../worker/extraction-probe.js');
+  const body = new TextEncoder().encode('%PDF-1.4\nsynthetic');
+  const reader = async (_env, _file, _bytes, _hash, options) => {
+    if (options.onHttpError) for (let n = 0; n < 5; n++) options.onHttpError(400, { error: {
+      message: env.OPENROUTER_API_KEY + ' ' + env.EXTRACTION_PROBE_TOKEN + 'x'.repeat(3000),
+      metadata: { raw: env.OPENROUTER_API_KEY, error_type: 'rate_limit_exceeded' } } });
+    throw new ExtractionError('ALL_MODELS_UNAVAILABLE');
+  };
+  const headers = { 'Content-Type': 'application/pdf', 'X-Oli-Provider-Diagnostic': '1' };
+  assert.equal((await handleDocumentProbe(request(body, { ...headers, Authorization: 'Bearer wrong' }), env, neverExtract)).status, 401);
+  const response = await handleDocumentProbe(request(body, headers), env, reader);
+  const payload = await response.json(); assert.equal(payload.providerErrors.length, 3);
+  assert.equal(payload.providerErrors[0].message.length, 1600);
+  for (const secret of [env.OPENROUTER_API_KEY, env.EXTRACTION_PROBE_TOKEN]) assert.ok(!JSON.stringify(payload).includes(secret));
+  const plain = await handleDocumentProbe(request(body, { 'Content-Type': 'application/pdf' }), env, reader);
+  assert.equal('providerErrors' in await plain.json(), false);
+});

@@ -1,0 +1,123 @@
+{
+  "scope": "Frontend onboarding, local mock API and fictional data; no extraction or end-to-end decision accuracy measurement",
+  "checked_at": "2026-10-17",
+  "checks": {
+    "production_build": "passed",
+    "frontend_tests": 24,
+    "frontend_test_files": 6,
+    "i18n_keys": 735,
+    "impeccable_detector_findings": 0,
+    "visual_inspection": {
+      "desktop": [
+        1280,
+        900
+      ],
+      "mobile": [
+        390,
+        844
+      ]
+    },
+    "browser": [
+      {
+        "label": "rules step",
+        "step": "1",
+        "oli": "understanding",
+        "invalid": 0,
+        "active": null,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "invalid ceiling blocked",
+        "step": "1",
+        "oli": "understanding",
+        "invalid": 1,
+        "active": null,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "saved rules",
+        "step": "2",
+        "oli": "listening",
+        "invalid": 0,
+        "active": null,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "sample reference data loaded",
+        "step": "2",
+        "oli": "listening",
+        "invalid": 0,
+        "active": null,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "review before confirmation",
+        "step": "3",
+        "oli": "focused",
+        "invalid": 0,
+        "active": null,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "activated only after confirmation",
+        "step": "4",
+        "oli": "celebrating",
+        "invalid": 0,
+        "active": 1,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "mobile final step",
+        "step": "4",
+        "oli": "celebrating",
+        "invalid": 0,
+        "active": 1,
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "label": "invalid upload rejected",
+        "step": "4",
+        "oli": "focused",
+        "invalid": 0,
+        "active": 1,
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "label": "sample invoice received without claiming approval",
+        "step": "4",
+        "oli": "celebrating",
+        "invalid": 0,
+        "active": 1,
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "label": "dashboard reached",
+        "invalid": 0,
+        "active": 1,
+        "width": 849,
+        "overflow": false
+      },
+      {
+        "label": "completed onboarding guarded",
+        "invalid": 0,
+        "active": 1,
+        "width": 849,
+        "overflow": false
+      }
+    ]
+  },
+  "not_measured": [
+    "motion graphics phase pending Claude",
+    "frame rate",
+    "live API onboarding in this session"
+  ]
+}

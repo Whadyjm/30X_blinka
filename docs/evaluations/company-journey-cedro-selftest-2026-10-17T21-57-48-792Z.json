@@ -1,0 +1,83 @@
+{
+  "runId": "2026-10-17T21-57-48-792Z",
+  "startedAt": "2026-10-17T21:57:48.792Z",
+  "finishedAt": "2026-10-17T21:57:50.230Z",
+  "scope": "SYNTHETIC_READS_LOCAL_JOURNEY_HARNESS_SELF_TEST_NOT_OCR_METRICS",
+  "company": {
+    "slug": "cedro",
+    "name": "Cedro Logistics Demo LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "datasetVersion": "company-journey-v1",
+  "manifestSha256": "cae8806baa7002fe8ffd45e5a7003c68ee33f99afc3af09b23854b6b9199751c",
+  "localCommit": "1a1130f69bd47fcd865e6b4b6278a526d3e99bd0",
+  "sourceHashes": {
+    "apps/api/scripts/evaluate-company-journey.mjs": "9da96cae2b7e16db6aa9eba52b8fa447431d5b1f0c92d74f9ea1d852fe1f5056",
+    "apps/api/worker/api.js": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+    "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+    "apps/api/worker/configuration.js": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+    "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+    "apps/api/worker/processing.js": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+    "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+    "apps/api/worker/repository.js": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+    "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+    "packages/domain/src/index.ts": "e8ca4b77e2ab2a76f304bb75a825a252734b62b0d019a9a660bfef6e54784219",
+    "packages/contracts/src/index.ts": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc"
+  },
+  "sourceUnchanged": null,
+  "remoteReaderTarget": null,
+  "remoteWorkerVersion": null,
+  "remoteVersionNote": "Reader provenance is recorded per document; exact remote Worker deployment identity is not verified by this runner.",
+  "limits": {
+    "documents": 20,
+    "maximumRemoteProbes": 0,
+    "externalRetries": 0,
+    "concurrencyPerCompany": 1,
+    "probeTimeoutMs": 65000
+  },
+  "context": {
+    "freshOrganization": true,
+    "directProvisioning": "Organization and owner membership only; rules, vendors, agreements and activation use original authenticated API.",
+    "cumulativeBudget": true,
+    "resetBetweenCases": false,
+    "localD1R2": true,
+    "localStatePath": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/company-journey/cedro/2026-10-17T21-57-48-792Z",
+    "queueTransport": "Controlled in-memory transport; original durable D1 job creation, enqueue API and consumeInvoiceJobs processor.",
+    "originalDomainAndReservationTriggers": true,
+    "productionFinancialWrites": false,
+    "browserTested": false,
+    "humanReviews": "Explicit simulated OWNER approval/rejection performed by the runner, never by the model.",
+    "labelsSentToReaders": false,
+    "cost": "Usage reported by successful reader responses only; interrupted calls and separate conversion may be unreported."
+  },
+  "setup": {
+    "organizationId": "org_journey_cedro_35833f16-e840-4cb0-8d4f-948aa88ed5dd",
+    "initialPolicyAbsent": true,
+    "activatedPolicy": {
+      "id": "pol_1383887a-071e-49cd-85f0-6aa6b46f093b",
+      "version": 1,
+      "status": "ACTIVE",
+      "rules": {
+        "currency": "USD",
+        "automaticLimitMinor": 50000,
+        "hardLimitMinor": 150000,
+        "monthlyBudgetMinor": 220000,
+        "requireAllowedVendor": true,
+        "requireAgreement": true,
+        "humanApprovalEnabled": true,
+        "reviewAboveMinor": 50000,
+        "processDaysBeforeDue": 0,
+        "scopedDelegations": []
+      },
+      "activatedAt": "2026-10-17T21:57:49.598Z",
+      "activatedBy": "owner_cedro_53690af8-697f-4b55-9267-261c6a7dc34e"
+    }
+  },
+  "results": [],
+  "summary": null,
+  "fatalError": {
+    "name": "AssertionError",
+    "message": "{\"path\":\"/vendors\",\"status\":409,\"payload\":{\"error\":{\"code\":\"CONFIGURATION_CONFLICT\",\"message\":\"La configuración cambió o el registro ya está en uso. Recarga e intenta nuevamente.\",\"fieldErrors\":{},\"requestId\":\"req_403fa2b0-f181-495e-ba63-a8a919303ffe\"}}}"
+  }
+}

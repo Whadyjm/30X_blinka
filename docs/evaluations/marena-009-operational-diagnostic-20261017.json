@@ -1,0 +1,134 @@
+{
+  "at": "2026-10-17T23:23:32.456Z",
+  "scope": "SINGLE_OPERATIONAL_DIAGNOSTIC_RETRY_AFTER_NO_MODEL_OUTPUT_NOT_HOLDOUT_REPLACEMENT",
+  "source": "marena/009",
+  "status": 200,
+  "payload": {
+    "data": {
+      "extraction": {
+        "vendorName": "Birth Ledger Demo LLC",
+        "invoiceNumber": "MN-009-2026",
+        "amountMinor": 30000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "One time operations review",
+        "extractionWarnings": [
+          "INDEPENDENT_READ_MISMATCH:vendorName"
+        ],
+        "evidence": [
+          {
+            "field": "vendorName",
+            "source": "page:1",
+            "quote": "Supplier: Birth Ledger Demo LLC"
+          },
+          {
+            "field": "invoiceNumber",
+            "source": "page:1",
+            "quote": "Invoice number: MN-009-2026"
+          },
+          {
+            "field": "amountMinor",
+            "source": "page:1",
+            "quote": "Total: USD 300.00"
+          },
+          {
+            "field": "issueDate",
+            "source": "page:1",
+            "quote": "Issue date: 2026-10-12"
+          },
+          {
+            "field": "dueDate",
+            "source": "page:1",
+            "quote": "Due date: 2026-10-30"
+          },
+          {
+            "field": "servicePeriod",
+            "source": "page:1",
+            "quote": "Service period: 2026-10"
+          },
+          {
+            "field": "description",
+            "source": "page:1",
+            "quote": "Description: One time operations review"
+          }
+        ]
+      },
+      "documentType": "INVOICE",
+      "primaryReadId": "f2dec7b7-1739-423c-b467-568b6c842ee4",
+      "documentSha256": "c8fd407209a6234fbb99a8b23787f86450a9e5dac6a25cd54c876a9b846022e3",
+      "corroboration": {
+        "documentSha256": "c8fd407209a6234fbb99a8b23787f86450a9e5dac6a25cd54c876a9b846022e3",
+        "readId": "pdftext_3f439024-6097-424a-9f1c-abfc58238255",
+        "method": "PDF_TEXT",
+        "fields": {
+          "vendorName": "Birch Ledger Demo LLC",
+          "amountMinor": 30000,
+          "currency": "USD",
+          "dueDate": "2026-10-30"
+        }
+      },
+      "agreementReference": null,
+      "provenance": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "provider": "Wafer",
+        "pdfTextParser": "labelled-v7",
+        "documentClassification": {
+          "documentType": "INVOICE",
+          "source": "PRIMARY_READER",
+          "documentSha256": "c8fd407209a6234fbb99a8b23787f86450a9e5dac6a25cd54c876a9b846022e3",
+          "primaryReadId": "f2dec7b7-1739-423c-b467-568b6c842ee4",
+          "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+        },
+        "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+        "attempts": [
+          {
+            "model": "deepseek/deepseek-v4.1-flash",
+            "outcome": "SUCCESS",
+            "finishReason": "stop",
+            "usage": {
+              "inputTokens": 792,
+              "outputTokens": 280,
+              "reasoningTokens": 0,
+              "costUsd": 0.00224072
+            },
+            "durationMs": 4335
+          }
+        ],
+        "usage": {
+          "inputTokens": 792,
+          "outputTokens": 280,
+          "reasoningTokens": 0,
+          "costUsd": 0.00224072
+        },
+        "advisories": [
+          "SYNTHETIC_LABEL",
+          "MISSING_BANK_DETAILS",
+          "MISSING_TAX_BREAKDOWN"
+        ],
+        "imageOcr": null,
+        "imageOcrMode": "OFF",
+        "pdfText": {
+          "text": "# invoice.pdf\n## Contents\n### Page 1\nBirch Ledger Demo LLC\nINVOICESupplier: Birch Ledger Demo LLCInvoice number: MN-009-2026\nIssue date: 2026-10-12 Due date: 2026-10-30\nService period: 2026-10\nDescription: One time operations reviewTotal: USD 300.00Notes: Fictional demonstration only. No payment instructions.\n\n",
+          "sha256": "e0bb1af71627180bf1ac8d45baddac3ab4520251dc7c49bd4d4d9c6d27652bd4",
+          "converter": "WORKERS_AI_TO_MARKDOWN"
+        },
+        "corroborationError": null,
+        "independentDisagreements": [
+          "vendorName"
+        ],
+        "independentIssues": [],
+        "cache": {
+          "PRIMARY": false,
+          "SECONDARY": false
+        },
+        "timings": {
+          "totalMs": 4335,
+          "primaryMs": 4335,
+          "secondaryMs": 24
+        }
+      }
+    }
+  }
+}

@@ -7,6 +7,7 @@ export interface OliProps extends OliOptions {
   size?: number;
   className?: string;
   label?: string;
+  followCursor?: boolean;
 }
 
 export function Oli({
@@ -18,6 +19,7 @@ export function Oli({
   particles = 1600,
   className,
   label = 'Oli',
+  followCursor = false,
 }: OliProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<OliCanvas | null>(null);
@@ -37,6 +39,41 @@ export function Oli({
   useEffect(() => {
     renderer.current?.setOptions({ state, speed, dark, paused });
   }, [state, speed, dark, paused]);
+
+  useEffect(() => {
+    if (!followCursor || paused) return;
+    let frame = 0;
+    let x = 0;
+    let y = 0;
+    const track = (event: PointerEvent) => {
+      x = event.clientX;
+      y = event.clientY;
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = canvas.current?.getBoundingClientRect();
+        if (!rect) return;
+        renderer.current?.lookAt(
+          (x - rect.left - rect.width / 2) / Math.max(rect.width, innerWidth * 0.4),
+          (y - rect.top - rect.height / 2) / Math.max(rect.height, innerHeight * 0.4),
+        );
+      });
+    };
+    const reset = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      renderer.current?.lookAt(0, 0);
+    };
+    document.addEventListener('pointermove', track, { passive: true });
+    document.documentElement.addEventListener('pointerleave', reset);
+    window.addEventListener('blur', reset);
+    return () => {
+      reset();
+      document.removeEventListener('pointermove', track);
+      document.documentElement.removeEventListener('pointerleave', reset);
+      window.removeEventListener('blur', reset);
+    };
+  }, [followCursor, paused, particles]);
 
   return (
     <canvas

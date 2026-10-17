@@ -12,6 +12,8 @@ import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
 import { configureTelegram, createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
 import { disableEmail, emailStatus, enableEmail, inbox, readInboxMessage } from './email.js';
+import { createSkillConnection, handleAgentRequest, revokeSkillConnection, skillConnections, updateSkillConnection } from './skill.js';
+import { evaluationReport, evaluationSummary } from './evaluation.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -28,9 +30,15 @@ export async function handleApi(request, env) {
   try {
     const url = new URL(request.url); const path = url.pathname.slice('/api/v1'.length); const method = request.method;
     if (path === '/session' && method === 'POST') return await login(request, env);
+    if (path.startsWith('/agent/')) return await handleAgentRequest(request, env, path);
     const session = await authenticate(request, env); const orgId = session.organization.id;
     if (path === '/me' && method === 'GET') { const { tokenHash, ...data } = session; return json({ data }); }
     if (path === '/session' && method === 'DELETE') return await logout(request, env, session);
+    if (path === '/integrations/skill' && method === 'GET') return await skillConnections(env, session);
+    if (path === '/integrations/skill/connections' && method === 'POST') return await createSkillConnection(request, env, session);
+    const skillConnection = path.match(/^\/integrations\/skill\/connections\/([^/]+)$/);
+    if (skillConnection && method === 'DELETE') return await revokeSkillConnection(env, session, skillConnection[1]);
+    if (skillConnection && method === 'PATCH') return await updateSkillConnection(request, env, session, skillConnection[1]);
     if (path === '/integrations/email' && method === 'GET') return await emailStatus(env, session);
     if (path === '/integrations/email' && method === 'POST') return await enableEmail(env, session);
     if (path === '/integrations/email' && method === 'DELETE') return await disableEmail(env, session);
@@ -102,7 +110,8 @@ export async function handleApi(request, env) {
       return json({ data: DashboardSchema.parse({ ...invoiceData,
         budgets: await budgets(env.DB, orgId, periodKey(session.organization.timezone)), generatedAt: now(), simulated: true }) });
     }
-    if (path === '/evaluation/summary' && method === 'GET') return json({ data: null });
+    if (path === '/evaluation/summary' && method === 'GET') return json({ data: evaluationSummary() });
+    if (path === '/evaluation/report' && method === 'GET') return json({ data: evaluationReport() });
     throw new HttpError(404, 'NOT_FOUND');
   } catch (error) {
     const known = error instanceof HttpError;

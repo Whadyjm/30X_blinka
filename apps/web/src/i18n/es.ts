@@ -10,6 +10,7 @@ import { esRules } from './es.rules';
 import { esIntegrations } from './es.integrations';
 import { esEmail } from './es.email';
 import { esChat } from './es.chat';
+import { esOnboarding } from './es.onboarding';
 import { esDashboard } from './es.dashboard';
 
 export const es: Record<string, string> = {
@@ -20,5 +21,6 @@ export const es: Record<string, string> = {
   ...esIntegrations,
   ...esEmail,
   ...esChat,
+  ...esOnboarding,
   ...esDashboard,
 };

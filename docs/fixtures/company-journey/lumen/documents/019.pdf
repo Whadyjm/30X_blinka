@@ -1,0 +1,39 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 440 >>
+stream
+BT /F1 20 Tf 45 722 Td (COBALT AUDIO LAB / PAYMENT RECEIPT) Tj ET
+BT /F1 12 Tf 45 640 Td (Supplier: Cobalt Audio Lab Demo) Tj ET
+BT /F1 12 Tf 45 575 Td (Receipt ref: RC-019) Tj ET
+BT /F1 12 Tf 45 510 Td (Received on: 2026-10-11) Tj ET
+BT /F1 12 Tf 45 440 Td (Description: Payment received for mix session) Tj ET
+BT /F1 16 Tf 350 346 Td (AMOUNT RECEIVED USD 100.00) Tj ET
+BT /F1 8 Tf 45 54 Td (Paid status: COMPLETE | fictional proof) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000218 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+834
+%%EOF

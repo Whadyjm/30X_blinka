@@ -1,0 +1,24 @@
+{
+  "scope": "INDEPENDENT_AUDIT_OF_IMMUTABLE_FIRST_LIVE_MARENA_RUN_NOT_NEW_MODEL_READS",
+  "source": "docs/evaluations/candidate-marena-live-2026-10-17T23-19-18-180Z.json",
+  "sourceSha256": "79bfbb0ac7f30b69995d95c818b8651b0015f2d0abfd54971fc46c13897bdb8b",
+  "attempted": 20,
+  "decided": 17,
+  "fullScriptCorrect": 16,
+  "normalAutoApproved": 8,
+  "unsafeApprovals": 0,
+  "technicalFailures": [
+    "009",
+    "019",
+    "020"
+  ],
+  "referenceBudgetDivergence": [
+    "016"
+  ],
+  "targetedP0Passed": false,
+  "notes": [
+    "Case006 differs by description capitalization only; existing domain normalization treats these as equivalent. Literal accuracy remains separate.",
+    "Case016 follows actual lower reserved budget after technicalfailure009, so ESCALATE is consistent with the live context, though it fails the predeclared full-script outcome.",
+    "Three failed reader requests and the separately failed targeted P0 remain failures; no gold or original reports changed."
+  ]
+}

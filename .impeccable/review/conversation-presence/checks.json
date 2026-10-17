@@ -1,0 +1,25 @@
+{
+  "scope": "Historial y respuesta controlados exclusivamente en navegador local; sin API ni modelo.",
+  "persistentSingleMascot": true,
+  "visibleWhileScrolling": true,
+  "sizes": {
+    "desktop": 104,
+    "mobile": 72,
+    "welcomeMobile": 176
+  },
+  "thinkingTracksPendingReply": true,
+  "draftListening": true,
+  "tapAndKeyboard": true,
+  "reducedMotion": true,
+  "welcomeRestored": true,
+  "viewports": [
+    1440,
+    390,
+    320
+  ],
+  "composerVisible": true,
+  "readableMessageArea": true,
+  "errors": [],
+  "mutations": [],
+  "result": "PASS"
+}

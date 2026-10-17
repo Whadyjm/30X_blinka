@@ -1,0 +1,667 @@
+{
+  "startedAt": "2026-10-17T23:12:54.377Z",
+  "finishedAt": "2026-10-17T23:13:46.365Z",
+  "scope": "PRODUCTION_HTTP_REAL_QUEUE_REAL_READERS_D1_R2_FRESH_FICTITIOUS_COMPANY_WITH_BROWSER",
+  "runnerSha256": "80efb91e01b9657fd122f8943c57758ebd454413b0b8198bbc876b4600f8480e",
+  "candidate": {
+    "version": "5c744a1c-d198-42d1-8465-9dae165a57ea",
+    "correctionCommit": "8057263a1ed24cded822de764fc22423cf94c44d",
+    "bundleSha256": "ff174bfacb239f2860e313aecaf30ab97ff23172b30270983d9619d01fec26d5"
+  },
+  "company": {
+    "slug": "marena",
+    "name": "Marena Demo Operations LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "orgId": "org_marena_3bfb947d-69be-4cae-b77c-588b5a1433c5",
+  "manifestPath": "docs/fixtures/company-journey/marena/manifest.json",
+  "manifestSha256": "29eee11d86e2f6c4fa500bbffe8f18e3d55fc06464c70507d2ecf1c109013971",
+  "targets": {
+    "unsafeApprovals": 0,
+    "minimumFullyCorrect": 19,
+    "minimumNormalAutomaticApprovals": 7,
+    "normalInvoices": 8
+  },
+  "limits": {
+    "documents": 20,
+    "additionalTargetedRegressionDocuments": 1,
+    "externalReaderRetries": 0,
+    "maximumWaitPerDocumentMs": 360000,
+    "concurrency": 1,
+    "models": "Only the original production processor calls models; existing durable job limits and caches apply."
+  },
+  "setup": {
+    "method": "Admin provisioning of fictitious organization, owner membership and scoped session only. All rules, directories, invoice and review operations use the original authenticated application.",
+    "policy": {
+      "id": "pol_738aacd2-242c-454e-8ece-f27bda09d338",
+      "version": 1,
+      "status": "ACTIVE",
+      "rules": {
+        "currency": "USD",
+        "automaticLimitMinor": 20000,
+        "hardLimitMinor": 100000,
+        "monthlyBudgetMinor": 180000,
+        "requireAllowedVendor": true,
+        "requireAgreement": true,
+        "humanApprovalEnabled": true,
+        "reviewAboveMinor": 20000,
+        "processDaysBeforeDue": 0,
+        "scopedDelegations": []
+      },
+      "activatedAt": "2026-10-17T23:12:56.250Z",
+      "activatedBy": "owner_marena_8e42448f-3256-41aa-a11c-9b76c3726cb7"
+    },
+    "openingLedger": {
+      "reservedMinor": 0,
+      "reservations": 0,
+      "decisions": 0,
+      "invoiceReservations": 0
+    },
+    "sessionRevoked": true
+  },
+  "browser": {
+    "screenshots": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/.impeccable/review/candidate-2026-10-17T23-12-53-341Z/",
+    "javascriptErrors": [],
+    "checks": []
+  },
+  "results": [
+    {
+      "caseId": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+        "sizeBytes": 1164
+      },
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 15000,
+      "startedAt": "2026-10-17T23:13:04.837Z",
+      "before": {
+        "reservedMinor": 0,
+        "reservations": 0,
+        "decisions": 0,
+        "invoiceReservations": 0
+      },
+      "referenceReservedBeforeMinor": 0,
+      "referenceContextDiverged": false,
+      "browserUpload": true,
+      "invoiceId": "inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e",
+      "uploadReplay": true,
+      "initialDecision": {
+        "id": "dec_cba9077e-a856-497f-abab-a829ce735767",
+        "invoiceId": "inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e",
+        "action": "APPROVE",
+        "reasons": [
+          "POLICY_ALLOWED"
+        ],
+        "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+        "policyVersionId": "pol_738aacd2-242c-454e-8ece-f27bda09d338",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T23:13:12.457Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 15000,
+          "currency": "USD",
+          "automaticLimitMinor": 20000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 180000,
+          "vendorAllowed": true,
+          "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17"
+        },
+        "trace": [
+          {
+            "rule": "DOCUMENT_TYPE",
+            "outcome": "PASS",
+            "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+            "evidence": {
+              "documentType": "INVOICE"
+            }
+          },
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_b55db12e-87bf-4abe-bca8-9a649da9ce82",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17",
+              "amountMinor": 15000,
+              "agreedAmountMinor": 15000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Secure archive capacity",
+              "agreedConcept": "Secure archive capacity"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 15000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 15000,
+              "availableMinor": 180000,
+              "reservedMinor": 0,
+              "budgetLimitMinor": 180000,
+              "policyMonthlyBudgetMinor": 180000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe está dentro de ambos umbrales automáticos.",
+            "evidence": {
+              "amountMinor": 15000,
+              "automaticLimitMinor": 20000,
+              "reviewAboveMinor": 20000
+            }
+          }
+        ],
+        "simulated": true
+      },
+      "read": {
+        "extraction": {
+          "vendorName": "Granite Data Demo LLC",
+          "invoiceNumber": "MN-001-2026",
+          "amountMinor": 15000,
+          "currency": "USD",
+          "issuedAt": "2026-10-12",
+          "dueDate": "2026-10-30",
+          "servicePeriod": "2026-10",
+          "description": "Secure archive capacity",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Granite Data Demo LLC"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: MN-001-2026"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-12"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-30"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Secure archive capacity"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: USD 150.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "2d350caa-0754-4fc0-8076-b8d8ad078680",
+        "documentSha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+        "corroboration": {
+          "documentSha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+          "readId": "pdftext_2233b5e3-3ce2-468f-a06f-ccbb230b9f29",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Granite Data Demo LLC",
+            "amountMinor": 15000,
+            "currency": "USD",
+            "dueDate": "2026-10-30"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v7",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+            "primaryReadId": "2d350caa-0754-4fc0-8076-b8d8ad078680",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2201,
+                "outputTokens": 334,
+                "reasoningTokens": 0,
+                "costUsd": 0.00225821
+              },
+              "durationMs": 3037
+            }
+          ],
+          "usage": {
+            "inputTokens": 2201,
+            "outputTokens": 334,
+            "reasoningTokens": 0,
+            "costUsd": 0.00225821
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": null,
+          "imageOcrMode": "OFF",
+          "pdfText": {
+            "text": "# invoice.pdf\n## Contents\n### Page 1\nGranite Data Demo LLC\nINVOICESupplier: Granite Data Demo LLCInvoice number: MN-001-2026\nIssue date: 2026-10-12 Due date: 2026-10-30\nService period: 2026-10\nDescription: Secure archive capacityTotal: USD 150.00Notes: Fictional demonstration only. No payment instructions.\n\n",
+            "sha256": "dc7110db6fe64d0286241a646deae607f7684025d56f0d81d2c7a0fc2ad20dd1",
+            "converter": "WORKERS_AI_TO_MARKDOWN"
+          },
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3140,
+            "primaryMs": 3037,
+            "secondaryMs": 1
+          }
+        }
+      },
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "initialCorrect": true,
+      "detail": {
+        "id": "inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e",
+        "status": "DECIDED",
+        "source": "HUMAN_UPLOAD",
+        "file": {
+          "name": "001.pdf",
+          "mimeType": "application/pdf",
+          "sizeBytes": 1164,
+          "url": "/api/v1/invoices/inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e/file"
+        },
+        "vendorId": "vendor_b55db12e-87bf-4abe-bca8-9a649da9ce82",
+        "vendorName": "Granite Data Demo LLC",
+        "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17",
+        "invoiceNumber": "MN-001-2026",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Secure archive capacity",
+        "extractionWarnings": [],
+        "latestDecision": {
+          "id": "dec_cba9077e-a856-497f-abab-a829ce735767",
+          "invoiceId": "inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e",
+          "action": "APPROVE",
+          "reasons": [
+            "POLICY_ALLOWED"
+          ],
+          "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+          "policyVersionId": "pol_738aacd2-242c-454e-8ece-f27bda09d338",
+          "policyVersion": 1,
+          "checkedAt": "2026-10-17T23:13:12.457Z",
+          "needsHumanApproval": false,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 15000,
+            "currency": "USD",
+            "automaticLimitMinor": 20000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 180000,
+            "vendorAllowed": true,
+            "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17"
+          },
+          "trace": [
+            {
+              "rule": "DOCUMENT_TYPE",
+              "outcome": "PASS",
+              "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+              "evidence": {
+                "documentType": "INVOICE"
+              }
+            },
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_b55db12e-87bf-4abe-bca8-9a649da9ce82",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17",
+                "amountMinor": 15000,
+                "agreedAmountMinor": 15000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Secure archive capacity",
+                "agreedConcept": "Secure archive capacity"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 15000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 15000,
+                "availableMinor": 180000,
+                "reservedMinor": 0,
+                "budgetLimitMinor": 180000,
+                "policyMonthlyBudgetMinor": 180000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe está dentro de ambos umbrales automáticos.",
+              "evidence": {
+                "amountMinor": 15000,
+                "automaticLimitMinor": 20000,
+                "reviewAboveMinor": 20000
+              }
+            }
+          ],
+          "simulated": true
+        },
+        "approvalRequest": null,
+        "processingError": null,
+        "createdAt": "2026-10-17T23:13:06.892Z",
+        "updatedAt": "2026-10-17T23:13:12.457Z",
+        "extraction": {
+          "vendorName": "Granite Data Demo LLC",
+          "invoiceNumber": "MN-001-2026",
+          "amountMinor": 15000,
+          "currency": "USD",
+          "issuedAt": "2026-10-12",
+          "dueDate": "2026-10-30",
+          "servicePeriod": "2026-10",
+          "description": "Secure archive capacity",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Granite Data Demo LLC"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: MN-001-2026"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-12"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-30"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Secure archive capacity"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: USD 150.00"
+            }
+          ]
+        },
+        "decisions": [
+          {
+            "id": "dec_cba9077e-a856-497f-abab-a829ce735767",
+            "invoiceId": "inv_d005bd1e-96d4-4077-a6f4-d0964a588d7e",
+            "action": "APPROVE",
+            "reasons": [
+              "POLICY_ALLOWED"
+            ],
+            "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+            "policyVersionId": "pol_738aacd2-242c-454e-8ece-f27bda09d338",
+            "policyVersion": 1,
+            "checkedAt": "2026-10-17T23:13:12.457Z",
+            "needsHumanApproval": false,
+            "actor": {
+              "kind": "SYSTEM",
+              "userId": null
+            },
+            "facts": {
+              "amountMinor": 15000,
+              "currency": "USD",
+              "automaticLimitMinor": 20000,
+              "hardLimitMinor": 100000,
+              "budgetAvailableBeforeMinor": 180000,
+              "vendorAllowed": true,
+              "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17"
+            },
+            "trace": [
+              {
+                "rule": "DOCUMENT_TYPE",
+                "outcome": "PASS",
+                "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+                "evidence": {
+                  "documentType": "INVOICE"
+                }
+              },
+              {
+                "rule": "EXTRACTION",
+                "outcome": "PASS",
+                "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+                "evidence": {
+                  "status": "CROSS_CHECKED",
+                  "issues": ""
+                }
+              },
+              {
+                "rule": "VENDOR",
+                "outcome": "PASS",
+                "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+                "evidence": {
+                  "vendorId": "vendor_b55db12e-87bf-4abe-bca8-9a649da9ce82",
+                  "allowed": true,
+                  "requireAllowedVendor": true
+                }
+              },
+              {
+                "rule": "AGREEMENT",
+                "outcome": "PASS",
+                "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+                "evidence": {
+                  "agreementId": "agr_1d2aa4fe-3acb-40ed-a17a-f5ab39bfaf17",
+                  "amountMinor": 15000,
+                  "agreedAmountMinor": 15000,
+                  "toleranceMinor": 0,
+                  "currency": "USD",
+                  "agreedCurrency": "USD",
+                  "description": "Secure archive capacity",
+                  "agreedConcept": "Secure archive capacity"
+                }
+              },
+              {
+                "rule": "CURRENCY",
+                "outcome": "PASS",
+                "explanation": "La moneda coincide con el mandato.",
+                "evidence": {
+                  "currency": "USD"
+                }
+              },
+              {
+                "rule": "HARD_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe no supera el techo absoluto.",
+                "evidence": {
+                  "amountMinor": 15000,
+                  "hardLimitMinor": 100000
+                }
+              },
+              {
+                "rule": "BUDGET",
+                "outcome": "PASS",
+                "explanation": "El presupuesto disponible cubre el importe.",
+                "evidence": {
+                  "amountMinor": 15000,
+                  "availableMinor": 180000,
+                  "reservedMinor": 0,
+                  "budgetLimitMinor": 180000,
+                  "policyMonthlyBudgetMinor": 180000
+                }
+              },
+              {
+                "rule": "AUTO_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe está dentro de ambos umbrales automáticos.",
+                "evidence": {
+                  "amountMinor": 15000,
+                  "automaticLimitMinor": 20000,
+                  "reviewAboveMinor": 20000
+                }
+              }
+            ],
+            "simulated": true
+          }
+        ]
+      },
+      "after": {
+        "reservedMinor": 15000,
+        "reservations": 1,
+        "decisions": 1,
+        "invoiceReservations": 1
+      },
+      "unsafeApprovalReasons": [],
+      "unsafeApproval": false,
+      "processingReplay": true,
+      "privateDocumentVerified": true,
+      "job": {
+        "state": "DONE",
+        "attempts": 1,
+        "last_error_json": null
+      },
+      "correct": false,
+      "error": {
+        "name": "TimeoutError",
+        "message": "locator.waitFor: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByText('La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.', { exact: true }).first() to be visible\u001b[22m\n"
+      },
+      "durationMs": 40085
+    }
+  ],
+  "summary": null,
+  "aborted": {
+    "caseId": "001",
+    "reason": "HARNESS_ERROR"
+  },
+  "fatalError": {
+    "name": "AssertionError",
+    "message": "The expression evaluated to a falsy value:\n\n  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth))\n"
+  }
+}

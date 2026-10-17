@@ -1,0 +1,22 @@
+{
+  "desktop": [
+    1440,
+    1000
+  ],
+  "mobile": [
+    390,
+    844
+  ],
+  "promptWithoutKey": true,
+  "defaultExpiryNull": true,
+  "editAndClearExpiry": true,
+  "revoke": true,
+  "escapeCloses": true,
+  "overflow": false,
+  "download": {
+    "status": 200,
+    "type": "application/gzip",
+    "bytes": 4908
+  },
+  "runtimeErrors": []
+}

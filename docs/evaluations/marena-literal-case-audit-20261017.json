@@ -1,0 +1,23 @@
+{
+  "auditedAt": "2026-10-17T23:19:19.270Z",
+  "scope": "CORRECT_FALSE_UNSAFE_FLAG_FROM_LITERAL_CASE_COMPARISON_NO_PRODUCT_OR_MODEL_CHANGE",
+  "source": "docs/evaluations/candidate-marena-live-2026-10-17T23-16-24-811Z.json",
+  "sourceSha256": "e1a4415740cb992d9f4b9c72a7c2f571a8c82c293fc2dbb48cf876f78da3ea36",
+  "caseId": "006",
+  "literalMatchingFields": [
+    "vendorName",
+    "invoiceNumber",
+    "amountMinor",
+    "currency",
+    "issuedAt",
+    "dueDate",
+    "servicePeriod"
+  ],
+  "actualDescription": "Search Index maintenance",
+  "expectedDescription": "Search index maintenance",
+  "normalizedEqual": true,
+  "modelWarnings": [],
+  "explanation": "Only capitalization differs. Existing server/domain policy already ignores case for supplier and concept; amounts,currency,dates stay exact. Literal extraction accuracy stays seven of eight. Preserve original flag and use established policy equivalence for financial safety.",
+  "readerCallsRepeated": 0,
+  "policyOrReferenceChanged": false
+}

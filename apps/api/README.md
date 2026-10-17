@@ -8,16 +8,18 @@ Conversación con DeepSeek V4.1 Flash usando el mismo `OPENROUTER_API_KEY`: herr
 de consulta y propuestas confirmables; historial privado, límites de uso y alta guiada
 de proveedor con reevaluación acotada de la factura original. Requiere migración0003.
 Ver [contrato y tarea de Whady](../../docs/CONVERSATION_FRONTEND_HANDOFF.md).
-La UI de conversación aún debe conectarse; `/propuesta/` conserva sus datos de ejemplo.
+La aplicación publicada consume la conversación; `/propuesta/` conserva sus datos de ejemplo.
 
 Implementa sesión demo con cookie HttpOnly/CSRF, reglas y activación OWNER, proveedores,
 acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamiento,
-revisión humana, dashboard y evaluación vacía. La UI de Whady debe conectarse a estas rutas.
+revisión humana, dashboard y evaluación histórica sobre documentos ficticios. El resumen
+mantiene el contrato de la UI; `/evaluation/report` conserva versión medida, hashes y casos.
 
 PDF se extrae mediante OpenRouter con Mistral OCR y se contrasta con una lectura separada
 PDF_TEXT de Cloudflare. El parser de texto acepta etiquetas explícitas conocidas; documentos
-escaneados/layouts no reconocidos y cualquier discrepancia se escalan. PNG/JPEG se extraen,
-pero **no se autoaprueban sin OCR independiente**, que sigue pendiente. Un segundo mensaje
+escaneados/layouts no reconocidos y cualquier discrepancia se escalan. PNG/JPEG se contrastan
+con la transcripción independiente de Qwen. La coincidencia entre lectores solo permite
+evaluar las reglas; cualquier advertencia bloqueante impide autoaprobar. Un segundo mensaje
 al mismo modelo no cuenta como corroboración.
 
 El motor recibe únicamente datos de la empresa de la sesión. Antes de guardar se comprueba

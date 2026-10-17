@@ -1,0 +1,253 @@
+{
+  "scope": "Frontend only, local mock and fictional data; developer banner hidden to measure production mobile layout",
+  "viewport": [
+    390,
+    844
+  ],
+  "checks": [
+    {
+      "label": "approval fields only",
+      "step": "1",
+      "section": "0",
+      "progress": "Aprobación\nParte 1 de 3",
+      "fields": [
+        {
+          "label": "Límite de aprobación automática",
+          "value": "450"
+        },
+        {
+          "label": "Revisión humana por encima de",
+          "value": "300.00"
+        }
+      ],
+      "switches": 0,
+      "invalid": 0,
+      "pageHeight": 844,
+      "viewport": 844,
+      "footerBottom": 637.324462890625,
+      "overflow": false,
+      "active": null,
+      "draft": false
+    },
+    {
+      "label": "invalid ceiling blocks this section",
+      "step": "1",
+      "section": "1",
+      "progress": "Presupuesto\nParte 2 de 3",
+      "fields": [
+        {
+          "label": "Techo absoluto",
+          "value": "100"
+        },
+        {
+          "label": "Presupuesto mensual",
+          "value": "2000.00"
+        }
+      ],
+      "switches": 0,
+      "invalid": 1,
+      "pageHeight": 844,
+      "viewport": 844,
+      "footerBottom": 645,
+      "overflow": false,
+      "active": null,
+      "draft": false
+    },
+    {
+      "label": "back preserves values",
+      "step": "1",
+      "section": "1",
+      "progress": "Presupuesto\nParte 2 de 3",
+      "fields": [
+        {
+          "label": "Techo absoluto",
+          "value": "1100.00"
+        },
+        {
+          "label": "Presupuesto mensual",
+          "value": "2500.00"
+        }
+      ],
+      "switches": 0,
+      "invalid": 0,
+      "pageHeight": 853,
+      "viewport": 853,
+      "footerBottom": 637,
+      "overflow": false,
+      "active": null,
+      "draft": false
+    },
+    {
+      "label": "checks only before save",
+      "step": "1",
+      "section": "2",
+      "progress": "Comprobaciones\nParte 3 de 3",
+      "fields": [],
+      "switches": 3,
+      "invalid": 0,
+      "pageHeight": 873,
+      "viewport": 853,
+      "footerBottom": 829,
+      "overflow": false,
+      "active": null,
+      "draft": false
+    },
+    {
+      "label": "vendors separate",
+      "step": "2",
+      "section": "0",
+      "progress": "Proveedores\nParte 1 de 2",
+      "fields": [
+        {
+          "label": "Agregar un proveedor",
+          "value": ""
+        }
+      ],
+      "switches": 0,
+      "invalid": 0,
+      "pageHeight": 867,
+      "viewport": 853,
+      "footerBottom": 823,
+      "overflow": false,
+      "active": null,
+      "draft": true
+    },
+    {
+      "label": "vendor and agreement inputs survive back",
+      "step": "2",
+      "section": "1",
+      "progress": "Acuerdos\nParte 2 de 2",
+      "fields": [
+        {
+          "label": "Proveedor",
+          "value": ""
+        },
+        {
+          "label": "Monto acordado",
+          "value": ""
+        },
+        {
+          "label": "Concepto",
+          "value": "Acuerdo por terminar"
+        },
+        {
+          "label": "Frecuencia",
+          "value": "MONTHLY"
+        },
+        {
+          "label": "Tolerancia",
+          "value": "0.00"
+        }
+      ],
+      "switches": 4,
+      "invalid": 0,
+      "pageHeight": 844,
+      "viewport": 844,
+      "footerBottom": 782,
+      "overflow": false,
+      "active": null,
+      "draft": true
+    },
+    {
+      "label": "back returns to last rules section",
+      "step": "1",
+      "section": "2",
+      "progress": "Comprobaciones\nParte 3 de 3",
+      "fields": [],
+      "switches": 3,
+      "invalid": 0,
+      "pageHeight": 873,
+      "viewport": 844,
+      "footerBottom": 829,
+      "overflow": false,
+      "active": null,
+      "draft": true
+    },
+    {
+      "label": "activation requires final confirmation",
+      "step": "4",
+      "section": "0",
+      "fields": [
+        {
+          "value": ""
+        }
+      ],
+      "switches": 0,
+      "invalid": 0,
+      "pageHeight": 1454,
+      "viewport": 853,
+      "footerBottom": 1422.484375,
+      "overflow": false,
+      "active": 1,
+      "draft": false
+    },
+    {
+      "label": "reduced motion works with split screens",
+      "step": "1",
+      "section": "0",
+      "progress": "Aprobación\nParte 1 de 3",
+      "fields": [
+        {
+          "label": "Límite de aprobación automática",
+          "value": "450.00"
+        },
+        {
+          "label": "Revisión humana por encima de",
+          "value": "300.00"
+        }
+      ],
+      "switches": 0,
+      "invalid": 0,
+      "pageHeight": 844,
+      "viewport": 844,
+      "footerBottom": 787,
+      "overflow": false,
+      "active": 1,
+      "draft": false
+    },
+    {
+      "label": "full Rules editor still has four amounts and all checks",
+      "fields": [
+        {
+          "label": "Límite de aprobación automática",
+          "value": "450.00"
+        },
+        {
+          "label": "Techo absoluto",
+          "value": "1100.00"
+        },
+        {
+          "label": "Presupuesto mensual",
+          "value": "2500.00"
+        },
+        {
+          "label": "Revisión humana por encima de",
+          "value": "300.00"
+        }
+      ],
+      "switches": 3,
+      "invalid": 0,
+      "pageHeight": 1056,
+      "viewport": 950,
+      "overflow": false,
+      "active": 1,
+      "draft": false
+    }
+  ],
+  "not_measured": [
+    "extractor accuracy",
+    "frame rate",
+    "live decisions"
+  ],
+  "validation": {
+    "isolated_build": "passed",
+    "isolated_frontend_tests": 24,
+    "i18n": "passed",
+    "detector_findings": 0
+  },
+  "deployment": {
+    "worker_version": "408f86a2-1894-4a26-b69e-1e31dda3aed4",
+    "url": "https://oli30x.ultramare.dev/onboarding?restart=1",
+    "only_own_uncommitted_sources_included": true
+  }
+}

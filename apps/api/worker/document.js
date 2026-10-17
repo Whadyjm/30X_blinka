@@ -1,7 +1,7 @@
 import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_CONFIG_VERSION, IMAGE_OCR_MODEL, ExtractionError, extractInvoiceWithOpenRouter, transcribeImageWithOpenRouter } from '@oli/extraction';
 import { CurrencySchema, DateSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
 import { normalizeInvoiceNumber } from '@oli/domain';
-import { HttpError, id } from './http.js';
+import { HttpError, id, sha256 } from './http.js';
 
 export function validateDocument(bytes, mimeType) {
   const png = [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => bytes[i] === b);
@@ -12,7 +12,7 @@ export function validateDocument(bytes, mimeType) {
   }
 }
 
-const PDF_PARSER_VERSION = 'labelled-v6';
+const PDF_PARSER_VERSION = 'labelled-v7';
 export const READER_VERSION = `${PDF_PARSER_VERSION}:${EXTRACTION_CONFIG_VERSION}:${IMAGE_OCR_CONFIG_VERSION}`;
 const MAX_TEXT_BYTES = 128 * 1024;
 const referenceIssue = 'INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN';
@@ -65,17 +65,29 @@ const labels = [
   ['currency', 'Moneda\\s*\\/\\s*Currency|Currency(?=\\s*[:|]|\\s*$)|Moneda(?=\\s*[:|]|\\s*$)'],
   ['description', 'CONCEPTO\\s*\\/\\s*DESCRIPTION|(?:Description|Concepto)(?=\\s*[:|]|\\s*$)'],
   ['subtotal', 'Sub[\\s-]*total(?: a cobrar)?(?=\\s*[:|]|\\s*$)'],
-  ['amountMinor', 'TOTAL A COBRAR|Invoice total(?=\\s*[:|]|\\s*$)|Total(?=\\s*[:|]|\\s*$)'],
+  ['amountMinor', 'TOTAL A COBRAR|(?:Invoice total|Total(?: due)?)(?=\\s*[:|]|\\s*$)'],
   ['footer', 'Importe final\\s*;'],
+  ['notes', 'Notes(?=\\s*:)|Notas(?=\\s*:)'],
 ];
 // Split the corpus's compound labels even when vector text items touch. Generic aliases stay line-anchored.
 const boundary = /EMISOR\s*\/\s*SUPPLIER|Cliente\s*:|N[úu]mero\s*\/\s*Number|Emisi[oó]n\s*\/\s*Issued|Vencimiento\s*\/\s*Due|Periodo de servicio|Acuerdo\s*\/\s*Agreement|Moneda\s*\/\s*Currency|CONCEPTO\s*\/\s*DESCRIPTION|Sub[\s-]*total(?: a cobrar)?\s*:|(?<!sub)TOTAL A COBRAR|Importe final\s*;/gi;
-const labelPatterns = labels.map(([field, pattern]) => [field, new RegExp(`^(?:${pattern})\\s*[:|]?\\s*(.*)$`, 'i')]);
+const labelPatterns = labels.map(([field, pattern]) => [field, new RegExp(`^(?:${pattern})\\s*(?:[:|]\\s*)*(.*)$`, 'i')]);
+// Missing punctuation is supported only for whole, explicit lines. Never split these words inside values.
+const bareLabelPatterns = [
+  ['vendorName', /^Supplier\s+([^:|].*)$/i],
+  ['invoiceNumber', /^Invoice number\s+([\p{L}\p{N}_.\/-]+)$/iu],
+  ['issuedAt', /^(?:Issue date|Issued date)\s+([^:|].*)$/i],
+  ['dueDate', /^Due date\s+([^:|].*)$/i],
+  ['servicePeriod', /^Service period\s+([^:|].*)$/i],
+  ['description', /^Description\s+([^:|].*)$/i],
+  ['amountMinor', /^Total\s+([A-Z]{3}\s+\d.*)$/],
+];
 const clean = value => value.replace(/^[#*|\s]+|[*|\s]+$/g, '').trim();
 const provided = value => value && !/^(?:NO INDICAD[OA]|N\/A|NOT PROVIDED|NONE|NULL)$/i.test(value) ? value : null;
-const matchLabel = line => labelPatterns.map(([field, pattern]) => [field, line.match(pattern)]).find(([, match]) => match);
+const matchLabel = (line, allowBare = false) => [...labelPatterns, ...(allowBare ? bareLabelPatterns : [])]
+  .map(([field, pattern]) => [field, line.match(pattern)]).find(([, match]) => match);
 // Conversion can join separate PDF text items. Single-language labels require an explicit colon.
-const colonBoundary = /(?:Proveedor|Supplier|Cliente|Customer|Invoice number|N[úu]mero|Issue date|Issued date|Emisi[oó]n|Due date|Vencimiento|Service period|Agreement reference|Acuerdo|Currency|Moneda|Description|Concepto|Sub[\s-]*total(?: a cobrar)?|(?<![\p{L}-])(?:Invoice total|Total))\s*:/giu;
+const colonBoundary = /(?:Proveedor|Supplier|Cliente|Customer|Invoice number|N[úu]mero|Issue date|Issued date|Emisi[oó]n|Due date|Vencimiento|Service period|Agreement reference|Acuerdo|Currency|Moneda|Description|Concepto|Sub[\s-]*total(?: a cobrar)?|(?<![\p{L}-])(?:Invoice total|Total)|(?:Invoice total|Total(?: due)?)(?=\s*:\s*(?:[A-Z]{3}\s+)?\d)|Notes|Notas)\s*:/giu;
 const sectionBoundary = /Datos de prueba\b|P[áa]gina\s+\d+\s+de\s+\d+\b|Detalle de (?:servicio|factura)\b|Unidades\s+Precio\s+Importe\b|Horas\s*:|Fecha de entrega\s*:|Recibido\s*:/gi;
 
 function pdfLines(text) {
@@ -109,7 +121,8 @@ export function parsePdfText(text) {
     if (!line || /^(?:Datos de prueba\b|P[áa]gina\s+\d+\s+de\s+\d+\b|Detalle de (?:servicio|factura)\b|Unidades\s+Precio\s+Importe\b)/i.test(line)) {
       active = null; continue;
     }
-    const labelled = matchLabel(line);
+    // A pending multiline value (e.g. supplier "Supplier Services") remains a value.
+    const labelled = matchLabel(line, !active || !!values[active].at(-1).value.trim());
     if (labelled) {
       active = labelled[0]; values[active].push({ value: labelled[1][1], page });
     } else if (/^[\p{L}][^:]{0,60}:/u.test(line)) {
@@ -164,7 +177,9 @@ function validArtifact(artifact, kind, documentSha256, mimeType) {
       || !(artifact.agreementReference === null || (typeof artifact.agreementReference === 'string' && /^[\p{L}\p{N}_.:-]{1,200}$/u.test(artifact.agreementReference)))
       || !Array.isArray(artifact.issues) || artifact.issues.some(issue => ![referenceIssue, ocrIssue].includes(issue))) return null;
     if (mimeType === 'application/pdf') {
-      if (artifact.method !== 'PDF_TEXT') return null;
+      if (artifact.method !== 'PDF_TEXT' || typeof artifact.pdfText?.text !== 'string'
+        || new TextEncoder().encode(artifact.pdfText.text).length > MAX_TEXT_BYTES
+        || !/^[a-f0-9]{64}$/.test(artifact.pdfText.sha256)) return null;
     } else if (artifact.method !== 'OCR' || artifact.ocr?.model !== IMAGE_OCR_MODEL
       || artifact.ocr.configVersion !== IMAGE_OCR_CONFIG_VERSION || artifact.ocr.documentSha256 !== documentSha256
       || artifact.ocr.readId !== artifact.readId || typeof artifact.ocr.text !== 'string'
@@ -186,7 +201,8 @@ async function readPdfText(env, bytes) {
     const output = Array.isArray(result) ? result[0] : result;
     if (output?.format === 'error' || typeof output?.data !== 'string' || output.data.length > MAX_TEXT_BYTES
       || new TextEncoder().encode(output.data).length > MAX_TEXT_BYTES) throw new Error('PDF_TEXT_UNAVAILABLE');
-    return parsePdfText(output.data);
+    return { ...parsePdfText(output.data), pdfText: { text: output.data, sha256: await sha256(output.data),
+      converter: 'WORKERS_AI_TO_MARKDOWN' } };
   } finally { clearTimeout(timer); }
 }
 
@@ -203,7 +219,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (cached.PRIMARY) return cached.PRIMARY;
     const began = performance.now();
     const result = await extractInvoiceWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) });
+      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) }, { onHttpError: options.onHttpError });
     const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, result,
       durationMs: Math.round(performance.now() - began) };
     await options.checkpoint?.('PRIMARY', artifact);
@@ -214,7 +230,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (imageOcr) {
       const began = performance.now();
       const ocr = await transcribeImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-        image: { mimeType: file.mimeType, bytes } });
+        image: { mimeType: file.mimeType, bytes } }, { onHttpError: options.onHttpError });
       const parsed = parsePdfText(ocr.text);
       if (ocr.issues.length || /\[ILLEGIBLE\]/i.test(ocr.text)) parsed.issues.push(ocrIssue);
       const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType,
@@ -257,7 +273,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
       documentClassification: { documentType: primary.documentType, source: 'PRIMARY_READER',
         documentSha256, primaryReadId: primary.readId, version: READER_VERSION },
       configVersion: READER_VERSION, attempts: primary.attempts, usage: primary.usage, advisories: primary.advisories ?? [],
-      imageOcr: secondary?.ocr ?? null, imageOcrMode: imageOcr ? env.IMAGE_OCR_MODE : 'OFF',
+      imageOcr: secondary?.ocr ?? null, imageOcrMode: imageOcr ? env.IMAGE_OCR_MODE : 'OFF', pdfText: secondary?.pdfText ?? null,
       corroborationError: secondary ? null : secondaryResult.value?.error ?? (pdf ? 'PDF_TEXT_UNAVAILABLE' : 'INDEPENDENT_IMAGE_OCR_UNAVAILABLE'),
       independentDisagreements: discrepancies, independentIssues: secondary?.issues ?? [], cache: { PRIMARY: !!cached.PRIMARY, SECONDARY: !!cached.SECONDARY },
       timings: { totalMs: Math.round(performance.now() - started), primaryMs: primaryResult.value.durationMs, secondaryMs: secondary?.durationMs ?? null } } };

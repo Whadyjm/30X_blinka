@@ -1,0 +1,13 @@
+{
+  "fourTilesRestored": true,
+  "primaryUploadRestored": true,
+  "beamAnimated": true,
+  "reducedMotionRespected": true,
+  "attentionAnchorWorks": true,
+  "noOverflow": [
+    1440,
+    390,
+    320
+  ],
+  "errors": []
+}

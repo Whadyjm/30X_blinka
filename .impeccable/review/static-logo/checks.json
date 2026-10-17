@@ -1,0 +1,15 @@
+{
+  "staticVectorMark": true,
+  "distinctiveEyesAndBrows": true,
+  "noHeaderCanvas": true,
+  "noGlowOrLogoAnimation": true,
+  "hoverKeepsMarkStatic": true,
+  "brandLinkOpensAskOli": true,
+  "publicBrandConsistent": true,
+  "viewportsWithoutOverflow": [
+    1440,
+    390,
+    320
+  ],
+  "errors": []
+}

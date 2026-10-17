@@ -21,6 +21,7 @@ import type {
 import type { z } from 'zod';
 import type { ChatMessageInputSchema, ChatHistorySchema, ChatConversationsSchema, ChatReply, ChatCard, ChatAction, ChatActionResult } from '@oli/contracts';
 import type { EmailIntegration, Inbox, TelegramIntegration, TelegramLink } from '@oli/contracts';
+import type { CreatedSkillConnection, SkillConnection, SkillIntegration } from '@oli/contracts';
 
 /**
  * The ONE interface the UI talks to. Two implementations:
@@ -40,6 +41,10 @@ export interface OliApi {
   getTelegramIntegration(): Promise<TelegramIntegration>;
   createTelegramLink(): Promise<TelegramLink>;
   disconnectTelegram(): Promise<void>;
+  getSkillIntegration(): Promise<SkillIntegration>;
+  createSkillConnection(name: string): Promise<CreatedSkillConnection>;
+  updateSkillConnection(id: string, expiresAt: string | null): Promise<SkillConnection>;
+  revokeSkillConnection(id: string): Promise<void>;
   getEmailIntegration(): Promise<EmailIntegration>;
   enableEmail(): Promise<EmailIntegration>;
   disableEmail(): Promise<void>;

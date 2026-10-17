@@ -125,6 +125,53 @@ test('Jobs: falla permanente termina una sola vez y mantiene FAILED para la inte
   await consumeInvoiceJobs({ messages: [s.message(s.queue[0])] }, s.env, () => assert.fail('No reintenta permanente'));
 });
 
+for (const typed of [true, false]) test(`Jobs: rate limit ${typed ? 'tipado' : 'opaco'} envuelto en HTTP 400 conserva lectura independiente y recupera una única reserva`, async t => {
+  const s = await setup(t), invoice = await s.upload();
+  let calls = 0, conversions = 0;
+  s.env.OPENROUTER_API_KEY = 'private-test-only';
+  s.env.AI = { toMarkdown: async () => {
+    conversions++;
+    return { format: 'markdown', data: `Supplier: ${ex.vendorName}\nInvoice number: ${ex.invoiceNumber}\nIssue date: ${ex.issuedAt}\nDue date: ${ex.dueDate}\nService period: ${ex.servicePeriod}\nDescription: ${ex.description}\nTotal: USD 200.00` };
+  } };
+  t.mock.method(globalThis, 'fetch', async (_url, init) => {
+    if (++calls <= 3) return Response.json({ error: { code: 400,
+      ...(typed ? { metadata: { error_type: 'rate_limit_exceeded' } } : { message: 'Upstream temporarily rate limited; retry later' }) } }, { status: 400 });
+    return Response.json({ model: JSON.parse(init.body).model,
+      choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...ex, documentType: 'INVOICE' }) } }] });
+  });
+  await enqueueInvoice(s.env, 'org_demo', invoice.id);
+  await consumeInvoiceJobs({ messages: [s.message(s.queue.shift())] }, s.env);
+  assert.equal((await s.job(invoice)).state, 'RETRY');
+  assert.equal((await getInvoice(s.DB, 'org_demo', invoice.id)).processingError.retryable, true);
+  assert.deepEqual(await s.ledger(), { decisions: 0, reservations: 0, reserved: 0 });
+  assert.equal(calls, 3); assert.equal(conversions, 1);
+  await s.due(invoice); await recoverInvoiceJobs(s.env);
+  const body = s.queue.shift();
+  await consumeInvoiceJobs({ messages: [s.message(body)] }, s.env);
+  assert.equal((await s.job(invoice)).state, 'DONE');
+  assert.equal(calls, 4); assert.equal(conversions, 1, 'la conversión válida se reutiliza');
+  assert.deepEqual(await s.ledger(), { decisions: 1, reservations: 1, reserved: 20000 });
+  await consumeInvoiceJobs({ messages: [s.message(body)] }, s.env, () => assert.fail('replay no llama lectores'));
+  assert.deepEqual(await s.ledger(), { decisions: 1, reservations: 1, reserved: 20000 });
+});
+
+test('Jobs: HTTP 400 sin indicio de saturación o con error permanente no reintenta', async t => {
+  for (const issueCodes of [['HTTP_400'], ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UNSUPPORTED_PARAMETER'],
+    ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UPSTREAM_CREDIT_LIMIT'],
+    ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UPSTREAM_POLICY_REFUSAL']]) {
+    await t.test(issueCodes.join(','), async sub => {
+      const s = await setup(sub), invoice = await s.upload();
+      await enqueueInvoice(s.env, 'org_demo', invoice.id);
+      const { ExtractionError } = await import('@oli/extraction');
+      await consumeInvoiceJobs({ messages: [s.message(s.queue[0])] }, s.env, (...args) => processInvoice(...args,
+        async () => { throw new ExtractionError('OPENROUTER_REQUEST_REJECTED', [], { stage: 'HTTP_ERROR', issueCodes }); }));
+      assert.equal((await s.job(invoice)).state, 'DEAD');
+      assert.equal((await s.job(invoice)).attempts, 1);
+      assert.deepEqual(await s.ledger(), { decisions: 0, reservations: 0, reserved: 0 });
+    });
+  }
+});
+
 test('Jobs: commit financiero antes de crash se recupera sin duplicar decisión ni reserva', async t => {
   const s = await setup(t); const invoice = await s.upload(); const j = await s.job(invoice);
   await stmt(s.DB, `UPDATE invoice_jobs SET state='RUNNING',attempts=1,lease_token='crashed',lease_until='2000-01-01T00:00:00.000Z' WHERE id=?`, j.id).run();

@@ -1,0 +1,859 @@
+{
+  "datasetVersion": "company-journey-v1",
+  "synthetic": true,
+  "company": {
+    "slug": "brisa",
+    "name": "Brisa Services Demo LLC",
+    "currency": "EUR",
+    "timezone": "America/Caracas"
+  },
+  "rules": {
+    "currency": "EUR",
+    "automaticLimitMinor": 20000,
+    "hardLimitMinor": 80000,
+    "monthlyBudgetMinor": 100000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 20000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  },
+  "vendors": [
+    {
+      "key": "northstar",
+      "name": "Northstar Cloud Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "maple",
+      "name": "Maple Office Demo GmbH",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "cobalt",
+      "name": "Cobalt Design Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "sunbeam",
+      "name": "Sunbeam Network Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "pioneer",
+      "name": "Pioneer Analytics Demo BV",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "harbor",
+      "name": "Harbor Hosting Demo SARL",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "juniper",
+      "name": "Juniper Media Demo SL",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "silverline",
+      "name": "Silverline Support Demo Oy",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "quartz",
+      "name": "Quartz Data Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "redwood",
+      "name": "Redwood Studio Demo GmbH",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "willow",
+      "name": "Willow Systems Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "unlisted",
+      "name": "Unlisted Vendor Demo LLC",
+      "allowed": false,
+      "externalRef": null
+    }
+  ],
+  "agreements": [
+    {
+      "key": "agr-northstar-001",
+      "vendorKey": "northstar",
+      "currency": "EUR",
+      "amountMinor": 4000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Cloud archive capacity",
+      "active": true
+    },
+    {
+      "key": "agr-maple-002",
+      "vendorKey": "maple",
+      "currency": "EUR",
+      "amountMinor": 4500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Office supply coordination",
+      "active": true
+    },
+    {
+      "key": "agr-cobalt-003",
+      "vendorKey": "cobalt",
+      "currency": "EUR",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Catalog layout services",
+      "active": true
+    },
+    {
+      "key": "agr-sunbeam-004",
+      "vendorKey": "sunbeam",
+      "currency": "EUR",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Network health monitoring",
+      "active": true
+    },
+    {
+      "key": "agr-pioneer-005",
+      "vendorKey": "pioneer",
+      "currency": "EUR",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Monthly analytics export",
+      "active": true
+    },
+    {
+      "key": "agr-harbor-006",
+      "vendorKey": "harbor",
+      "currency": "EUR",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Backup storage allocation",
+      "active": true
+    },
+    {
+      "key": "agr-juniper-007",
+      "vendorKey": "juniper",
+      "currency": "EUR",
+      "amountMinor": 5500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Media asset indexing",
+      "active": true
+    },
+    {
+      "key": "agr-silverline-008",
+      "vendorKey": "silverline",
+      "currency": "EUR",
+      "amountMinor": 6000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Support desk coverage",
+      "active": true
+    },
+    {
+      "key": "agr-quartz-009",
+      "vendorKey": "quartz",
+      "currency": "EUR",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Data retention expansion",
+      "active": true
+    },
+    {
+      "key": "agr-redwood-010",
+      "vendorKey": "redwood",
+      "currency": "EUR",
+      "amountMinor": 23000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Creative review package",
+      "active": true
+    },
+    {
+      "key": "agr-northstar-012",
+      "vendorKey": "northstar",
+      "currency": "EUR",
+      "amountMinor": 6800,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Northstar incident response workshop",
+      "active": true
+    },
+    {
+      "key": "agr-unlisted-013",
+      "vendorKey": "unlisted",
+      "currency": "EUR",
+      "amountMinor": 7200,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Unlisted document processing",
+      "active": true
+    },
+    {
+      "key": "agr-cobalt-014",
+      "vendorKey": "cobalt",
+      "currency": "EUR",
+      "amountMinor": 11900,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Brand illustration set",
+      "active": true
+    },
+    {
+      "key": "agr-sunbeam-015",
+      "vendorKey": "sunbeam",
+      "currency": "EUR",
+      "amountMinor": 85000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Core network resilience service",
+      "active": true
+    },
+    {
+      "key": "agr-harbor-016",
+      "vendorKey": "harbor",
+      "currency": "EUR",
+      "amountMinor": 40000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Harbor backup capacity extension",
+      "active": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "e973f9222d2e5ab15c6120ffaff0b0d3e9be2d041354a5e201ad3f3b0bb873a3",
+        "sizeBytes": 1125
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Cloud Demo LLC",
+        "invoiceNumber": "NS-2601",
+        "amountMinor": 4000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Cloud archive capacity"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 4000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "002",
+      "file": {
+        "path": "documents/002.png",
+        "mimeType": "image/png",
+        "sha256": "1597958e7d04bbdddde6ecc4daf6dd23486e83d52b65aac58a220d7eca322472",
+        "sizeBytes": 52705
+      },
+      "expectedExtraction": {
+        "vendorName": "Maple Office Demo GmbH",
+        "invoiceNumber": "MO-2602",
+        "amountMinor": 4500,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Office supply coordination"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 4500,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "bc358e93f4d357ac2a093a5e196cf46fa65bd50a39d8204af6fcf2ffa9e88e68",
+        "sizeBytes": 1127
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Design Demo Ltd",
+        "invoiceNumber": "CD-2603",
+        "amountMinor": 5000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Catalog layout services"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 5000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "004",
+      "file": {
+        "path": "documents/004.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "a2962a06da1ef4cb82b3f408d435515550725fbbb8b997e03cf5df61e1edf571",
+        "sizeBytes": 127543
+      },
+      "expectedExtraction": {
+        "vendorName": "Sunbeam Network Demo LLC",
+        "invoiceNumber": "SN-2604",
+        "amountMinor": 5000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Network health monitoring"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 5000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "1783b02a1c5f3d76439af279c81aa91b5724108d19fadd496c12331a33ddb365",
+        "sizeBytes": 1130
+      },
+      "expectedExtraction": {
+        "vendorName": "Pioneer Analytics Demo BV",
+        "invoiceNumber": "PA-2605",
+        "amountMinor": 5000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Monthly analytics export"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 5000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "006",
+      "file": {
+        "path": "documents/006.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+        "sizeBytes": 141953
+      },
+      "expectedExtraction": {
+        "vendorName": "Harbor Hosting Demo SARL",
+        "invoiceNumber": "HH-2606",
+        "amountMinor": 5000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Backup storage allocation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 5000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "007",
+      "file": {
+        "path": "documents/007.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "fe9bfc439d988215ef029784584a5b98d59b3afdbd673566f3a86b44a33a4bc7",
+        "sizeBytes": 1120
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Media Demo SL",
+        "invoiceNumber": "JM-2607",
+        "amountMinor": 5500,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Media asset indexing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 5500,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "008",
+      "file": {
+        "path": "documents/008.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "e59ac5884fe3dab127df65d6150e9b578715e56eb2cd144a9aaeff39d096e0b0",
+        "sizeBytes": 1128
+      },
+      "expectedExtraction": {
+        "vendorName": "Silverline Support Demo Oy",
+        "invoiceNumber": "SS-2608",
+        "amountMinor": 6000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Support desk coverage"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 6000,
+      "notes": "Distinct one-time agreement; concept resolves it without an embedded reference."
+    },
+    {
+      "id": "009",
+      "file": {
+        "path": "documents/009.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "42012cc5ad52cb7e143eaa5b688fcbf4eb7961eb63ea94c439c23d66c2474f19",
+        "sizeBytes": 1127
+      },
+      "expectedExtraction": {
+        "vendorName": "Quartz Data Demo LLC",
+        "invoiceNumber": "QD-2609",
+        "amountMinor": 25000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Data retention expansion"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "APPROVE",
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 25000,
+      "notes": "Within hard limit, exact active agreement, and eligible for simulated human review."
+    },
+    {
+      "id": "010",
+      "file": {
+        "path": "documents/010.png",
+        "mimeType": "image/png",
+        "sha256": "955ee7fc69e20c1831d2bcdfb7a7f05735b0b8d4c7fc3389a79f4a40bcff84d2",
+        "sizeBytes": 58015
+      },
+      "expectedExtraction": {
+        "vendorName": "Redwood Studio Demo GmbH",
+        "invoiceNumber": "RS-2610",
+        "amountMinor": 23000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Creative review package"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "REJECT",
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Within hard limit, exact active agreement, and eligible for simulated human review."
+    },
+    {
+      "id": "011",
+      "file": {
+        "path": "documents/011.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "e973f9222d2e5ab15c6120ffaff0b0d3e9be2d041354a5e201ad3f3b0bb873a3",
+        "sizeBytes": 1125
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Cloud Demo LLC",
+        "invoiceNumber": "NS-2601",
+        "amountMinor": 4000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Cloud archive capacity"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Binary duplicate of 001: same bytes and SHA-256; no new agreement or reservation."
+    },
+    {
+      "id": "012",
+      "file": {
+        "path": "documents/012.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "a5f4b53136ea97c8e433ab0b94278a64e4e69326943562bc6d4f2a431dc6ece7",
+        "sizeBytes": 137767
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Cloud Demo LLC",
+        "invoiceNumber": "NS-2601",
+        "amountMinor": 6800,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Northstar incident response workshop"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Different bytes, same vendor and normalized invoice number as 001."
+    },
+    {
+      "id": "013",
+      "file": {
+        "path": "documents/013.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "6b903848dd080c952ea577e349428880eb1775e3dfed7ff40fb239a4e8c44627",
+        "sizeBytes": 1131
+      },
+      "expectedExtraction": {
+        "vendorName": "Unlisted Vendor Demo LLC",
+        "invoiceNumber": "UV-2613",
+        "amountMinor": 7200,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Unlisted document processing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "UNKNOWN_VENDOR"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Vendor is explicitly disallowed; an exact agreement isolates vendor policy."
+    },
+    {
+      "id": "014",
+      "file": {
+        "path": "documents/014.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "218061b66f1c8ba61cf4411f14e51095ff96becfcac747945f0c0d497e019738",
+        "sizeBytes": 1125
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Design Demo Ltd",
+        "invoiceNumber": "CD-2614",
+        "amountMinor": 12000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Brand illustration set"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AGREEMENT_MISMATCH"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Allowed vendor and exact concept, but amount differs from its agreement."
+    },
+    {
+      "id": "015",
+      "file": {
+        "path": "documents/015.png",
+        "mimeType": "image/png",
+        "sha256": "b69b115432bd34ee234d401912bc84ca9e16e1e03b5655c0d40c0085c26faaae",
+        "sizeBytes": 57151
+      },
+      "expectedExtraction": {
+        "vendorName": "Sunbeam Network Demo LLC",
+        "invoiceNumber": "SN-2615",
+        "amountMinor": 85000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Core network resilience service"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_HARD_LIMIT",
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Amount exceeds the hard limit and the remaining budget; both blocking facts are expected."
+    },
+    {
+      "id": "016",
+      "file": {
+        "path": "documents/016.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "7a8cea5e017fa1f45b3d517b8601afd496530cf7a8000b6d6e0862158eae3747",
+        "sizeBytes": 1136
+      },
+      "expectedExtraction": {
+        "vendorName": "Harbor Hosting Demo SARL",
+        "invoiceNumber": "HH-2616",
+        "amountMinor": 40000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Harbor backup capacity extension"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "BUDGET_EXCEEDED",
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "After approvals 001-009 reserve EUR 650, only EUR 350 remains; amount exceeds auto but not hard limit."
+    },
+    {
+      "id": "017",
+      "file": {
+        "path": "documents/017.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "a9ff41a868777fe21f821001bf005d292823b8b2ad590948e27703021e2a59e0",
+        "sizeBytes": 1124
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Media Demo SL",
+        "invoiceNumber": "JM-2617",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Digital archive maintenance"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Visible amount lacks a currency code; currency and normalized amount remain unknown."
+    },
+    {
+      "id": "018",
+      "file": {
+        "path": "documents/018.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "a66c0fb4540db7ad3cc98ae1d80d0c857439f92688529634bdba4b8b0cc07916",
+        "sizeBytes": 154567
+      },
+      "expectedExtraction": {
+        "vendorName": "Silverline Support Demo Oy",
+        "invoiceNumber": "SS-2618",
+        "amountMinor": null,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Support response retainer"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Two contradictory final totals are visible; amountMinor is null."
+    },
+    {
+      "id": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "b6fd8c9b69df9ed0e9427a8192622048a6bc497d745beb0aff609abcf465cf3a",
+        "sizeBytes": 950
+      },
+      "expectedExtraction": {
+        "vendorName": "Willow Systems Demo Ltd",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Payment recorded for test service"
+      },
+      "expectedDocumentType": "PAYMENT_RECEIPT",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Document type is visibly PAYMENT_RECEIPT; it creates no payable invoice or reservation."
+    },
+    {
+      "id": "020",
+      "file": {
+        "path": "documents/020.png",
+        "mimeType": "image/png",
+        "sha256": "f0407b526ac81ca258a9afc79b14714c30c0c70e94c95cb94c28cc695636d627",
+        "sizeBytes": 56003
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Media Demo SL",
+        "invoiceNumber": "QT-2620",
+        "amountMinor": 11200,
+        "currency": "EUR",
+        "issuedAt": "2026-10-06",
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Proposed archive migration service"
+      },
+      "expectedDocumentType": "QUOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Document type is visibly QUOTE; it creates no payable invoice or reservation."
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "createdAt": "2026-10-17T23:06:03.630Z",
+  "deadline": "2026-10-18T12:00:00-04:00",
+  "worker": "oli-api",
+  "account": "fbaa64f96579f93b2db32a1eb12ff6c9",
+  "previousVersion": "ba27d357-3930-49d0-92c1-1df61530b83b",
+  "baseCommit": "7b05faec936c00b6918360dbcacca1ced8ccfc5d",
+  "changedFiles": [
+    "apps/api/worker/document.js",
+    "packages/domain/src/index.ts",
+    "packages/extraction/src/openrouter.ts"
+  ],
+  "sources": {
+    "packages/contracts/src/index.ts": {
+      "publishedSha256": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
+      "candidateSha256": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
+      "changed": false
+    },
+    "packages/extraction/src/openrouter.ts": {
+      "publishedSha256": "3df9f9aa6d5cbe519c4e57c82fc0cf9df8d648fd18b3b77bb696d861a194a2c8",
+      "candidateSha256": "e4ecdfb4cc97377dcec1b3a4d1f391f64f516dd817a0a3a590a3ec75171cd149",
+      "changed": true
+    },
+    "packages/domain/src/index.ts": {
+      "publishedSha256": "e8ca4b77e2ab2a76f304bb75a825a252734b62b0d019a9a660bfef6e54784219",
+      "candidateSha256": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+      "changed": true
+    },
+    "apps/api/worker/http.js": {
+      "publishedSha256": "86b2bc488dcfe55cc862f233be4aae6830585eed6af2941879301d38b8d55670",
+      "candidateSha256": "86b2bc488dcfe55cc862f233be4aae6830585eed6af2941879301d38b8d55670",
+      "changed": false
+    },
+    "apps/api/worker/document.js": {
+      "publishedSha256": "9c1f58fffd0367a419ebb9369e18609eeab4a472e678e8d8481c3eb7b421a73d",
+      "candidateSha256": "51a6a7bc5e22d9480245cc8cfa1924a5a803633cd5aef8e567ff8ebb99122699",
+      "changed": true
+    },
+    "apps/api/worker/extraction-probe.js": {
+      "publishedSha256": "eb4a5e28d9bba43a2a90f77c4427ce96a9a377fef2cab46ef764d1fe3f59666d",
+      "candidateSha256": "eb4a5e28d9bba43a2a90f77c4427ce96a9a377fef2cab46ef764d1fe3f59666d",
+      "changed": false
+    },
+    "apps/api/worker/auth.js": {
+      "publishedSha256": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+      "candidateSha256": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+      "changed": false
+    },
+    "apps/api/worker/repository.js": {
+      "publishedSha256": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+      "candidateSha256": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+      "changed": false
+    },
+    "apps/api/worker/configuration.js": {
+      "publishedSha256": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+      "candidateSha256": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+      "changed": false
+    },
+    "apps/api/worker/processing.js": {
+      "publishedSha256": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+      "candidateSha256": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+      "changed": false
+    },
+    "apps/api/worker/jobs.js": {
+      "publishedSha256": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+      "candidateSha256": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+      "changed": false
+    },
+    "apps/api/worker/invoices.js": {
+      "publishedSha256": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+      "candidateSha256": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+      "changed": false
+    },
+    "apps/api/worker/legacy-document-type.js": {
+      "publishedSha256": "1b757c7fd2de9d327bf67eda986c41a5ad1b44e24a7d3b2567badd2b79a8391f",
+      "candidateSha256": "1b757c7fd2de9d327bf67eda986c41a5ad1b44e24a7d3b2567badd2b79a8391f",
+      "changed": false
+    },
+    "apps/api/worker/reanalysis-limits.js": {
+      "publishedSha256": "31632d455dc9d676ca00d2d95976996d5086253ce3e85527b04b120aaa059509",
+      "candidateSha256": "31632d455dc9d676ca00d2d95976996d5086253ce3e85527b04b120aaa059509",
+      "changed": false
+    },
+    "apps/api/worker/reevaluation.js": {
+      "publishedSha256": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+      "candidateSha256": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+      "changed": false
+    },
+    "apps/api/worker/chat-actions.js": {
+      "publishedSha256": "eb5d5d8fe288a094a54372744243d20efe1faae97683d893fe86e7940dcb5c6d",
+      "candidateSha256": "eb5d5d8fe288a094a54372744243d20efe1faae97683d893fe86e7940dcb5c6d",
+      "changed": false
+    },
+    "apps/api/worker/chat-tools.js": {
+      "publishedSha256": "c6d6d8138f0d8e0382357953816cc883fa9840b96058c86fed20a4716c920563",
+      "candidateSha256": "c6d6d8138f0d8e0382357953816cc883fa9840b96058c86fed20a4716c920563",
+      "changed": false
+    },
+    "apps/api/worker/chat-prompt.js": {
+      "publishedSha256": "5fd259b17c6d67a65d1bb39ccb11eca25eeaa9499f74d9e612da8b56b82a2332",
+      "candidateSha256": "5fd259b17c6d67a65d1bb39ccb11eca25eeaa9499f74d9e612da8b56b82a2332",
+      "changed": false
+    },
+    "apps/api/worker/chat.js": {
+      "publishedSha256": "d82bb03de58cbf1d4a740d2634c4bfd10e9260fe9c8d9c71d16cb34715ae0d9e",
+      "candidateSha256": "d82bb03de58cbf1d4a740d2634c4bfd10e9260fe9c8d9c71d16cb34715ae0d9e",
+      "changed": false
+    },
+    "apps/api/worker/telegram-invoice.js": {
+      "publishedSha256": "b4e78b669d9e17fc904bff44fcf03a2378b851a3be7032c74eb4a076d566cb70",
+      "candidateSha256": "b4e78b669d9e17fc904bff44fcf03a2378b851a3be7032c74eb4a076d566cb70",
+      "changed": false
+    },
+    "apps/api/worker/telegram-chat.js": {
+      "publishedSha256": "25966118ca5724934ac287c87647b953a47a40433e47a28f6d82f22c827ea05f",
+      "candidateSha256": "25966118ca5724934ac287c87647b953a47a40433e47a28f6d82f22c827ea05f",
+      "changed": false
+    },
+    "apps/api/worker/telegram.js": {
+      "publishedSha256": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+      "candidateSha256": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+      "changed": false
+    },
+    "apps/api/worker/email.js": {
+      "publishedSha256": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+      "candidateSha256": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+      "changed": false
+    },
+    "apps/api/worker/skill.js": {
+      "publishedSha256": "c8b2c5c3be2d80e72f5f4b0c184a9a6de7cbe65a99811d6bea20285232f343b7",
+      "candidateSha256": "c8b2c5c3be2d80e72f5f4b0c184a9a6de7cbe65a99811d6bea20285232f343b7",
+      "changed": false
+    },
+    "apps/api/worker/api.js": {
+      "publishedSha256": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+      "candidateSha256": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+      "changed": false
+    },
+    "apps/api/worker/index.js": {
+      "publishedSha256": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
+      "candidateSha256": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
+      "changed": false
+    }
+  },
+  "frontendPreserved": true,
+  "verifiedPublicAssets": [
+    "/assets/index-Cm4Xes7Y.js",
+    "/assets/Button-Cgocdm9u.js",
+    "/assets/index-BLIW7lOh.css"
+  ],
+  "publishedWorkerSha256": "21676a21dbf0e93f26234fb465e83fc0581b8e549b5413c4fc9ac065679c1d0d",
+  "correctionCommit": "8057263a1ed24cded822de764fc22423cf94c44d",
+  "bundleSha256": "ff174bfacb239f2860e313aecaf30ab97ff23172b30270983d9619d01fec26d5",
+  "note": "Candidate consists of the verified published backend plus this commit's three production changes; already-published uncommitted Skill code is preserved by source hash.",
+  "deployedVersion": "5c744a1c-d198-42d1-8465-9dae165a57ea",
+  "publishedBundleExact": true,
+  "deployedAt": "2026-10-17T23:09:10.454Z",
+  "frontendUnchangedAfterDeploy": true,
+  "equivalentBackendVersions": [
+    "5c744a1c-d198-42d1-8465-9dae165a57ea",
+    "438f49f7-714c-455f-b840-064232fb46e2"
+  ],
+  "latestVerifiedEquivalentVersion": "438f49f7-714c-455f-b840-064232fb46e2",
+  "backendVerifiedAt": "2026-10-17T23:16:01.877Z"
+}

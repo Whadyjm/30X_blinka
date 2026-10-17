@@ -1,0 +1,18 @@
+{
+  "frozenAt": "2026-10-17T23:11:43.533Z",
+  "scope": "PRE_LIVE_SAMPLE_FREEZE",
+  "manifestSha256": "29eee11d86e2f6c4fa500bbffe8f18e3d55fc06464c70507d2ecf1c109013971",
+  "documents": 20,
+  "normalInvoices": 8,
+  "targets": {
+    "unsafeApprovals": 0,
+    "minimumCorrect": 19,
+    "minimumNormalAutomatic": 7
+  },
+  "review": {
+    "pdfVisibleFields": "pypdf extraction compared to independent labelled parser; all invoice PDFs match predeclared fields",
+    "raster": "Generated from same literal reviewed labels; ambiguous currency and competing totals intentionally preserved",
+    "selfTest": "20/20 financial reference expectations, no live model calls"
+  },
+  "readerTuningAfterFreeze": false
+}

@@ -1,0 +1,19 @@
+{
+  "company": "ronda",
+  "frozenAt": "2026-10-17T23:40:12.593408+00:00",
+  "scope": "FINAL_ADDITIONAL_20_DOCUMENT_SAMPLE_FROZEN_BEFORE_FIRST_REAL_READ",
+  "manifestSha256": "d730dae5b668b0c000b6535ad061e120c527608b1a4ee795ef66b547bfffabb1",
+  "targetedManifestSha256": "5cb11923a67f518a61d9b9cd29ae0f0b073ced8d282bd89123e708d176ee140c",
+  "documents": 20,
+  "maximumAdditionalFreshSamples": 1,
+  "targets": {
+    "unsafeApprovals": 0,
+    "minimumFullyCorrect": 19,
+    "minimumNormalAuto": 7,
+    "explained": 20
+  },
+  "reason": "One final predeclared sample after transport-only fallback correction. Marena and Selva failures stay published and become regressions; no prompt, fields or expected actions tuned to these new documents. No further fresh samples will be drawn to obtain a favorable result.",
+  "modelCallsBeforeFreeze": 0,
+  "selfTest": "20/20 synthetic reads; not OCR or decision-evaluation metrics",
+  "limits": "New identities, values, dates and concepts, same supported labelled layouts and scenario families; not unrestricted real-world generalization."
+}

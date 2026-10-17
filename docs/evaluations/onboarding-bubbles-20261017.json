@@ -1,0 +1,228 @@
+{
+  "scope": "UI only; local mock data; headless Chrome with real CSS and renderer, reduced motion emulated with CDP",
+  "checks": [
+    {
+      "label": "step 0 starts typing",
+      "step": "0",
+      "oli": "happy",
+      "bubbles": 2,
+      "letters": 104,
+      "visible": 0,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false
+    },
+    {
+      "label": "gaze right up",
+      "step": "0",
+      "oli": "happy",
+      "bubbles": 2,
+      "letters": 104,
+      "visible": 15,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": 1.740234375,
+        "y": -0.6008794282612048
+      }
+    },
+    {
+      "label": "gaze left down",
+      "step": "0",
+      "oli": "happy",
+      "bubbles": 2,
+      "letters": 104,
+      "visible": 20,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "listens during typing",
+      "step": "0",
+      "oli": "listening",
+      "bubbles": 2,
+      "letters": 114,
+      "visible": 25,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "happy after typing",
+      "step": "0",
+      "oli": "happy",
+      "bubbles": 2,
+      "letters": 114,
+      "visible": 71,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "step 1 starts typing",
+      "step": "1",
+      "oli": "understanding",
+      "bubbles": 2,
+      "letters": 93,
+      "visible": 0,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "reacts to limits",
+      "step": "1",
+      "oli": "listening",
+      "bubbles": 2,
+      "letters": 93,
+      "visible": 17,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "step 2 starts typing",
+      "step": "2",
+      "oli": "listening",
+      "bubbles": 2,
+      "letters": 134,
+      "visible": 2,
+      "bubbleHeight": 204.25,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "reacts to vendor input",
+      "step": "2",
+      "oli": "listening",
+      "bubbles": 2,
+      "letters": 134,
+      "visible": 20,
+      "bubbleHeight": 204.25,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "step 3 starts typing",
+      "step": "3",
+      "oli": "focused",
+      "bubbles": 2,
+      "letters": 118,
+      "visible": 0,
+      "bubbleHeight": 179.5,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "step 4 starts typing",
+      "step": "4",
+      "oli": "celebrating",
+      "bubbles": 2,
+      "letters": 119,
+      "visible": 0,
+      "bubbleHeight": 204.25,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": false,
+      "gaze": {
+        "x": -0.603515625,
+        "y": 1.295511265804893
+      }
+    },
+    {
+      "label": "real reduced motion",
+      "step": "4",
+      "oli": "celebrating",
+      "bubbles": 2,
+      "letters": 119,
+      "visible": 119,
+      "bubbleHeight": 204.25,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": true,
+      "gaze": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "label": "reduced motion stops tracking",
+      "step": "4",
+      "oli": "celebrating",
+      "bubbles": 2,
+      "letters": 119,
+      "visible": 119,
+      "bubbleHeight": 204.25,
+      "overflow": false,
+      "sameCanvas": true,
+      "reduced": true,
+      "gaze": null
+    }
+  ],
+  "validation": {
+    "build": "passed",
+    "frontend_tests": 24,
+    "i18n": "passed",
+    "impeccable_findings": 0
+  },
+  "not_measured": [
+    "frame rate",
+    "extractor accuracy",
+    "live policy decisions"
+  ],
+  "deployment": {
+    "worker_version": "9681c832-f641-417e-bead-a8ca9b447050",
+    "url": "https://oli30x.ultramare.dev/onboarding?restart=1",
+    "isolated_from_uncommitted_concurrent_work": true,
+    "assets_verified": [
+      "Onboarding-Bxf4qarM.js",
+      "Onboarding-DwhQTWEt.css",
+      "Oli-BwLvg2UU.js"
+    ],
+    "health_ok": true
+  }
+}

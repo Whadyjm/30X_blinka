@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { checkExtraction } from '@oli/contracts';
 import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_MODEL } from '@oli/extraction';
 import { corroboratePdfText, parseMoneyMinor, parsePdfText, readDocument, READER_VERSION } from '../worker/document.js';
@@ -24,6 +25,42 @@ const pngBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const ocrWire = (source = text(), issues = []) => Response.json({ model: IMAGE_OCR_MODEL,
   choices: [{ finish_reason: 'stop', message: { content: source + issues.map(issue => `\n[${issue}]`).join('') } }],
   usage: { prompt_tokens: 2000, completion_tokens: 500, cost: 0.000535 } });
+
+test('company PDF conversions retain glued labels, totals and notes without guessing missing currency', () => {
+  const root = new URL('../../../', import.meta.url);
+  const { captures } = JSON.parse(readFileSync(new URL('docs/fixtures/company-journey/pdf-text-captures-20261017.json', root)));
+  assert.equal(captures.length, 33);
+  for (const capture of captures.filter(c => Number(c.caseId) <= 17)) {
+    const manifest = JSON.parse(readFileSync(new URL(`docs/fixtures/company-journey/${capture.company}/manifest.json`, root)));
+    const scenario = manifest.cases.find(c => c.id === capture.caseId);
+    const digest = value => createHash('sha256').update(value).digest('hex');
+    assert.equal(digest(readFileSync(new URL(capture.sourceFile, root))), capture.sourceSha256);
+    assert.equal(digest(capture.text), capture.textSha256);
+    assert.equal(scenario.file.sha256, capture.sourceSha256);
+    assert.deepEqual(parsePdfText(capture.text).fields, scenario.expectedExtraction, `${capture.company}/${capture.caseId}`);
+    const conflicting = capture.text.replace('Notes:', 'Notes: Other total USD 1.00;');
+    if (conflicting !== capture.text) assert.equal(parsePdfText(conflicting).fields.amountMinor, null);
+  }
+});
+
+test('original Qwen transcripts support repeated punctuation and explicit lines without colons', () => {
+  const root = new URL('../../../', import.meta.url);
+  for (const [company, caseId, report] of [
+    ['brisa', '006', 'company-journey-brisa-2026-10-17T22-01-40-441Z.json'],
+    ['cedro', '016', 'company-journey-cedro-2026-10-17T22-01-30-431Z.json'],
+  ]) {
+    const historical = JSON.parse(readFileSync(new URL('docs/evaluations/' + report, root)));
+    const row = historical.results.find(row => row.caseId === caseId);
+    const manifest = JSON.parse(readFileSync(new URL(`docs/fixtures/company-journey/${company}/manifest.json`, root)));
+    assert.deepEqual(parsePdfText(row.read.provenance.imageOcr.text).fields, manifest.cases.find(c => c.id === caseId).expectedExtraction);
+  }
+  const bare = 'Invoice number INV-001\nSupplier Acme Cloud Services\nIssued date 2026-10-01\nDue date 2026-10-31\nService period 2026-10\nDescription Servicio mensual\nTotal USD 9,999.00';
+  assert.deepEqual(parsePdfText(bare).fields, { ...fields, vendorName: 'Acme Cloud Services' });
+  assert.equal(parsePdfText(bare.replace('Acme Cloud', 'Total Cloud')).fields.vendorName, 'Total Cloud Services');
+  assert.equal(parsePdfText(bare + '\nTotal USD 9,999.00').fields.amountMinor, null);
+  assert.equal(parsePdfText(bare.replace('2026-10-31', '03/04/2026')).fields.dueDate, null);
+  assert.equal(parsePdfText(bare.replace('USD 9,999.00', '$ 9,999.00')).fields.amountMinor, null);
+});
 
 test('image readers start separately in parallel; OCR gets original bytes, persists transcript and gates shadow mode', async t => {
   const primaryStarted = Promise.withResolvers(), secondaryStarted = Promise.withResolvers();
@@ -213,6 +250,9 @@ test('both independent readers start together and checkpoint successful artifact
   assert.equal(result.agreementReference, 'agr_demo_one');
   assert.equal(checkpoints.PRIMARY.result.extraction.extractionWarnings.length, 0);
   assert.deepEqual(checkpoints.SECONDARY.fields, fields);
+  assert.equal(checkpoints.SECONDARY.pdfText.text, text());
+  assert.equal(checkpoints.SECONDARY.pdfText.sha256, createHash('sha256').update(text()).digest('hex'));
+  assert.deepEqual(result.provenance.pdfText, checkpoints.SECONDARY.pdfText);
   assert.deepEqual(result.provenance.advisories, ['SYNTHETIC_LABEL']);
   assert.deepEqual(result.provenance.cache, { PRIMARY: false, SECONDARY: false });
   assert.ok(READER_VERSION.includes(EXTRACTION_CONFIG_VERSION));

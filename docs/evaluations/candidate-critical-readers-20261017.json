@@ -1,0 +1,807 @@
+{
+  "startedAt": "2026-10-17T23:12:31.096Z",
+  "scope": "LIVE_TARGETED_READER_REGRESSION_NOT_UNSEEN_SAMPLE_OR_FINANCIAL_DECISIONS",
+  "version": "5c744a1c-d198-42d1-8465-9dae165a57ea",
+  "maximumProbes": 5,
+  "externalRetries": 0,
+  "results": [
+    {
+      "company": "lumen",
+      "caseId": "003",
+      "sourceSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+      "status": 200,
+      "read": {
+        "extraction": {
+          "vendorName": "Cobalt Audio Lab Demo",
+          "invoiceNumber": "LM-0003-26",
+          "amountMinor": 10000,
+          "currency": "USD",
+          "issuedAt": "2026-10-06",
+          "dueDate": "2026-10-27",
+          "servicePeriod": "2026-10",
+          "description": "Studio sound mix",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Cobalt Audio Lab Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: LM-0003-26"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-06"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-27"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Studio sound mix"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Invoice total: USD 100.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "18e83187-97e3-49f3-9ddd-c9191044114c",
+        "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+        "corroboration": {
+          "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+          "readId": "pdftext_f2a08cd5-2c26-4fb4-8629-e683c760c940",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Cobalt Audio Lab Demo",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "dueDate": "2026-10-27"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v7",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+            "primaryReadId": "18e83187-97e3-49f3-9ddd-c9191044114c",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2204,
+                "outputTokens": 335,
+                "reasoningTokens": 0,
+                "costUsd": 0.00225866
+              },
+              "durationMs": 3761
+            }
+          ],
+          "usage": {
+            "inputTokens": 2204,
+            "outputTokens": 335,
+            "reasoningTokens": 0,
+            "costUsd": 0.00225866
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": null,
+          "imageOcrMode": "OFF",
+          "pdfText": {
+            "text": "# invoice.pdf\n## Contents\n### Page 1\nJUNIPER MOTION FINANCE\nBILLSupplier: Cobalt Audio Lab Demo\nInvoice number: LM-0003-26\nIssue date: 2026-10-06\nDue date: 2026-10-27\nService period: 2026-10\nDescription: Studio sound mixInvoice total: USD 100.00Notes: Synthetic document / no real-world value\n\n",
+            "sha256": "b532d8201c99b3cee991fd3a97d7ff6cea04216601e1187d37b995ba49948734",
+            "converter": "WORKERS_AI_TO_MARKDOWN"
+          },
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3761,
+            "primaryMs": 3761,
+            "secondaryMs": 125
+          }
+        }
+      },
+      "error": null,
+      "exactFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ]
+    },
+    {
+      "company": "lumen",
+      "caseId": "006",
+      "sourceSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+      "status": 200,
+      "read": {
+        "extraction": {
+          "vendorName": "Northstar Type Foundry Demo",
+          "invoiceNumber": "LM-0006-26",
+          "amountMinor": 10000,
+          "currency": "USD",
+          "issuedAt": "2026-10-06",
+          "dueDate": "2026-10-27",
+          "servicePeriod": "2026-10",
+          "description": "Variable font specimen",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Northstar Type Foundry Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: LM-0006-26"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-06"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-27"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Variable font specimen"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Invoice total: USD 100.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "fda85688-293a-423b-a9bb-e60c925a6e5a",
+        "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+        "corroboration": {
+          "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+          "readId": "76f45da2-179c-4c92-abc7-330a2cc7ef4e",
+          "method": "OCR",
+          "fields": {
+            "vendorName": "Northstar Type Foundry Demo",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "dueDate": "2026-10-27"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+            "primaryReadId": "fda85688-293a-423b-a9bb-e60c925a6e5a",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 3089,
+                "outputTokens": 284,
+                "reasoningTokens": 0,
+                "costUsd": 0.00032913
+              },
+              "durationMs": 2097
+            }
+          ],
+          "usage": {
+            "inputTokens": 3089,
+            "outputTokens": 284,
+            "reasoningTokens": 0,
+            "costUsd": 0.00032913
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": {
+            "text": "COBALT AUDIO LAB\n\nINVOICE / FACTURA\n\nProveedor: Northstar Type Foundry Demo\n\nInvoice number: LM-0006-26\nIssue date: 2026-10-06\n\nDue date: 2026-10-27\n\nPeriodo de servicio: 2026-10\n\nDescription: Variable font specimen\n\nInvoice total: USD 100.00\n\nNotes: Fictional test copy - not for payment",
+            "issues": [],
+            "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+            "readId": "76f45da2-179c-4c92-abc7-330a2cc7ef4e",
+            "model": "qwen/qwen3.8-flash",
+            "provider": "Alibaba",
+            "usage": {
+              "inputTokens": 2147,
+              "outputTokens": 107,
+              "reasoningTokens": 0,
+              "costUsd": 0.00037234
+            },
+            "attempts": [
+              {
+                "model": "qwen/qwen3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 2147,
+                  "outputTokens": 107,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00037234
+                },
+                "durationMs": 2565
+              }
+            ],
+            "configVersion": "qwen-image-transcript-v2-20261017"
+          },
+          "imageOcrMode": "ENABLED",
+          "pdfText": null,
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 2565,
+            "primaryMs": 2097,
+            "secondaryMs": 2565
+          }
+        }
+      },
+      "error": null,
+      "exactFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ]
+    },
+    {
+      "company": "lumen",
+      "caseId": "007",
+      "sourceSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+      "status": 200,
+      "read": {
+        "extraction": {
+          "vendorName": "Paper Kite Studio Demo",
+          "invoiceNumber": "LM-0007-26",
+          "amountMinor": 10000,
+          "currency": "USD",
+          "issuedAt": "2026-10-06",
+          "dueDate": "2026-10-27",
+          "servicePeriod": "2026-10",
+          "description": "Cover grid adaptation",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Paper Kite Studio Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: LM-0007-26"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-06"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-27"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Cover grid adaptation"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Invoice total: USD 100.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "6e69d319-6456-4e3f-9c22-709b546a787f",
+        "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+        "corroboration": {
+          "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+          "readId": "9ad79c2b-5c2f-4a03-8e46-34503007db59",
+          "method": "OCR",
+          "fields": {
+            "vendorName": "Paper Kite Studio Demo",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "dueDate": "2026-10-27"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+            "primaryReadId": "6e69d319-6456-4e3f-9c22-709b546a787f",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 3089,
+                "outputTokens": 278,
+                "reasoningTokens": 0,
+                "costUsd": 0.000180594
+              },
+              "durationMs": 3318
+            }
+          ],
+          "usage": {
+            "inputTokens": 3089,
+            "outputTokens": 278,
+            "reasoningTokens": 0,
+            "costUsd": 0.000180594
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": {
+            "text": "JUNIPER MOTION FINANCE\n\nBILL\n\nSupplier: Paper Kite Studio Demo\nIssue date: 2026-10-06\n\nInvoice number: LM-0007-26\nDue date: 2026-10-27\n\nService period: 2026-10\n\nDescription: Cover grid adaptation\n\nInvoice total: USD 100.00\n\nNotes: Synthetic document / no real-world value",
+            "issues": [],
+            "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+            "readId": "9ad79c2b-5c2f-4a03-8e46-34503007db59",
+            "model": "qwen/qwen3.8-flash",
+            "provider": "Alibaba",
+            "usage": {
+              "inputTokens": 2147,
+              "outputTokens": 102,
+              "reasoningTokens": 0,
+              "costUsd": 0.00036999
+            },
+            "attempts": [
+              {
+                "model": "qwen/qwen3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 2147,
+                  "outputTokens": 102,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00036999
+                },
+                "durationMs": 2973
+              }
+            ],
+            "configVersion": "qwen-image-transcript-v2-20261017"
+          },
+          "imageOcrMode": "ENABLED",
+          "pdfText": null,
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3318,
+            "primaryMs": 3318,
+            "secondaryMs": 2973
+          }
+        }
+      },
+      "error": null,
+      "exactFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ]
+    },
+    {
+      "company": "brisa",
+      "caseId": "006",
+      "sourceSha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+      "status": 200,
+      "read": {
+        "extraction": {
+          "vendorName": "Harbor Hosting Demo SARL",
+          "invoiceNumber": "HH-2606",
+          "amountMinor": 5000,
+          "currency": "EUR",
+          "issuedAt": "2026-10-06",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Backup storage allocation",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: : Harbor Hosting Demo SARL"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: : HH-2606"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: : 2026-10-06"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: : 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: : 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Backup storage allocation"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: EUR 50.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "2181ea3f-47fe-458c-99a0-11384b097925",
+        "documentSha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+        "corroboration": {
+          "documentSha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+          "readId": "16c17e5e-5e41-4467-9bcc-542df7bfe109",
+          "method": "OCR",
+          "fields": {
+            "vendorName": "Harbor Hosting Demo SARL",
+            "amountMinor": 5000,
+            "currency": "EUR",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+            "primaryReadId": "2181ea3f-47fe-458c-99a0-11384b097925",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 3089,
+                "outputTokens": 283,
+                "reasoningTokens": 0,
+                "costUsd": 0.00032895
+              },
+              "durationMs": 4499
+            }
+          ],
+          "usage": {
+            "inputTokens": 3089,
+            "outputTokens": 283,
+            "reasoningTokens": 0,
+            "costUsd": 0.00032895
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": {
+            "text": "BRISA SERVICES / FACTURA\n\nSupplier: : Harbor Hosting Demo SARL\nInvoice number: : HH-2606\nIssue date: : 2026-10-06\nDue date: : 2026-10-28\nService period: : 2026-10\n\nDescription: Backup storage allocation\n\nTotal: EUR 50.00\n\nNotes: Fictional sample - not valid for payment",
+            "issues": [],
+            "documentSha256": "ac1c8b2255718470fcedb03f7876e8d8ca5b12f1c9f45680218c724d14578b78",
+            "readId": "16c17e5e-5e41-4467-9bcc-542df7bfe109",
+            "model": "qwen/qwen3.8-flash",
+            "provider": "Alibaba",
+            "usage": {
+              "inputTokens": 2097,
+              "outputTokens": 99,
+              "reasoningTokens": 0,
+              "costUsd": 0.00036108
+            },
+            "attempts": [
+              {
+                "model": "qwen/qwen3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 2097,
+                  "outputTokens": 99,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00036108
+                },
+                "durationMs": 7571
+              }
+            ],
+            "configVersion": "qwen-image-transcript-v2-20261017"
+          },
+          "imageOcrMode": "ENABLED",
+          "pdfText": null,
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 7571,
+            "primaryMs": 4499,
+            "secondaryMs": 7571
+          }
+        }
+      },
+      "error": null,
+      "exactFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ]
+    },
+    {
+      "company": "cedro",
+      "caseId": "016",
+      "sourceSha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+      "status": 200,
+      "read": {
+        "extraction": {
+          "vendorName": "Silver Poppy Operations Demo",
+          "invoiceNumber": "V15-016",
+          "amountMinor": 90000,
+          "currency": "USD",
+          "issuedAt": "2026-10-06",
+          "dueDate": "2026-10-26",
+          "servicePeriod": "2026-10",
+          "description": "Fleet telemetry reconciliation",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier Silver Poppy Operations Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number V15-016"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issued date 2026-10-06"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date 2026-10-26"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description Fleet telemetry reconciliation"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total USD 900.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "cff76a7a-21c6-40b7-8531-7ed2b5397997",
+        "documentSha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+        "corroboration": {
+          "documentSha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+          "readId": "9d14f49e-4606-49c5-8707-4ee0e977bda6",
+          "method": "OCR",
+          "fields": {
+            "vendorName": "Silver Poppy Operations Demo",
+            "amountMinor": 90000,
+            "currency": "USD",
+            "dueDate": "2026-10-26"
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+            "primaryReadId": "cff76a7a-21c6-40b7-8531-7ed2b5397997",
+            "version": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+          },
+          "configVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 3089,
+                "outputTokens": 270,
+                "reasoningTokens": 0,
+                "costUsd": 0.00032661
+              },
+              "durationMs": 1894
+            }
+          ],
+          "usage": {
+            "inputTokens": 3089,
+            "outputTokens": 270,
+            "reasoningTokens": 0,
+            "costUsd": 0.00032661
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "imageOcr": {
+            "text": "CEDRO LOGISTICS DEMO LLC / SYNTHETIC\nInvoice number V15-016\nSupplier Silver Poppy Operations Demo\nIssued date 2026-10-06\nDue date 2026-10-26\nService period 2026-10\nDescription Fleet telemetry reconciliation\nTotal USD 900.00\nNotes: fictional training document; no tax or payment value",
+            "issues": [],
+            "documentSha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+            "readId": "9d14f49e-4606-49c5-8707-4ee0e977bda6",
+            "model": "qwen/qwen3.8-flash",
+            "provider": "Alibaba",
+            "usage": {
+              "inputTokens": 2277,
+              "outputTokens": 97,
+              "reasoningTokens": 0,
+              "costUsd": 0.00038714
+            },
+            "attempts": [
+              {
+                "model": "qwen/qwen3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 2277,
+                  "outputTokens": 97,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00038714
+                },
+                "durationMs": 7907
+              }
+            ],
+            "configVersion": "qwen-image-transcript-v2-20261017"
+          },
+          "imageOcrMode": "ENABLED",
+          "pdfText": null,
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 7907,
+            "primaryMs": 1894,
+            "secondaryMs": 7907
+          }
+        }
+      },
+      "error": null,
+      "exactFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ]
+    }
+  ],
+  "finishedAt": "2026-10-17T23:12:56.954Z",
+  "summary": {
+    "attempted": 5,
+    "allEightFieldsExact": 5,
+    "fullyCorroborated": 5,
+    "readerFailures": 0
+  }
+}

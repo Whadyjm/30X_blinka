@@ -1,0 +1,912 @@
+{
+  "datasetVersion": "selva-holdout-v1-predeclared",
+  "synthetic": true,
+  "company": {
+    "slug": "selva",
+    "name": "Selva Demo Services LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "rules": {
+    "currency": "USD",
+    "automaticLimitMinor": 20000,
+    "hardLimitMinor": 150000,
+    "monthlyBudgetMinor": 180000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 20000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  },
+  "vendors": [
+    {
+      "key": "vendor_001",
+      "name": "Summit Storage Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_002",
+      "name": "Willow Print Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_003",
+      "name": "Falcon Studio Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_004",
+      "name": "Maple Systems Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_005",
+      "name": "Riverdesk Support Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_006",
+      "name": "Delta Search Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_007",
+      "name": "Juniper Sound Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_008",
+      "name": "Compass Route Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_009",
+      "name": "Atlas Records Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_010",
+      "name": "Orchid Research Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_013",
+      "name": "Unlisted Valley Demo",
+      "allowed": false,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_014",
+      "name": "Kestrel Design Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_015",
+      "name": "Orion Network Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_016",
+      "name": "Cobalt Survey Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_017",
+      "name": "Pine Archive Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_018",
+      "name": "Clover Metrics Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_019",
+      "name": "Harbor Parcel Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_020",
+      "name": "Spruce Creative Demo",
+      "allowed": true,
+      "externalRef": null
+    }
+  ],
+  "agreements": [
+    {
+      "key": "agreement_001",
+      "vendorKey": "vendor_001",
+      "currency": "USD",
+      "amountMinor": 14000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Encrypted backup storage",
+      "active": true
+    },
+    {
+      "key": "agreement_002",
+      "vendorKey": "vendor_002",
+      "currency": "USD",
+      "amountMinor": 6500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Technical manual layout",
+      "active": true
+    },
+    {
+      "key": "agreement_003",
+      "vendorKey": "vendor_003",
+      "currency": "USD",
+      "amountMinor": 7500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Product catalogue revision",
+      "active": true
+    },
+    {
+      "key": "agreement_004",
+      "vendorKey": "vendor_004",
+      "currency": "USD",
+      "amountMinor": 8500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Service health monitoring",
+      "active": true
+    },
+    {
+      "key": "agreement_005",
+      "vendorKey": "vendor_005",
+      "currency": "USD",
+      "amountMinor": 9500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Customer support coverage",
+      "active": true
+    },
+    {
+      "key": "agreement_006",
+      "vendorKey": "vendor_006",
+      "currency": "USD",
+      "amountMinor": 10500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Knowledge index maintenance",
+      "active": true
+    },
+    {
+      "key": "agreement_007",
+      "vendorKey": "vendor_007",
+      "currency": "USD",
+      "amountMinor": 11500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Podcast sound editing",
+      "active": true
+    },
+    {
+      "key": "agreement_008",
+      "vendorKey": "vendor_008",
+      "currency": "USD",
+      "amountMinor": 12500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Delivery route annotation",
+      "active": true
+    },
+    {
+      "key": "agreement_009",
+      "vendorKey": "vendor_009",
+      "currency": "USD",
+      "amountMinor": 28000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Operations process review",
+      "active": true
+    },
+    {
+      "key": "agreement_010",
+      "vendorKey": "vendor_010",
+      "currency": "USD",
+      "amountMinor": 35000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Operations process review",
+      "active": true
+    },
+    {
+      "key": "agreement_012",
+      "vendorKey": "vendor_001",
+      "currency": "USD",
+      "amountMinor": 6500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Backup transfer consultation",
+      "active": true
+    },
+    {
+      "key": "agreement_013",
+      "vendorKey": "vendor_013",
+      "currency": "USD",
+      "amountMinor": 7500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Unrequested export service",
+      "active": true
+    },
+    {
+      "key": "agreement_014",
+      "vendorKey": "vendor_014",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Annual visual review",
+      "active": true
+    },
+    {
+      "key": "agreement_015",
+      "vendorKey": "vendor_015",
+      "currency": "USD",
+      "amountMinor": 160000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Relay infrastructure setup",
+      "active": true
+    },
+    {
+      "key": "agreement_016",
+      "vendorKey": "vendor_016",
+      "currency": "USD",
+      "amountMinor": 120000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Regional capacity survey",
+      "active": true
+    },
+    {
+      "key": "agreement_017",
+      "vendorKey": "vendor_017",
+      "currency": "USD",
+      "amountMinor": 8500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archive classification",
+      "active": true
+    },
+    {
+      "key": "agreement_018",
+      "vendorKey": "vendor_018",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Monthly metrics summary",
+      "active": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "885305cd276785e3a991d20dcb3b55e479c302573d5ca3b9a03b3d1799113b6f",
+        "sizeBytes": 1169
+      },
+      "expectedExtraction": {
+        "vendorName": "Summit Storage Demo LLC",
+        "invoiceNumber": "SV-001-2026",
+        "amountMinor": 14000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Encrypted backup storage"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 14000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "002",
+      "file": {
+        "path": "documents/002.png",
+        "mimeType": "image/png",
+        "sha256": "4d4ffdd8c9e2783ceed9e2e597ff855cf76b3b9f1b9e73ea389baecb627c9f50",
+        "sizeBytes": 53476
+      },
+      "expectedExtraction": {
+        "vendorName": "Willow Print Demo Ltd",
+        "invoiceNumber": "SV-002-2026",
+        "amountMinor": 6500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Technical manual layout"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 6500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "f67dad9724e116f57bf44ace8946855285ad6d4e3f3979a07fa06f656c694532",
+        "sizeBytes": 1167
+      },
+      "expectedExtraction": {
+        "vendorName": "Falcon Studio Demo LLC",
+        "invoiceNumber": "SV-003-2026",
+        "amountMinor": 7500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Product catalogue revision"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 7500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "004",
+      "file": {
+        "path": "documents/004.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "2677c65d42d7972cc23626a70885af2c87ff6ca6a370f03c339826933ae8fb81",
+        "sizeBytes": 99403
+      },
+      "expectedExtraction": {
+        "vendorName": "Maple Systems Demo Ltd",
+        "invoiceNumber": "SV-004-2026",
+        "amountMinor": 8500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Service health monitoring"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 8500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "83c64d1943b654fea0da03df4bfda1b04c225e5cd1979dadc3e084fe87203f02",
+        "sizeBytes": 1198
+      },
+      "expectedExtraction": {
+        "vendorName": "Riverdesk Support Demo",
+        "invoiceNumber": "SV-005-2026",
+        "amountMinor": 9500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Customer support coverage"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 9500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "006",
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sha256": "ce69de1e4cc4f6262cfbda05e2036402f68a9f24b8f20c011da0201f9a880c7b",
+        "sizeBytes": 52985
+      },
+      "expectedExtraction": {
+        "vendorName": "Delta Search Demo LLC",
+        "invoiceNumber": "SV-006-2026",
+        "amountMinor": 10500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Knowledge index maintenance"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "007",
+      "file": {
+        "path": "documents/007.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "be677e988b4523b3abb7790ec4dd5c7990eb9994e4978dd42e0e9501f25a70b1",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Sound Demo Ltd",
+        "invoiceNumber": "SV-007-2026",
+        "amountMinor": 11500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Podcast sound editing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 11500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "008",
+      "file": {
+        "path": "documents/008.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "80cfabb41e5c62de44f81f5bd7abc199e92f0b948e9ff3ce7bd0eadf435f9e4e",
+        "sizeBytes": 108976
+      },
+      "expectedExtraction": {
+        "vendorName": "Compass Route Demo LLC",
+        "invoiceNumber": "SV-008-2026",
+        "amountMinor": 12500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Delivery route annotation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 12500,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "009",
+      "file": {
+        "path": "documents/009.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "cfc3ef96232856794896cb4cce5fc761fc79f2350020d75a0a5180354ba45743",
+        "sizeBytes": 1167
+      },
+      "expectedExtraction": {
+        "vendorName": "Atlas Records Demo LLC",
+        "invoiceNumber": "SV-009-2026",
+        "amountMinor": 28000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Operations process review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "APPROVE",
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 28000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "010",
+      "file": {
+        "path": "documents/010.png",
+        "mimeType": "image/png",
+        "sha256": "26952168fc605ac93207c58ab851ac4095e7f50a0d50260292b93dcfd7566189",
+        "sizeBytes": 54016
+      },
+      "expectedExtraction": {
+        "vendorName": "Orchid Research Demo Ltd",
+        "invoiceNumber": "SV-010-2026",
+        "amountMinor": 35000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Operations process review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "REJECT",
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "011",
+      "file": {
+        "path": "documents/011.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "885305cd276785e3a991d20dcb3b55e479c302573d5ca3b9a03b3d1799113b6f",
+        "sizeBytes": 1169
+      },
+      "expectedExtraction": {
+        "vendorName": "Summit Storage Demo LLC",
+        "invoiceNumber": "SV-001-2026",
+        "amountMinor": 14000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Encrypted backup storage"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "012",
+      "file": {
+        "path": "documents/012.png",
+        "mimeType": "image/png",
+        "sha256": "74305edba8059bace7465033b9a6b3fcdaede204dd793a311967ed0322fe0a81",
+        "sizeBytes": 52598
+      },
+      "expectedExtraction": {
+        "vendorName": "Summit Storage Demo LLC",
+        "invoiceNumber": "SV-001-2026",
+        "amountMinor": 6500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Backup transfer consultation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "013",
+      "file": {
+        "path": "documents/013.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "f142a93313eb4971461e65455307fee849b3e01ede2ff4fcb25c1947decd86dc",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Unlisted Valley Demo",
+        "invoiceNumber": "SV-013-2026",
+        "amountMinor": 7500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Unrequested export service"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "UNKNOWN_VENDOR"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "014",
+      "file": {
+        "path": "documents/014.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "a8d0f9e1eaea3b8a73b98cdbc83db60acb7de39fcf444a7e43241d405ab2e598",
+        "sizeBytes": 96750
+      },
+      "expectedExtraction": {
+        "vendorName": "Kestrel Design Demo",
+        "invoiceNumber": "SV-014-2026",
+        "amountMinor": 12500,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Annual visual review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AGREEMENT_MISMATCH"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "015",
+      "file": {
+        "path": "documents/015.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "92ad4bab8270ec228e206ecbf31d5c5c96524933883e51565924c543d3ab0ad8",
+        "sizeBytes": 1162
+      },
+      "expectedExtraction": {
+        "vendorName": "Orion Network Demo",
+        "invoiceNumber": "SV-015-2026",
+        "amountMinor": 160000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Relay infrastructure setup"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_HARD_LIMIT"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "016",
+      "file": {
+        "path": "documents/016.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "4e8ea6fedacdd098179a1f5a6328e9131989b66c9c7e3b927573c80e21cc4f58",
+        "sizeBytes": 1167
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Survey Demo LLC",
+        "invoiceNumber": "SV-016-2026",
+        "amountMinor": 120000,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Regional capacity survey"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "017",
+      "file": {
+        "path": "documents/017.png",
+        "mimeType": "image/png",
+        "sha256": "e2abc5636d9d77e3ff1c856de8fbed5bfff64f2896ce5e8923b71749c2da16c3",
+        "sizeBytes": 53564
+      },
+      "expectedExtraction": {
+        "vendorName": "Pine Archive Demo LLC",
+        "invoiceNumber": "SV-017-2026",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Archive classification"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "018",
+      "file": {
+        "path": "documents/018.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "930712590c50f98c3d76f625ff8e0b032e01c4312ffb7d4c5c0ff2a60b4c5caa",
+        "sizeBytes": 105910
+      },
+      "expectedExtraction": {
+        "vendorName": "Clover Metrics Demo LLC",
+        "invoiceNumber": "SV-018-2026",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Monthly metrics summary"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "c44f8f467cf9e1d96c9f419e2bf18e1bbd7ba3007b2478658d9a4645a16b823d",
+        "sizeBytes": 1147
+      },
+      "expectedExtraction": {
+        "vendorName": "Harbor Parcel Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Draft artwork package"
+      },
+      "expectedDocumentType": "DELIVERY_NOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "020",
+      "file": {
+        "path": "documents/020.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "89b611c9deb203e7524fd47d1f7aeb0a867df1b864d0a9643c26dedee9a1e9b7",
+        "sizeBytes": 1145
+      },
+      "expectedExtraction": {
+        "vendorName": "Spruce Creative Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-13",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-10",
+        "description": "Draft artwork package"
+      },
+      "expectedDocumentType": "QUOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    }
+  ]
+}

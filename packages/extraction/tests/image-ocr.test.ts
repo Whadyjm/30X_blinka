@@ -61,3 +61,19 @@ test('provider errors, refusal, timeout and invalid bytes fail closed without se
   }) }), /ALL_MODELS_UNAVAILABLE/);
   await assert.rejects(transcribeImageWithOpenRouter({ ...options, image: { ...image, bytes: new Uint8Array([0, 1, 2]) } }, { fetch: async () => assert.fail('invalid file must not call provider') }), /INVALID_IMAGE/);
 });
+
+test('Qwen distingue saturación tipada de rechazos permanentes sin repetir la transcripción', async () => {
+  for (const [error_type, code, expected] of [
+    ['rate_limit_exceeded', 400, 'ALL_MODELS_UNAVAILABLE'],
+    ['invalid_request', 400, 'OPENROUTER_REQUEST_REJECTED'],
+    ['content_policy_violation', 502, 'OPENROUTER_REQUEST_REJECTED'],
+  ] as const) {
+    for (const status of [200, 400]) {
+      let calls = 0;
+      await assert.rejects(transcribeImageWithOpenRouter(options, { fetch: async () => {
+        calls++; return Response.json({ error: { code, metadata: { error_type } } }, { status });
+      } }), new RegExp(expected));
+      assert.equal(calls, 1);
+    }
+  }
+});

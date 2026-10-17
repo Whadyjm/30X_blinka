@@ -222,6 +222,19 @@ export const ReviewApprovalSchema = z.strictObject({
 });
 
 export const MAX_INVOICE_BYTES = 5 * 1024 * 1024;
+export const CreateSkillConnectionSchema = z.strictObject({ name: NameSchema.max(80) });
+export const UpdateSkillConnectionSchema = z.strictObject({ expiresAt: TimestampSchema.nullable() });
+export const SkillConnectionSchema = z.strictObject({
+  id: IdSchema, name: NameSchema, keyPrefix: z.string(),
+  scopes: z.tuple([z.literal('invoices:submit'), z.literal('invoices:read-own'), z.literal('invoices:process-own')]),
+  createdAt: TimestampSchema, expiresAt: TimestampSchema.nullable(),
+  lastUsedAt: TimestampSchema.nullable(), revokedAt: TimestampSchema.nullable(),
+});
+export const SkillIntegrationSchema = z.strictObject({ connections: z.array(SkillConnectionSchema) });
+export const CreatedSkillConnectionSchema = z.strictObject({ connection: SkillConnectionSchema, apiKey: z.string().regex(/^oli_sk_[0-9a-f]{64}$/) });
+export type SkillConnection = z.infer<typeof SkillConnectionSchema>;
+export type SkillIntegration = z.infer<typeof SkillIntegrationSchema>;
+export type CreatedSkillConnection = z.infer<typeof CreatedSkillConnectionSchema>;
 export const TelegramIntegrationSchema = z.strictObject({
   available: z.boolean(),
   connection: z.strictObject({ id: IdSchema, displayName: z.string(), connectedAt: TimestampSchema }).nullable(),
@@ -241,7 +254,7 @@ export const UploadFileMetadataSchema = z.strictObject({
 export const InvoiceSchema = z.strictObject({
   id: IdSchema,
   status: InvoiceStatusSchema,
-  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM', 'EMAIL']),
+  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM', 'EMAIL', 'AGENT_REQUEST']),
   file: UploadFileMetadataSchema.extend({
     url: z.string().regex(/^\/api\/v1\/invoices\/[^/?#]+\/file$/),
   }),
