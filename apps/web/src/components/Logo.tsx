@@ -1,48 +1,20 @@
-import { useEffect, useState } from 'react';
 import { brand } from '@/config/brand';
-import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { Oli } from './Oli';
-import '@/styles/logo.css';
 
-export function Logo({ light = false, mascot = false }: { light?: boolean; mascot?: boolean }) {
+export function Logo({ light = false }: { light?: boolean }) {
   return (
     <span className="inline-flex items-center gap-2">
-      {mascot ? <LogoMascot light={light} /> : <span className="grid size-8 place-items-center rounded-md bg-ink" aria-hidden>
-        <span className="size-3.5 rounded-full border-[3px] border-highlighter" />
-      </span>}
+      <svg viewBox="0 0 36 36" className={`size-8 shrink-0 ${light ? 'text-white' : 'text-ink'}`} aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M18.2 3C26.8 3 33 9.1 33 17.7 33 26.7 26.9 33 18.1 33 9.5 33 3 26.8 3 18.2 3 9.4 9.5 3 18.2 3Z" />
+        <g className={light ? 'fill-ink' : 'fill-highlighter'}>
+          <rect x="12.2" y="15" width="3.6" height="7" rx="1.8" />
+          <rect x="20.2" y="15" width="3.6" height="7" rx="1.8" />
+        </g>
+        <g className={light ? 'stroke-ink' : 'stroke-highlighter'} fill="none" strokeWidth="1.6" strokeLinecap="round">
+          <path d="M11.7 12.3c1.2-.9 2.9-1.1 4.4-.5" />
+          <path d="M20 11.8c1.5-.6 3.2-.4 4.4.5" />
+        </g>
+      </svg>
       <span className={`text-xl tracking-tight ${light ? 'text-white' : 'text-ink'}`}>{brand.name}</span>
-    </span>
-  );
-}
-
-function LogoMascot({ light }: { light: boolean }) {
-  const reduced = usePrefersReducedMotion();
-  const [hovered, setHovered] = useState(false);
-  const [greeting, setGreeting] = useState(false);
-
-  useEffect(() => {
-    setGreeting(false);
-    if (reduced) return;
-    let settle: ReturnType<typeof setTimeout> | undefined;
-    const greet = setInterval(() => {
-      if (document.hidden) return;
-      setGreeting(true);
-      settle = setTimeout(() => setGreeting(false), 3400);
-    }, 14000);
-    return () => { clearInterval(greet); clearTimeout(settle); };
-  }, [reduced]);
-
-  const state = !reduced && (hovered || greeting) ? 'happy' : 'idle';
-  return (
-    <span
-      className="oli-logo-mascot"
-      aria-hidden="true"
-      data-oli-state={state}
-      onPointerEnter={event => { if (event.pointerType === 'mouse') setHovered(true); }}
-      onPointerLeave={() => setHovered(false)}
-    >
-      <span className="oli-logo-glow" />
-      <Oli state={state} size={40} particles={360} speed={0.55} dark={light} paused={reduced} />
     </span>
   );
 }

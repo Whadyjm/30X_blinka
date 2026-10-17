@@ -77,7 +77,7 @@ export function AppLayout() {
       <div className="flex flex-1">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-white p-4 lg:flex">
           <Link to="/app" className="mb-6 px-1">
-            <Logo mascot />
+            <Logo />
           </Link>
           {links}
           <div className="mt-auto space-y-3 border-t border-hairline pt-4 text-sm">
@@ -97,7 +97,7 @@ export function AppLayout() {
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex h-16 shrink-0 items-center justify-between border-b border-hairline bg-white px-4 lg:hidden">
             <Link to="/app">
-              <Logo mascot />
+              <Logo />
             </Link>
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
