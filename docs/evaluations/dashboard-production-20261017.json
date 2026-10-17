@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-17T22:34:35.114Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "add94d0",
+  "version": "f1f34ff1-6882-47b6-bc70-fd422cfcc7d9",
+  "scope": "Lecturas en producción; inicio/cierre de sesión únicamente. Sin documentos nuevos, decisiones, mensajes ni llamadas al modelo.",
+  "checks": [
+    "Health API200",
+    "Dashboard nuevo visible; conteos de pendientes/aprobadas/bloqueadas coinciden con API paginada; enlace de pendiente abre detalle",
+    "Escritorio1440 y móvil390 sin desbordamiento",
+    "Resumen enlaza al filtro correcto",
+    "Oli Skill y archivo descargable preservados"
+  ],
+  "counts": {
+    "invoices": 13,
+    "pending": 6,
+    "approved": 3,
+    "blocked": 4
+  },
+  "mutations": [],
+  "errors": [],
+  "result": "PASS",
+  "previousVersion": "0907cbaa-d45e-4683-a749-afddebad0133",
+  "preservation": {
+    "runtimeSourceExact": true,
+    "bindingsExact": true,
+    "workerSha256": "21676a21dbf0e93f26234fb465e83fc0581b8e549b5413c4fc9ac065679c1d0d",
+    "existingFrontendSourceFilesPreserved": 113,
+    "existingFrontendSourceFilesChanged": [
+      "apps/web/src/lib/briefing.ts",
+      "apps/web/src/i18n/es.ts",
+      "apps/web/src/pages/Dashboard.tsx"
+    ],
+    "skillArchiveUnchanged": true
+  },
+  "validation": {
+    "cleanCommitBuild": "PASS: TypeScript + Vite",
+    "cleanCommitRegressionTests": 7,
+    "releaseBuild": "PASS: published frontend sources + dashboard changes",
+    "wranglerDryRun": "PASS"
+  },
+  "screenshots": ".impeccable/review/dashboard-production/"
+}
