@@ -55,7 +55,8 @@
       "user-393: compositor visible",
       "keyboard: sin desborde horizontal",
       "keyboard: compositor visible",
-      "Nueva conversación vacía independiente"
+      "Nueva conversación vacía independiente",
+      "Proveedor sin resolver: Confirmar deshabilitado, Cancelar disponible y cancelación local confirmada por servidor"
     ]
   },
   "viewports": [
@@ -82,5 +83,12 @@
     "Capturas con respuestas simuladas: no evaluación del lenguaje del modelo real",
     "No comprobación en teclado físico iOS",
     "Build mantiene advertencia previa de chunk principal >500kB"
-  ]
+  ],
+  "independentReview": {
+    "initialDisposition": "fix",
+    "materialFix": "Ocultar IDs en propuestas y before; resolver nombre proveedor",
+    "finalDisposition": "ship",
+    "verdictScope": "Correcciones puntuadas resueltas; sin afirmación de evaluación del modelo real",
+    "documentation": "Extensión ordinaria comparada con diseño actual; archivos de diseño existentes conservados"
+  }
 }
