@@ -8,7 +8,7 @@ import {
   ExtractedInvoiceSchema, InvoiceQuerySchema, InvoiceSchema, MAX_INVOICE_BYTES,
   MandateRulesSchema, MinorUnitsSchema, PaginationSchema, PolicyDecisionSchema,
   ReviewApprovalSchema, SaveMandateDraftSchema, UpdateVendorSchema,
-  UploadFileMetadataSchema,
+  UploadFileMetadataSchema, checkExtraction,
 } from '../src/index.ts';
 
 const document = readFileSync(new URL('../../../docs/API.md', import.meta.url), 'utf8');
@@ -148,4 +148,80 @@ test('un estado técnico no se confunde con una decisión financiera', () => {
   assert.equal(received.latestDecision, null);
   assert.equal(InvoiceSchema.safeParse({ ...received, status: 'APPROVE' }).success, false);
   assert.equal(InvoiceSchema.safeParse({ ...received, status: 'NEEDS_APPROVAL' }).success, false);
+});
+
+const extractionCandidate = {
+  vendorName: 'Acme Accounting', invoiceNumber: 'INV-001', amountMinor: 45000, currency: 'USD',
+  issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10',
+  description: 'Contabilidad mensual', extractionWarnings: [], evidence: [],
+};
+const corroboratingRead = {
+  documentSha256: 'a'.repeat(64), readId: 'pdf_text_read_1', method: 'PDF_TEXT',
+  fields: { vendorName: 'Acme Accounting', amountMinor: 45000, currency: 'USD', dueDate: '2026-10-31' },
+};
+const extractionInput = {
+  documentSha256: 'a'.repeat(64), primaryReadId: 'model_read_1',
+  candidate: extractionCandidate, corroboration: corroboratingRead,
+};
+
+test('corroborar los cuatro campos solo habilita evaluación posterior, nunca aprueba', () => {
+  const result = checkExtraction(extractionInput);
+  assert.equal(result.status, 'CROSS_CHECKED');
+  assert.deepEqual(result.issues, []);
+  assert.equal('action' in result, false);
+  assert.equal('approved' in result, false);
+});
+
+test('JSON plausible con importe, moneda, proveedor o vencimiento mal leídos requiere revisión', () => {
+  for (const [field, wrongValue] of [
+    ['amountMinor', 4500], ['currency', 'EUR'], ['vendorName', 'Acme Accounting II'], ['dueDate', '2026-11-30'],
+  ] as const) {
+    const result = checkExtraction({ ...extractionInput, candidate: { ...extractionCandidate, [field]: wrongValue } });
+    assert.equal(result.status, 'REVIEW_REQUIRED');
+    assert.ok(result.issues.some((issue) => issue.code === 'FIELD_MISMATCH' && issue.field === field));
+  }
+});
+
+test('citas del propio modelo y campos válidos no sustituyen una lectura separada', () => {
+  const result = checkExtraction({
+    ...extractionInput, corroboration: null,
+    candidate: { ...extractionCandidate, evidence: [{ field: 'amountMinor', source: 'page 1', quote: 'Total USD 450' }] },
+  });
+  assert.equal(result.status, 'REVIEW_REQUIRED');
+  assert.ok(result.issues.some((issue) => issue.code === 'CORROBORATION_REQUIRED'));
+});
+
+test('reutilizar la misma lectura o evidencia de otro documento no pasa la verificación', () => {
+  for (const [change, expectedCode] of [
+    [{ readId: extractionInput.primaryReadId }, 'SAME_READ'],
+    [{ documentSha256: 'b'.repeat(64) }, 'SOURCE_MISMATCH'],
+  ] as const) {
+    const result = checkExtraction({ ...extractionInput, corroboration: { ...corroboratingRead, ...change } });
+    assert.equal(result.status, 'REVIEW_REQUIRED');
+    assert.ok(result.issues.some((issue) => issue.code === expectedCode));
+  }
+});
+
+test('datos críticos desconocidos, advertencias y resultados no estructurados fallan de forma cerrada', () => {
+  for (const candidate of [
+    { ...extractionCandidate, amountMinor: null },
+    { ...extractionCandidate, extractionWarnings: ['Dos totales contradictorios'] },
+    { ...extractionCandidate, amountMinor: '450.00' },
+    { ...extractionCandidate, confidence: 0.99 },
+    'No pude leer el documento',
+  ]) assert.equal(checkExtraction({ ...extractionInput, candidate }).status, 'REVIEW_REQUIRED');
+});
+
+test('la normalización del proveedor solo admite diferencias de caja y espacios', () => {
+  assert.equal(checkExtraction({ ...extractionInput, candidate: { ...extractionCandidate, vendorName: ' acme  ACCOUNTING ' } }).status, 'CROSS_CHECKED');
+  assert.equal(checkExtraction({ ...extractionInput, candidate: { ...extractionCandidate, vendorName: 'Acme Account1ng' } }).status, 'REVIEW_REQUIRED');
+});
+
+test('una corroboración incompleta o de origen inválido no habilita evaluación automática', () => {
+  assert.equal(checkExtraction({ ...extractionInput, documentSha256: '' }).status, 'REVIEW_REQUIRED');
+  assert.equal(checkExtraction({ ...extractionInput, primaryReadId: '' }).status, 'REVIEW_REQUIRED');
+  assert.equal(checkExtraction({ ...extractionInput, corroboration: { ...corroboratingRead, fields: { ...corroboratingRead.fields, amountMinor: null } } }).status, 'REVIEW_REQUIRED');
+  assert.equal(checkExtraction({ ...extractionInput, corroboration: { ...corroboratingRead, method: 'MODEL_SELF_REPORT' } }).status, 'REVIEW_REQUIRED');
+  // @ts-expect-error También comprobar metadatos inválidos al cruzar una frontera runtime.
+  assert.equal(checkExtraction({ ...extractionInput, primaryReadId: null }).status, 'REVIEW_REQUIRED');
 });

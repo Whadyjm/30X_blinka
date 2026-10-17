@@ -47,5 +47,11 @@ Los esquemas de mutación rechazan campos desconocidos, sin convertir strings en
 `ExtractedInvoiceSchema` admite campos `null`; los errores deben terminar sin autoaprobación.
 Los datos inválidos del modelo deben convertirse en revisión/corrección segura, nunca en un éxito por defecto.
 
+`checkExtraction()` compara los cuatro campos críticos contra una lectura separada del mismo archivo.
+Devuelve `CROSS_CHECKED` o `REVIEW_REQUIRED`, nunca aprobación. Solo debe invocarse con metadatos
+y corroboración obtenidos por adapters del backend; no autentica la procedencia por sí mismo.
+Las citas/confianza del modelo no sustituyen corroboración. Todavía falta implementar los adapters
+y conectar el resultado al motor; véase [el plan de extracción](../../docs/EXTRACTION_SAFETY.md).
+
 Las pruebas validan los JSON publicados en `docs/API.md` y casos límite de los contratos.
 No son la suite del motor de políticas ni prueban concurrencia, extracción real o seguridad de endpoints.

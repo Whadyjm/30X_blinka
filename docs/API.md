@@ -260,6 +260,11 @@ type InvoiceDetail = Invoice & {
 El frontend recibe el importe extraído incluso si es ambiguo; solo usa `latestDecision`
 para mostrar el resultado oficial. No calcula «aprobado» comparando el importe con un límite.
 Solo `APPROVE` persistido después de reservar presupuesto permite mostrar aprobación simulada.
+La extracción requiere corroboración de campos críticos según
+[`EXTRACTION_SAFETY.md`](./EXTRACTION_SAFETY.md). Una discrepancia se muestra con
+`extractionWarnings` y la explicación/traza; no crea por sí misma una excepción humana autorizable.
+No hay campos HTTP nuevos obligatorios. `CROSS_CHECKED` es un resultado interno de comparación,
+no una decisión financiera ni una garantía de lectura correcta.
 
 ## 5. Mapa P0 y comportamiento de endpoints
 

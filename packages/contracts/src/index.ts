@@ -324,3 +324,65 @@ export type InvoiceDetail = z.infer<typeof InvoiceDetailSchema>;
 export type Dashboard = z.infer<typeof DashboardSchema>;
 export type EvaluationSummary = z.infer<typeof EvaluationSummarySchema>;
 export type ApiError = z.infer<typeof ApiErrorSchema>;
+
+const CriticalExtractionFields = ['vendorName', 'amountMinor', 'currency', 'dueDate'] as const;
+const CorroboratingReadSchema = z.strictObject({
+  documentSha256: z.hash('sha256'),
+  readId: IdSchema,
+  method: z.enum(['PDF_TEXT', 'OCR']),
+  fields: ExtractedInvoiceSchema.pick({ vendorName: true, amountMinor: true, currency: true, dueDate: true }),
+});
+
+export type ExtractionCheckIssue = {
+  code: 'INVALID_EXTRACTION' | 'MISSING_CRITICAL_FIELD' | 'EXTRACTION_WARNING'
+    | 'INVALID_SOURCE' | 'CORROBORATION_REQUIRED' | 'SOURCE_MISMATCH'
+    | 'SAME_READ' | 'FIELD_MISMATCH';
+  field: typeof CriticalExtractionFields[number] | null;
+};
+export type ExtractionCheck = {
+  status: 'CROSS_CHECKED' | 'REVIEW_REQUIRED';
+  extraction: ExtractedInvoice | null;
+  issues: ExtractionCheckIssue[];
+};
+
+/**
+ * Backend-only inputs: IDs, hash and corroboration must come from the document adapters,
+ * never the browser or the model's JSON. CROSS_CHECKED means agreement, not truth or approval.
+ */
+export function checkExtraction(input: {
+  documentSha256: string;
+  primaryReadId: string;
+  candidate: unknown;
+  corroboration: unknown;
+}): ExtractionCheck {
+  const parsed = ExtractedInvoiceSchema.safeParse(input.candidate);
+  if (!parsed.success) {
+    return { status: 'REVIEW_REQUIRED', extraction: null, issues: [{ code: 'INVALID_EXTRACTION', field: null }] };
+  }
+  const extraction = parsed.data;
+  const issues: ExtractionCheckIssue[] = [];
+  for (const field of CriticalExtractionFields) {
+    if (extraction[field] === null) issues.push({ code: 'MISSING_CRITICAL_FIELD', field });
+  }
+  if (extraction.extractionWarnings.length > 0) issues.push({ code: 'EXTRACTION_WARNING', field: null });
+  const primaryReadId = IdSchema.safeParse(input.primaryReadId);
+  if (!z.hash('sha256').safeParse(input.documentSha256).success || !primaryReadId.success) {
+    issues.push({ code: 'INVALID_SOURCE', field: null });
+  }
+  const corroboration = CorroboratingReadSchema.safeParse(input.corroboration);
+  if (!corroboration.success) {
+    issues.push({ code: 'CORROBORATION_REQUIRED', field: null });
+  } else {
+    const source = corroboration.data;
+    if (source.documentSha256 !== input.documentSha256) issues.push({ code: 'SOURCE_MISMATCH', field: null });
+    if (primaryReadId.success && source.readId === primaryReadId.data) issues.push({ code: 'SAME_READ', field: null });
+    for (const field of CriticalExtractionFields) {
+      const normalize = (value: string | number | null) => typeof value === 'string' && field === 'vendorName'
+        ? value.normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase() : value;
+      if (source.fields[field] === null || normalize(extraction[field]) !== normalize(source.fields[field])) {
+        issues.push({ code: 'FIELD_MISMATCH', field });
+      }
+    }
+  }
+  return { status: issues.length === 0 ? 'CROSS_CHECKED' : 'REVIEW_REQUIRED', extraction, issues };
+}
