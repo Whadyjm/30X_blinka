@@ -134,7 +134,7 @@ for (const typed of [true, false]) test(`Jobs: rate limit ${typed ? 'tipado' : '
     return { format: 'markdown', data: `Supplier: ${ex.vendorName}\nInvoice number: ${ex.invoiceNumber}\nIssue date: ${ex.issuedAt}\nDue date: ${ex.dueDate}\nService period: ${ex.servicePeriod}\nDescription: ${ex.description}\nTotal: USD 200.00` };
   } };
   t.mock.method(globalThis, 'fetch', async (_url, init) => {
-    if (++calls <= (typed ? 3 : 1)) return Response.json({ error: { code: 400,
+    if (++calls <= 3) return Response.json({ error: { code: 400,
       ...(typed ? { metadata: { error_type: 'rate_limit_exceeded' } } : { message: 'Upstream temporarily rate limited; retry later' }) } }, { status: 400 });
     return Response.json({ model: JSON.parse(init.body).model,
       choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...ex, documentType: 'INVOICE' }) } }] });
@@ -144,12 +144,12 @@ for (const typed of [true, false]) test(`Jobs: rate limit ${typed ? 'tipado' : '
   assert.equal((await s.job(invoice)).state, 'RETRY');
   assert.equal((await getInvoice(s.DB, 'org_demo', invoice.id)).processingError.retryable, true);
   assert.deepEqual(await s.ledger(), { decisions: 0, reservations: 0, reserved: 0 });
-  assert.equal(calls, typed ? 3 : 1); assert.equal(conversions, 1);
+  assert.equal(calls, 3); assert.equal(conversions, 1);
   await s.due(invoice); await recoverInvoiceJobs(s.env);
   const body = s.queue.shift();
   await consumeInvoiceJobs({ messages: [s.message(body)] }, s.env);
   assert.equal((await s.job(invoice)).state, 'DONE');
-  assert.equal(calls, typed ? 4 : 2); assert.equal(conversions, 1, 'la conversión válida se reutiliza');
+  assert.equal(calls, 4); assert.equal(conversions, 1, 'la conversión válida se reutiliza');
   assert.deepEqual(await s.ledger(), { decisions: 1, reservations: 1, reserved: 20000 });
   await consumeInvoiceJobs({ messages: [s.message(body)] }, s.env, () => assert.fail('replay no llama lectores'));
   assert.deepEqual(await s.ledger(), { decisions: 1, reservations: 1, reserved: 20000 });
@@ -157,7 +157,8 @@ for (const typed of [true, false]) test(`Jobs: rate limit ${typed ? 'tipado' : '
 
 test('Jobs: HTTP 400 sin indicio de saturación o con error permanente no reintenta', async t => {
   for (const issueCodes of [['HTTP_400'], ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UNSUPPORTED_PARAMETER'],
-    ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UPSTREAM_CREDIT_LIMIT']]) {
+    ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UPSTREAM_CREDIT_LIMIT'],
+    ['HTTP_400', 'UPSTREAM_RATE_LIMIT', 'UPSTREAM_POLICY_REFUSAL']]) {
     await t.test(issueCodes.join(','), async sub => {
       const s = await setup(sub), invoice = await s.upload();
       await enqueueInvoice(s.env, 'org_demo', invoice.id);

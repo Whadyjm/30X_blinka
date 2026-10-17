@@ -9,7 +9,7 @@ export const EXTRACTION_MODELS = [
 ] as const;
 
 // Bump when models, prompt, response schema or PDF engine change; never cache a decision.
-export const EXTRACTION_CONFIG_VERSION = 'invoice-json-v4-supplier-role-20261017';
+export const EXTRACTION_CONFIG_VERSION = 'invoice-json-v4-supplier-role-rate-fallback-20261017';
 export const IMAGE_OCR_MODEL = 'qwen/qwen3.8-flash';
 export const IMAGE_OCR_CONFIG_VERSION = 'qwen-image-transcript-v2-20261017';
 // Verified against OpenRouter /models: GLM requires reasoning; DeepSeek and MiniMax do not.
@@ -191,6 +191,7 @@ function errorIssueCodes(raw: unknown): string[] {
     ['UPSTREAM_CREDIT_LIMIT', /credit|insufficient balance|payment required/i],
     ['UPSTREAM_AUTH_ERROR', /api.?key|unauthorized|authentication/i],
     ['UPSTREAM_CONTEXT_LIMIT', /context.*(length|limit)|too many tokens/i],
+    ['UPSTREAM_POLICY_REFUSAL', /content.?policy|safety.?policy|policy.?violation|\brefus(?:al|ed)\b/i],
     ['UPSTREAM_MODEL_UNAVAILABLE', /model.*(not found|not available|does not exist)/i],
     ['UNSUPPORTED_PARAMETER', /unsupported.*(parameter|setting)|(?:parameter|setting).*not supported/i],
     ['STRUCTURED_OUTPUT_ERROR', /json.?schema|response.?format|structured.?output/i],
@@ -204,11 +205,20 @@ async function classifyHttpError(response: Response) {
     const raw = await boundedJson(response, 64 * 1024);
     issueCodes.push(...errorIssueCodes(raw));
     const envelope = z.object({ error: ProviderError }).safeParse(raw);
-    // Some upstream failures arrive wrapped in HTTP 400. Only typed metadata/status can
-    // recover them; regex matches in provider prose are diagnostics, never retry authority.
+    // An error hint can only try the next bounded reader; it never accepts output or authorizes an invoice.
     if (response.status === 400 && envelope.success && retryableProviderError(envelope.data.error)) {
       retryable = true;
       issueCodes.push('TRANSIENT_PROVIDER_ERROR');
+    }
+    const untyped = z.object({ error: z.object({ metadata: z.object({
+      error_type: z.literal('unmapped').optional(),
+    }).optional() }) }).safeParse(raw).success;
+    if (response.status === 400 && !retryable && untyped
+      && issueCodes.includes('UPSTREAM_RATE_LIMIT')
+      && !['UPSTREAM_CREDIT_LIMIT', 'UPSTREAM_AUTH_ERROR', 'UPSTREAM_CONTEXT_LIMIT', 'UPSTREAM_POLICY_REFUSAL',
+        'UNSUPPORTED_PARAMETER', 'STRUCTURED_OUTPUT_ERROR'].some(code => issueCodes.includes(code))) {
+      retryable = true;
+      issueCodes.push('BOUNDED_RATE_HINT_FALLBACK');
     }
   } catch { /* Never return raw upstream text or make an unparseable 400 retryable. */ }
   return { issueCodes, retryable };

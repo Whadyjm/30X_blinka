@@ -249,8 +249,9 @@ test('clasifica rechazo del parser sin exponer mensaje, documento ni credenciale
     error: { message: `PDF file parser OCR rate limit exceeded; ${input.apiKey}; private-document-text` },
   }), { status: 400 }) }), (error: unknown) => {
     assert.ok(error instanceof ExtractionError);
-    assert.equal(error.code, 'OPENROUTER_REQUEST_REJECTED');
-    assert.deepEqual(error.diagnostic, { stage: 'HTTP_ERROR', issueCodes: ['HTTP_400', 'FILE_PARSER_ERROR', 'UPSTREAM_RATE_LIMIT'] });
+    assert.equal(error.code, 'ALL_MODELS_UNAVAILABLE');
+    assert.equal(error.attempts.length, 3);
+    assert.deepEqual(error.attempts[0]!.issueCodes, ['HTTP_400', 'FILE_PARSER_ERROR', 'UPSTREAM_RATE_LIMIT', 'BOUNDED_RATE_HINT_FALLBACK']);
     assert.equal(JSON.stringify(error).includes(input.apiKey), false);
     assert.equal(JSON.stringify(error).includes('private-document-text'), false);
     return true;
@@ -343,7 +344,7 @@ test('clasifica errores anidados del proveedor y no reintenta un 400 con prose a
   }
 });
 
-test('HTTP 400 con error transitorio tipado activa respaldo acotado; prose de rate limit no autoriza reintento', async () => {
+test('HTTP 400 tipado o con indicio operativo usa respaldo acotado; errores permanentes se detienen', async () => {
   for (const error of [
     { code: 400, metadata: { error_type: 'rate_limit_exceeded' } },
     { code: 400, metadata: { error_type: 'provider_overloaded' } },
@@ -357,7 +358,6 @@ test('HTTP 400 con error transitorio tipado activa respaldo acotado; prose de ra
     assert.ok(result.attempts[0]!.issueCodes?.includes('TRANSIENT_PROVIDER_ERROR'));
   }
   for (const error of [
-    { code: 400, message: 'rate limit exceeded; quota unavailable' },
     { code: 429, metadata: { error_type: 'invalid_request' } },
     { code: 400, metadata: { error_type: 'context_length_exceeded' } },
   ]) {
@@ -376,6 +376,37 @@ test('HTTP 400 con error transitorio tipado activa respaldo acotado; prose de ra
     assert.equal(error.attempts.length, 3);
     return true;
   });
+  assert.equal(calls, 3);
+});
+
+test('saturación opaca prueba otro modelo, no repite resultados inciertos ni errores permanentes', async () => {
+  for (const raw of [{ error: { code: 400, message: 'rate limit exceeded; quota unavailable' } },
+    { error: { code: 400, metadata: { raw: JSON.stringify({ error: { message: 'Upstream rate limited' } }) } } }]) {
+    let calls = 0;
+    const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => ++calls === 1
+      ? Response.json(raw, { status: 400 }) : success(modelOf(init)) });
+    assert.equal(calls, 2); assert.equal(result.model, EXTRACTION_MODELS[1]);
+    assert.ok(result.attempts[0]!.issueCodes?.includes('BOUNDED_RATE_HINT_FALLBACK'));
+  }
+  for (const message of ['Rate limit; unsupported parameter response_format', 'Rate limit; insufficient balance',
+    'Rate limit; authentication failed', 'Rate limit; context length exceeded', 'Rate limit; content policy violation']) {
+    let calls = 0;
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+      calls++; return Response.json({ error: { code: 400, message } }, { status: 400 });
+    } }), /OPENROUTER_REQUEST_REJECTED/);
+    assert.equal(calls, 1);
+  }
+  for (const error_type of ['invalid_request', 'content_policy_violation']) {
+    let calls = 0;
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+      calls++; return Response.json({ error: { message: 'rate limited', metadata: { error_type } } }, { status: 400 });
+    } }), /OPENROUTER_REQUEST_REJECTED/);
+    assert.equal(calls, 1);
+  }
+  let calls = 0;
+  await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+    calls++; return Response.json({ error: { message: 'Upstream rate limited' } }, { status: 400 });
+  } }), (error: unknown) => error instanceof ExtractionError && error.code === 'ALL_MODELS_UNAVAILABLE' && error.attempts.length === 3);
   assert.equal(calls, 3);
 });
 

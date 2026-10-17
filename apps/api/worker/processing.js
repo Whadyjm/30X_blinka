@@ -139,7 +139,7 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
     const rateLimitedRequest = error instanceof ExtractionError && error.code === 'OPENROUTER_REQUEST_REJECTED'
       && ['HTTP_ERROR', 'IMAGE_OCR'].includes(error.diagnostic?.stage)
       && ['HTTP_400', 'UPSTREAM_RATE_LIMIT'].every(code => error.diagnostic.issueCodes.includes(code))
-      && !['UPSTREAM_CREDIT_LIMIT', 'UPSTREAM_AUTH_ERROR', 'UPSTREAM_CONTEXT_LIMIT', 'UNSUPPORTED_PARAMETER', 'STRUCTURED_OUTPUT_ERROR']
+      && !['UPSTREAM_CREDIT_LIMIT', 'UPSTREAM_AUTH_ERROR', 'UPSTREAM_CONTEXT_LIMIT', 'UPSTREAM_POLICY_REFUSAL', 'UNSUPPORTED_PARAMETER', 'STRUCTURED_OUTPUT_ERROR']
         .some(code => error.diagnostic.issueCodes.includes(code));
     const nonRetryable = error instanceof ExtractionError && !truncated && !rateLimitedRequest && ['INVALID_OUTPUT', 'MODEL_REFUSED', 'INVALID_IMAGE', 'INVALID_PDF', 'MISSING_API_KEY', 'INVALID_API_KEY', 'INSUFFICIENT_CREDITS', 'OPENROUTER_REQUEST_REJECTED'].includes(error.code);
     const code = error instanceof ExtractionError ? error.code : error instanceof HttpError ? error.code : 'PROCESSING_FAILED';
