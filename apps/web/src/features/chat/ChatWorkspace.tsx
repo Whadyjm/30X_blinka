@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { ArrowDown, ArrowUp, FileText, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
 import type { ChatChannel } from '@oli/contracts';
@@ -34,17 +34,19 @@ export function ChatWorkspace() {
       const viewport = window.visualViewport;
       const top = Math.max(0, root.current.getBoundingClientRect().top - (viewport?.offsetTop ?? 0));
       root.current.style.setProperty('--chat-height', `${Math.max(240, (viewport?.height ?? innerHeight) - top)}px`);
+      if (shouldFollow.current && log.current) log.current.scrollTop = log.current.scrollHeight;
     };
     update(); window.addEventListener('resize', update); window.visualViewport?.addEventListener('resize', update);
     return () => { window.removeEventListener('resize', update); window.visualViewport?.removeEventListener('resize', update); };
   }, []);
-  useEffect(() => {
+  useLayoutEffect(() => {
     shouldFollow.current = true;
+    setNearBottom(true);
     if (log.current) log.current.scrollTop = log.current.scrollHeight;
   }, [channel, conversation.id]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (shouldFollow.current && log.current) { log.current.scrollTop = log.current.scrollHeight; setNearBottom(true); }
-  }, [conversation.turns.length, conversation.pending, conversation.sending, conversation.loading]);
+  }, [conversation.turns, conversation.pending, conversation.sending, conversation.loading]);
   useEffect(() => {
     if (textarea.current) { textarea.current.style.height = 'auto'; textarea.current.style.height = `${Math.min(textarea.current.scrollHeight, 144)}px`; }
   }, [draft, channel]);
@@ -65,7 +67,7 @@ export function ChatWorkspace() {
 
   return <section id="oli-chat" ref={root} className={cn('oli-chat relative -mx-4 -mt-6 flex min-h-0 flex-col overflow-hidden bg-white md:mx-0 md:mt-0 md:rounded-2xl md:border md:border-hairline', dragging && 'ring-2 ring-inset ring-ink')}
     aria-label={t('Chat with Oli')} onDragOver={e => { if (channel === 'WEB') { e.preventDefault(); setDragging(true); } }}
-    onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragging(false); }}
+    onDragLeave={e => { if (!(e.relatedTarget instanceof Node) || !e.currentTarget.contains(e.relatedTarget)) setDragging(false); }}
     onDrop={e => { e.preventDefault(); setDragging(false); attach(Array.from(e.dataTransfer.files)); }}>
     <header className="shrink-0 border-b border-hairline px-4 pt-3 md:px-6">
       <div className="flex items-center justify-between gap-3">

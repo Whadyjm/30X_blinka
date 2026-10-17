@@ -28,7 +28,7 @@ reales y extracción simulada; no se presenta como medición OCR en producción.
 | Método/ruta | Entrada | Salida `data` |
 |---|---|---|
 | `POST /chat/messages` | `ChatMessageInputSchema` + `Idempotency-Key` | `ChatReplySchema` |
-| `GET /chat/conversations` | Sin body | `ChatConversationsSchema`, últimas 20 del usuario/empresa |
+| `GET /chat/conversations` | `channel=WEB|TELEGRAM`, por defecto `WEB` | `ChatConversationsSchema`, últimas 20 del usuario/empresa/canal; cada fila incluye `channel` y `title` |
 | `GET /chat/conversations/:id` | Sin body | `ChatHistorySchema`, últimos 20 turnos en orden cronológico |
 | `GET /invoices/:id/intake` | Sin body | Tarjeta `ChatCardSchema` con `type=INVOICE` |
 | `POST /chat/actions` | `ChatActionInputSchema` + `Idempotency-Key` | `ChatActionSchema`, `201` |
@@ -37,6 +37,18 @@ reales y extracción simulada; no se presenta como medición OCR en producción.
 | `POST /chat/actions/:id/cancel` | Sin body | `ChatActionSchema` |
 
 Todas las mutaciones requieren CSRF. Solo OWNER prepara/confirma/cancela cambios. APPROVER puede conversar y consultar, sin herramientas de escritura. Conversaciones y acciones son privadas para el mismo usuario y empresa; IDs de otro usuario devuelven404. Los listados de conversaciones y su historial tienen un límite fijo, sin envelope de paginación P0.
+
+Home mantiene dos pestañas con selección y queries independientes. `ChatHistorySchema`
+incluye `channel`; Web conserva borrador y adjuntos al consultar Telegram. Telegram es
+una vista del historial con enlace al bot y sin botones de confirmar/cancelar. El servidor
+rechaza escribir o reutilizar una clave Telegram desde Web con `CHAT_CHANNEL_MISMATCH`409.
+La migración0009 separa el legado mezclado mediante una proyección append-only; conserva
+los snapshots originales y el contexto al modelo usa exclusivamente el canal del hilo.
+
+El chat móvil ocupa el espacio disponible sobre el teclado mediante `visualViewport`;
+el historial tiene scroll propio y el compositor permanece al pie. El texto del asistente
+usa Markdown acotado, sin HTML ni imágenes remotas. El prompt `chat-v3` pide respuestas
+breves y preguntas progresivas en lenguaje cotidiano, sin nombres de campos de programación.
 
 ## Mensajes y adjuntos
 

@@ -87,11 +87,14 @@ Estos tests no miden precisión del extractor ni prueban entrega real desde una 
 Los mensajes de texto de una conexión activa llaman al mismo `chatMessage` de la web,
 con el rol y empresa obtenidos de D1, no del texto de Telegram. «Hola», preguntas y
 seguimientos usan el modelo y las herramientas acotadas de `chat-tools.js`; no hay SQL libre.
-El prompt común está en `apps/api/worker/chat-prompt.js` (versión `chat-v2`): limita el tema
+El prompt común está en `apps/api/worker/chat-prompt.js` (versión `chat-v3`): limita el tema
 a Oli y finanzas de la empresa, exige consultar registros actuales y prohíbe ejecutar pagos.
 Esa instrucción orienta al modelo; el aislamiento de datos y los permisos se aplican en el servidor.
 
 Cada conexión tiene su conversación privada y la última factura enviada como contexto.
+Home muestra ese historial en la pestaña Telegram, separado del historial Web y con enlace
+para continuar en el bot. El navegador no escribe turnos ni confirma propuestas desde esa
+pestaña. El canal procede de la ruta autenticada del servidor, no del cuerpo del mensaje.
 Desconectar y volver a conectar crea un contexto nuevo. Se conservan seis turnos completos
 para el modelo; texto de hasta 4000 caracteres y el mismo límite de 20 intentos por usuario/empresa
 cada 15 minutos que en web. No se interpretan audios. Las respuestas largas se dividen en mensajes.
@@ -105,3 +108,9 @@ Esto no permite aprobar facturas por encima de las reglas ni sustituir revisión
 La respuesta se guarda antes de enviarla y se registra cada parte entregada: un reintento de
 notificación no vuelve a gastar en el modelo ni repite una mutación. Persiste la limitación de
 Telegram: una caída entre su aceptación y el registro local puede repetir un mensaje.
+
+La migración0009 recupera los mensajes Web que antes se agregaron a un hilo Telegram.
+La atribución usa auditoría/eventos del servidor. Una vista de historial los presenta en
+una conversación Web recuperada, sin reescribir `conversation_id` ni los replies históricos.
+Sus IDs internos guardados en snapshots siguen siendo históricos; el siguiente turno usa
+el ID del historial Web recuperado. No se modifican decisiones ni reservas financieras.

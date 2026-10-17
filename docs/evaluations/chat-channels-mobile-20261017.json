@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-17T19:59:37.250726+00:00",
+  "scope": "Separación Web/Telegram, recuperación de legado y chat móvil",
+  "api": {
+    "tests": 117,
+    "passed": 117,
+    "provider": "Simulado; D1/R2 locales",
+    "includes": [
+      "Aislamiento por canal antes de modelo/replay",
+      "Migración preserva conversation_id y response_json históricos",
+      "Contexto del modelo solo del canal seleccionado"
+    ]
+  },
+  "web": {
+    "tests": 24,
+    "passed": 24,
+    "includes": [
+      "Markdown seguro sin HTML/imágenes remotas/javascript URL",
+      "Propuestas no exponen IDs internos y muestran nombre de proveedor"
+    ]
+  },
+  "contracts": {
+    "tests": 28,
+    "passed": 28,
+    "typecheck": "PASS"
+  },
+  "packagedWorker": {
+    "tests": 1,
+    "passed": 1,
+    "runtime": "workerd/Miniflare",
+    "provider": "OpenRouter y Telegram simulados",
+    "includes": [
+      "Listado e historial por canal",
+      "Web rechaza conversación Telegram con409",
+      "Pipeline existente de subida/procesamiento/email"
+    ]
+  },
+  "browser": {
+    "fixture": "Local: respuestas modelo simuladas, datos ficticios, sin enviar Telegram",
+    "results": [
+      "Web no muestra Telegram",
+      "Markdown renderizado",
+      "Telegram sin compositor web",
+      "Telegram sin confirmar desde web",
+      "Telegram continúa en bot correcto",
+      "Borrador preservado entre pestañas",
+      "Web sigue aislado después de enviar",
+      "Adjunto visible",
+      "Adjunto se puede quitar",
+      "mobile: sin desborde horizontal",
+      "mobile: compositor visible",
+      "telegram-mobile: sin desborde horizontal",
+      "telegram-mobile: compositor visible",
+      "user-393: sin desborde horizontal",
+      "user-393: compositor visible",
+      "keyboard: sin desborde horizontal",
+      "keyboard: compositor visible",
+      "Nueva conversación vacía independiente"
+    ]
+  },
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 1050
+    },
+    {
+      "width": 390,
+      "height": 844
+    },
+    {
+      "width": 393,
+      "height": 700
+    },
+    {
+      "width": 393,
+      "height": 430,
+      "note": "Espacio reducido simula teclado; no hardware iOS"
+    }
+  ],
+  "detectorFindings": [],
+  "limitations": [
+    "Capturas con respuestas simuladas: no evaluación del lenguaje del modelo real",
+    "No comprobación en teclado físico iOS",
+    "Build mantiene advertencia previa de chunk principal >500kB"
+  ]
+}

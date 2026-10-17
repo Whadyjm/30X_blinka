@@ -114,6 +114,18 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   await waitForReply(2);
   assert.match(sent.at(-1).text, /¡Hola!/);
   assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 2);
+  const webThreads = (await (await runtime.dispatchFetch(`${origin}/api/v1/chat/conversations`, { headers })).json()).data;
+  const telegramThreads = (await (await runtime.dispatchFetch(`${origin}/api/v1/chat/conversations?channel=TELEGRAM`, { headers })).json()).data;
+  assert.equal(webThreads.length, 1); assert.equal(webThreads[0].channel, 'WEB');
+  assert.equal(telegramThreads.length, 1); assert.equal(telegramThreads[0].channel, 'TELEGRAM');
+  assert.notEqual(webThreads[0].id, telegramThreads[0].id);
+  const telegramHistory = (await (await runtime.dispatchFetch(`${origin}/api/v1/chat/conversations/${telegramThreads[0].id}`, { headers })).json()).data;
+  assert.equal(telegramHistory.channel, 'TELEGRAM'); assert.equal(telegramHistory.turns.length, 1);
+  assert.equal(telegramHistory.turns[0].text, 'hola');
+  const wrongChannel = await runtime.dispatchFetch(`${origin}/api/v1/chat/messages`, { method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
+    body: JSON.stringify({ conversationId: telegramThreads[0].id, text: 'no mezclar', invoiceIds: [] }) });
+  assert.equal(wrongChannel.status, 409); assert.equal((await wrongChannel.json()).error.code, 'CHAT_CHANNEL_MISMATCH');
   const reevaluate = (current, key) => runtime.dispatchFetch(`${origin}/api/v1/invoices/${invoice.id}/reevaluate`, {
     method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Idempotency-Key': key },
     body: JSON.stringify({ expectedDecisionId: current.latestDecision.id, expectedPolicyVersionId: current.latestDecision.policyVersionId }),
