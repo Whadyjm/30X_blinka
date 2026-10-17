@@ -10,7 +10,8 @@ import { Login } from '@/pages/Login';
 import { NotFound } from '@/pages/NotFound';
 
 const Onboarding = lazy(() => import('@/pages/Onboarding').then((m) => ({ default: m.Onboarding })));
-const Home = lazy(() => import('@/pages/Home').then((m) => ({ default: m.Home })));
+const AskOli = lazy(() => import('@/pages/AskOli').then((m) => ({ default: m.AskOli })));
+const Dashboard = lazy(() => import('@/pages/Dashboard').then((m) => ({ default: m.Dashboard })));
 const Bills = lazy(() => import('@/pages/Bills').then((m) => ({ default: m.Bills })));
 const BillDetail = lazy(() => import('@/pages/BillDetail').then((m) => ({ default: m.BillDetail })));
 const Approvals = lazy(() => import('@/pages/Approvals').then((m) => ({ default: m.Approvals })));
@@ -34,7 +35,8 @@ export function App() {
               <Route path="/onboarding" element={<Onboarding />} />
               <Route element={<RequireMandate />}>
                 <Route path="/app" element={<AppLayout />}>
-                  <Route index element={<Home />} />
+                  <Route index element={<AskOli />} />
+                  <Route path="dashboard" element={<Dashboard />} />
                   <Route path="bills" element={<Bills />} />
                   <Route path="bills/:id" element={<BillDetail />} />
                   <Route path="approvals" element={<Approvals />} />
@@ -44,7 +46,7 @@ export function App() {
                   <Route path="inbox" element={<Inbox />} />
                   <Route path="evaluation" element={<Evaluation />} />
                   {env.features.agentAccess && <Route path="agent-access" element={<ComingSoon title="Agent access" />} />}
-                  {env.features.chat && <Route path="chat" element={<ComingSoon title="Chat with Oli" />} />}
+                  <Route path="chat" element={<Navigate to="/app" replace />} />
                 </Route>
               </Route>
             </Route>

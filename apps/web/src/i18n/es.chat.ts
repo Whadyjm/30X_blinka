@@ -1,4 +1,10 @@
 export const esChat: Record<string, string> = {
+  'Ask Oli': 'Ask Oli',
+  'Dashboard': 'Dashboard',
+  'Close conversation': 'Cerrar conversación',
+  'Close conversation: {title}': 'Cerrar conversación: {title}',
+  'Closed conversations': 'Conversaciones cerradas',
+  'Reopen a conversation': 'Volver a abrir una conversación',
   'Conversation channels': 'Canales de conversación',
   'Conversation history': 'Historial de conversaciones',
   'Web conversation': 'Conversación web',

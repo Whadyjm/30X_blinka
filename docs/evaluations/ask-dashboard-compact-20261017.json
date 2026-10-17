@@ -1,0 +1,39 @@
+{
+  "scope": "D1 efímero y modelo simulado; sin mensajes externos",
+  "checks": [
+    "Ask Oli y Dashboard son rutas separadas; Ask no incluye métricas",
+    "Barra compacta de 54px con clip/texto/enviar alineados",
+    "Cerrar activa selecciona otra; recuperar restaura historial y borrador",
+    "Cerrar inactiva conserva la conversación actual",
+    "Pestañas cerradas siguen cerradas al recargar",
+    "Móvil: barra crece con líneas y adjuntos, sin desbordar viewport",
+    "Cerrar última deja una conversación nueva; ningún historial borrado",
+    "Dashboard conserva resumen, métricas, bandeja, presupuesto y actividad sin chat",
+    "Ruta antigua /app/chat redirige a Ask Oli; cerrar/recuperar no muta API"
+  ],
+  "composerHeight": 54,
+  "mutations": [],
+  "webTests": {
+    "passed": 24,
+    "total": 24
+  },
+  "build": "PASS",
+  "detector": [],
+  "independentReview": {
+    "disposition": "ship",
+    "materialFixes": [],
+    "scope": "Barra compacta, cierre reversible y rutas Ask Oli/Dashboard"
+  },
+  "documentationReview": "Extensión ordinaria; sistema visual y contenido de Dashboard existentes conservados",
+  "additionalBrowserChecks": [
+    "Envía texto desde barra compacta con proveedor simulado",
+    "× deshabilitada durante turno pendiente",
+    "Delete cierra tab y devuelve foco a tab activo"
+  ],
+  "limitations": [
+    "Cierre guardado por usuario/empresa en este navegador, sin borrar historial servidor",
+    "Borradores/archivos en memoria solo mientras Ask Oli permanece montado",
+    "Pruebas locales con proveedor simulado; no medición OCR ni modelo real",
+    "Dashboard conserva estilos anteriores; no rediseño"
+  ]
+}

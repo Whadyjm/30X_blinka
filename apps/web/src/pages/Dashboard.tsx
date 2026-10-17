@@ -14,9 +14,8 @@ import { formatMoney } from '@/lib/money';
 import { getOutcome } from '@/lib/outcome';
 import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
 import { InboxPreview } from '@/features/integrations/InboxPreview';
-import { ChatWorkspace } from '@/features/chat/ChatWorkspace';
 
-export function Home() {
+export function Dashboard() {
   const invoices = useInvoices();
   const mandate = useMandate();
   if (invoices.isError) return <ErrorState error={invoices.error} onRetry={() => void invoices.refetch()} />;
@@ -26,8 +25,6 @@ export function Home() {
   const budget = mandate.data?.budget;
   const used = budget && budget.limitMinor > 0 ? Math.min(100, Math.round((budget.reservedMinor / budget.limitMinor) * 100)) : null;
   return (<div className="space-y-8">
-      <ChatWorkspace />
-      {/* ───────────────── 2. LIVE DASHBOARD (APP ACTUAL) ───────────────── */}
       <section id="organization-overview" aria-label={t('Overview')} className="space-y-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
