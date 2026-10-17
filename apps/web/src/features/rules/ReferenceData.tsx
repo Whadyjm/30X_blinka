@@ -193,7 +193,7 @@ export function SampleSetButton({ currency, onDone }: { currency: string; onDone
 
   return (
     <Button variant="secondary" loading={busy} icon={<Sparkles className="size-4" aria-hidden />} onClick={() => void load()}>
-      {t('Load fictitious sample set')}
+      {t('Load sample set')}
     </Button>
   );
 }

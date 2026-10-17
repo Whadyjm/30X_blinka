@@ -19,11 +19,6 @@ export const esShell: Record<string, string> = {
   owner: 'propietario',
   approver: 'aprobador',
 
-  // demo banner
-  'Mock API — no backend connected': 'API simulada: sin backend conectado',
-  'Reset demo data': 'Restablecer datos de demostración',
-  'Preview onboarding': 'Ver el onboarding',
-
   // guards
   'Signing you in': 'Iniciando tu sesión',
   'Can’t reach Oli': 'No se puede conectar con Oli',
@@ -32,36 +27,32 @@ export const esShell: Record<string, string> = {
     'Las reglas aún no se han activado en esta organización. Un propietario debe terminar primero la configuración.',
 
   // login
-  'Enter the demo organization': 'Demo de organización',
-  'A fictitious company with sample invoices. No sign-up needed.': 'Una empresa ficticia con facturas de ejemplo. No necesitas registrarte.',
+  'Try Oli': 'Probar Oli',
   'or sign in': 'o inicia sesión',
   Email: 'Correo electrónico',
   Password: 'Contraseña',
   'Sign in': 'Iniciar sesión',
-  'Mock mode credentials:': 'Credenciales del modo simulado:',
+  'Access credentials:': 'Credenciales de acceso:',
 
   // landing
   'Open app': 'Abrir la app',
   'Give Oli your invoices and tell it what it may approve. It reviews each one against your rules and only interrupts you when it truly needs permission.':
     'Entrégale tus facturas a Oli y dile qué puede aprobar. Revisa cada una según tus reglas y solo te interrumpe cuando de verdad necesita permiso.',
   'See how it decides': 'Mira cómo decide',
-  'Fictitious companies and documents. No real money moves.': 'Empresas y documentos ficticios. No se mueve dinero real.',
   'Possible outcomes': 'Resultados posibles',
-  'Authorized vendor, matches the agreement, inside your limits, budget available. Approved for simulated payment.':
-    'Proveedor autorizado, coincide con el acuerdo, dentro de tus límites y con presupuesto disponible. Aprobada para pago simulado.',
+  'Authorized vendor, matches the agreement, inside your limits, budget available. Approved.':
+    'Proveedor autorizado, coincide con el acuerdo, dentro de tus límites y con presupuesto disponible. Aprobada.',
   'A real exception — like an amount above the automatic limit. Oli asks you and re-checks everything before confirming.':
     'Una excepción real, como un monto por encima del límite automático. Oli te consulta y vuelve a verificar todo antes de confirmar.',
   'Duplicate, unauthorized vendor, over the ceiling or out of budget. A “yes” can’t override these.':
     'Duplicada, proveedor no autorizado, sobre el techo o sin presupuesto. Un “sí” no puede anular estos casos.',
   'The idea': 'La idea',
-  '{name} is a hackathon prototype. “Approved” means approved for a simulated payment — no transfers, bank connections or KYC.':
-    '{name} es un prototipo de hackatón. “Aprobada” significa aprobada para un pago simulado: sin transferencias, conexiones bancarias ni KYC.',
 
   // home
+  'Approved invoices': 'Facturas aprobadas',
   'Hi {name}': 'Hola, {name}',
   'Hi there': 'Hola',
   Summary: 'Resumen',
-  'Approved (simulated)': 'Aprobadas (simulado)',
   'Needs you': 'Te necesitan',
   'Due in 14 days': 'Vencen en 14 días',
   'Recent activity': 'Actividad reciente',
@@ -74,7 +65,6 @@ export const esShell: Record<string, string> = {
   '{left} left of {total}': 'Quedan {left} de {total}',
   'Coming due': 'Próximos vencimientos',
   'Nothing due in the next two weeks.': 'Nada vence en las próximas dos semanas.',
-  '{label}: no transfer is made. Demo data is fictitious.': '{label}: no se realiza ninguna transferencia. Los datos de demostración son ficticios.',
 
   // onboarding
   'Your mandate': 'Tu mandato',
@@ -83,9 +73,9 @@ export const esShell: Record<string, string> = {
   'Oli is ready. Upload your first invoice.': 'Oli está listo. Sube tu primera factura.',
   'Step {n} of {total}': 'Paso {n} de {total}',
   'Setup progress': 'Progreso de la configuración',
-  'Tell Oli about your (fictitious) company. Use made-up names — this is a demo.': 'Cuéntale a Oli sobre tu empresa (ficticia). Usa nombres inventados: esto es una demostración.',
+  'Tell Oli about your company.': 'Cuéntale a Oli sobre tu empresa.',
   'Company name': 'Nombre de la empresa',
-  'e.g. Northwind Demo Co.': 'p. ej. Northwind Demo Co.',
+  'e.g. Northwind': 'p. ej. Northwind',
   'Default currency': 'Moneda predeterminada',
   'Budgets are kept per currency; Oli never mixes them.': 'Los presupuestos se llevan por moneda; Oli nunca las mezcla.',
   'Your name': 'Tu nombre',

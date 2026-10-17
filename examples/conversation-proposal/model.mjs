@@ -1,10 +1,10 @@
 // All records are illustrative. This module has no API or payment authority.
 export const invoices = Object.freeze([
   { id: 'acme', vendor: 'Acme Accounting Demo', concept: 'Contabilidad · OCT-026', amount: 450, status: 'review', reason: 'El importe de USD 450 supera el límite automático de USD 300. Requiere revisión de una persona autorizada; no se ha reservado presupuesto.' },
-  { id: 'cloud', vendor: 'Cloud Hosting Demo', concept: 'Infraestructura · OCT-014', amount: 200, status: 'approved', reason: 'Coincide con el acuerdo del proveedor, está dentro del límite automático y tiene presupuesto disponible. Autorización simulada; no se ejecutó un pago.' },
-  { id: 'fibra', vendor: 'Fibra Norte Demo', concept: 'Internet · OCT-008', amount: 89, status: 'approved', reason: 'Servicio mensual de internet por USD 89, coincidente con su acuerdo. Autorización simulada; no se ejecutó un pago.' },
+  { id: 'cloud', vendor: 'Cloud Hosting Demo', concept: 'Infraestructura · OCT-014', amount: 200, status: 'approved', reason: 'Coincide con el acuerdo del proveedor, está dentro del límite automático y tiene presupuesto disponible.' },
+  { id: 'fibra', vendor: 'Fibra Norte Demo', concept: 'Internet · OCT-008', amount: 89, status: 'approved', reason: 'Servicio mensual de internet por USD 89, coincidente con su acuerdo.' },
   { id: 'pixel', vendor: 'Pixel Mesa Demo', concept: 'Diseño · OCT-011', amount: 120, status: 'blocked', reason: 'El número de factura ya aparece en el historial del proveedor. Este cobro duplicado no crea otra reserva de presupuesto.' },
-  { id: 'linea', vendor: 'Línea Studio Demo', concept: 'Herramientas · OCT-003', amount: 160, status: 'approved', reason: 'Coincide con el acuerdo vigente y respeta el mandato. Autorización simulada; no se ejecutó un pago.' },
+  { id: 'linea', vendor: 'Línea Studio Demo', concept: 'Herramientas · OCT-003', amount: 160, status: 'approved', reason: 'Coincide con el acuerdo vigente y respeta el mandato.' },
 ]);
 export const internetSeptember = Object.freeze({ vendor: 'Fibra Norte Demo', amount: 89, invoice: 'SEP-008', period: 'septiembre de 2026' });
 export const budget = Object.freeze({ total: 2000, reserved: invoices.filter(i => i.status === 'approved').reduce((sum, i) => sum + i.amount, 0) });

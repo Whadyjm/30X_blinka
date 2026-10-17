@@ -53,8 +53,8 @@ export function buildBriefing(stats: Stats, today: Date = new Date()): string[] 
       .join(' + ');
     lines.push(
       totals
-        ? t('{n} approved for simulated payment ({total}).', { n: stats.approvedCount, total: totals })
-        : t('{n} approved for simulated payment.', { n: stats.approvedCount }),
+        ? t('{n} invoices approved ({total}).', { n: stats.approvedCount, total: totals })
+        : t('{n} invoices approved.', { n: stats.approvedCount }),
     );
   }
   if (stats.blockedCount > 0) {

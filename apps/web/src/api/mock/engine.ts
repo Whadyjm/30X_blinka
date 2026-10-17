@@ -160,7 +160,7 @@ function explain(action: string, reasons: string[], x: ExtractedInvoice, ctx: En
   const amt = money(x.amountMinor, x.currency);
   const vendor = x.vendorName ?? 'This vendor';
   if (action === 'APPROVE') {
-    return `${vendor} is authorized, ${amt} matches its agreement and is within the automatic limit of ${money(ctx.mandate.automaticLimitMinor, ctx.mandate.currency)}, and the budget covers it. Approved for simulated payment.`;
+    return `${vendor} is authorized, ${amt} matches its agreement and is within the automatic limit of ${money(ctx.mandate.automaticLimitMinor, ctx.mandate.currency)}, and the budget covers it. Approved.`;
   }
   const parts: string[] = [];
   if (reasons.includes('AGENT_REVOKED')) parts.push('the requesting agent’s access was revoked');

@@ -8,7 +8,6 @@ import { DocumentViewer } from '@/components/DocumentViewer';
 import { ExtractionPanel } from '@/components/ExtractionPanel';
 import { Card, CardHeader, ErrorState, InlineAlert, PageLoading } from '@/components/ui/Card';
 import { Orb } from '@/components/ui/Orb';
-import { brand } from '@/config/brand';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
@@ -28,7 +27,7 @@ const EVENT_LABEL: Record<string, string> = {
   APPROVAL_APPROVED: 'Approved by a reviewer',
   APPROVAL_REJECTED: 'Rejected by a reviewer',
   APPROVAL_REVALIDATION_FAILED: 'Re-check failed — not approved',
-  BUDGET_RESERVED: 'Budget reserved (simulated)',
+  BUDGET_RESERVED: 'Budget reserved',
 };
 
 export function BillDetail() {
@@ -113,8 +112,7 @@ export function BillDetail() {
                   <p className="text-[15px] leading-relaxed text-ink">{d.explanation || t('No explanation was recorded.')}</p>
                   <ReasonChips reasons={d.reasons} />
                   <p className="text-xs text-slate-500">
-                    {t('Policy v{n}', { n: String(d.policyVersion ?? '?') })} · {d.checkedAt ? formatDateTime(d.checkedAt) : t('time not recorded')} ·{' '}
-                    {outcome === 'APPROVED' ? brand.approveLabel : t('Simulated — no real money')}
+                    {t('Policy v{n}', { n: String(d.policyVersion ?? '?') })} · {d.checkedAt ? formatDateTime(d.checkedAt) : t('time not recorded')}
                   </p>
                 </>
               )}

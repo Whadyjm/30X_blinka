@@ -1,6 +1,5 @@
 import { Link } from 'react-router';
-import { Ban, CheckCircle2, Hand, ShieldCheck } from 'lucide-react';
-import { DemoBanner } from '@/components/DemoBanner';
+import { Ban, CheckCircle2, Hand } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { buttonClass } from '@/components/ui/Button';
@@ -11,7 +10,7 @@ import { t } from '@/i18n';
 
 // Title/body are English i18n keys, translated at render time.
 const OUTCOMES = [
-  { Icon: CheckCircle2, title: 'Approved', body: 'Authorized vendor, matches the agreement, inside your limits, budget available. Approved for simulated payment.', cls: 'bg-highlighter text-ink' },
+  { Icon: CheckCircle2, title: 'Approved', body: 'Authorized vendor, matches the agreement, inside your limits, budget available. Approved.', cls: 'bg-highlighter text-ink' },
   { Icon: Hand, title: 'Needs approval', body: 'A real exception — like an amount above the automatic limit. Oli asks you and re-checks everything before confirming.', cls: 'bg-white text-ink ring-1 ring-inset ring-ink' },
   { Icon: Ban, title: 'Blocked', body: 'Duplicate, unauthorized vendor, over the ceiling or out of budget. A “yes” can’t override these.', cls: 'bg-ink text-white' },
 ];
@@ -22,7 +21,6 @@ export function Landing() {
   const cta = signedIn ? '/app' : '/login';
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
       <header className="border-b border-hairline bg-white">
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-4 sm:px-6">
           <Logo />
@@ -51,9 +49,6 @@ export function Landing() {
               {t('See how it decides')}
             </a>
           </div>
-          <p className="mt-6 inline-flex items-center gap-1.5 text-sm text-ash">
-            <ShieldCheck className="size-4 text-ink" aria-hidden /> {t('Fictitious companies and documents. No real money moves.')}
-          </p>
         </section>
 
         <section id="outcomes" aria-label={t('Possible outcomes')} className="mx-auto grid w-full max-w-[1200px] gap-4 px-4 pb-24 sm:grid-cols-3 sm:px-6">
@@ -75,11 +70,6 @@ export function Landing() {
         </section>
       </main>
 
-      <footer className="border-t border-hairline bg-white px-4 py-6 text-xs text-ash sm:px-6">
-        <div className="mx-auto max-w-[1200px]">
-          {t('{name} is a hackathon prototype. “Approved” means approved for a simulated payment — no transfers, bank connections or KYC.', { name: brand.name })}
-        </div>
-      </footer>
     </div>
   );
 }

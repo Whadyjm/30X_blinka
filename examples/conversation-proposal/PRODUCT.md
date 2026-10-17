@@ -16,7 +16,7 @@ Entrada conversacional: pedir una consulta, iniciar el alta de un proveedor o tr
 
 ## Capabilities and Constraints
 
-Propuesta independiente solicitada por Oscar, sin cambios en apps/web. Datos ficticios explícitos y respuestas demostrativas locales. No llama modelos, no sube archivos, no concede autoridad ni modifica D1. La app actual sigue accesible. No representa transferencias: los importes son facturas aprobadas simuladas.
+Propuesta independiente solicitada por Oscar, sin cambios en apps/web. Respuestas demostrativas locales; por decisión de Oscar, sin avisos de datos ficticios o dinero simulado en la UI. No llama modelos, no sube archivos, no concede autoridad ni modifica D1. La app actual sigue accesible. No representa transferencias: los importes son facturas aprobadas simuladas.
 
 ## Brand Commitments
 

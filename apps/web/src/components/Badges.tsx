@@ -19,7 +19,7 @@ import { outcomeLabel, type Outcome } from '@/lib/outcome';
  * `title` values are English i18n keys, translated at render time.
  */
 const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> = {
-  APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved for simulated payment' },
+  APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved' },
   BLOCKED: { cls: 'bg-ink text-white', Icon: Ban, title: 'Blocked by your rules' },
   NEEDS_APPROVAL: { cls: 'bg-white text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
   NEEDS_REVIEW: { cls: 'bg-bone text-ink ring-1 ring-inset ring-smoke', Icon: AlertCircle, title: 'Needs correction or clarification' },

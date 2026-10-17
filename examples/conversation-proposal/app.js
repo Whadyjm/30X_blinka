@@ -56,7 +56,7 @@ function vendorForm(box) {
     const vendor = { name: name.value.trim(), service: service.value.trim() }; form.remove();
     box.append(el('p', '', `De acuerdo: ${vendor.name}, para ${vendor.service}. ¿Lo guardamos como borrador?`));
     const controls = el('div', 'reply-actions');
-    controls.append(action('Confirmar borrador de ejemplo', () => { vendors.push(vendor); controls.remove(); box.append(el('p', '', `${vendor.name} quedó en la lista de esta propuesta. El siguiente paso sería definir su acuerdo y revisar las reglas.`)); box.append(el('p', 'answer-note', 'Borrador local. No se creó un proveedor en tu cuenta ni se autorizó ningún pago.')); pose('happy'); notice('Borrador de ejemplo confirmado.'); }, true), action('Cancelar', () => { controls.remove(); box.append(el('p', '', 'Lo dejamos aquí. No se guardó el borrador.')); pose('idle'); }));
+    controls.append(action('Confirmar borrador de ejemplo', () => { vendors.push(vendor); controls.remove(); box.append(el('p', '', `${vendor.name} quedó en la lista de esta propuesta. El siguiente paso sería definir su acuerdo y revisar las reglas.`)); box.append(el('p', 'answer-note', 'Borrador local.')); pose('happy'); notice('Borrador de ejemplo confirmado.'); }, true), action('Cancelar', () => { controls.remove(); box.append(el('p', '', 'Lo dejamos aquí. No se guardó el borrador.')); pose('idle'); }));
     box.append(controls, el('p', 'answer-note', 'Solo en esta propuesta. Guardar un proveedor no habilita pagos.')); $('#messages').scrollTop = $('#messages').scrollHeight;
   });
   for (const input of [name, service]) input.addEventListener('input', () => input.setCustomValidity(''));
@@ -82,11 +82,11 @@ function answer(text, attachments) {
       { const controls = el('div', 'reply-actions'); controls.append(action('Agregar proveedor', () => ask('Quiero agregar un proveedor'))); box.append(controls); } break;
     case 'internet': {
       box.append(el('p', '', `En el ejemplo de ${internetSeptember.period}, tienes una factura de internet:`), el('strong', 'answer-number', money(internetSeptember.amount)));
-      const line = el('div', 'review-line'); line.append(el('span', '', internetSeptember.vendor), el('small', '', internetSeptember.invoice)); box.append(line, el('p', 'answer-note', 'Es el importe facturado y aprobado de ejemplo. No confirma un pago ejecutado.'));
+      const line = el('div', 'review-line'); line.append(el('span', '', internetSeptember.vendor), el('small', '', internetSeptember.invoice)); box.append(line, el('p', 'answer-note', 'Importe facturado y aprobado.'));
       const controls = el('div', 'reply-actions'); controls.append(action('Comparar con octubre', () => { box.append(el('p', '', 'En octubre también son USD 89.00: el importe del servicio no cambió.')); controls.remove(); })); box.append(controls); break;
     }
     case 'budget':
-      box.append(el('p', '', 'Tu ejemplo de octubre tiene margen para seguir operando.'), el('strong', 'answer-number', money(budget.total - budget.reserved) + ' disponibles'), el('p', '', `Hay ${money(budget.reserved)} reservados de un presupuesto de ${money(budget.total)}. La factura pendiente de USD 450 todavía no consume presupuesto. La duplicada de USD 120 está bloqueada.`), el('p', 'answer-note', 'Datos de ejemplo. Las reservas representan autorizaciones simuladas, no pagos ejecutados.')); break;
+      box.append(el('p', '', 'Tu ejemplo de octubre tiene margen para seguir operando.'), el('strong', 'answer-number', money(budget.total - budget.reserved) + ' disponibles'), el('p', '', `Hay ${money(budget.reserved)} reservados de un presupuesto de ${money(budget.total)}. La factura pendiente de USD 450 todavía no consume presupuesto. La duplicada de USD 120 está bloqueada.`)); break;
     case 'blocked': invoiceAnswer(box, invoices.find(i => i.id === 'pixel')); break;
     case 'cloud': invoiceAnswer(box, invoices.find(i => i.id === 'cloud')); break;
     case 'linea': invoiceAnswer(box, invoices.find(i => i.id === 'linea')); break;

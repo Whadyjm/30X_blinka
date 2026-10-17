@@ -47,7 +47,6 @@ export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
         </div>
         <Button beam onClick={() => input.current?.click()}>{t('Choose files')}</Button>
         <input ref={input} type="file" multiple accept={UPLOAD.accept} className="sr-only" aria-label={t('Choose invoice files')} onChange={(e) => { add([...(e.target.files ?? [])]); e.target.value = ''; }} />
-        <p className="text-xs text-slate-400">{t('Synthetic documents only. Nothing here moves real money.')}</p>
         {env.apiMode === 'mock' && (
           <p className="max-w-xl rounded-md bg-bone px-3 py-2 text-xs text-slate-500">
             {t('Mock mode: the outcome follows the file name. Try one of these words in the name:')}{' '}

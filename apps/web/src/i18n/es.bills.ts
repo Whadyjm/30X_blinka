@@ -31,13 +31,13 @@ export const esBills: Record<string, string> = {
   Upload: 'Carga',
 
   // approval panel
-  'Approved for simulated payment.': 'Aprobada para pago simulado.',
+  'Invoice approved.': 'Factura aprobada.',
   'Invoice rejected.': 'Factura rechazada.',
   'You can’t decide this request.': 'No puedes decidir esta solicitud.',
   'Your reason': 'Tu motivo',
   'Why is this exception acceptable?': '¿Por qué es aceptable esta excepción?',
   'Saved with your name and the time. History is never edited.': 'Se guarda con tu nombre y la hora. El historial nunca se edita.',
-  'Approve for simulated payment': 'Aprobar para pago simulado',
+  'Approve invoice': 'Aprobar factura',
   Reject: 'Rechazar',
   'Before confirming, Oli re-checks the invoice, your permissions, duplicates, budget and the current policy version.':
     'Antes de confirmar, Oli vuelve a verificar la factura, tus permisos, los duplicados, el presupuesto y la versión vigente de la política.',
@@ -51,7 +51,6 @@ export const esBills: Record<string, string> = {
   'PDF, PNG or JPEG · up to 5 MB each · several at once is fine': 'PDF, PNG o JPEG · hasta 5 MB cada una · puedes subir varias a la vez',
   'Choose files': 'Elegir archivos',
   'Choose invoice files': 'Elegir archivos de facturas',
-  'Synthetic documents only. Nothing here moves real money.': 'Solo documentos sintéticos. Aquí no se mueve dinero real.',
   'Mock mode: the outcome follows the file name. Try one of these words in the name:': 'Modo simulado: el resultado depende del nombre del archivo. Prueba una de estas palabras en el nombre:',
   'Uploading the same file twice triggers the duplicate rule.': 'Subir el mismo archivo dos veces activa la regla de duplicados.',
   'This batch': 'Este lote',
@@ -99,7 +98,6 @@ export const esBills: Record<string, string> = {
   'Human approval requested': 'Aprobación humana solicitada',
   'Approved by a reviewer': 'Aprobada por un revisor',
   'Re-check failed — not approved': 'Falló la reverificación; no se aprobó',
-  'Budget reserved (simulated)': 'Presupuesto reservado (simulado)',
   'Loading invoice': 'Cargando factura',
   'Invoice not found': 'Factura no encontrada',
   'Received {when}': 'Recibida el {when}',
@@ -111,7 +109,6 @@ export const esBills: Record<string, string> = {
   'Processing failed. Nothing was approved. Try uploading the document again.': 'El procesamiento falló. No se aprobó nada. Intenta subir el documento de nuevo.',
   'No explanation was recorded.': 'No se registró ninguna explicación.',
   'time not recorded': 'hora no registrada',
-  'Simulated — no real money': 'Simulado: sin dinero real',
   'Oli needs your decision': 'Oli necesita tu decisión',
   'Oli doesn’t have the authority to approve this on its own. Your policy lets an owner or approver decide.':
     'Oli no tiene autoridad para aprobar esto por sí solo. Tu política permite que un propietario o aprobador decida.',

@@ -9,8 +9,6 @@ export const esCore: Record<string, string> = {
   'Meet Oli': 'Conoce a Oli',
   'AI agents can do the work. Oli decides whether they’re allowed to spend.':
     'Los agentes de IA pueden hacer el trabajo. Oli decide si tienen permiso para gastar.',
-  'Demo environment · No real money': 'Entorno de demostración · Sin dinero real',
-  'Approved for simulated payment': 'Aprobada para pago simulado',
 
   // outcomes
   Processing: 'Procesando',
@@ -40,8 +38,8 @@ export const esCore: Record<string, string> = {
   '1 invoice needs your decision — everything else is on track.': '1 factura necesita tu decisión; todo lo demás va bien.',
   '{n} invoices need your decision — everything else is on track.': '{n} facturas necesitan tu decisión; todo lo demás va bien.',
   'Nothing is waiting on you right now.': 'Nada está esperando tu decisión por ahora.',
-  '{n} approved for simulated payment ({total}).': '{n} aprobadas para pago simulado ({total}).',
-  '{n} approved for simulated payment.': '{n} aprobadas para pago simulado.',
+  '{n} invoices approved ({total}).': '{n} facturas aprobadas ({total}).',
+  '{n} invoices approved.': '{n} facturas aprobadas.',
   '1 invoice was blocked by your rules.': '1 factura fue bloqueada por tus reglas.',
   '{n} invoices were blocked by your rules.': '{n} facturas fueron bloqueadas por tus reglas.',
   'an invoice': 'una factura',
@@ -116,7 +114,7 @@ export const esCore: Record<string, string> = {
   'Human review above': 'Revisión humana por encima de',
   'Amounts above this threshold need a person, even below the automatic limit.': 'Los importes por encima de este umbral necesitan una persona, incluso dentro del límite automático.',
   'Only amount exceptions within the ceiling and available budget can be authorized. Agreement discrepancies require correction.': 'Solo se pueden autorizar excepciones de importe dentro del techo y del presupuesto disponible. Las diferencias con el acuerdo requieren corrección.',
-  'Sign in with your demo credentials. No real money is moved.': 'Entra con tus credenciales de demo. No se mueve dinero real.',
+  'Sign in to manage your invoices.': 'Inicia sesión para gestionar tus facturas.',
   'Needs review': 'Requiere revisión',
   'Needs correction or clarification': 'Requiere corrección o aclaración',
   'Refresh': 'Actualizar',

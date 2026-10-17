@@ -27,7 +27,7 @@ export function ApprovalPanel({ approvalId, expectedDecisionId, expectedPolicyVe
       { id: approvalId, input: { decision, justification: justification.trim(), expectedDecisionId, expectedPolicyVersionId } },
       {
         onSuccess: () => {
-          toast.success(decision === 'APPROVE' ? t('Approved for simulated payment.') : t('Invoice rejected.'));
+          toast.success(decision === 'APPROVE' ? t('Invoice approved.') : t('Invoice rejected.'));
           setJustification('');
         },
         onError: (e) => setError(errorMessage(e)),
@@ -59,7 +59,7 @@ export function ApprovalPanel({ approvalId, expectedDecisionId, expectedPolicyVe
       {error && <InlineAlert>{error}</InlineAlert>}
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" icon={<Check className="size-4" aria-hidden />} disabled={!valid || decide.isPending} loading={decide.isPending && decide.variables?.input.decision === 'APPROVE'} onClick={() => run('APPROVE')}>
-          {t('Approve for simulated payment')}
+          {t('Approve invoice')}
         </Button>
         <Button variant="secondary" icon={<X className="size-4" aria-hidden />} disabled={!valid || decide.isPending} loading={decide.isPending && decide.variables?.input.decision === 'REJECT'} onClick={() => run('REJECT')}>
           {t('Reject')}
