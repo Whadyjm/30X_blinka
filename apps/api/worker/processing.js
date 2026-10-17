@@ -135,7 +135,13 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
     throw new Error('CONCURRENT_UPDATE');
   } catch (error) {
     const truncated = error instanceof ExtractionError && error.diagnostic?.issueCodes?.includes('FINISH_length');
-    const nonRetryable = error instanceof ExtractionError && !truncated && ['INVALID_OUTPUT', 'MODEL_REFUSED', 'INVALID_IMAGE', 'INVALID_PDF', 'MISSING_API_KEY', 'INVALID_API_KEY', 'INSUFFICIENT_CREDITS', 'OPENROUTER_REQUEST_REJECTED'].includes(error.code);
+    // An opaque HTTP 400 rate-limit hint permits bounded queue backoff, never model-output retries or approval.
+    const rateLimitedRequest = error instanceof ExtractionError && error.code === 'OPENROUTER_REQUEST_REJECTED'
+      && ['HTTP_ERROR', 'IMAGE_OCR'].includes(error.diagnostic?.stage)
+      && ['HTTP_400', 'UPSTREAM_RATE_LIMIT'].every(code => error.diagnostic.issueCodes.includes(code))
+      && !['UPSTREAM_CREDIT_LIMIT', 'UPSTREAM_AUTH_ERROR', 'UPSTREAM_CONTEXT_LIMIT', 'UNSUPPORTED_PARAMETER', 'STRUCTURED_OUTPUT_ERROR']
+        .some(code => error.diagnostic.issueCodes.includes(code));
+    const nonRetryable = error instanceof ExtractionError && !truncated && !rateLimitedRequest && ['INVALID_OUTPUT', 'MODEL_REFUSED', 'INVALID_IMAGE', 'INVALID_PDF', 'MISSING_API_KEY', 'INVALID_API_KEY', 'INSUFFICIENT_CREDITS', 'OPENROUTER_REQUEST_REJECTED'].includes(error.code);
     const code = error instanceof ExtractionError ? error.code : error instanceof HttpError ? error.code : 'PROCESSING_FAILED';
     console.error(JSON.stringify({ event: 'invoice_processing_failed', invoiceId, code, durationMs: Math.round(performance.now() - started), diagnostics: error instanceof ExtractionError ? error.diagnostic : undefined, attempts: error instanceof ExtractionError ? error.attempts : undefined }));
     await stmt(env.DB, `UPDATE invoices SET status = 'FAILED', processing_error_json = ?, processing_token = NULL,
