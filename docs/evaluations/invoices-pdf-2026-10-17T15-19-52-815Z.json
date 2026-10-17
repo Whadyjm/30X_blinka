@@ -1,0 +1,204 @@
+{
+  "runId": "2026-10-17T15-19-52-815Z",
+  "startedAt": "2026-10-17T15:19:52.815Z",
+  "finishedAt": "2026-10-17T15:20:04.537Z",
+  "scope": "REAL_PDF_READERS_LOCAL_API_PROCESSING_D1_R2",
+  "datasetVersion": "oli-invoices-v1",
+  "selection": [
+    "case_037"
+  ],
+  "manifestSha256": "17495bd32b89ee17c2552b3c2d494a9dbbb5f2ec4d6e0caa00e38cd7f55d079a",
+  "target": "https://oli-api.tiamat-agency.workers.dev",
+  "remoteWorkerVersion": "9000e01b-2606-40aa-8f49-7c2e29f4a330",
+  "code": {
+    "apps/api/worker/document.js": "eaab84edcc6bedbcc599f43fd02d94817d0d786c007746e486b90b5e531fac41",
+    "apps/api/worker/processing.js": "81b4ca7d748c198c4c4d9e5957ec26bbb9bcb191035852a159a49ab888b33aea",
+    "packages/extraction/src/openrouter.ts": "1302cdb15b7afeeef4b27c15150c240ad4e4cd8a190c8975aa5ea18161d20d7c",
+    "packages/domain/src/index.ts": "887303f2cd23b2f1bc2abe2a5d0302e042b976fad7b367729a3a68bee5ca9bfd"
+  },
+  "limits": {
+    "documents": 1,
+    "concurrency": 1,
+    "maximumModelCalls": 3,
+    "retriesPerDocument": 0
+  },
+  "context": {
+    "perCaseIsolatedD1": true,
+    "productionDatabaseWrites": false,
+    "persistedLocalState": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/corpus/2026-10-17T15-19-52-815Z",
+    "priorInvoices": "Labelled synthetic historical context, not newly measured OCR",
+    "openingReservedBudget": "Established with explicit synthetic fixture decisions and the original D1 reservation triggers; no counter edits",
+    "clock": "Current API clock; corpus evaluationTime belongs to the same budget month",
+    "processingEntry": "Original processInvoice service with a server-only adapter to the authenticated remote readDocument probe; upload/detail/document APIs unchanged",
+    "browser": "Not run for all 50; API details and private document bytes verified",
+    "cost": "Reported successful responses only; excludes failed/interrupted calls and possibly separately billed PDF conversion"
+  },
+  "results": [
+    {
+      "caseId": "case_037",
+      "group": "budget",
+      "label": "Presupuesto no configurado",
+      "file": {
+        "path": "invoices/037.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "1ecacc39a4cb5b49ed7e2aebeddc7a539939398ebda675f62cac0a0caf6e0d35",
+        "sizeBytes": 2582
+      },
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "MISSING_BUDGET"
+        ],
+        "needsHumanApproval": false,
+        "explanation": "No puede reservarse el importe: falta presupuesto disponible en USD."
+      },
+      "expectedResolution": {
+        "vendorId": "ven_demo_1",
+        "agreementId": "agr_demo_037"
+      },
+      "startedAt": "2026-10-17T15:19:54.238Z",
+      "durationMs": 10299,
+      "error": null,
+      "invoiceId": "inv_a7779199-c685-4142-981b-249189bac427",
+      "openingLedger": {
+        "reservedMinor": 0,
+        "reservations": 0,
+        "decisions": 0
+      },
+      "readDurationMs": 9934,
+      "readHttpStatus": 502,
+      "readError": {
+        "code": "INVALID_OUTPUT",
+        "attempts": [
+          {
+            "model": "deepseek/deepseek-v4.1-flash",
+            "outcome": "INVALID_OUTPUT",
+            "durationMs": 9710
+          }
+        ],
+        "diagnostic": {
+          "stage": "INVOICE",
+          "issueCodes": [
+            "FINISH_length"
+          ]
+        }
+      },
+      "detail": {
+        "id": "inv_a7779199-c685-4142-981b-249189bac427",
+        "status": "FAILED",
+        "source": "HUMAN_UPLOAD",
+        "file": {
+          "name": "037.pdf",
+          "mimeType": "application/pdf",
+          "sizeBytes": 2582,
+          "url": "/api/v1/invoices/inv_a7779199-c685-4142-981b-249189bac427/file"
+        },
+        "vendorId": null,
+        "vendorName": null,
+        "agreementId": null,
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": null,
+        "extractionWarnings": [],
+        "latestDecision": null,
+        "approvalRequest": null,
+        "processingError": {
+          "code": "INVALID_OUTPUT",
+          "message": "No se pudo completar el procesamiento; no se creó una aprobación.",
+          "retryable": false
+        },
+        "createdAt": "2026-10-17T15:19:54.323Z",
+        "updatedAt": "2026-10-17T15:20:04.383Z",
+        "extraction": null,
+        "decisions": []
+      },
+      "read": null,
+      "finalLedger": {
+        "reservedMinor": 0,
+        "reservations": 0,
+        "decisions": 0,
+        "invoiceReservations": 0
+      },
+      "actionMatches": false,
+      "reasonsMatch": false,
+      "humanApprovalMatches": false,
+      "correct": false,
+      "unsafeApproval": false,
+      "idempotentReplay": false,
+      "privateDocumentMatches": true
+    }
+  ],
+  "summary": {
+    "attempted": 1,
+    "returnedExtractions": 0,
+    "technicalFailures": 1,
+    "harnessErrors": 0,
+    "decided": 0,
+    "actions": {
+      "APPROVE": 0,
+      "BLOCK": 0,
+      "ESCALATE": 0
+    },
+    "allEightFieldsExact": 0,
+    "criticalFieldsExact": 0,
+    "fieldMatches": {
+      "vendorName": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "invoiceNumber": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "amountMinor": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "currency": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "issuedAt": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "dueDate": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "servicePeriod": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      },
+      "description": {
+        "exact": 0,
+        "attempted": 1,
+        "returned": 0
+      }
+    },
+    "crossChecked": 0,
+    "withWarnings": 0,
+    "actionMatches": 0,
+    "fullyCorrect": 0,
+    "unsafeApprovals": 0,
+    "correctAutonomous": 0,
+    "explainedDecisions": 0,
+    "decisionAccuracy": 0,
+    "correctAutonomy": 0,
+    "medianDurationMs": 10299,
+    "maxDurationMs": 10299,
+    "successfulResponsesReportedCostUsd": 0,
+    "successfulModels": {}
+  }
+}

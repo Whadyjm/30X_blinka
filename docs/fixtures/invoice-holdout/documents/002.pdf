@@ -1,0 +1,58 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 660 >>
+stream
+BT /F1 26 Tf 40 724 Td (FACTURA) Tj ET
+BT /F1 17 Tf 40 675 Td (Proveedor: Brisa Support Demo) Tj ET
+BT /F1 12 Tf 40 635 Td (Cliente: Aurora Demo Labs LLC) Tj ET
+BT /F1 12 Tf 40 590 Td (Numero: BS-7923) Tj ET
+BT /F1 12 Tf 40 550 Td (Emision: 2026-10-08) Tj ET
+BT /F1 12 Tf 40 510 Td (Vencimiento: 2026-10-28) Tj ET
+BT /F1 12 Tf 40 470 Td (Periodo de servicio: 2026-10) Tj ET
+BT /F1 12 Tf 40 430 Td (Acuerdo: agr_holdout_002) Tj ET
+BT /F1 12 Tf 40 380 Td (Concepto: Soporte de infraestructura) Tj ET
+BT /F1 9 Tf 40 63 Td (Datos de prueba. Sin datos bancarios ni valor fiscal.) Tj ET
+BT /F1 12 Tf 40 260 Td (Detalle de servicio en pagina 2. Pagina 1 de 2.) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 314 >>
+stream
+BT /F1 22 Tf 40 725 Td (DETALLE DE FACTURA BS-7923) Tj ET
+BT /F1 12 Tf 40 620 Td (Concepto: Soporte de infraestructura) Tj ET
+BT /F1 12 Tf 40 560 Td (Horas: 6 | Tarifa por hora: USD 30.00) Tj ET
+BT /F1 22 Tf 40 220 Td (TOTAL A COBRAR: USD 180.00) Tj ET
+BT /F1 9 Tf 40 53 Td (Pagina 2 de 2. Datos de prueba.) Tj ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000127 00000 n 
+0000000224 00000 n 
+0000000350 00000 n 
+0000001060 00000 n 
+0000001186 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+1550
+%%EOF

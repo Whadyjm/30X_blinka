@@ -42,8 +42,34 @@
     "DEMO_USER_ID": "user_demo_owner"
   },
   "queues": {
-    "producers": [{ "binding": "TELEGRAM_QUEUE", "queue": "oli-telegram" }],
-    "consumers": [{ "queue": "oli-telegram", "max_batch_size": 1, "max_batch_timeout": 1, "max_retries": 5, "max_concurrency": 2 }]
+    "producers": [
+      {
+        "binding": "TELEGRAM_QUEUE",
+        "queue": "oli-telegram"
+      },
+      {
+        "binding": "INVOICE_QUEUE",
+        "queue": "oli-invoices"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "oli-telegram",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 5,
+        "max_concurrency": 2
+      },
+      {
+        "queue": "oli-invoices",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "max_concurrency": 2,
+        "dead_letter_queue": "oli-invoices-dead",
+        "retry_delay": 30
+      }
+    ]
   },
   "assets": {
     "directory": "../web/dist",
@@ -51,6 +77,11 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": [
       "/api/*"
+    ]
+  },
+  "triggers": {
+    "crons": [
+      "* * * * *"
     ]
   }
 }

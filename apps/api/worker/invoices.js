@@ -2,6 +2,7 @@ import { MAX_INVOICE_BYTES, ReviewApprovalSchema } from '@oli/contracts';
 import { audit, body, clearGuard, guard, HttpError, id, json, now, readBytes, sha256, stmt } from './http.js';
 import { getInvoice, idempotency } from './repository.js';
 import { validateDocument } from './document.js';
+import { enqueueInvoice } from './jobs.js';
 import { decisionStatements, evaluateStored, snapshot } from './processing.js';
 
 export async function uploadInvoice(request, env, session) {
@@ -51,6 +52,11 @@ export async function receiveInvoice(request, env, session, file, sourceEventId 
     const replay = await idempotency(request, env.DB, session, requestHash);
     if (replay.cached) return json(replay.cached.body, replay.cached.status);
     throw error;
+  }
+  // The trigger has committed the processing intent. A publication failure is recovered by the scheduler.
+  if (env.INVOICE_QUEUE) {
+    try { await enqueueInvoice(env, orgId, invoiceId); }
+    catch (error) { console.error(JSON.stringify({ event: 'invoice_initial_dispatch_deferred', invoiceId, code: error instanceof HttpError ? error.code : 'SERVICE_UNAVAILABLE' })); }
   }
   return json(response, 201);
 }

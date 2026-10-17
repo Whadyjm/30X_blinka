@@ -5,6 +5,31 @@ El objetivo es resolver correctamente facturas y **no aprobar fuera de las regla
 La extracción de documentos puede equivocarse; la arquitectura debe detectar incertidumbre
 y permitir revisión/corrección antes de que se autorice algo con datos no corroborados.
 
+## Estado de la implementación (2026-10-17)
+
+El Worker usa Mistral OCR vía OpenRouter para el candidato PDF y conversión de texto independiente
+vía Workers AI para corroborarlo. Ambas lecturas arrancan en paralelo; el parser conservador de
+etiquetas compara los ocho campos y obtiene la referencia de acuerdo exclusivamente del texto
+independiente. El contrato `checkExtraction()` mantiene sus cuatro campos críticos; las diferencias
+adicionales se convierten en advertencias bloqueantes antes de invocarlo. No se infiere una moneda
+por defecto ni se reparan respuestas JSON truncadas.
+
+Los importes se convierten con `BigInt`, exponentes de moneda y formatos explícitos de separadores.
+`1,234.56` y `1.234,56` son formatos reconocibles; `1,234`/`1.234` ambiguos requieren revisión.
+Las observaciones informativas del modelo son tres etiquetas acotadas separadas de las advertencias;
+ninguna advertencia recibida se elimina. El modelo tiene un presupuesto de salida de 4096 tokens
+con el control de razonamiento compatible con cada proveedor.
+
+Las imágenes siguen sin OCR independiente: no se autoaprueban. Tampoco se promete cubrir diseños
+arbitrarios ni verificar aritmética de líneas que no se hayan extraído. Las mediciones del corpus
+están en [INVOICE_CORPUS_EVALUATION.md](INVOICE_CORPUS_EVALUATION.md); los tests unitarios no las sustituyen.
+
+Las facturas tienen un trabajo durable creado por trigger D1 al recibirlas. Cola, leases y recuperación
+periódica toleran duplicados y caídas; se conservan decisiones, reservas e intentos. Se cachean lecturas
+inmutables por empresa/hash/versión/canal, nunca decisiones: la política y el presupuesto se vuelven
+a consultar en el commit financiero. El primer presupuesto debe haberse inicializado; solo se permite
+renovación automática de una moneda que ya tenga un periodo anterior.
+
 ## 1. Decisión de arquitectura
 
 Usar extracción híbrida y verificaciones deterministas. No considerar una respuesta JSON,

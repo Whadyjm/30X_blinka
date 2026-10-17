@@ -1,6 +1,6 @@
 import { ChatCardSchema, ChatToolInputSchemas as schemas, ChatToolParameters } from '@oli/contracts';
 import { HttpError, periodKey, stmt } from './http.js';
-import { agreementDto, invoiceRows, vendorDto } from './repository.js';
+import { agreementDto, invoicePage, vendorDto } from './repository.js';
 import { budgets } from './configuration.js';
 import { inspectInvoice, prepareAction } from './chat-actions.js';
 
@@ -33,8 +33,8 @@ export async function runTool(env, session, name, raw) {
   let card;
   if (name === 'inspect_invoice') card = await inspectInvoice(env, session, input.invoiceId);
   if (name === 'list_invoices') {
-    const all = (await invoiceRows(env.DB, org)).filter(i => !input.action || i.latestDecision?.action === input.action);
-    card = { type: 'INVOICES', invoices: all.slice(0, 20), truncated: all.length > 20 };
+    const listed = await invoicePage(env.DB, org, { page: 1, pageSize: 20, ...(input.action ? { action: input.action } : {}) });
+    card = { type: 'INVOICES', invoices: listed.data, truncated: listed.pagination.total > 20 };
   }
   if (name === 'list_vendors' || name === 'list_agreements') {
     const table = name === 'list_vendors' ? 'vendors' : 'agreements';

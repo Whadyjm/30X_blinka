@@ -13,7 +13,22 @@ const pdf = new TextEncoder().encode('%PDF-1.4\nsynthetic integration fixture, p
 const extraction = (overrides = {}) => ({ vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'DEMO-001',
   amountMinor: 20000, currency: 'USD', issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10',
   description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [], ...overrides });
-const text = (ex) => `EMISOR / SUPPLIER\n${ex.vendorName}\nMoneda / Currency\n${ex.currency}\nVencimiento / Due\n${ex.dueDate}\nTOTAL A COBRAR\n${ex.currency} ${(ex.amountMinor / 100).toFixed(2)}`;
+const text = (ex) => `EMISOR / SUPPLIER
+${ex.vendorName}
+Número / Number
+${ex.invoiceNumber}
+Emisión / Issued
+${ex.issuedAt}
+Vencimiento / Due
+${ex.dueDate}
+Periodo de servicio
+${ex.servicePeriod}
+Moneda / Currency
+${ex.currency}
+CONCEPTO / DESCRIPTION
+${ex.description}
+TOTAL A COBRAR
+${ex.currency} ${(ex.amountMinor / 100).toFixed(2)}`;
 
 async function setup(t) {
   const runtime = new Miniflare({ modules: true, script: 'export default {fetch(){return new Response("test")}}',
@@ -109,15 +124,17 @@ test('subida privada idempotente; nueva clave crea documento auditable distinto 
   assert.equal((await api('/invoices', { method: 'POST', key, file: { name: 'different.pdf' } })).status, 409);
   assert.equal((await api(`/invoices/${first.id}`)).data.file.url.includes('uploads/'), false);
   await DB.prepare("INSERT INTO organizations(id,name,default_currency,timezone) VALUES ('other','Other demo','USD','UTC')").run();
-  await stmt(DB, 'UPDATE invoices SET org_id = ? WHERE id = ?', 'other', next.id).run();
-  assert.equal((await api(`/invoices/${next.id}`)).status, 404);
+  await assert.rejects(stmt(DB, 'UPDATE invoices SET org_id = ? WHERE id = ?', 'other', next.id).run(), /FOREIGN KEY/);
+  await stmt(DB, `INSERT INTO invoices(id,org_id,file_key,file_name,file_mime_type,file_size_bytes,file_sha256)
+    SELECT 'foreign-invoice','other',file_key,file_name,file_mime_type,file_size_bytes,file_sha256 FROM invoices WHERE id=?`, next.id).run();
+  assert.equal((await api('/invoices/foreign-invoice')).status, 404);
   const response = await worker.fetch(new Request(`${origin}${first.file.url}`, { headers: { Cookie: (await DB.prepare('SELECT token_hash FROM sessions').first()).token_hash } }), env);
   assert.equal(response.status, 401);
   const preview = await worker.fetch(new Request(`${origin}${first.file.url}`, { headers: { Cookie: cookie() } }), env);
   assert.equal(preview.status, 200); assert.deepEqual(new Uint8Array(await preview.arrayBuffer()), pdf);
   assert.equal(preview.headers.get('Content-Type'), 'application/pdf');
   assert.equal(preview.headers.get('Cache-Control'), 'private, no-store');
-  assert.equal(await DB.prepare('SELECT count(*) AS n FROM invoices').first('n'), 2);
+  assert.equal(await DB.prepare('SELECT count(*) AS n FROM invoices').first('n'), 3);
 });
 
 test('extracción→motor→D1 confirma APPROVE y reserva una sola vez; historial y dashboard coherentes', async t => {
@@ -271,11 +288,31 @@ test('APPROVER consulta y carga pero no modifica mandato ni directorio; login li
 test('abre presupuesto del periodo empresarial vigente desde el mandato sin reiniciar reservas', async t => {
   const { env, DB, upload, read, ledger } = await setup(t); const invoice = await upload();
   await DB.prepare('DELETE FROM budget_periods').run();
+  const previous = new Date(periodKey('America/Caracas') + '-01T12:00:00Z');
+  previous.setUTCMonth(previous.getUTCMonth() - 1);
+  await stmt(DB, 'INSERT INTO budget_periods(id,org_id,currency,period_key,limit_minor) VALUES (?,?,?,?,?)',
+    'budget_previous', 'org_demo', 'USD', previous.toISOString().slice(0, 7), 200000).run();
   const result = await processInvoice(env, 'org_demo', invoice.id, read());
   assert.equal(result.data.latestDecision.action, 'APPROVE');
-  assert.equal(await DB.prepare('SELECT period_key FROM budget_periods').first('period_key'), periodKey('America/Caracas'));
+  assert.equal(await DB.prepare("SELECT count(*) AS n FROM budget_periods WHERE period_key = ?").bind(periodKey('America/Caracas')).first('n'), 1);
   assert.equal(await DB.prepare("SELECT count(*) AS n FROM audit_events WHERE type = 'BUDGET_PERIOD_OPENED'").first('n'), 1);
   assert.deepEqual(await ledger(), { reserved: 20000, reservations: 1, decisions: 1 });
+});
+
+test('sin presupuesto inicial no lo inventa; otra moneda o un periodo futuro no autorizan apertura', async t => {
+  for (const prior of [null, { currency: 'EUR', period: '2020-01' }, { currency: 'USD', period: '2099-01' }]) {
+    const { env, DB, upload, read, ledger } = await setup(t);
+    await DB.prepare('DELETE FROM budget_periods').run();
+    if (prior) await stmt(DB, 'INSERT INTO budget_periods(id,org_id,currency,period_key,limit_minor) VALUES (?,?,?,?,?)',
+      'unrelated_budget', 'org_demo', prior.currency, prior.period, 200000).run();
+    const invoice = await upload();
+    const result = await processInvoice(env, 'org_demo', invoice.id, read());
+    assert.equal(result.data.latestDecision.action, 'BLOCK');
+    assert.ok(result.data.latestDecision.reasons.includes('MISSING_BUDGET'));
+    assert.equal(result.data.approvalRequest, null);
+    assert.equal(await DB.prepare("SELECT count(*) AS n FROM audit_events WHERE type = 'BUDGET_PERIOD_OPENED'").first('n'), 0);
+    assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 1 });
+  }
 });
 
 test('proveedor y acuerdo creados por onboarding alimentan el motor sin IDs del seed', async t => {
@@ -291,4 +328,25 @@ test('proveedor y acuerdo creados por onboarding alimentan el motor sin IDs del 
   assert.equal(result.data.latestDecision.action, 'APPROVE'); assert.equal(result.data.agreementId, agreement.data.id);
   const filtered = await api('/invoices?action=APPROVE&needsHumanApproval=false'); assert.equal(filtered.data.length, 1);
   assert.equal((await api(`/agreements?vendorId=${vendor.data.id}`)).data[0].id, agreement.data.id);
+});
+
+test('un checkpoint pendiente del lector anterior se relee y no autoriza con controles obsoletos', async t => {
+  const { env, DB, api, upload, ledger } = await setup(t);
+  const invoice = await upload();
+  const hash = await stmt(DB, 'SELECT file_sha256 FROM invoices WHERE id = ?', invoice.id).first('file_sha256');
+  const old = { extraction: extraction(), documentSha256: hash, primaryReadId: 'old-primary',
+    corroboration: corroboratePdfText(text(extraction()), hash), provenance: { configVersion: 'labelled-v1' } };
+  await stmt(DB, `UPDATE invoices SET status='FAILED', extracted_json=?, processing_error_json=? WHERE id=?`,
+    JSON.stringify(old), JSON.stringify({ code: 'CONCURRENT_UPDATE', message: 'Intento anterior interrumpido.', retryable: true }), invoice.id).run();
+  let calls = 0;
+  env.AI = { toMarkdown: async () => ({ format: 'markdown', data: text(extraction()) }) };
+  t.mock.method(globalThis, 'fetch', async () => {
+    calls++;
+    return Response.json({ model: 'test', choices: [{ finish_reason: 'stop', message: { content: null, refusal: 'Cannot read' } }] });
+  });
+  const result = await api(`/invoices/${invoice.id}/process`, { method: 'POST' });
+  assert.equal(calls, 1, 'la extracción v1 no puede saltar el lector actual');
+  assert.equal(result.data.status, 'FAILED');
+  assert.equal(result.data.latestDecision, null);
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 0 });
 });

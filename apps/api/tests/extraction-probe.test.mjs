@@ -43,3 +43,22 @@ test("provider failures expose only safe code and attempts", async () => {
   assert.equal(response.status, 502);
   assert.deepEqual(await response.json(), { error: { code: "ALL_MODELS_UNAVAILABLE", attempts: [] } });
 });
+
+test('document probe is private, bounded and validates bytes before production readers', async () => {
+  const { handleDocumentProbe } = await import('../worker/extraction-probe.js');
+  const pdfRequest = (body = new TextEncoder().encode('%PDF-1.4\nsynthetic'), headers = {}) => request(body, { 'Content-Type': 'application/pdf', ...headers });
+  assert.equal((await handleDocumentProbe(pdfRequest(), {}, neverExtract)).status, 404);
+  assert.equal((await handleDocumentProbe(pdfRequest(undefined, { Authorization: 'Bearer wrong' }), env, neverExtract)).status, 401);
+  assert.equal((await handleDocumentProbe(pdfRequest(undefined, { 'Content-Length': '5242881' }), env, neverExtract)).status, 413);
+  assert.equal((await handleDocumentProbe(pdfRequest(new Uint8Array(5242881)), env, neverExtract)).status, 413);
+  assert.equal((await handleDocumentProbe(pdfRequest(new TextEncoder().encode('not a PDF')), env, neverExtract)).status, 415);
+  const bytes = new TextEncoder().encode('%PDF-1.4\nsynthetic');
+  const response = await handleDocumentProbe(pdfRequest(bytes), env, async (bindings, file, actual, hash) => {
+    assert.equal(bindings, env); assert.equal(file.mimeType, 'application/pdf'); assert.deepEqual(actual, bytes);
+    assert.equal(hash, createHash('sha256').update(bytes).digest('hex'));
+    return { documentSha256: hash, extraction: { amountMinor: null }, corroboration: null };
+  });
+  assert.equal(response.status, 200); assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  assert.equal('action' in (await response.json()).data, false);
+  assert.equal((await handleDocumentProbe(pdfRequest(), env, async () => { throw new ExtractionError('ALL_MODELS_UNAVAILABLE'); })).status, 502);
+});

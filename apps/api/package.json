@@ -13,6 +13,7 @@
     "test": "node --test tests/*.test.mjs",
     "test:extraction:live": "node scripts/extraction-smoke.mjs",
     "test:extraction:corpus": "node scripts/evaluate-extraction.mjs --run",
+    "test:invoices:corpus": "node scripts/evaluate-invoices.mjs --run",
     "types": "wrangler types --include-runtime=false",
     "db:migrate:local": "wrangler d1 migrations apply DB --local",
     "db:migrate:remote": "wrangler d1 migrations apply DB --remote",

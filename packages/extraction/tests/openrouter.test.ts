@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { EXTRACTION_MODELS, ExtractionError, extractInvoiceWithOpenRouter } from '../src/openrouter.ts';
+import { EXTRACTION_CONFIG_VERSION, EXTRACTION_MODELS, ExtractionError, extractInvoiceWithOpenRouter } from '../src/openrouter.ts';
 
 const image = new Uint8Array(readFileSync(new URL('../../../fixtures/invoices/001.png', import.meta.url)));
 const input = { apiKey: 'test-only-not-a-real-key', documentSha256: 'a'.repeat(64), images: [{ mimeType: 'image/png' as const, bytes: image }] };
@@ -242,4 +242,103 @@ test('sin clave o con imagen/hash inválidos no se hace ninguna llamada', async 
   await assert.rejects(extractInvoiceWithOpenRouter({ ...input, documentSha256: '' }, { fetch: fetchImpl }), ExtractionError);
   await assert.rejects(extractInvoiceWithOpenRouter({ ...input, images: [{ mimeType: 'image/png', bytes: new Uint8Array([1, 2, 3]) }] }, { fetch: fetchImpl }), ExtractionError);
   await assert.rejects(extractInvoiceWithOpenRouter({ ...input, images: [] }, { fetch: fetchImpl }), ExtractionError);
+});
+
+test('clasifica rechazo del parser sin exponer mensaje, documento ni credenciales', async () => {
+  await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => new Response(JSON.stringify({
+    error: { message: `PDF file parser OCR rate limit exceeded; ${input.apiKey}; private-document-text` },
+  }), { status: 400 }) }), (error: unknown) => {
+    assert.ok(error instanceof ExtractionError);
+    assert.equal(error.code, 'OPENROUTER_REQUEST_REJECTED');
+    assert.deepEqual(error.diagnostic, { stage: 'HTTP_ERROR', issueCodes: ['HTTP_400', 'FILE_PARSER_ERROR', 'UPSTREAM_RATE_LIMIT'] });
+    assert.equal(JSON.stringify(error).includes(input.apiKey), false);
+    assert.equal(JSON.stringify(error).includes('private-document-text'), false);
+    return true;
+  });
+});
+
+test('cada modelo usa su control de razonamiento soportado y un presupuesto de salida acotado', async () => {
+  const reasoning: unknown[] = [];
+  const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => {
+    const body = JSON.parse(String(init?.body));
+    reasoning.push(body.reasoning);
+    assert.equal(body.max_tokens, 4096);
+    assert.equal(body.stream, false);
+    return reasoning.length < 3 ? new Response(null, { status: 503 }) : success(body.model);
+  } });
+  assert.deepEqual(reasoning, [{ effort: 'none' }, { effort: 'low' }, { enabled: false }]);
+  assert.equal(result.configVersion, EXTRACTION_CONFIG_VERSION);
+  assert.deepEqual(result.advisories, []);
+});
+
+test('los avisos acotados no descartan incertidumbre ni contaminan el contrato de extracción', async () => {
+  let calls = 0;
+  const warnings = ['Total ilegible', 'Faltan datos bancarios; el total podría ser 999'];
+  const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => {
+    calls++;
+    const body = JSON.parse(String(init?.body));
+    assert.deepEqual(body.response_format.json_schema.schema.properties.advisories.items.enum,
+      ['SYNTHETIC_LABEL', 'MISSING_BANK_DETAILS', 'MISSING_TAX_BREAKDOWN']);
+    return success(body.model, { ...candidate, amountMinor: null, extractionWarnings: warnings,
+      advisories: ['SYNTHETIC_LABEL', 'MISSING_BANK_DETAILS'] });
+  } });
+  assert.equal(calls, 1);
+  assert.equal(result.extraction.amountMinor, null);
+  assert.deepEqual(result.extraction.extractionWarnings, warnings);
+  assert.deepEqual(result.advisories, ['SYNTHETIC_LABEL', 'MISSING_BANK_DETAILS']);
+  assert.equal('advisories' in result.extraction, false);
+});
+
+test('avisos libres o etiquetas críticas se rechazan sin buscar otro modelo favorable', async () => {
+  for (const advisories of [['TOTAL_CONFLICT'], ['Missing bank details. Total ambiguous'], [{ code: 'MISSING_BANK_DETAILS', text: 'illegible total' }]]) {
+    let calls = 0;
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => {
+      calls++;
+      return success(modelOf(init), { ...candidate, advisories });
+    } }), (error: unknown) => {
+      assert.ok(error instanceof ExtractionError);
+      assert.equal(error.code, 'INVALID_OUTPUT');
+      assert.equal(JSON.stringify(error).includes('illegible total'), false);
+      return true;
+    });
+    assert.equal(calls, 1);
+  }
+});
+
+test('el diagnóstico de truncamiento conserva tokens de razonamiento sin aceptar ni reparar JSON parcial', async () => {
+  let calls = 0;
+  await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+    calls++;
+    return Response.json({ model: EXTRACTION_MODELS[0],
+      choices: [{ finish_reason: 'length', message: { content: '{"vendorName":"secret-document-name"', reasoning: input.apiKey } }],
+      usage: { prompt_tokens: 500, completion_tokens: 4096, completion_tokens_details: { reasoning_tokens: 4090 }, cost: 0.01 },
+    });
+  } }), (error: unknown) => {
+    assert.ok(error instanceof ExtractionError);
+    assert.deepEqual(error.diagnostic, { stage: 'INVOICE', issueCodes: ['FINISH_length'] });
+    assert.equal(error.attempts[0]!.finishReason, 'length');
+    assert.deepEqual(error.attempts[0]!.usage, { inputTokens: 500, outputTokens: 4096, reasoningTokens: 4090, costUsd: 0.01 });
+    assert.equal(JSON.stringify(error).includes(input.apiKey), false);
+    assert.equal(JSON.stringify(error).includes('secret-document-name'), false);
+    return true;
+  });
+  assert.equal(calls, 1);
+});
+
+test('clasifica errores anidados del proveedor y no reintenta un 400 con prose arbitraria', async () => {
+  for (const raw of [JSON.stringify({ error: { message: `Unsupported parameter response_format; ${input.apiKey}` } }),
+    { error: { message: `Unsupported parameter response_format; ${input.apiKey}` } }]) {
+    let calls = 0;
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+      calls++;
+      return Response.json({ error: { code: 400, message: 'Provider returned error', metadata: { raw } } }, { status: 400 });
+    } }), (error: unknown) => {
+      assert.ok(error instanceof ExtractionError);
+      assert.deepEqual(error.diagnostic, { stage: 'HTTP_ERROR', issueCodes: ['HTTP_400', 'UNSUPPORTED_PARAMETER', 'STRUCTURED_OUTPUT_ERROR'] });
+      assert.equal(JSON.stringify(error).includes(input.apiKey), false);
+      assert.equal(error.attempts[0]!.issueCodes?.includes('UNSUPPORTED_PARAMETER'), true);
+      return true;
+    });
+    assert.equal(calls, 1);
+  }
 });

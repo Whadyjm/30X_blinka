@@ -1,4 +1,6 @@
 import { ExtractionError, extractInvoiceWithOpenRouter } from "@oli/extraction";
+import { readDocument, validateDocument } from './document.js';
+import { HttpError, sha256 } from './http.js';
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const json = (body, status = 200) => Response.json(body, {
@@ -61,5 +63,26 @@ export async function handleExtractionProbe(request, env, extract = extractInvoi
     }
     console.error(JSON.stringify({ event: "extraction_probe_failed" }));
     return json({ error: { code: "EXTRACTION_FAILED" } }, 500);
+  }
+}
+
+// Same production readers, without invoice/policy inputs or writes to the shared database.
+export async function handleDocumentProbe(request, env, read = readDocument) {
+  if (!env.EXTRACTION_PROBE_TOKEN) return new Response('Not found', { status: 404 });
+  if (!await authorized(request, env.EXTRACTION_PROBE_TOKEN)) return json({ error: { code: 'UNAUTHORIZED' } }, 401);
+  if (request.method !== 'POST') return json({ error: { code: 'METHOD_NOT_ALLOWED' } }, 405);
+  const mimeType = request.headers.get('Content-Type')?.split(';')[0].trim();
+  if (!['application/pdf', 'image/png', 'image/jpeg'].includes(mimeType)) return json({ error: { code: 'UNSUPPORTED_FILE_TYPE' } }, 415);
+  try {
+    const bytes = await readImage(request);
+    if (bytes === null) return json({ error: { code: 'DOCUMENT_TOO_LARGE' } }, 413);
+    validateDocument(bytes, mimeType);
+    const documentSha256 = await sha256(bytes);
+    const data = await read(env, { mimeType }, bytes, documentSha256);
+    return json({ data });
+  } catch (error) {
+    if (error instanceof HttpError) return json({ error: { code: error.code } }, error.status);
+    if (error instanceof ExtractionError) return json({ error: { code: error.code, attempts: error.attempts, diagnostic: error.diagnostic } }, 502);
+    return json({ error: { code: 'DOCUMENT_READ_FAILED' } }, 500);
   }
 }

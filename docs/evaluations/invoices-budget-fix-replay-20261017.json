@@ -1,0 +1,301 @@
+{
+  "evaluatedAt": "2026-10-17T15:21:02.505Z",
+  "scope": "RECORDED_REAL_READ_REPLAY_FIXED_PROCESSING",
+  "sourceReport": "invoices-pdf-2026-10-17T15-07-58-988Z.json",
+  "caseId": "case_037",
+  "documentSha256": "1ecacc39a4cb5b49ed7e2aebeddc7a539939398ebda675f62cac0a0caf6e0d35",
+  "originalReadId": "b6f035d2-fceb-4f67-88ff-1a9da600d855",
+  "processingSourceSha256": "81b4ca7d748c198c4c4d9e5957ec26bbb9bcb191035852a159a49ab888b33aea",
+  "newModelCalls": 0,
+  "readerInvocations": 1,
+  "result": {
+    "id": "inv_121af36d-7f79-4b1d-a628-5e383dc9f19f",
+    "status": "DECIDED",
+    "source": "HUMAN_UPLOAD",
+    "file": {
+      "name": "037.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2582,
+      "url": "/api/v1/invoices/inv_121af36d-7f79-4b1d-a628-5e383dc9f19f/file"
+    },
+    "vendorId": "ven_demo_1",
+    "vendorName": "Nimbo Cloud Demo",
+    "agreementId": "agr_demo_037",
+    "invoiceNumber": "INV-0037",
+    "amountMinor": 25000,
+    "currency": "USD",
+    "issuedAt": "2026-10-01",
+    "dueDate": "2026-10-15",
+    "servicePeriod": "2026-10",
+    "description": "Servicio de prueba - orden 0037",
+    "extractionWarnings": [],
+    "latestDecision": {
+      "id": "dec_e87a5fed-34e3-435a-ae1d-c5de8b3040fc",
+      "invoiceId": "inv_121af36d-7f79-4b1d-a628-5e383dc9f19f",
+      "action": "BLOCK",
+      "reasons": [
+        "MISSING_BUDGET"
+      ],
+      "humanExplanation": "Bloqueada para pago simulado. No existe presupuesto compatible para la moneda y periodo de evaluación.",
+      "policyVersionId": "pol_demo_v1",
+      "policyVersion": 1,
+      "checkedAt": "2026-10-17T15:21:02.396Z",
+      "needsHumanApproval": false,
+      "actor": {
+        "kind": "SYSTEM",
+        "userId": null
+      },
+      "facts": {
+        "amountMinor": 25000,
+        "currency": "USD",
+        "automaticLimitMinor": 30000,
+        "hardLimitMinor": 100000,
+        "budgetAvailableBeforeMinor": null,
+        "vendorAllowed": true,
+        "agreementId": "agr_demo_037"
+      },
+      "trace": [
+        {
+          "rule": "EXTRACTION",
+          "outcome": "PASS",
+          "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+          "evidence": {
+            "status": "CROSS_CHECKED",
+            "issues": ""
+          }
+        },
+        {
+          "rule": "VENDOR",
+          "outcome": "PASS",
+          "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+          "evidence": {
+            "vendorId": "ven_demo_1",
+            "allowed": true,
+            "requireAllowedVendor": true
+          }
+        },
+        {
+          "rule": "AGREEMENT",
+          "outcome": "PASS",
+          "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+          "evidence": {
+            "agreementId": "agr_demo_037",
+            "amountMinor": 25000,
+            "agreedAmountMinor": 25000,
+            "toleranceMinor": 0,
+            "currency": "USD",
+            "agreedCurrency": "USD",
+            "description": "Servicio de prueba - orden 0037",
+            "agreedConcept": "Servicio de prueba - orden 0037"
+          }
+        },
+        {
+          "rule": "CURRENCY",
+          "outcome": "PASS",
+          "explanation": "La moneda coincide con el mandato.",
+          "evidence": {
+            "currency": "USD"
+          }
+        },
+        {
+          "rule": "HARD_LIMIT",
+          "outcome": "PASS",
+          "explanation": "El importe no supera el techo absoluto.",
+          "evidence": {
+            "amountMinor": 25000,
+            "hardLimitMinor": 100000
+          }
+        },
+        {
+          "rule": "BUDGET",
+          "outcome": "BLOCK",
+          "explanation": "No existe presupuesto compatible para la moneda y periodo de evaluación.",
+          "evidence": {
+            "invoiceCurrency": "USD",
+            "periodKey": "2026-10",
+            "budgetCurrency": null,
+            "budgetPeriodKey": null
+          }
+        },
+        {
+          "rule": "AUTO_LIMIT",
+          "outcome": "PASS",
+          "explanation": "El importe está dentro de ambos umbrales automáticos.",
+          "evidence": {
+            "amountMinor": 25000,
+            "automaticLimitMinor": 30000,
+            "reviewAboveMinor": 30000
+          }
+        }
+      ],
+      "simulated": true
+    },
+    "approvalRequest": null,
+    "processingError": null,
+    "createdAt": "2026-10-17T15:21:02.269Z",
+    "updatedAt": "2026-10-17T15:21:02.396Z",
+    "extraction": {
+      "vendorName": "Nimbo Cloud Demo",
+      "invoiceNumber": "INV-0037",
+      "amountMinor": 25000,
+      "currency": "USD",
+      "issuedAt": "2026-10-01",
+      "dueDate": "2026-10-15",
+      "servicePeriod": "2026-10",
+      "description": "Servicio de prueba - orden 0037",
+      "extractionWarnings": [],
+      "evidence": [
+        {
+          "field": "vendorName",
+          "source": "page:1",
+          "quote": "Nimbo Cloud Demo"
+        },
+        {
+          "field": "invoiceNumber",
+          "source": "page:1",
+          "quote": "INV-0037"
+        },
+        {
+          "field": "amountMinor",
+          "source": "page:1",
+          "quote": "TOTAL A COBRAR USD 250.00"
+        },
+        {
+          "field": "currency",
+          "source": "page:1",
+          "quote": "Moneda / Currency | USD"
+        },
+        {
+          "field": "issuedAt",
+          "source": "page:1",
+          "quote": "Emisión / Issued | 2026-10-01"
+        },
+        {
+          "field": "dueDate",
+          "source": "page:1",
+          "quote": "Vencimiento / Due | 2026-10-15"
+        },
+        {
+          "field": "servicePeriod",
+          "source": "page:1",
+          "quote": "Periodo de servicio | 2026-10"
+        },
+        {
+          "field": "description",
+          "source": "page:1",
+          "quote": "Servicio de prueba - orden 0037"
+        }
+      ]
+    },
+    "decisions": [
+      {
+        "id": "dec_e87a5fed-34e3-435a-ae1d-c5de8b3040fc",
+        "invoiceId": "inv_121af36d-7f79-4b1d-a628-5e383dc9f19f",
+        "action": "BLOCK",
+        "reasons": [
+          "MISSING_BUDGET"
+        ],
+        "humanExplanation": "Bloqueada para pago simulado. No existe presupuesto compatible para la moneda y periodo de evaluación.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T15:21:02.396Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 25000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": null,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_037"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "ven_demo_1",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_037",
+              "amountMinor": 25000,
+              "agreedAmountMinor": 25000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Servicio de prueba - orden 0037",
+              "agreedConcept": "Servicio de prueba - orden 0037"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 25000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "BLOCK",
+            "explanation": "No existe presupuesto compatible para la moneda y periodo de evaluación.",
+            "evidence": {
+              "invoiceCurrency": "USD",
+              "periodKey": "2026-10",
+              "budgetCurrency": null,
+              "budgetPeriodKey": null
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe está dentro de ambos umbrales automáticos.",
+            "evidence": {
+              "amountMinor": 25000,
+              "automaticLimitMinor": 30000,
+              "reviewAboveMinor": 30000
+            }
+          }
+        ],
+        "simulated": true
+      }
+    ]
+  },
+  "ledger": {
+    "budgets": 0,
+    "reservations": 0,
+    "decisions": 1
+  },
+  "idempotentReplay": true,
+  "note": "Real recorded extraction and separate corroboration from the same original PDF, replayed in a new local D1/R2 context. This is not a fresh OCR measurement; the separate post-fix live read failed and remains in its report."
+}

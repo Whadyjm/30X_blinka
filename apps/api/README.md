@@ -192,3 +192,72 @@ Las rutas `/api/*` ejecutan el Worker antes del fallback SPA, incluyendo errores
 La web usa cookies privadas y CSRF en memoria; no se abre CORS ni se reescribe Origin.
 Para desarrollo: `npm --prefix ../web run dev:live` junto con `pnpm dev`, bindings locales
 y el origen explícito `DEV_WEB_ORIGIN` de `.dev.vars`. Ver `apps/web/README.md`.
+
+
+## Evaluar los 50 PDF con lectores reales
+
+`npm run test:invoices:corpus` consume llamadas reales y evalúa los 50 PDF originales,
+sin enviar respuestas esperadas, políticas ni proveedores al extractor. Usa
+`/api/internal/document-probe`, protegido por el mismo `EXTRACTION_PROBE_TOKEN`
+y deshabilitado si falta ese secreto. Solo acepta PDF/PNG/JPEG binarios de hasta 5 MiB;
+reutiliza `readDocument` y no escribe en la D1 compartida. El token local permanece
+ignorado en `.env.extraction-probe`, nunca en argumentos ni en resultados.
+
+El runner prepara una D1 independiente por escenario, con migraciones originales,
+R2 local y el seed Aurora. Las reservas de contexto se crean como antecedentes
+sintéticos explícitos mediante decisiones y triggers; no se alteran contadores.
+Después sube cada PDF por la API local, llama al servicio original `processInvoice`
+con un adapter de los lectores remotos y comprueba detalle, archivo privado,
+historial, reserva e idempotencia en D1. No es una medición del navegador ni del
+endpoint público de procesamiento para las50 facturas.
+
+La corrida completa admite dos documentos concurrentes y máximo 150 intentos
+internos de modelo, sin repetir un archivo fallido. Una selección explícita
+`npm run test:invoices:corpus -- --cases=case_010,case_014` usa una corrida separada
+y serial, con un máximo de tres intentos internos por documento. Los resultados parciales/finales se conservan en
+`docs/evaluations/invoices-pdf-<runId>.json`; los fallos permanecen en las métricas.
+El estado local queda en `.wrangler/corpus/<runId>/`. El mes de ejecución debe
+coincidir con el mes del contexto del corpus; no se modifican etiquetas para
+acomodar otro mes. Los diez PNG son una evaluación separada.
+
+Mediciones y límites observados: [evaluación de los 50 PDF](../../docs/INVOICE_CORPUS_EVALUATION.md).
+
+
+### Procesamiento durable y operación
+
+En producción `POST /invoices` confirma en D1 la factura y su trabajo en la misma transacción;
+R2 conserva el original privado con SHA-256. La respuesta no espera OCR. `POST /invoices/:id/process`
+publica/consulta ese mismo trabajo y devuelve 202 mientras continúa. Web y Telegram utilizan
+`oli-invoices`; el chat opera sobre las facturas persistidas. El entorno local sin binding de cola
+conserva el procesamiento síncrono para desarrollar y probar adaptadores.
+
+`invoice_jobs` conserva PENDING/RUNNING/RETRY/DONE/DEAD, tres intentos máximos de por vida,
+lease de 180 s y espera de 30/120 s. Un cron cada minuto recupera publicaciones perdidas y leases
+caducados (100 por barrido). La entrega de Queues puede repetirse: tokens de trabajo, guards D1 y
+triggers de reserva hacen idempotentes los efectos financieros. Una caída después del commit se
+recupera leyendo el resultado ya persistido. El cron no invoca al modelo.
+
+La cola de transporte tiene DLQ `oli-invoices-dead` (retención 24 h). El estado DEAD y el historial
+append-only en D1 permanecen aunque caduque un mensaje. Repetir el endpoint no reinicia intentos.
+Un error técnico transitorio muestra RECEIVED mientras espera; el error terminal muestra FAILED.
+Un documento incierto produce una decisión de revisión, no un reintento para buscar otra respuesta.
+
+Los logs estructurados incluyen `invoice_processing_completed`, `invoice_processing_failed`,
+`invoice_job_dispatch_failed`, `invoice_job_consumer_failed` e `invoice_jobs_recovered` con tiempos,
+versión y caché, sin texto de facturas ni credenciales. Los intentos del proveedor conservan códigos
+acotados. Consultar el backlog y errores con D1:
+
+```sql
+SELECT state, count(*) AS jobs, min(created_at) AS oldest FROM invoice_jobs GROUP BY state;
+SELECT id, invoice_id, attempts, last_error_json FROM invoice_jobs WHERE state = 'DEAD';
+SELECT job_id, state, attempt, error_json, created_at FROM invoice_job_events ORDER BY sequence DESC LIMIT 100;
+```
+
+Ante DEAD revisar causa/documento; no editar reservas ni resetear contadores. Ante atraso comprobar
+salud de D1, productor/consumidor, cron y DLQ. Los logs y estas consultas permiten diagnosticar;
+no se ha configurado un servicio externo de alertas. Los tipos de bindings se generan con `npm run types`.
+
+Fuentes: [garantías de entrega](https://developers.cloudflare.com/queues/reference/delivery-guarantees/),
+[reintentos](https://developers.cloudflare.com/queues/configuration/batching-retries/),
+[DLQ](https://developers.cloudflare.com/queues/configuration/dead-letter-queues/) y
+[cron](https://developers.cloudflare.com/workers/configuration/cron-triggers/).

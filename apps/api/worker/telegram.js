@@ -232,7 +232,7 @@ export async function consumeTelegram(batch, env, process = processInvoice) {
       const exhausted = message.attempts >= 5;
       await stmt(env.DB, 'UPDATE telegram_events SET state = ?, lease_token = NULL, lease_until = NULL WHERE update_id = ? AND lease_token = ?', exhausted ? 'FAILED' : 'PENDING', updateId, lease).run();
       console.error(JSON.stringify({ event: 'telegram_event_failed', updateId, exhausted }));
-      if (exhausted) message.ack(); else message.retry({ delaySeconds: 30 });
+      if (exhausted) message.ack(); else message.retry({ delaySeconds: env.INVOICE_QUEUE ? 120 : 30 });
     }
   }
 }

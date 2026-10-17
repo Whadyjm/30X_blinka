@@ -1,5 +1,9 @@
 # Evaluación real de extracción PNG
 
+La evaluación posterior de los 50 PDF con decisiones y D1 locales se documenta en
+[INVOICE_CORPUS_EVALUATION.md](INVOICE_CORPUS_EVALUATION.md). Esta página conserva
+la medición PNG original y sus pendientes históricos.
+
 Evaluación del **16 de octubre de 2026, Caracas** (17 de octubre UTC), sobre los
 diez PNG sintéticos existentes. Una solicitud por documento, secuencialmente;
 solo se enviaron imágenes, sin respuestas de referencia, políticas ni contexto

@@ -12,7 +12,8 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }] });
   const runtime = new Miniflare({ modules: true, scriptPath: new URL('../.wrangler/runtime/index.js', import.meta.url).pathname,
     compatibilityDate: '2026-07-30', d1Databases: { DB: 'runtime' }, r2Buckets: ['INVOICES'], fetchMock,
-    queueProducers: { TELEGRAM_QUEUE: 'telegram-runtime' },
+    queueProducers: { TELEGRAM_QUEUE: 'telegram-runtime', INVOICE_QUEUE: 'oli-invoices' },
+    queueConsumers: { 'oli-invoices': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 3 } },
     bindings: { DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner', DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only',
       PUBLIC_APP_URL: 'https://oli.invalid', TELEGRAM_BOT_TOKEN: '123456:runtime-test-token', TELEGRAM_WEBHOOK_SECRET: 'runtime-webhook-secret' } });
   t.after(() => runtime.dispose());
@@ -42,7 +43,12 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   const uploaded = await upload.json();
   assert.equal(upload.status, 201, JSON.stringify(uploaded)); const invoice = uploaded.data;
   const process = await runtime.dispatchFetch(`${origin}/api/v1/invoices/${invoice.id}/process`, { method: 'POST', headers });
-  assert.equal(process.status, 200); const detail = (await process.json()).data;
+  assert.ok([200, 202].includes(process.status));
+  let detail = (await process.json()).data;
+  for (let poll = 0; poll < 50 && detail.status !== 'DECIDED'; poll++) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    detail = (await (await runtime.dispatchFetch(`${origin}/api/v1/invoices/${invoice.id}`, { headers })).json()).data;
+  }
   assert.equal(detail.status, 'DECIDED'); assert.equal(detail.latestDecision.action, 'ESCALATE');
   assert.equal(detail.approvalRequest, null); assert.equal(detail.decisions.length, 1);
   assert.equal(await db.prepare('SELECT count(*) AS n FROM budget_reservations').first('n'), 0);
@@ -58,5 +64,9 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   const reply = await chat.json(); assert.equal(chat.status, 200, JSON.stringify(reply));
   assert.equal(reply.data.cards[0].type, 'BUDGET');
   assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 1);
+  assert.equal(await db.prepare('SELECT state FROM invoice_jobs WHERE invoice_id = ?').bind(invoice.id).first('state'), 'DONE');
+  const replay = await runtime.dispatchFetch(`${origin}/api/v1/invoices/${invoice.id}/process`, { method: 'POST', headers });
+  assert.equal(replay.status, 200);
+  assert.equal(await db.prepare('SELECT count(*) AS n FROM decisions WHERE invoice_id = ?').bind(invoice.id).first('n'), 1);
   fetchMock.assertNoPendingInterceptors();
 });

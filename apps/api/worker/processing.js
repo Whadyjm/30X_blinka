@@ -2,8 +2,9 @@ import { evaluateInvoice, normalizeInvoiceNumber } from '@oli/domain';
 import { ExtractedInvoiceSchema, PolicyDecisionSchema } from '@oli/contracts';
 import { ExtractionError } from '@oli/extraction';
 import { audit, clearGuard, guard, HttpError, id, now, periodKey, sha256, stmt } from './http.js';
-import { agreementDto, budgetDto, getInvoice, policyDto, vendorDto } from './repository.js';
-import { readDocument } from './document.js';
+import { agreementDto, budgetDto, getInvoice, policyDto, snapshotInvoicesStatement, vendorDto } from './repository.js';
+import { readDocument, READER_VERSION } from './document.js';
+import { getReadArtifact, putReadArtifact } from './jobs.js';
 
 const emptyExtraction = () => ExtractedInvoiceSchema.parse({ vendorName: null, invoiceNumber: null, amountMinor: null,
   currency: null, issuedAt: null, dueDate: null, servicePeriod: null, description: null, extractionWarnings: [], evidence: [] });
@@ -15,8 +16,7 @@ export async function snapshot(db, orgId, invoiceId, attempt = 0) {
     stmt(db, 'SELECT * FROM vendors WHERE org_id = ?', orgId),
     stmt(db, 'SELECT * FROM agreements WHERE org_id = ?', orgId),
     stmt(db, 'SELECT * FROM budget_periods WHERE org_id = ?', orgId),
-    stmt(db, `SELECT i.*, EXISTS(SELECT 1 FROM budget_reservations r WHERE r.org_id = i.org_id AND r.invoice_id = i.id) AS reserved
-      FROM invoices i WHERE i.org_id = ?`, orgId),
+    snapshotInvoicesStatement(db, orgId, invoiceId),
   ]);
   const org = results[0].results[0];
   const policy = policyDto(results[1].results[0]);
@@ -25,7 +25,9 @@ export async function snapshot(db, orgId, invoiceId, attempt = 0) {
   if (!invoice) throw new HttpError(404, 'NOT_FOUND');
   const key = periodKey(org.timezone);
   const budget = results[4].results.find(b => b.period_key === key && b.currency === policy.rules.currency);
-  if (!budget) {
+  // Activation initializes the first budget. Only an established currency can roll into a new month.
+  const hasPriorPeriod = results[4].results.some(b => b.currency === policy.rules.currency && b.period_key < key);
+  if (!budget && hasPriorPeriod) {
     if (attempt >= 3) throw new HttpError(503, 'SERVICE_UNAVAILABLE');
     const guardId = id('guard');
     try {
@@ -67,10 +69,11 @@ export function decisionStatements(db, orgId, evaluation, storedRead, actorId = 
 export function evaluateStored(read, state) {
   return evaluateInvoice({ id: state.invoice.id, documentSha256: state.invoice.file_sha256,
     primaryReadId: read.primaryReadId, extraction: read.extraction, corroboration: read.corroboration,
-    agreementReference: null }, state.context);
+    agreementReference: read.agreementReference ?? null }, state.context);
 }
 
 export async function processInvoice(env, orgId, invoiceId, read = readDocument) {
+  const started = performance.now();
   const existing = await getInvoice(env.DB, orgId, invoiceId);
   if (existing.status === 'DECIDED') return { data: existing, status: 200 };
   if (existing.status === 'FAILED' && !existing.processingError?.retryable) return { data: existing, status: 200 };
@@ -83,12 +86,18 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
   if (!claimed) return { data: await getInvoice(env.DB, orgId, invoiceId), status: 202 };
   try {
     let storedRead = claimed.extracted_json ? JSON.parse(claimed.extracted_json) : null;
+    // An undecided legacy checkpoint cannot bypass the current reader's safety rules.
+    if (read === readDocument && storedRead?.provenance?.configVersion !== READER_VERSION) storedRead = null;
     if (!storedRead) {
       const object = await env.INVOICES.get(claimed.file_key);
       if (!object || object.size > 5242880) throw new Error('DOCUMENT_UNAVAILABLE');
       const bytes = new Uint8Array(await object.arrayBuffer());
       if (bytes.length !== claimed.file_size_bytes || await sha256(bytes) !== claimed.file_sha256) throw new Error('DOCUMENT_INTEGRITY_FAILED');
-      storedRead = await read(env, { mimeType: claimed.file_mime_type }, bytes, claimed.file_sha256);
+      const artifacts = read === readDocument ? Object.fromEntries(await Promise.all(['PRIMARY', 'SECONDARY'].map(async kind =>
+        [kind, await getReadArtifact(env.DB, orgId, claimed.file_sha256, READER_VERSION, kind)]))) : {};
+      storedRead = await read(env, { mimeType: claimed.file_mime_type }, bytes, claimed.file_sha256, {
+        artifacts, checkpoint: (kind, artifact) => putReadArtifact(env.DB, orgId, claimed.file_sha256, READER_VERSION, kind, artifact),
+      });
       // The adapter is a server-owned trust boundary, not a route input.
       storedRead.extraction = ExtractedInvoiceSchema.parse(storedRead.extraction);
       if (storedRead.documentSha256 !== claimed.file_sha256) throw new Error('DOCUMENT_INTEGRITY_FAILED');
@@ -116,6 +125,7 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
           stmt(env.DB, 'UPDATE invoices SET processing_token = NULL, processing_started_at = NULL WHERE id = ? AND org_id = ?', invoiceId, orgId),
           clearGuard(env.DB, guardId),
         ]);
+        console.log(JSON.stringify({ event: 'invoice_processing_completed', invoiceId, action: evaluation.candidate.action, durationMs: Math.round(performance.now() - started), readerVersion: storedRead.provenance?.configVersion ?? null, cache: storedRead.provenance?.cache ?? null }));
         return { data: await getInvoice(env.DB, orgId, invoiceId), status: 200 };
       } catch (error) {
         if (!/CHECK constraint failed: valid|BUDGET_EXCEEDED|POLICY_CHANGED|UNIQUE constraint failed: budget_reservations/.test(String(error))) throw error;
@@ -123,9 +133,10 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
     }
     throw new Error('CONCURRENT_UPDATE');
   } catch (error) {
-    const nonRetryable = error instanceof ExtractionError && ['INVALID_OUTPUT', 'MODEL_REFUSED', 'INVALID_IMAGE', 'INVALID_PDF'].includes(error.code);
+    const truncated = error instanceof ExtractionError && error.diagnostic?.issueCodes?.includes('FINISH_length');
+    const nonRetryable = error instanceof ExtractionError && !truncated && ['INVALID_OUTPUT', 'MODEL_REFUSED', 'INVALID_IMAGE', 'INVALID_PDF', 'MISSING_API_KEY', 'INVALID_API_KEY', 'INSUFFICIENT_CREDITS', 'OPENROUTER_REQUEST_REJECTED'].includes(error.code);
     const code = error instanceof ExtractionError ? error.code : error instanceof HttpError ? error.code : 'PROCESSING_FAILED';
-    console.error(JSON.stringify({ event: 'invoice_processing_failed', invoiceId, code }));
+    console.error(JSON.stringify({ event: 'invoice_processing_failed', invoiceId, code, durationMs: Math.round(performance.now() - started), diagnostics: error instanceof ExtractionError ? error.diagnostic : undefined, attempts: error instanceof ExtractionError ? error.attempts : undefined }));
     await stmt(env.DB, `UPDATE invoices SET status = 'FAILED', processing_error_json = ?, processing_token = NULL,
       processing_started_at = NULL, updated_at = ? WHERE id = ? AND org_id = ? AND processing_token = ? AND status <> 'DECIDED'`,
     JSON.stringify({ code, message: 'No se pudo completar el procesamiento; no se creó una aprobación.', retryable: !nonRetryable }), now(), invoiceId, orgId, token).run();

@@ -3,9 +3,10 @@ import { AgreementQuerySchema, ApprovalQuerySchema, BudgetQuerySchema, Dashboard
 import { authenticate, login, logout } from './auth.js';
 import { activateMandate, budgets, mandateState, mutateDirectory, saveDraft } from './configuration.js';
 import { HttpError, id, json, now, periodKey, readBytes, stmt } from './http.js';
-import { agreementDto, approvalDto, decisionDto, getInvoice, invoiceRows, vendorDto } from './repository.js';
+import { agreementDto, approvalPage, dashboardInvoiceData, getInvoice, invoicePage, vendorDto } from './repository.js';
 import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
+import { enqueueInvoice } from './jobs.js';
 import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
 import { createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
@@ -66,10 +67,7 @@ export async function handleApi(request, env) {
     if (path === '/invoices' && method === 'POST') return await uploadInvoice(request, env, session);
     if (path === '/invoices' && method === 'GET') {
       const q = query(url, InvoiceQuerySchema);
-      const rows = await invoiceRows(env.DB, orgId);
-      return page(rows.filter(r => (!q.status || r.status === q.status) && (!q.action || r.latestDecision?.action === q.action)
-        && (!q.vendorId || r.vendorId === q.vendorId) && (q.needsHumanApproval === undefined
-          || (r.approvalRequest?.state === 'PENDING' && r.approvalRequest.canApprove) === q.needsHumanApproval)), q);
+      return json(await invoicePage(env.DB, orgId, q));
     }
     const invoice = path.match(/^\/invoices\/([^/]+)(?:\/(process|file))?$/);
     if (invoice) {
@@ -77,32 +75,20 @@ export async function handleApi(request, env) {
       if (method === 'GET' && invoice[2] === 'file') return await invoiceFile(env, orgId, invoice[1]);
       if (method === 'POST' && invoice[2] === 'process') {
         if ((await readBytes(request, 1024)).length) throw new HttpError(400, 'VALIDATION_ERROR', 'Este endpoint no recibe datos de extracción ni decisiones.');
-        const result = await processInvoice(env, orgId, invoice[1]); return json({ data: result.data }, result.status);
+        const result = await (env.INVOICE_QUEUE ? enqueueInvoice : processInvoice)(env, orgId, invoice[1]); return json({ data: result.data }, result.status);
       }
     }
     if (path === '/approvals' && method === 'GET') {
       const q = query(url, ApprovalQuerySchema);
-      const invoices = await invoiceRows(env.DB, orgId);
-      const active = (await mandateState(env.DB, orgId)).active;
-      const rows = (await stmt(env.DB, 'SELECT * FROM approval_requests WHERE org_id = ? AND state = ? ORDER BY created_at DESC, id DESC', orgId, q.state).all()).results;
-      return page(rows.map(r => ({ approval: approvalDto(r, active?.id), invoice: invoices.find(i => i.id === r.invoice_id) })), q);
+      return json(await approvalPage(env.DB, orgId, q));
     }
     const approval = path.match(/^\/approvals\/([^/]+)\/decision$/);
     if (approval && method === 'POST') return await reviewApproval(request, env, session, approval[1]);
     if (path === '/dashboard' && method === 'GET') {
-      const rows = await invoiceRows(env.DB, orgId);
-      const actions = rows.map(r => r.latestDecision?.action);
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: session.organization.timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-      const recent = (await stmt(env.DB, 'SELECT * FROM decisions WHERE org_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 10', orgId).all()).results.map(decisionDto);
-      return json({ data: DashboardSchema.parse({ counts: {
-        total: rows.length, approved: actions.filter(a => a === 'APPROVE').length, blocked: actions.filter(a => a === 'BLOCK').length,
-        escalated: actions.filter(a => a === 'ESCALATE').length,
-        needsHumanApproval: rows.filter(r => r.approvalRequest?.state === 'PENDING' && r.approvalRequest.canApprove).length,
-        processing: rows.filter(r => ['RECEIVED', 'PARSING', 'READY', 'PROCESSING'].includes(r.status)).length,
-        failed: rows.filter(r => r.status === 'FAILED').length },
-      budgets: await budgets(env.DB, orgId, periodKey(session.organization.timezone)),
-      upcoming: rows.filter(r => r.dueDate && r.dueDate >= today && r.latestDecision?.action !== 'BLOCK' && r.status !== 'FAILED')
-        .sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 5), recentDecisions: recent, generatedAt: now(), simulated: true }) });
+      const invoiceData = await dashboardInvoiceData(env.DB, orgId, today);
+      return json({ data: DashboardSchema.parse({ ...invoiceData,
+        budgets: await budgets(env.DB, orgId, periodKey(session.organization.timezone)), generatedAt: now(), simulated: true }) });
     }
     if (path === '/evaluation/summary' && method === 'GET') return json({ data: null });
     throw new HttpError(404, 'NOT_FOUND');
