@@ -38,7 +38,11 @@ reales y extracción simulada; no se presenta como medición OCR en producción.
 
 Todas las mutaciones requieren CSRF. Solo OWNER prepara/confirma/cancela cambios. APPROVER puede conversar y consultar, sin herramientas de escritura. Conversaciones y acciones son privadas para el mismo usuario y empresa; IDs de otro usuario devuelven404. Los listados de conversaciones y su historial tienen un límite fijo, sin envelope de paginación P0.
 
-Ask Oli mantiene dos pestañas con selección y queries independientes. `ChatHistorySchema`
+Ask Oli oculta Telegram por defecto. Settings → Conversaciones permite activar
+«Ver conversación de Telegram en Home»: es una preferencia personal por usuario/empresa
+guardada en este navegador. Ocultar la vista suspende sus consultas/polling; no desconecta
+el bot ni cambia sus mensajes. Activarla muestra dos pestañas con selección y queries
+independientes. `ChatHistorySchema`
 incluye `channel`; Web conserva borrador y adjuntos al consultar Telegram. Telegram es
 una vista del historial con enlace al bot y sin botones de confirmar/cancelar. El servidor
 rechaza escribir o reutilizar una clave Telegram desde Web con `CHAT_CHANNEL_MISMATCH`409.

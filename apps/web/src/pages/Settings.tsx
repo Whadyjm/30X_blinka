@@ -2,14 +2,23 @@ import { Link } from 'react-router';
 import { RotateCcw } from 'lucide-react';
 import { buttonClass } from '@/components/ui/Button';
 import { InlineAlert, PageHeader } from '@/components/ui/Card';
+import { Toggle } from '@/components/ui/Field';
+import { useTelegramHistoryPreference } from '@/features/chat/useTelegramHistoryPreference';
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 
 export function Settings() {
   const me = useMe();
+  const scope = me.data?.org ? `${me.data.org.id}:${me.data.user.id}` : '';
+  const telegramHistory = useTelegramHistoryPreference(scope);
   return (
     <>
-      <PageHeader title={t('Settings')} subtitle={t('Manage your company setup and the rules Oli follows.')} />
+      <PageHeader title={t('Settings')} subtitle={t('Manage your preferences and the rules Oli follows.')} />
+      <section className="mb-8 max-w-2xl space-y-4 border-t border-hairline pt-6" aria-labelledby="chat-preferences-heading">
+        <h2 id="chat-preferences-heading" className="text-xl">{t('Conversations')}</h2>
+        <Toggle label={t('Show Telegram conversation on Home')} description={t('Only changes this browser’s view. Your Telegram bot stays connected.')}
+          checked={telegramHistory.visible} onChange={telegramHistory.setVisible} disabled={!scope} />
+      </section>
       <section className="max-w-2xl space-y-4 border-t border-hairline pt-6" aria-labelledby="company-setup-heading">
         <div className="space-y-2">
           <h2 id="company-setup-heading" className="text-xl">{t('Company setup')}</h2>
