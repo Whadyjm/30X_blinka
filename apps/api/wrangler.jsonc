@@ -37,8 +37,13 @@
     "binding": "AI"
   },
   "vars": {
+    "PUBLIC_APP_URL": "https://oli30x.ultramare.dev",
     "DEMO_ORG_ID": "org_demo",
     "DEMO_USER_ID": "user_demo_owner"
+  },
+  "queues": {
+    "producers": [{ "binding": "TELEGRAM_QUEUE", "queue": "oli-telegram" }],
+    "consumers": [{ "queue": "oli-telegram", "max_batch_size": 1, "max_batch_timeout": 1, "max_retries": 5, "max_concurrency": 2 }]
   },
   "assets": {
     "directory": "../web/dist",

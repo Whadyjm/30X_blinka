@@ -3,7 +3,7 @@ import {
   ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
   MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema,
-  SaveMandateDraftSchema, SessionSchema,
+  SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
 } from '@oli/contracts';
 import { HealthSchema } from '@/contracts';
 import { ApiError, ContractError } from './errors';
@@ -97,6 +97,11 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     loginDemo: unavailable,
     async logout() { await raw('DELETE', '/session'); csrf = null; pendingKeys.clear(); },
     createOrg: unavailable,
+    getTelegramIntegration: () => get('/integrations/telegram', TelegramIntegrationSchema),
+    async createTelegramLink() {
+      return parse('/integrations/telegram/link', envelope(TelegramLinkSchema), await raw('POST', '/integrations/telegram/link')).data;
+    },
+    async disconnectTelegram() { await raw('DELETE', '/integrations/telegram'); },
     async getMandate() {
       const state = await get('/mandate', mandateSchema);
       const budgets = await get('/budgets', z.array(BudgetPeriodSchema));

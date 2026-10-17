@@ -12,7 +12,9 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(extraction) } }] });
   const runtime = new Miniflare({ modules: true, scriptPath: new URL('../.wrangler/runtime/index.js', import.meta.url).pathname,
     compatibilityDate: '2026-07-30', d1Databases: { DB: 'runtime' }, r2Buckets: ['INVOICES'], fetchMock,
-    bindings: { DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner', DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only' } });
+    queueProducers: { TELEGRAM_QUEUE: 'telegram-runtime' },
+    bindings: { DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner', DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only',
+      PUBLIC_APP_URL: 'https://oli.invalid', TELEGRAM_BOT_TOKEN: '123456:runtime-test-token', TELEGRAM_WEBHOOK_SECRET: 'runtime-webhook-secret' } });
   t.after(() => runtime.dispose());
   const db = await runtime.getD1Database('DB');
   const root = new URL('../../../packages/database/', import.meta.url);
@@ -24,6 +26,14 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: 'owner@oli-demo.invalid', password: 'test-only' }) });
   assert.equal(login.status, 200); const session = (await login.json()).data;
   const headers = { Origin: origin, Cookie: login.headers.get('Set-Cookie').split(';')[0], 'X-CSRF-Token': session.csrfToken };
+  fetchMock.get('https://api.telegram.org').intercept({ path: '/bot123456:runtime-test-token/getMe', method: 'POST' })
+    .reply(200, { ok: true, result: { username: 'OliRuntimeBot' } });
+  fetchMock.get('https://api.telegram.org').intercept({ path: '/bot123456:runtime-test-token/setWebhook', method: 'POST' })
+    .reply(200, { ok: true, result: true });
+  const telegram = await runtime.dispatchFetch(`${origin}/api/v1/integrations/telegram/link`, { method: 'POST', headers });
+  const linked = await telegram.json();
+  assert.equal(telegram.status, 201, JSON.stringify(linked));
+  assert.match(linked.data.url, /^https:\/\/t.me\/OliRuntimeBot\?start=/);
   const form = new FormData(); form.append('file', new Blob([new Uint8Array([137,80,78,71,13,10,26,10,0])], { type: 'image/png' }), 'synthetic.png');
   // Serialize Node's native FormData before crossing Miniflare's Undici boundary.
   const multipart = new Request(`${origin}/api/v1/invoices`, { method: 'POST', body: form });

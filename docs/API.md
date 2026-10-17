@@ -249,7 +249,7 @@ type ApprovalRequest = {
 type Invoice = {
   id: string;
   status: InvoiceStatus;
-  source: 'HUMAN_UPLOAD';
+  source: 'HUMAN_UPLOAD' | 'TELEGRAM';
   file: { name: string; mimeType: string; sizeBytes: number; url: string };
   vendorId: string | null;
   vendorName: string | null;
@@ -721,3 +721,11 @@ una evaluación OCR de los 50 documentos. Los tipos P1 de delegaciones siguen re
 El API es del mismo origen. En desarrollo, Whady debe usar un proxy `/api` hacia el Worker
 o servir el frontend junto al API; no copiar la contraseña ni secretos al bundle. No hay CORS abierto.
 `CONFIGURATION_CONFLICT` (409) indica que un proveedor/acuerdo cambió o su identidad está en uso.
+
+## Integración con Telegram
+
+La sección `/app/integrations` permite vincular y desconectar la cuenta de Telegram del usuario.
+`GET /integrations/telegram` devuelve `TelegramIntegration`; `POST /integrations/telegram/link`
+devuelve `201 TelegramLink` con un enlace temporal; `DELETE /integrations/telegram` responde `204`.
+Las rutas mantienen sesión y CSRF. El usuario no envía claves de BotFather ni IDs de empresa.
+El origen de factura también acepta `TELEGRAM`. Ver [flujo, configuración y garantías](TELEGRAM.md).

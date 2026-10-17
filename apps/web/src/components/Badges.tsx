@@ -1,5 +1,5 @@
 import { AlertCircle, Ban, CheckCircle2, Hand, XCircle, type LucideIcon } from 'lucide-react';
-import { Bot, User } from 'lucide-react';
+import { Bot, Send, User } from 'lucide-react';
 import { Orb } from '@/components/ui/Orb';
 import type { InvoiceSource } from '@/contracts';
 import { reasonInfo, type ReasonTone } from '@/contracts/reasons';
@@ -66,8 +66,8 @@ export function SourceBadge({ source, agentName }: { source: InvoiceSource; agen
   const agent = source === 'AGENT_REQUEST';
   return (
     <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-      {agent ? <Bot className="size-3.5" aria-hidden /> : <User className="size-3.5" aria-hidden />}
-      {agent ? (agentName ?? t('Agent')) : t('Upload')}
+      {agent ? <Bot className="size-3.5" aria-hidden /> : source === 'TELEGRAM' ? <Send className="size-3.5" aria-hidden /> : <User className="size-3.5" aria-hidden />}
+      {agent ? (agentName ?? t('Agent')) : source === 'TELEGRAM' ? 'Telegram' : t('Upload')}
     </span>
   );
 }

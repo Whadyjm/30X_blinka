@@ -346,6 +346,9 @@ function meOf(d: Db): Me {
 }
 
 export const mockApi: OliApi = {
+  async getTelegramIntegration() { return { available: false, connection: null }; },
+  async createTelegramLink() { throw new ApiError({ status: 503, code: 'TELEGRAM_NOT_CONFIGURED', message: 'Telegram requires a connection to the Oli server.' }); },
+  async disconnectTelegram() {},
   async health() {
     return { ok: true, service: 'oli-mock' };
   },

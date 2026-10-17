@@ -7,10 +7,12 @@ import { esCore } from './es.core';
 import { esShell } from './es.shell';
 import { esBills } from './es.bills';
 import { esRules } from './es.rules';
+import { esIntegrations } from './es.integrations';
 
 export const es: Record<string, string> = {
   ...esCore,
   ...esShell,
   ...esBills,
   ...esRules,
+  ...esIntegrations,
 };

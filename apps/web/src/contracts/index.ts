@@ -8,7 +8,7 @@ import { z } from 'zod';
 export const DecisionActionSchema = z.enum(['APPROVE', 'BLOCK', 'ESCALATE']);
 export type Decision = z.infer<typeof DecisionActionSchema>;
 
-export const InvoiceSourceSchema = z.enum(['HUMAN_UPLOAD', 'AGENT_REQUEST']);
+export const InvoiceSourceSchema = z.enum(['HUMAN_UPLOAD', 'AGENT_REQUEST', 'TELEGRAM']);
 export type InvoiceSource = z.infer<typeof InvoiceSourceSchema>;
 
 export const RoleSchema = z.enum(['owner', 'approver']);

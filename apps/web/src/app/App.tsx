@@ -15,6 +15,7 @@ const Bills = lazy(() => import('@/pages/Bills').then((m) => ({ default: m.Bills
 const BillDetail = lazy(() => import('@/pages/BillDetail').then((m) => ({ default: m.BillDetail })));
 const Approvals = lazy(() => import('@/pages/Approvals').then((m) => ({ default: m.Approvals })));
 const Rules = lazy(() => import('@/pages/Rules').then((m) => ({ default: m.Rules })));
+const Integrations = lazy(() => import('@/pages/Integrations').then((m) => ({ default: m.Integrations })));
 const Evaluation = lazy(() => import('@/pages/Evaluation').then((m) => ({ default: m.Evaluation })));
 const ComingSoon = lazy(() => import('@/pages/ComingSoon').then((m) => ({ default: m.ComingSoon })));
 
@@ -36,6 +37,7 @@ export function App() {
                   <Route path="bills/:id" element={<BillDetail />} />
                   <Route path="approvals" element={<Approvals />} />
                   <Route path="rules" element={<Rules />} />
+                  <Route path="integrations" element={<Integrations />} />
                   <Route path="evaluation" element={<Evaluation />} />
                   {env.features.agentAccess && <Route path="agent-access" element={<ComingSoon title="Agent access" />} />}
                   {env.features.chat && <Route path="chat" element={<ComingSoon title="Chat with Oli" />} />}
