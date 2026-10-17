@@ -26,6 +26,12 @@
   .ask-oli-mascot { width: 224px; height: 224px; }
 }
 
+.ask-oli-mascot--compact { width: 72px; height: 72px; }
+
+@media (min-width: 640px) {
+  .ask-oli-mascot--compact { width: 104px; height: 104px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ask-oli-float { animation: none; }
 }

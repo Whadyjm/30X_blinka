@@ -18,6 +18,7 @@ export const esChat: Record<string, string> = {
   'Say hello to Oli': 'Saludar a Oli',
   'Tap Oli to say hello.': 'Toca a Oli para saludarla.',
   'Here I am!': '¡Aquí estoy!',
+  'I’m here with you': 'Aquí contigo',
   'Ask me about an invoice, a supplier or your budget. We’ll take it one step at a time.': 'Pregúntame por una factura, un proveedor o tu presupuesto. Vamos paso a paso.',
   'Your Telegram conversations appear here': 'Tus conversaciones de Telegram aparecen aquí',
   'Connect Telegram to keep its history here, separate from your web conversations.': 'Conecta Telegram para consultar aquí su historial, separado de tus conversaciones web.',

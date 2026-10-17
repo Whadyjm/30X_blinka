@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
-import { ArrowDown, ArrowUp, FileText, History, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, FileText, History, LayoutDashboard, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
 import type { ChatChannel } from '@oli/contracts';
 import { buttonClass } from '@/components/ui/Button';
 import { UPLOAD } from '@/config/env';
@@ -34,6 +34,8 @@ export function ChatWorkspace() {
   const shouldFollow = useRef(true);
   const busy = web.sending || web.processing || web.loading;
   const empty = conversation.turns.length === 0 && !conversation.pending && !conversation.loading;
+  const showCompanion = channel === 'WEB' && !empty;
+  const thinking = conversation.sending || conversation.processing;
   const emptyRef = useRef(empty);
   emptyRef.current = empty;
   const webTabs = web.id === null ? [{ id: null, title: t('New conversation') }, ...openThreads] : openThreads;
@@ -123,9 +125,15 @@ export function ChatWorkspace() {
     onDrop={e => { e.preventDefault(); setDragging(false); attach(Array.from(e.dataTransfer.files)); }}>
     <header className="shrink-0 border-b border-hairline px-4 pt-3 md:px-6">
       <div className="flex items-center justify-between gap-3">
-        <h1 className="text-lg leading-normal text-ink">{t('Chat with Oli')}</h1>
-        <div className="flex items-center gap-1">
-          <Link to="/app/dashboard" className="inline-flex min-h-11 items-center px-3 text-sm text-slate-600 hover:text-ink">{t('Dashboard')}</Link>
+        <div className="flex min-w-0 items-center gap-2 md:gap-3">
+          {showCompanion && <ChatMascot compact state={thinking ? 'thinking' : draft.trim() ? 'listening' : undefined} />}
+          <div className="min-w-0">
+            <h1 className="text-lg leading-normal text-ink"><span className={showCompanion ? 'hidden sm:inline' : undefined}>{t('Chat with Oli')}</span>{showCompanion && <span className="sm:hidden">Oli</span>}</h1>
+            {showCompanion && <p role="status" className="mt-1 text-xs leading-relaxed text-slate-600">{t(conversation.loading ? 'Loading conversation...' : thinking ? 'Oli is thinking...' : 'I’m here with you')}</p>}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <Link to="/app/dashboard" aria-label={t('Dashboard')} className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-sm text-slate-600 hover:text-ink sm:px-3"><LayoutDashboard className="size-5 sm:hidden" aria-hidden /><span className="hidden sm:inline">{t('Dashboard')}</span></Link>
           {channel === 'WEB' && closedThreads.length > 0 && <details className="relative" onKeyDown={e => { if (e.key === 'Escape') { e.currentTarget.open = false; e.currentTarget.querySelector('summary')?.focus(); } }}
             onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.open = false; }}>
             <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-md text-ink hover:bg-bone [&::-webkit-details-marker]:hidden" aria-label={t('Closed conversations')} title={t('Closed conversations')}><History className="size-5" aria-hidden /></summary>

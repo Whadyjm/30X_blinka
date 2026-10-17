@@ -7,7 +7,7 @@ import '@/styles/chat-mascot.css';
 const MOODS = ['listening', 'focused', 'happy', 'understanding'] as const;
 const REACTIONS = ['celebrating', 'happy', 'understanding'] as const;
 
-export function ChatMascot() {
+export function ChatMascot({ compact = false, state }: { compact?: boolean; state?: OliState }) {
   const reduced = usePrefersReducedMotion();
   const hint = useId();
   const [mood, setMood] = useState(0);
@@ -49,18 +49,18 @@ export function ChatMascot() {
     settle.current = setTimeout(() => setReaction(null), reduced ? 1200 : 2600);
   };
 
-  const expression = reaction ?? MOODS[mood]!;
+  const expression = state ?? reaction ?? MOODS[mood]!;
   return (
     <div className="flex shrink-0 flex-col items-center">
-      <button type="button" className="ask-oli-mascot" onClick={greet}
+      <button type="button" className={`ask-oli-mascot${compact ? ' ask-oli-mascot--compact' : ''}`} onClick={greet}
         aria-label={t('Say hello to Oli')} aria-describedby={hint} data-oli-expression={expression}>
         <span className="ask-oli-float" aria-hidden="true">
           <span ref={body} className="block">
-            <Oli size={224} particles={1800} state={expression} speed={0.85} paused={reduced} />
+            <Oli size={compact ? 104 : 224} particles={compact ? 1200 : 1800} state={expression} speed={0.85} paused={reduced} />
           </span>
         </span>
       </button>
-      <p id={hint} role="status" className="mt-1 text-xs text-ash">{reaction ? t('Here I am!') : t('Tap Oli to say hello.')}</p>
+      <p id={hint} role="status" className={compact ? 'sr-only' : 'mt-1 text-xs text-ash'}>{reaction ? t('Here I am!') : t('Tap Oli to say hello.')}</p>
     </div>
   );
 }
