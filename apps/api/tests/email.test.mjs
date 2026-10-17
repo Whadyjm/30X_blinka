@@ -63,12 +63,12 @@ async function setup(t) {
   };
   const batch = list => ({ messages: list.map(body => ({ body, attempts: 1, ack() {}, retry() { assert.fail('durable recovery handles retries'); } })) });
   const drainEmails = () => consumeEmails(batch(emails.splice(0)), env);
-  const drainJobs = async (kind = 'INVOICE') => {
+  const drainJobs = async (kind = 'INVOICE', corroborated = true) => {
     const b = batch(jobs.splice(0));
     await consumeInvoiceJobs(b, env, (e,o,i) => processInvoice(e,o,i, async (_env,_file,_bytes,hash) => {
       reads++;
       return { extraction: ex, documentType: kind, primaryReadId: 'primary', documentSha256: hash,
-        corroboration: corroboratePdfText(`EMISOR / SUPPLIER\n${ex.vendorName}\nMoneda / Currency\nUSD\nVencimiento / Due\n${ex.dueDate}\nTOTAL A COBRAR\nUSD 200.00`, hash) };
+        corroboration: corroborated ? corroboratePdfText(`EMISOR / SUPPLIER\n${ex.vendorName}\nMoneda / Currency\nUSD\nVencimiento / Due\n${ex.dueDate}\nTOTAL A COBRAR\nUSD 200.00`, hash) : null };
     }));
     await wakeEmailInvoices(b, env);
   };
@@ -146,6 +146,38 @@ test('Email: scheduler recupera publicación y fallo de Telegram sin reextraer; 
   await recoverEmails(s.env); await s.drainEmails();
   assert.equal(s.reads, 1); assert.equal(s.sent.length, 0);
   assert.ok(await s.DB.prepare('SELECT notified_at FROM email_messages').first('notified_at'));
+});
+
+test('Email: imágenes pegadas en Gmail llegan a inbox y Telegram sin autoaprobar lecturas inciertas ni logos', async t => {
+  for (const [mime, bytes, kind, expected] of [
+    ['image/png', [137,80,78,71,13,10,26,10,0], 'INVOICE', 'ESCALATE'],
+    ['image/jpeg', [255,216,255,0], 'OTHER', 'BLOCK'],
+  ]) {
+    const s = await setup(t), address = await s.enable();
+    const raw = [
+      'From: supplier@example.invalid', `To: ${address}`, 'Subject: Factura pegada en el cuerpo',
+      'MIME-Version: 1.0', 'Content-Type: multipart/related; boundary="gmail-body"', '',
+      '--gmail-body', 'Content-Type: multipart/alternative; boundary="gmail-text"', '',
+      '--gmail-text', 'Content-Type: text/plain; charset=utf-8', '', 'Factura en imagen.',
+      '--gmail-text', 'Content-Type: text/html; charset=utf-8', '',
+      '<div><img src="cid:invoice-body"><img src="https://remote.invalid/tracking.png"></div>',
+      '--gmail-text--', '', '--gmail-body', `Content-Type: ${mime}; name="image.png"`,
+      'Content-Disposition: inline; filename="image.png"', 'Content-ID: <invoice-body>',
+      'X-Attachment-Id: invoice-body', 'Content-Transfer-Encoding: base64', '',
+      Buffer.from(bytes).toString('base64'), '--gmail-body--', '',
+    ].join('\r\n');
+    assert.equal(await s.receive(address, raw), null);
+    const received = (await s.api('/inbox')).data.messages[0];
+    assert.equal(received.state, 'RECEIVED'); assert.equal(received.attachments.length, 1);
+    await s.drainEmails(); await s.drainJobs(kind, false); await s.drainEmails();
+    const message = (await s.api('/inbox')).data.messages[0];
+    assert.equal(message.state, 'COMPLETED'); assert.equal(message.attachments[0].decision, expected);
+    const invoice = (await s.api(`/invoices/${message.attachments[0].invoiceId}`)).data;
+    assert.equal(invoice.source, 'EMAIL'); assert.equal(invoice.file.mimeType, mime);
+    assert.equal(await s.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+    assert.equal(s.reads, 1); assert.equal(s.sent.length, 1);
+    assert.match(s.sent[0].text, /Factura pegada en el cuerpo/);
+  }
 });
 
 test('Email: sin adjuntos o documentos ajenos no autoriza; límites rechazan antes de extraer', async t => {
