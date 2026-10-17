@@ -1,0 +1,688 @@
+# Contrato API v1 — Oscar ↔ Whady
+
+Estado: **contrato de backend v1 definido por Oscar; todavía sin endpoints implementados**.
+
+Oscar implementa backend, persistencia y reglas. Whady implementa todo el frontend.
+Este documento permite que ambos trabajen con los mismos payloads desde ahora.
+Oscar define y mantiene el contrato; Whady consume estas rutas y formas sin cambiarlas
+por su cuenta. Si una pantalla requiere un dato o una acción adicional, Whady lo comunica
+a Oscar, quien actualiza el contrato y coordina el cambio. La implementación del frontend
+no necesita esperar una aprobación conjunta del documento.
+
+## 1. Fuente de verdad y alcance
+
+1. [RETO_BLINKA.md](../master_files/RETO_BLINKA.md) prevalece siempre.
+2. [Brief v3](../master_files/OLI_MASTER_BRIEF_v3_EMPLEADO_FINANCIERO.md) define la propuesta de producto subordinada al reto.
+3. Este contrato concreta el intercambio HTTP. Oscar lo actualiza y comunica los cambios antes de que se cambien las implementaciones afectadas.
+
+El núcleo P0 es: reglas configurables → cargar factura ficticia → extraer proveedor,
+importe, moneda y vencimiento → decidir → registrar y explicar → revisión humana cuando corresponde.
+`APPROVE` significa aprobado para **pago simulado**. No se mueve dinero.
+
+Delegation Insights y chat son P1. Agent Access, Clearance, registro público y pagos reales
+no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
+No se requiere una pantalla de registro.
+
+## 2. Convenciones comunes
+
+- Base: `/api/v1`. Excepción pública: `GET /api/health`.
+- Mismo origen para SPA y API; el frontend usa rutas relativas.
+- JSON en camelCase. IDs opacos `string`; el frontend no interpreta su contenido.
+- JSON de éxito: `{ "data": ... }`. Listados: `{ "data": [...], "pagination": ... }`.
+- Fechas de factura: `YYYY-MM-DD`; timestamps: ISO 8601 UTC, por ejemplo `2026-10-17T02:00:00Z`.
+- Importes: enteros seguros en unidades menores. `45000 USD` representa USD 450,00.
+  El formateo usa el exponente de cada moneda; no dividir siempre por 100.
+- Monedas ISO 4217 en mayúsculas. No se convierten monedas ni se suman presupuestos de monedas diferentes.
+- P0 configura un presupuesto mensual en la moneda del mandato. Una factura en otra moneda
+  se extrae, pero sin presupuesto compatible no se aprueba. No mostrar un selector que sugiera conversión automática.
+- `null` significa dato desconocido/no disponible. No sustituir por cero o cadena vacía.
+- `orgId`, roles, versiones, reservas y decisiones se determinan en el servidor; no se aceptan como autoridad del navegador.
+- Los ejemplos y sus resultados son **datos ficticios para mocks**, no métricas de una implementación real.
+- Listados: `page=1`, `pageSize=20` por defecto; máximo 100. Orden: `createdAt DESC, id DESC`.
+- Toda mutación rechaza campos desconocidos; no aceptar `approved: true` ni decisiones arbitrarias al subir una factura.
+
+### Tres conceptos separados
+
+| Concepto | Valores | Uso en UI |
+|---|---|---|
+| `Invoice.status` | `RECEIVED`, `PARSING`, `READY`, `PROCESSING`, `DECIDED`, `FAILED` | Progreso técnico |
+| `PolicyDecision.action` | `APPROVE`, `BLOCK`, `ESCALATE` | Resultado del motor |
+| `ApprovalRequest.state` | `PENDING`, `APPROVED`, `REJECTED`, `INVALIDATED` | Revisión humana |
+
+`DECIDED` no significa aprobado. `ESCALATE` no siempre tiene una aprobación autorizable:
+datos ilegibles pueden requerir corregir/subir el documento, no pulsar «Aprobar».
+No enviar `NEEDS_APPROVAL` como estado de procesamiento.
+
+### Nombres canónicos
+
+Usamos `action`, `humanExplanation`, `policyVersionId` y `basedOnPolicyVersionId`,
+según los tipos del brief. Sus ejemplos con `decision`, `explanation`, `policyVersion`
+y `basedOnPolicyVersion` son ilustrativos y **no son el formato HTTP definido aquí**.
+El número visible de una política se expone además como `policyVersion` dentro de una decisión.
+
+## 3. Sesión demo y permisos
+
+Contrato de sesión mínimo, independiente del proveedor de autenticación que implemente Oscar:
+
+| Método | Ruta | Entrada | Respuesta |
+|---|---|---|---|
+| POST | `/session` | `{ email, password }` | `200 { data: Session }` + cookie de sesión |
+| GET | `/me` | Sin body | `200 { data: Session }` |
+| DELETE | `/session` | Sin body | `204`, elimina sesión |
+
+```ts
+type Role = 'OWNER' | 'APPROVER';
+type Session = {
+  user: { id: string; name: string; email: string };
+  organization: { id: string; name: string; defaultCurrency: string; timezone: string };
+  role: Role;
+  csrfToken: string;
+};
+```
+
+Cookie `HttpOnly`, `Secure` en producción y `SameSite`. Credenciales de demo comunicadas
+por separado, sin claves reales en este documento ni credenciales incorporadas al bundle.
+`GET /me` devuelve `401` si no hay sesión; el front muestra acceso demo.
+
+Las mutaciones autenticadas llevan `X-CSRF-Token` obtenido de `/me` o del login.
+El login valida origen y tiene limitación de intentos. No se envían tokens de dueño en localStorage.
+
+OWNER administra reglas, proveedores y acuerdos. OWNER y APPROVER pueden revisar excepciones
+autorizables; ambos pueden consultar y cargar facturas en su empresa. Un APPROVER no cambia reglas.
+Otros permisos se incorporarán explícitamente si fueran necesarios.
+
+## 4. Modelos que consume el frontend
+
+Estos son DTOs HTTP, no filas SQL. Oscar implementará sus validaciones compartidas en
+`packages/contracts`; Whady puede crear mocks con estas formas mientras existe el scaffold.
+No mantener una segunda definición divergente cuando el paquete esté disponible.
+
+```ts
+type DecisionAction = 'APPROVE' | 'BLOCK' | 'ESCALATE';
+type InvoiceStatus = 'RECEIVED' | 'PARSING' | 'READY' | 'PROCESSING' | 'DECIDED' | 'FAILED';
+type Pagination = { page: number; pageSize: number; total: number };
+type Page<T> = { data: T[]; pagination: Pagination };
+type Envelope<T> = { data: T };
+
+type Vendor = {
+  id: string;
+  name: string;
+  allowed: boolean;
+  externalRef: string | null;
+  createdAt: string;
+};
+type Agreement = {
+  id: string;
+  vendorId: string;
+  currency: string;
+  amountMinor: number;
+  toleranceMinor: number;
+  frequency: 'ONE_TIME' | 'MONTHLY';
+  concept: string;
+  active: boolean;
+  createdAt: string;
+};
+type ScopedDelegation = {
+  vendorId: string;
+  agreementId: string;
+  currency: string;
+  maxAmountMinor: number;
+  validFrom: string;
+  validUntil: string;
+  maxPerPeriod: number;
+};
+type MandateRules = {
+  currency: string;
+  automaticLimitMinor: number;
+  hardLimitMinor: number;
+  monthlyBudgetMinor: number;
+  requireAllowedVendor: boolean;
+  requireAgreement: boolean;
+  humanApprovalEnabled: boolean;
+  reviewAboveMinor: number;
+  processDaysBeforeDue: number;
+  scopedDelegations: ScopedDelegation[];
+};
+type PolicyVersion = {
+  id: string;
+  version: number;
+  status: 'ACTIVE' | 'SUPERSEDED';
+  rules: MandateRules;
+  activatedAt: string;
+  activatedBy: string;
+};
+type MandateDraft = {
+  id: string;
+  revision: number;
+  basedOnPolicyVersionId: string | null;
+  rules: MandateRules;
+  updatedAt: string;
+};
+type BudgetPeriod = {
+  id: string;
+  currency: string;
+  periodKey: string; // YYYY-MM, según timezone de la empresa
+  limitMinor: number;
+  reservedMinor: number;
+  availableMinor: number;
+};
+type ExtractedInvoice = {
+  vendorName: string | null;
+  invoiceNumber: string | null;
+  amountMinor: number | null;
+  currency: string | null;
+  issuedAt: string | null;
+  dueDate: string | null;
+  servicePeriod: string | null; // YYYY-MM, solo si el documento identifica el periodo mensual
+  description: string | null;
+  extractionWarnings: string[];
+  evidence: Array<{ field: string; source: string; quote?: string }>;
+};
+type DecisionReasonCode =
+  | 'ALLOWED_VENDOR' | 'UNKNOWN_VENDOR'
+  | 'DUPLICATE_INVOICE' | 'POSSIBLE_DUPLICATE'
+  | 'AGREEMENT_MISMATCH' | 'MISSING_AGREEMENT'
+  | 'AMOUNT_ABOVE_AUTO_LIMIT' | 'AMOUNT_ABOVE_HARD_LIMIT'
+  | 'BUDGET_EXCEEDED' | 'MISSING_BUDGET'
+  | 'INVALID_OR_MISSING_DATA' | 'INVALID_CURRENCY'
+  | 'HUMAN_APPROVAL_REQUIRED' | 'POLICY_ALLOWED'
+  | 'HUMAN_APPROVED' | 'HUMAN_REJECTED';
+type PolicyDecision = {
+  id: string;
+  invoiceId: string;
+  action: DecisionAction;
+  reasons: DecisionReasonCode[];
+  humanExplanation: string;
+  policyVersionId: string;
+  policyVersion: number;
+  checkedAt: string;
+  needsHumanApproval: boolean;
+  actor: { kind: 'SYSTEM' | 'HUMAN'; userId: string | null };
+  facts: {
+    amountMinor: number | null;
+    currency: string | null;
+    automaticLimitMinor: number;
+    hardLimitMinor: number;
+    budgetAvailableBeforeMinor: number | null;
+    vendorAllowed: boolean | null;
+    agreementId: string | null;
+  };
+  trace: Array<{
+    rule: string;
+    outcome: 'PASS' | 'BLOCK' | 'ESCALATE';
+    explanation: string;
+    evidence: Record<string, string | number | boolean | null>;
+  }>;
+  simulated: true;
+};
+type ApprovalRequest = {
+  id: string;
+  invoiceId: string;
+  decisionId: string;
+  policyVersionId: string;
+  state: 'PENDING' | 'APPROVED' | 'REJECTED' | 'INVALIDATED';
+  reason: string;
+  canApprove: boolean; // calculado para la sesión actual; servidor revalida
+  reviewerId: string | null;
+  reviewComment: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+};
+type Invoice = {
+  id: string;
+  status: InvoiceStatus;
+  source: 'HUMAN_UPLOAD';
+  file: { name: string; mimeType: string; sizeBytes: number; url: string };
+  vendorId: string | null;
+  vendorName: string | null;
+  agreementId: string | null;
+  invoiceNumber: string | null;
+  amountMinor: number | null;
+  currency: string | null;
+  issuedAt: string | null;
+  dueDate: string | null;
+  servicePeriod: string | null;
+  description: string | null;
+  extractionWarnings: string[];
+  latestDecision: PolicyDecision | null;
+  approvalRequest: ApprovalRequest | null;
+  processingError: { code: string; message: string; retryable: boolean } | null;
+  createdAt: string;
+  updatedAt: string;
+};
+type InvoiceDetail = Invoice & {
+  extraction: ExtractedInvoice | null;
+  decisions: PolicyDecision[]; // historial cronológico, sin reescribir decisiones anteriores
+};
+```
+
+El frontend recibe el importe extraído incluso si es ambiguo; solo usa `latestDecision`
+para mostrar el resultado oficial. No calcula «aprobado» comparando el importe con un límite.
+Solo `APPROVE` persistido después de reservar presupuesto permite mostrar aprobación simulada.
+
+## 5. Mapa P0 y comportamiento de endpoints
+
+`Session` y errores se describen arriba/abajo. Todas las rutas siguientes requieren sesión,
+excepto health. Se devuelve `404` tanto para recurso inexistente como para recurso ajeno.
+
+| Método | Ruta | Entrada | Respuesta de éxito |
+|---|---|---|---|
+| GET | `/api/health` | — | `200 { data: { ok: true, service: "oli-api" } }` |
+| GET | `/mandate` | — | `200 Envelope<{ active: PolicyVersion \| null; draft: MandateDraft \| null }>` |
+| PUT | `/mandate/draft` | Ver abajo | `200 Envelope<MandateDraft>` |
+| POST | `/mandate/activate` | Ver abajo | `200 Envelope<PolicyVersion>` |
+| GET | `/vendors` | Paginación | `200 Page<Vendor>` |
+| POST | `/vendors` | `{ name, allowed, externalRef }` | `201 Envelope<Vendor>` |
+| PATCH | `/vendors/:id` | Uno o más campos de creación | `200 Envelope<Vendor>` |
+| GET | `/agreements` | Paginación; `vendorId?` | `200 Page<Agreement>` |
+| POST | `/agreements` | Campos de Agreement excepto `id`, `createdAt` | `201 Envelope<Agreement>` |
+| PATCH | `/agreements/:id` | Uno o más campos de creación | `200 Envelope<Agreement>` |
+| GET | `/budgets` | `periodKey?` (`YYYY-MM`; defecto mes actual) | `200 Envelope<BudgetPeriod[]>` |
+| POST | `/invoices` | Multipart, campo `file` | `201 Envelope<Invoice>` |
+| GET | `/invoices` | Filtros abajo | `200 Page<Invoice>` |
+| GET | `/invoices/:id` | — | `200 Envelope<InvoiceDetail>` |
+| GET | `/invoices/:id/file` | — | `200` binario privado PDF/imagen |
+| POST | `/invoices/:id/process` | Sin body | `200 Envelope<InvoiceDetail>` o `202 Envelope<Invoice>` |
+| GET | `/approvals` | Paginación; `state?` (defecto `PENDING`) | `200 Page<{ approval: ApprovalRequest; invoice: Invoice }>` |
+| POST | `/approvals/:id/decision` | Ver abajo | `200 Envelope<{ approval: ApprovalRequest; invoice: InvoiceDetail }>` |
+| GET | `/dashboard` | — | `200 Envelope<Dashboard>` |
+| GET | `/evaluation/summary` | — | `200 Envelope<EvaluationSummary \| null>` |
+
+`PATCH` de proveedores/acuerdos, `/session`, `/budgets`, `/dashboard` y `/invoices/:id/file`
+completan operaciones que las pantallas necesitan y el mapa del brief no detallaba.
+`POST /orgs` se pospone: la empresa demo se crea mediante seed, sin onboarding multiempresa.
+
+### Reglas y presupuesto
+
+Crear/actualizar borrador requiere OWNER:
+
+```ts
+type SaveMandateDraft = {
+  expectedRevision: number | null; // null solo si no existe borrador
+  basedOnPolicyVersionId: string | null; // null solo para primer mandato
+  rules: MandateRules;
+};
+type ActivateMandate = {
+  draftId: string;
+  expectedRevision: number;
+  expectedActivePolicyVersionId: string | null;
+  confirmed: true;
+};
+```
+
+Guardar borrador no activa nada. Activar revalida el contenido, la revisión y la política de origen;
+si cambiaron, `409 POLICY_CHANGED` o `409 DRAFT_CHANGED` y el front recarga y pide nueva confirmación.
+El backend asigna ID y número de versión. No se editan versiones activadas.
+
+Condiciones: `0 <= reviewAboveMinor <= automaticLimitMinor <= hardLimitMinor`,
+`monthlyBudgetMinor >= 0`, importes seguros; moneda válida y compatible con el presupuesto.
+Un importe **mayor** al límite automático o a `reviewAboveMinor` requiere revisión humana;
+la igualdad al umbral no lo supera. Si no se permite revisión humana se bloquea ese caso.
+El límite duro, las prohibiciones, duplicados y presupuesto siguen prevaleciendo.
+
+Ejemplo completo del primer borrador:
+
+```json
+{
+  "expectedRevision": null,
+  "basedOnPolicyVersionId": null,
+  "rules": {
+    "currency": "USD",
+    "automaticLimitMinor": 30000,
+    "hardLimitMinor": 100000,
+    "monthlyBudgetMinor": 200000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 30000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  }
+}
+```
+
+La demo empieza con `requireAllowedVendor=true`, `requireAgreement=true`,
+`humanApprovalEnabled=true`, `reviewAboveMinor=automaticLimitMinor` y `scopedDelegations=[]`.
+Desactivar un requisito solo se hace mediante activación explícita del OWNER; no por chat.
+`processDaysBeforeDue=0` en P0: se evalúa al procesar, sin scheduler. No mostrar controles de
+programación hasta implementar P1. Fechas futuras/vencidas se muestran; no se simulan pagos futuros.
+
+El presupuesto se modifica activando mandato, no escribiendo reservas desde el navegador.
+Actualizar el límite del mes conserva las reservas existentes; no puede quedar por debajo
+de `reservedMinor`. La moneda del mandato no puede cambiar con reservas vigentes
+(`409 CURRENCY_CHANGE_CONFLICT`). El servidor conserva las reglas/versiones que dieron origen a cada decisión.
+
+Modificar proveedor/acuerdo requiere OWNER y un evento auditado con antes/después.
+No cambia resultados históricos; el siguiente procesamiento o aprobación usa datos vigentes.
+`frequency=MONTHLY` exige identificar el periodo de servicio desde la evidencia del documento;
+se guarda en `servicePeriod`. Si no se puede comprobar, se escala. No inferirlo solo de
+la fecha de vencimiento. P0 permite un cobro por acuerdo y periodo mensual; otro cobro para
+ese mismo periodo se bloquea si se confirma la duplicación, o se escala si es ambiguo.
+`ONE_TIME` permite una sola obligación por acuerdo. Reintentos de procesamiento no crean otra obligación.
+`amountMinor > 0`, `toleranceMinor >= 0`; nombres/conceptos no vacíos tras trim.
+Referencias a proveedor/acuerdo deben pertenecer a la empresa de la sesión.
+
+### Facturas: subida, procesamiento y polling
+
+1. `POST /invoices`: `FormData` con un PDF/PNG/JPEG ficticio, máximo **5 MiB (5 242 880 bytes)**.
+   No fijar `Content-Type` manualmente; el navegador incluye el boundary.
+2. Devuelve factura `RECEIVED`, campos desconocidos en `null` y `latestDecision=null`.
+3. El front llama `POST /invoices/:id/process`.
+4. Si termina durante la solicitud: `200` con detalle. Si continúa: `202` con la factura actual.
+5. Mientras esté `PARSING`, `READY` o `PROCESSING`, consultar `GET /invoices/:id`
+   cada 2 segundos. Parar en `DECIDED`/`FAILED`, al salir de la pantalla o después de
+   60 segundos; al agotar ese tiempo mostrar «Sigue procesando» con actualización manual,
+   sin inventar un fallo o repetir automáticamente la subida.
+
+Repetir `process` devuelve el trabajo/resultado existente y nunca reserva dos veces.
+Si está `FAILED` y `processingError.retryable=true`, el usuario puede reintentar con el mismo endpoint.
+Una factura ya decidida no se reevalúa por llamar `process`; P1 usa `/reevaluate` explícito.
+
+Un documento ilegible puede terminar `DECIDED` con `ESCALATE` y explicación de datos faltantes.
+Una caída técnica del proveedor/BD deja `FAILED`, sin una aprobación nueva. Ante fallo de polling,
+mantener la última información conocida y mostrar el error de conexión.
+
+Subir el mismo documento como factura nueva debe producir un registro auditable bloqueado como
+duplicado cuando se confirme. Repetir la misma solicitud HTTP con la misma clave de idempotencia
+devuelve el mismo registro original; son dos situaciones distintas.
+
+Filtros de `GET /invoices`: `status?`, `action?`, `vendorId?`, `needsHumanApproval?` y paginación.
+Los filtros se combinan con AND; `action` consulta la última decisión.
+`needsHumanApproval=true` selecciona solicitudes `PENDING` autorizables, no todos los `ESCALATE`.
+
+`Invoice.file.url` es una ruta del mismo origen, por ejemplo `/api/v1/invoices/inv_demo_450/file`.
+Permite preview autenticado; no entrega `file_key`, secretos ni URLs públicas de R2.
+PDF se sirve con `Content-Type: application/pdf`, imágenes con su MIME validado;
+`Content-Disposition: inline` y nombre saneado. Respuestas privadas sin caché compartida.
+No hay edición manual de extracción en P0: datos ilegibles requieren una nueva carga corregida.
+
+### Aprobación humana
+
+```json
+{
+  "action": "APPROVE",
+  "comment": "Verifiqué el acuerdo mensual y autorizo esta excepción.",
+  "expectedDecisionId": "dec_demo_escalation",
+  "expectedPolicyVersionId": "pol_demo_v1"
+}
+```
+
+`action` admite `APPROVE` o `REJECT`; `comment` es obligatorio, entre 1 y 1000 caracteres tras trim.
+Estos son comandos humanos; `REJECT` se registra como nueva decisión `BLOCK` con `HUMAN_REJECTED`.
+El OWNER/APPROVER solo autoriza excepciones que la política permite. El servidor revalida
+permisos, proveedor, acuerdo, duplicados, política y presupuesto; no basta con `canApprove=true`.
+
+Si los IDs quedaron antiguos: `409 POLICY_CHANGED` o `409 DECISION_CHANGED`.
+Si ya no es autorizable: `409 APPROVAL_NOT_ALLOWED`; se invalida la solicitud pendiente,
+se registra el motivo actual y el front vuelve a cargar detalle/lista.
+Rechazar una solicitud vigente agrega `BLOCK`; aprobar agrega `APPROVE` con actor humano,
+solo tras reserva segura. Conservar la escalación anterior en `decisions`.
+
+### Idempotencia y errores de concurrencia
+
+El frontend manda `Idempotency-Key` (UUID aleatorio por acción lógica) en subida,
+activación de mandato y decisión humana. Lo reutiliza al reintentar tras un fallo de red;
+una nueva acción/documento genera otra clave. `process` es idempotente además por factura.
+
+El backend vincula la clave a empresa, actor, ruta y contenido. Misma clave con contenido distinto:
+`409 IDEMPOTENCY_CONFLICT`. Repetición con mismo contenido: devuelve la misma respuesta sin repetir efectos.
+Garantía P0: las claves se conservan durante toda la vida de los datos de demo.
+
+El backend evita simultáneamente doble aprobación, doble reserva y superar el presupuesto.
+El frontend no anuncia éxito antes de la confirmación del servidor.
+
+## 6. Ejemplos listos para mocks
+
+### Factura recién subida — `201`
+
+```json
+{
+  "data": {
+    "id": "inv_demo_450",
+    "status": "RECEIVED",
+    "source": "HUMAN_UPLOAD",
+    "file": { "name": "acme-octubre.pdf", "mimeType": "application/pdf", "sizeBytes": 18240, "url": "/api/v1/invoices/inv_demo_450/file" },
+    "vendorId": null,
+    "vendorName": null,
+    "agreementId": null,
+    "invoiceNumber": null,
+    "amountMinor": null,
+    "currency": null,
+    "issuedAt": null,
+    "dueDate": null,
+    "servicePeriod": null,
+    "description": null,
+    "extractionWarnings": [],
+    "latestDecision": null,
+    "approvalRequest": null,
+    "processingError": null,
+    "createdAt": "2026-10-17T02:00:00Z",
+    "updatedAt": "2026-10-17T02:00:00Z"
+  }
+}
+```
+
+### Decisión que irá dentro de `latestDecision`
+
+Proveedor/acuerdo válidos por USD 450, automático USD 300 y techo USD 1000:
+
+```json
+{
+  "id": "dec_demo_escalation",
+  "invoiceId": "inv_demo_450",
+  "action": "ESCALATE",
+  "reasons": ["AMOUNT_ABOVE_AUTO_LIMIT", "HUMAN_APPROVAL_REQUIRED"],
+  "humanExplanation": "La factura de USD 450 coincide con el acuerdo, pero supera el límite automático de USD 300. Requiere autorización humana.",
+  "policyVersionId": "pol_demo_v1",
+  "policyVersion": 1,
+  "checkedAt": "2026-10-17T02:00:05Z",
+  "needsHumanApproval": true,
+  "actor": { "kind": "SYSTEM", "userId": null },
+  "facts": { "amountMinor": 45000, "currency": "USD", "automaticLimitMinor": 30000, "hardLimitMinor": 100000, "budgetAvailableBeforeMinor": 200000, "vendorAllowed": true, "agreementId": "agr_demo_acme" },
+  "trace": [
+    { "rule": "AUTO_LIMIT", "outcome": "ESCALATE", "explanation": "45000 supera 30000 unidades menores de USD.", "evidence": { "amountMinor": 45000, "automaticLimitMinor": 30000, "currency": "USD" } }
+  ],
+  "simulated": true
+}
+```
+
+En el detalle procesado, actualizar los campos de factura, `status=DECIDED` y usar:
+
+```json
+{
+  "id": "apr_demo_450",
+  "invoiceId": "inv_demo_450",
+  "decisionId": "dec_demo_escalation",
+  "policyVersionId": "pol_demo_v1",
+  "state": "PENDING",
+  "reason": "Importe superior al límite automático, dentro del tramo autorizable.",
+  "canApprove": true,
+  "reviewerId": null,
+  "reviewComment": null,
+  "createdAt": "2026-10-17T02:00:05Z",
+  "decidedAt": null
+}
+```
+
+Ejemplo de listado vacío, aplicable a facturas, proveedores o aprobaciones:
+
+```json
+{ "data": [], "pagination": { "page": 1, "pageSize": 20, "total": 0 } }
+```
+
+Mocks mínimos para Whady (no modificar solo el badge: mantener coherentes todos los campos):
+
+| Escenario ficticio | Estado técnico | Decisión | Aprobación |
+|---|---|---|---|
+| Documento recibido | `RECEIVED` | `null` | `null` |
+| Extrayendo | `PARSING` | `null` | `null` |
+| Válida USD 200, acuerdo 200 y presupuesto suficiente | `DECIDED` | `APPROVE / POLICY_ALLOWED` | `null` |
+| Duplicado confirmado | `DECIDED` | `BLOCK / DUPLICATE_INVOICE` | `null` |
+| Proveedor no permitido | `DECIDED` | `BLOCK / UNKNOWN_VENDOR` | `null` |
+| USD 450 con acuerdo válido y automático 300 | `DECIDED` | `ESCALATE / HUMAN_APPROVAL_REQUIRED` | `PENDING` |
+| USD 200 sin presupuesto suficiente | `DECIDED` | `BLOCK / BUDGET_EXCEEDED` | `null` |
+| Acuerdo 400 y factura 475 fuera de tolerancia | `DECIDED` | `ESCALATE / AGREEMENT_MISMATCH` | `null`, requiere corregir/aclarar |
+| Monto ilegible | `DECIDED` | `ESCALATE / INVALID_OR_MISSING_DATA` | `null` |
+| Proveedor de extracción caído | `FAILED` | `null` | `null`; `processingError.retryable=true` |
+
+La política demo escala discrepancias comerciales para aclaración, pero no permite aprobarlas
+con un botón genérico. No se trata de una excepción autorizable como superar el automático.
+Ante varios motivos, prevalece `BLOCK > ESCALATE > APPROVE`; conservar las razones relevantes.
+
+## 7. Dashboard y evaluación
+
+```ts
+type Dashboard = {
+  counts: {
+    total: number;
+    approved: number;
+    blocked: number;
+    escalated: number;
+    needsHumanApproval: number;
+    processing: number;
+    failed: number;
+  };
+  budgets: BudgetPeriod[];
+  upcoming: Invoice[]; // máximo 5, dueDate >= hoy, orden ascendente
+  recentDecisions: PolicyDecision[]; // máximo 10, checkedAt descendente
+  generatedAt: string;
+  simulated: true;
+};
+type EvaluationSummary = {
+  datasetVersion: string;
+  evaluatedAt: string;
+  totalCases: number;
+  correctDecisions: number;
+  unsafeApprovals: number;
+  correctAutonomousCases: number;
+  explainedDecisions: number;
+  decisionAccuracy: number; // 0..1, denominador totalCases
+  correctAutonomy: number; // 0..1, denominador totalCases
+  explanationCoverage: number; // 0..1, denominador totalCases
+};
+```
+
+Dashboard se calcula en backend, para toda la empresa y según la última decisión de cada factura;
+`needsHumanApproval` es subconjunto de `escalated`, no un estado adicional que sumar al total.
+`processing` incluye RECEIVED/PARSING/READY/PROCESSING. `upcoming` excluye facturas bloqueadas/fallidas.
+Las reservas no son transferencias ni importes bancarios pagados.
+
+Sin mandato: `/mandate` devuelve `active=null`; el front muestra configuración inicial.
+Procesar sin mandato activo devuelve `409 MANDATE_REQUIRED`, sin aprobar.
+Sin ejecución de pruebas: `/evaluation/summary` devuelve `{ data: null }` y la UI dice «Sin evaluación».
+No mostrar porcentajes o resultados inventados como si fueran mediciones.
+
+## 8. Errores y estados de UI
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Revisa los campos indicados.",
+    "fieldErrors": { "rules.hardLimitMinor": ["Debe ser mayor o igual al límite automático."] },
+    "requestId": "req_demo_001"
+  }
+}
+```
+
+`fieldErrors` es siempre un objeto (vacío si no aplica). Claves son rutas de campos,
+por ejemplo `rules.hardLimitMinor`. `requestId` permite investigar sin exponer secretos.
+
+| HTTP | Códigos | Comportamiento frontend |
+|---|---|---|
+| 400 | `VALIDATION_ERROR`, `INVALID_QUERY`, `IDEMPOTENCY_KEY_REQUIRED` | Mostrar error y conservar formulario |
+| 401 | `UNAUTHENTICATED`, `INVALID_CREDENTIALS` | Pedir sesión; no reintentar mutación automáticamente |
+| 403 | `FORBIDDEN`, `CSRF_INVALID` | Informar falta de permiso o pedir renovar sesión |
+| 404 | `NOT_FOUND` | Recurso no disponible |
+| 409 | `POLICY_CHANGED`, `DRAFT_CHANGED`, `DECISION_CHANGED`, `APPROVAL_NOT_ALLOWED`, `IDEMPOTENCY_CONFLICT`, `MANDATE_REQUIRED`, `BUDGET_LIMIT_CONFLICT`, `CURRENCY_CHANGE_CONFLICT` | Recargar estado; nueva revisión/confirmación humana si corresponde |
+| 413 | `FILE_TOO_LARGE` | Mostrar límite de 5 MiB |
+| 415 | `UNSUPPORTED_FILE_TYPE` | Pedir PDF/PNG/JPEG |
+| 429 | `RATE_LIMITED` | Respetar `Retry-After` en segundos |
+| 500/503 | `INTERNAL_ERROR`, `SERVICE_UNAVAILABLE` | Mostrar fallo técnico sin anunciar aprobación |
+
+`BLOCK` y `ESCALATE` son resultados de negocio y responden HTTP `200` al procesar;
+no son errores HTTP. Un `409` al aprobar nunca se interpreta como aprobación exitosa.
+Validar además el MIME/contenido del archivo en servidor, no solo su extensión.
+
+## 9. P1 reservado: delegaciones y chat
+
+No integrar estas pantallas a datos reales hasta que P0 esté probado. Formas reservadas:
+
+```ts
+type DelegationProposal = {
+  id: string;
+  vendorId: string;
+  agreementId: string;
+  currency: string;
+  proposedAutoLimitMinor: number;
+  validFrom: string;
+  validUntil: string;
+  maxPerPeriod: number;
+  evidenceDecisionIds: string[];
+  evidence: Array<{ decisionId: string; invoiceId: string }>;
+  basedOnPolicyVersionId: string;
+  status: 'DRAFT' | 'REJECTED' | 'ACCEPTED' | 'STALE';
+  description: string;
+  currentRules: MandateRules;
+  proposedRules: MandateRules;
+  activatedPolicyVersionId: string | null;
+  createdAt: string;
+};
+```
+
+| Método | Ruta | Entrada | Respuesta |
+|---|---|---|---|
+| GET | `/delegations/proposals` | `status?`, paginación | `200 Page<DelegationProposal>` |
+| POST | `/delegations/proposals/detect` | Sin body | `200 Envelope<DelegationProposal[]>` |
+| POST | `/delegations/proposals/:id/reject` | `{ comment }` | `200 Envelope<DelegationProposal>` |
+| POST | `/delegations/proposals/:id/activate` | `{ expectedActivePolicyVersionId, confirmed: true }` | `200 Envelope<{ proposal: DelegationProposal; policy: PolicyVersion }>` |
+| POST | `/invoices/:id/reevaluate` | `{ expectedPolicyVersionId }` | Misma forma 200/202 de `process` |
+| POST | `/chat` | `{ message }` | `200 Envelope<{ reply: string }>` |
+
+Mutaciones de propuestas requieren OWNER. Activación y reevaluación llevan `Idempotency-Key`;
+la detección no duplica propuestas equivalentes. Sin evidencia suficiente devuelve `data=[]`.
+La propuesta incluye los dos conjuntos de reglas para que el front muestre antes/después;
+el servidor reconstruye y valida el cambio, no acepta reglas arbitrarias del navegador.
+`evidence` vincula cada `decisionId` con su `invoiceId` para enlazar al detalle de factura;
+sus IDs coinciden con `evidenceDecisionIds`. Las decisiones completas están en `InvoiceDetail.decisions`.
+
+Propuesta de versión anterior: `409 POLICY_CHANGED`, estado `STALE`.
+Activar no aprueba facturas ni las reevalúa automáticamente; el owner pide reevaluación explícita.
+Reevaluar solo casos pendientes sin aprobación/reserva previa; si ya están resueltos,
+`409 APPROVAL_NOT_ALLOWED`. Cada resultado nuevo se agrega al historial.
+Chat no modifica políticas, no autoriza facturas y no sustituye formularios de confirmación.
+
+## 10. Cómo trabajar juntos y compartir este contrato
+
+1. Oscar publica este documento en `oscar/backend` y Whady usa sus DTOs/ejemplos para las pantallas.
+2. Integrar **solo el contrato** a `main` con un PR pequeño de documentación.
+   No esperar a terminar todo el backend para compartirlo.
+3. Whady actualiza su rama desde `main` y construye mocks con las mismas formas.
+4. Oscar implementa los endpoints y el paquete compartido sin modificar las pantallas.
+5. Sustituir mocks por HTTP por flujo: reglas → subida → lista/detalle → aprobación.
+6. Oscar comunica cambios de nombre/tipo/body y los actualiza aquí y en los contratos compartidos en el mismo PR; Whady adapta los consumidores afectados.
+
+Si `oscar/backend` todavía no está publicada, el archivo existe solo localmente.
+Una vez subida, se puede compartir la URL de GitHub del archivo en esa rama; un push a la rama
+no modifica `main` ni actualiza automáticamente el checkout de Whady.
+
+Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
+
+> Dejé `docs/API.md` en `oscar/backend`: contrato v1 para frontend/backend, con modelos,
+> rutas, ejemplos JSON, errores y estados de UI. Usa exactamente esos payloads para tus mocks.
+> Yo mantengo el contrato de backend. Si te falta algún dato o acción para una pantalla,
+> dímelo para incorporarlo; no cambies los nombres o formatos por tu cuenta.
+> El norte sigue siendo `master_files/RETO_BLINKA.md`. Primero conectamos reglas,
+> carga/listado/detalle de facturas y aprobaciones. Delegaciones/chat quedan para después.
+
+### Checklist de integración
+
+- [ ] Whady usa los DTOs para onboarding, Home, Bills, detalle, Rules y Approvals; reporta cualquier dato que falte.
+- [ ] Los mocks respetan los nombres, estados, filtros y errores P0 definidos por Oscar.
+- [ ] El frontend distingue decisión, estado técnico y revisión humana.
+- [ ] La UI identifica datos ficticios y pago simulado.
+- [ ] Se integra el contrato a `main`; cada uno continúa su implementación en su rama.
+- [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
+
+Estado actual: este archivo especifica comportamiento futuro. No demuestra que login,
+endpoints, base de datos, extracción o pruebas estén implementados.
