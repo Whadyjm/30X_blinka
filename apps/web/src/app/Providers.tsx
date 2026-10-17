@@ -23,7 +23,7 @@ export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(makeClient);
 
   useEffect(() => {
-    // Session expired / revoked anywhere → drop `me`; guards send the user to /login.
+    // Session expired / revoked anywhere → drop `me`; the session gate then explains there is no session.
     const onUnauthorized = () => client.setQueryData(qk.me, null);
     window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
     return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);

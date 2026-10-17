@@ -129,9 +129,8 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const lag = () => sleep(120 + Math.random() * 180);
 
 function auth(): Db {
-  const d = getDb();
-  if (!d.signedIn) throw new ApiError({ status: 401, code: 'UNAUTHENTICATED', message: 'Please sign in.' });
-  return d;
+  // No sign-in screen: the mock always has a session. (`signedIn` is kept only for persisted DBs.)
+  return getDb();
 }
 
 function requireOwner(d: Db) {
@@ -362,8 +361,7 @@ export const mockApi: OliApi = {
 
   async me() {
     await lag();
-    const d = getDb();
-    return d.signedIn ? meOf(d) : null;
+    return meOf(getDb());
   },
   async login(input) {
     await lag();

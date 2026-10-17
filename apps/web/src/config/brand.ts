@@ -16,6 +16,10 @@ export const brand = {
   get pitch() {
     return t('AI agents can do the work. Oli decides whether they’re allowed to spend.');
   },
+  /** Always visible. This product never moves real money. */
+  get envLabel() {
+    return t('Demo environment · No real money');
+  },
   /** Wording for APPROVE. Never "paid" / "sent" / "transferred". */
   get approveLabel() {
     return t('Approved');

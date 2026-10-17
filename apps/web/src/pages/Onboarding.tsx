@@ -60,7 +60,8 @@ export function Onboarding() {
   }, [mandate.data, draft]);
 
   if (me.isLoading) return <PageLoading />;
-  if (!me.data) return <Navigate to="/login" replace />;
+  // The session gate in App.tsx guarantees a session; this only narrows the type.
+  if (!me.data) return null;
   if (me.data.role === 'approver') return <Navigate to="/app" replace />;
   if (mandate.data?.active) return <Navigate to="/app" replace />;
 
