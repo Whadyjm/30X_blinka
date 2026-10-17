@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-17T23:26:02.537Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "aef3bc5",
+  "version": "666e41e2-3773-4337-a413-c95d5ae349c8",
+  "scope": "Lecturas en producción; inicio/cierre de sesión únicamente. Sin documentos nuevos, decisiones, mensajes ni llamadas al modelo.",
+  "checks": [
+    "Health API200",
+    "Cuatro tiles originales y botón primario amarillo con Beam animado restaurados",
+    "Dashboard nuevo visible; conteos de pendientes/aprobadas/bloqueadas coinciden con API paginada; enlace de pendiente abre detalle",
+    "Escritorio1440 y móvil390 sin desbordamiento",
+    "Oli224px escritorio/176px móvil; expresiones autónomas; reacción táctil y teclado; borrador conservado; reposo reducido inmóvil; móvil320/390 con compositor visible",
+    "Marca vectorial estática de Oli; encabezado sin canvas, glow ni animación; Ask Oli conserva su interfaz conversacional",
+    "Resumen enlaza al filtro correcto",
+    "Oli Skill y archivo descargable preservados"
+  ],
+  "counts": {
+    "invoices": 13,
+    "pending": 6,
+    "approved": 3,
+    "blocked": 4
+  },
+  "mutations": [],
+  "errors": [],
+  "result": "PASS",
+  "request": "Oli más grande en Ask Oli; reacción al tocar y gestos autónomos incluso sin interacción.",
+  "localChecks": {
+    "desktopSize": 224,
+    "mobileSize": 176,
+    "idleFramesChange": true,
+    "autonomousExpressions": true,
+    "tapAndRepeatedTapReact": true,
+    "keyboardEnterAndSpaceWork": true,
+    "reactionReturnsToRest": true,
+    "draftPreserved": true,
+    "localInteractionsNoApiWrites": true,
+    "reducedMotionStaticUntilInteraction": true,
+    "viewports": [
+      1440,
+      390,
+      320
+    ],
+    "shortMobileComposerVisible": true,
+    "staticHeaderLogoPreserved": true,
+    "unmountOnDashboard": true,
+    "errors": [],
+    "mutations": []
+  },
+  "regressionTests": {
+    "files": 8,
+    "passed": 33,
+    "scope": "Suite frontend existente; no mide extracción ni decisiones end-to-end"
+  },
+  "i18nKeysCovered": 851,
+  "build": "TypeScript + Vite: PASS, local y release publicado",
+  "wranglerDryRun": "PASS",
+  "preservation": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "ff174bfacb239f2860e313aecaf30ab97ff23172b30270983d9619d01fec26d5",
+    "deployment": {
+      "id": "a9d052c6-4e10-4e24-b109-32a4136a5deb",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "tiamat.agency@gmail.com",
+      "annotations": {
+        "workers/message": "Ask Oli: personaje más grande e interactivo (aef3bc5)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "666e41e2-3773-4337-a413-c95d5ae349c8",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-17T23:25:39.738356Z"
+    }
+  },
+  "baseVersion": "438f49f7-714c-455f-b840-064232fb46e2",
+  "screenshots": ".impeccable/review/interactive-chat-production/"
+}
