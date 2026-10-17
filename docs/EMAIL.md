@@ -46,7 +46,11 @@ El inbox distingue RECEIVED, WAITING, COMPLETED, NO_DOCUMENT y FAILED. Sin adjun
 compatibles no hay extracción ni aprobación. El documento debe viajar dentro del correo,
 como adjunto o imagen incrustada: no se siguen enlaces, se abren ZIP/Office ni se convierte
 el texto/HTML del cuerpo en un documento. Las imágenes remotas no se descargan.
-Los avisos usan decisiones registradas. Cursor por partes evita reenviar lo ya registrado
+Los avisos cuentan en primera persona qué llegó, el resultado y el siguiente paso, con botones
+al documento privado. Se traducen acción y motivos registrados, sin otra llamada al modelo;
+el texto técnico completo sigue en Oli. Correos con varios documentos conservan un botón por
+documento y otro a la bandeja. Las URLs y vistas previas no ocupan el cuerpo del mensaje.
+Cursor por partes evita reenviar lo ya registrado
 al reintentar Telegram, sin repetir extracción ni efectos financieros. Una caída entre
 aceptación remota y registro local puede repetir una notificación. Los adjuntos temporales
 se eliminan al terminar; los originales de facturas permanecen en R2 privado.
