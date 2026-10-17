@@ -13,7 +13,7 @@ export const esRules: Record<string, string> = {
   'What Oli may approve on its own, and who it may pay. Changes create a new, auditable version.':
     'Lo que Oli puede aprobar por sí solo y a quién puede pagar. Cada cambio crea una nueva versión auditable.',
   'Rules sections': 'Secciones de reglas',
-  Mandate: 'Mandato',
+  Mandate: 'Reglas',
   Vendors: 'Proveedores',
   Agreements: 'Acuerdos',
   'You can view the rules. Only an owner can change them.': 'Puedes ver las reglas. Solo un propietario puede cambiarlas.',
