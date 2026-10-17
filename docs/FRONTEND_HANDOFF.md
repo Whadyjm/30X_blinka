@@ -78,3 +78,22 @@ OWNER simulada; reserva total USD 650. Ninguna transferencia de dinero.
 
 La tabla anterior de tests del backend es su referencia original. El cliente añade seis tests,
 incluyendo un recorrido contra el Worker con D1/R2 reales y proveedores simulados.
+
+## Comprobación en navegador (17 de octubre)
+
+Se condujo Chrome sobre la web publicada, sin sustituir el proveedor ni las respuestas HTTP:
+login, selección de dos PDF ficticios, procesamiento, detalle y autorización humana de USD450
+con comentario. La decisión ESCALATE anterior permanece en el historial; D1 confirma la reserva.
+La factura nueva de USD200 quedó en revisión porque el modelo emitió advertencias incluso
+sobre características esperadas de una demo. Esas advertencias se conservaron y no hubo
+botón para sobreescribirlas. La reserva total de la base pasó de USD650 a USD1100.
+
+El documento privado responde PDF con caché privada; la vista previa usa un Blob efímero,
+limitado a 5MiB y revocado al salir, conservando el sandbox del archivo original. Las
+comprobaciones y resultados reales se guardan en `docs/evaluations/frontend-browser-20261017.json`.
+La activación de reglas y la presentación de FAILED reintentable también se probaron en la
+base local aislada; no se modificaron las reglas remotas para conseguir resultados favorables.
+
+La comprobación visual final en Chrome confirmó inicio y detalle a 1440px y 390px
+sin overflow horizontal, PDF visible, historial presente, evaluación vacía y ninguna
+excepción JavaScript observada. El reporte del navegador conserva esos resultados.

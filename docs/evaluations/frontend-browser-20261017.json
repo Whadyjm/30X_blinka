@@ -1,0 +1,817 @@
+{
+  "scope": "LIVE_BROWSER_INTEGRATION",
+  "checkedAt": "2026-10-17T12:19:37.521Z",
+  "url": "https://oli-api.tiamat-agency.workers.dev",
+  "method": "Chrome CDP drove the actual rendered production React client; cookie login, DOM file selection and human approval button. No model or HTTP fixture substitution.",
+  "initialDecisions": [
+    {
+      "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+      "action": "ESCALATE",
+      "reasons": [
+        "AMOUNT_ABOVE_AUTO_LIMIT",
+        "HUMAN_APPROVAL_REQUIRED"
+      ]
+    },
+    {
+      "invoiceId": "inv_c1aabc98-d096-44e1-83f4-2926247b16dd",
+      "action": "ESCALATE",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA"
+      ]
+    }
+  ],
+  "invoices": [
+    {
+      "id": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+      "status": "DECIDED",
+      "source": "HUMAN_UPLOAD",
+      "file": {
+        "name": "accounting.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 2618,
+        "url": "/api/v1/invoices/inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c/file"
+      },
+      "vendorId": "vendor_demo_acme",
+      "vendorName": "Acme Accounting (ficticio)",
+      "agreementId": "agr_demo_acme",
+      "invoiceNumber": "WEB-ACCOUNTING-4e2641a7",
+      "amountMinor": 45000,
+      "currency": "USD",
+      "issuedAt": "2026-10-18",
+      "dueDate": "2026-10-31",
+      "servicePeriod": "2026-11",
+      "description": "Contabilidad mensual ficticia",
+      "extractionWarnings": [],
+      "latestDecision": {
+        "id": "dec_2657c9e8-a300-426b-a16b-6fd4a9506503",
+        "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+        "action": "APPROVE",
+        "reasons": [
+          "HUMAN_APPROVED"
+        ],
+        "humanExplanation": "Aprobación simulada autorizada por una persona: Autorización simulada desde la interfaz: acuerdo y factura ficticios verificados para probar la integración.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T12:19:36.733Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "HUMAN",
+          "userId": "user_demo_owner"
+        },
+        "facts": {
+          "amountMinor": 45000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 135000,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_acme"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_demo_acme",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_acme",
+              "amountMinor": 45000,
+              "agreedAmountMinor": 45000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Contabilidad mensual ficticia",
+              "agreedConcept": "Contabilidad mensual ficticia"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 45000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 45000,
+              "availableMinor": 135000,
+              "reservedMinor": 65000,
+              "budgetLimitMinor": 200000,
+              "policyMonthlyBudgetMinor": 200000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "ESCALATE",
+            "explanation": "El importe supera el límite automático.",
+            "evidence": {
+              "amountMinor": 45000,
+              "automaticLimitMinor": 30000
+            }
+          },
+          {
+            "rule": "HUMAN_REVIEW",
+            "outcome": "ESCALATE",
+            "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+            "evidence": {
+              "amountMinor": 45000,
+              "reviewAboveMinor": 30000,
+              "humanApprovalEnabled": true
+            }
+          },
+          {
+            "rule": "HUMAN_REVIEW",
+            "outcome": "PASS",
+            "explanation": "Autorización simulada desde la interfaz: acuerdo y factura ficticios verificados para probar la integración.",
+            "evidence": {
+              "userId": "user_demo_owner",
+              "previousDecisionId": "dec_16a32396-e8cf-4ce5-9a07-78f29daf7795"
+            }
+          }
+        ],
+        "simulated": true
+      },
+      "approvalRequest": {
+        "id": "apr_694409d5-9e64-4c41-a7b2-402a1559adb4",
+        "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+        "decisionId": "dec_16a32396-e8cf-4ce5-9a07-78f29daf7795",
+        "policyVersionId": "pol_demo_v1",
+        "state": "APPROVED",
+        "reason": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+        "canApprove": false,
+        "reviewerId": "user_demo_owner",
+        "reviewComment": "Autorización simulada desde la interfaz: acuerdo y factura ficticios verificados para probar la integración.",
+        "createdAt": "2026-10-17T12:19:34.450Z",
+        "decidedAt": "2026-10-17T12:19:36.733Z"
+      },
+      "processingError": null,
+      "createdAt": "2026-10-17T12:19:05.209Z",
+      "updatedAt": "2026-10-17T12:19:36.733Z",
+      "extraction": {
+        "vendorName": "Acme Accounting (ficticio)",
+        "invoiceNumber": "WEB-ACCOUNTING-4e2641a7",
+        "amountMinor": 45000,
+        "currency": "USD",
+        "issuedAt": "2026-10-18",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-11",
+        "description": "Contabilidad mensual ficticia",
+        "extractionWarnings": [],
+        "evidence": [
+          {
+            "field": "vendorName",
+            "source": "page:1",
+            "quote": "Acme Accounting (ficticio)"
+          },
+          {
+            "field": "invoiceNumber",
+            "source": "page:1",
+            "quote": "WEB-ACCOUNTING-4e2641a7"
+          },
+          {
+            "field": "amountMinor",
+            "source": "page:1",
+            "quote": "TOTAL A COBRAR USD 450.00"
+          },
+          {
+            "field": "currency",
+            "source": "page:1",
+            "quote": "Moneda / Currency USD"
+          },
+          {
+            "field": "issuedAt",
+            "source": "page:1",
+            "quote": "Emisión / Issued 2026-10-18"
+          },
+          {
+            "field": "dueDate",
+            "source": "page:1",
+            "quote": "Vencimiento / Due 2026-10-31"
+          },
+          {
+            "field": "servicePeriod",
+            "source": "page:1",
+            "quote": "Periodo de servicio 2026-11"
+          },
+          {
+            "field": "description",
+            "source": "page:1",
+            "quote": "Contabilidad mensual ficticia"
+          }
+        ]
+      },
+      "decisions": [
+        {
+          "id": "dec_16a32396-e8cf-4ce5-9a07-78f29daf7795",
+          "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+          "action": "ESCALATE",
+          "reasons": [
+            "AMOUNT_ABOVE_AUTO_LIMIT",
+            "HUMAN_APPROVAL_REQUIRED"
+          ],
+          "humanExplanation": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+          "policyVersionId": "pol_demo_v1",
+          "policyVersion": 1,
+          "checkedAt": "2026-10-17T12:19:34.450Z",
+          "needsHumanApproval": true,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 45000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 135000,
+            "vendorAllowed": true,
+            "agreementId": "agr_demo_acme"
+          },
+          "trace": [
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_demo_acme",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_demo_acme",
+                "amountMinor": 45000,
+                "agreedAmountMinor": 45000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Contabilidad mensual ficticia",
+                "agreedConcept": "Contabilidad mensual ficticia"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 45000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 45000,
+                "availableMinor": 135000,
+                "reservedMinor": 65000,
+                "budgetLimitMinor": 200000,
+                "policyMonthlyBudgetMinor": 200000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "ESCALATE",
+              "explanation": "El importe supera el límite automático.",
+              "evidence": {
+                "amountMinor": 45000,
+                "automaticLimitMinor": 30000
+              }
+            },
+            {
+              "rule": "HUMAN_REVIEW",
+              "outcome": "ESCALATE",
+              "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+              "evidence": {
+                "amountMinor": 45000,
+                "reviewAboveMinor": 30000,
+                "humanApprovalEnabled": true
+              }
+            }
+          ],
+          "simulated": true
+        },
+        {
+          "id": "dec_2657c9e8-a300-426b-a16b-6fd4a9506503",
+          "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+          "action": "APPROVE",
+          "reasons": [
+            "HUMAN_APPROVED"
+          ],
+          "humanExplanation": "Aprobación simulada autorizada por una persona: Autorización simulada desde la interfaz: acuerdo y factura ficticios verificados para probar la integración.",
+          "policyVersionId": "pol_demo_v1",
+          "policyVersion": 1,
+          "checkedAt": "2026-10-17T12:19:36.733Z",
+          "needsHumanApproval": false,
+          "actor": {
+            "kind": "HUMAN",
+            "userId": "user_demo_owner"
+          },
+          "facts": {
+            "amountMinor": 45000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 135000,
+            "vendorAllowed": true,
+            "agreementId": "agr_demo_acme"
+          },
+          "trace": [
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_demo_acme",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_demo_acme",
+                "amountMinor": 45000,
+                "agreedAmountMinor": 45000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Contabilidad mensual ficticia",
+                "agreedConcept": "Contabilidad mensual ficticia"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 45000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 45000,
+                "availableMinor": 135000,
+                "reservedMinor": 65000,
+                "budgetLimitMinor": 200000,
+                "policyMonthlyBudgetMinor": 200000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "ESCALATE",
+              "explanation": "El importe supera el límite automático.",
+              "evidence": {
+                "amountMinor": 45000,
+                "automaticLimitMinor": 30000
+              }
+            },
+            {
+              "rule": "HUMAN_REVIEW",
+              "outcome": "ESCALATE",
+              "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+              "evidence": {
+                "amountMinor": 45000,
+                "reviewAboveMinor": 30000,
+                "humanApprovalEnabled": true
+              }
+            },
+            {
+              "rule": "HUMAN_REVIEW",
+              "outcome": "PASS",
+              "explanation": "Autorización simulada desde la interfaz: acuerdo y factura ficticios verificados para probar la integración.",
+              "evidence": {
+                "userId": "user_demo_owner",
+                "previousDecisionId": "dec_16a32396-e8cf-4ce5-9a07-78f29daf7795"
+              }
+            }
+          ],
+          "simulated": true
+        }
+      ]
+    },
+    {
+      "id": "inv_c1aabc98-d096-44e1-83f4-2926247b16dd",
+      "status": "DECIDED",
+      "source": "HUMAN_UPLOAD",
+      "file": {
+        "name": "hosting.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 2614,
+        "url": "/api/v1/invoices/inv_c1aabc98-d096-44e1-83f4-2926247b16dd/file"
+      },
+      "vendorId": "vendor_demo_cloud",
+      "vendorName": "Demo Cloud Hosting (ficticio)",
+      "agreementId": "agr_demo_cloud",
+      "invoiceNumber": "WEB-HOSTING-f7fc14fd",
+      "amountMinor": 20000,
+      "currency": "USD",
+      "issuedAt": "2026-10-18",
+      "dueDate": "2026-10-31",
+      "servicePeriod": "2026-11",
+      "description": "Hosting mensual ficticio",
+      "extractionWarnings": [
+        "Document is explicitly marked as fictitious/demo (DOCUMENTO FICTICIO - SOLO PRUEBAS - SIN VALOR FISCAL); no banking, tax or address details present, which is expected for this authorized test corpus.",
+        "No subtotal or tax breakdown provided; only a single 'TOTAL A COBRAR' line is present, which is unambiguous."
+      ],
+      "latestDecision": {
+        "id": "dec_eef28544-4e90-431d-9b43-a4a77f843d03",
+        "invoiceId": "inv_c1aabc98-d096-44e1-83f4-2926247b16dd",
+        "action": "ESCALATE",
+        "reasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "humanExplanation": "Requiere revisión. La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T12:19:34.860Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 20000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 135000,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_cloud"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "ESCALATE",
+            "explanation": "La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+            "evidence": {
+              "status": "REVIEW_REQUIRED",
+              "issues": "EXTRACTION_WARNING:*"
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_demo_cloud",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_cloud",
+              "amountMinor": 20000,
+              "agreedAmountMinor": 20000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Hosting mensual ficticio",
+              "agreedConcept": "Hosting mensual ficticio"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 20000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 20000,
+              "availableMinor": 135000,
+              "reservedMinor": 65000,
+              "budgetLimitMinor": 200000,
+              "policyMonthlyBudgetMinor": 200000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe está dentro de ambos umbrales automáticos.",
+            "evidence": {
+              "amountMinor": 20000,
+              "automaticLimitMinor": 30000,
+              "reviewAboveMinor": 30000
+            }
+          }
+        ],
+        "simulated": true
+      },
+      "approvalRequest": null,
+      "processingError": null,
+      "createdAt": "2026-10-17T12:19:05.207Z",
+      "updatedAt": "2026-10-17T12:19:34.860Z",
+      "extraction": {
+        "vendorName": "Demo Cloud Hosting (ficticio)",
+        "invoiceNumber": "WEB-HOSTING-f7fc14fd",
+        "amountMinor": 20000,
+        "currency": "USD",
+        "issuedAt": "2026-10-18",
+        "dueDate": "2026-10-31",
+        "servicePeriod": "2026-11",
+        "description": "Hosting mensual ficticio",
+        "extractionWarnings": [
+          "Document is explicitly marked as fictitious/demo (DOCUMENTO FICTICIO - SOLO PRUEBAS - SIN VALOR FISCAL); no banking, tax or address details present, which is expected for this authorized test corpus.",
+          "No subtotal or tax breakdown provided; only a single 'TOTAL A COBRAR' line is present, which is unambiguous."
+        ],
+        "evidence": [
+          {
+            "field": "vendorName",
+            "source": "page:1",
+            "quote": "Demo Cloud Hosting (ficticio)"
+          },
+          {
+            "field": "invoiceNumber",
+            "source": "page:1",
+            "quote": "WEB-HOSTING-f7fc14fd"
+          },
+          {
+            "field": "amountMinor",
+            "source": "page:1",
+            "quote": "TOTAL A COBRAR | USD 200.00"
+          },
+          {
+            "field": "currency",
+            "source": "page:1",
+            "quote": "Moneda / Currency | USD"
+          },
+          {
+            "field": "issuedAt",
+            "source": "page:1",
+            "quote": "Emisión / Issued | 2026-10-18"
+          },
+          {
+            "field": "dueDate",
+            "source": "page:1",
+            "quote": "Vencimiento / Due | 2026-10-31"
+          },
+          {
+            "field": "servicePeriod",
+            "source": "page:1",
+            "quote": "Periodo de servicio | 2026-11"
+          },
+          {
+            "field": "description",
+            "source": "page:1",
+            "quote": "Hosting mensual ficticio"
+          }
+        ]
+      },
+      "decisions": [
+        {
+          "id": "dec_eef28544-4e90-431d-9b43-a4a77f843d03",
+          "invoiceId": "inv_c1aabc98-d096-44e1-83f4-2926247b16dd",
+          "action": "ESCALATE",
+          "reasons": [
+            "INVALID_OR_MISSING_DATA"
+          ],
+          "humanExplanation": "Requiere revisión. La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+          "policyVersionId": "pol_demo_v1",
+          "policyVersion": 1,
+          "checkedAt": "2026-10-17T12:19:34.860Z",
+          "needsHumanApproval": false,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 20000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 135000,
+            "vendorAllowed": true,
+            "agreementId": "agr_demo_cloud"
+          },
+          "trace": [
+            {
+              "rule": "EXTRACTION",
+              "outcome": "ESCALATE",
+              "explanation": "La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+              "evidence": {
+                "status": "REVIEW_REQUIRED",
+                "issues": "EXTRACTION_WARNING:*"
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_demo_cloud",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_demo_cloud",
+                "amountMinor": 20000,
+                "agreedAmountMinor": 20000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Hosting mensual ficticio",
+                "agreedConcept": "Hosting mensual ficticio"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 20000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 20000,
+                "availableMinor": 135000,
+                "reservedMinor": 65000,
+                "budgetLimitMinor": 200000,
+                "policyMonthlyBudgetMinor": 200000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe está dentro de ambos umbrales automáticos.",
+              "evidence": {
+                "amountMinor": 20000,
+                "automaticLimitMinor": 30000,
+                "reviewAboveMinor": 30000
+              }
+            }
+          ],
+          "simulated": true
+        }
+      ]
+    }
+  ],
+  "budgets": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 200000,
+      "reservedMinor": 110000,
+      "availableMinor": 90000
+    }
+  ],
+  "browserErrors": [],
+  "note": "Only fictitious documents and simulated authorizations. Not an OCR corpus evaluation. Local isolated D1 rules activation and technical FAILED state were checked separately.",
+  "visualChecks": [
+    {
+      "page": "home",
+      "viewport": 1440,
+      "contentWidth": 1440,
+      "noOverflow": true
+    },
+    {
+      "page": "detail",
+      "viewport": 1440,
+      "contentWidth": 1440,
+      "noOverflow": true,
+      "historyVisible": true
+    },
+    {
+      "page": "home",
+      "viewport": 390,
+      "contentWidth": 390,
+      "noOverflow": true
+    },
+    {
+      "page": "detail",
+      "viewport": 390,
+      "contentWidth": 390,
+      "noOverflow": true,
+      "historyVisible": true
+    }
+  ],
+  "privateFile": {
+    "status": 200,
+    "type": "application/pdf",
+    "cache": "private, no-store"
+  },
+  "correctionHasNoApprovalButton": true,
+  "evaluationEmpty": true,
+  "deploymentVersion": "dfaf9264-d270-4851-8bb8-b0517c2a3bc7",
+  "extractionObservation": "Hosting USD200 was conservatively escalated because the model emitted warnings about demo labels and missing subtotal despite an unambiguous total. Warnings were retained; there was no approval button or unsafe override.",
+  "visualDeploymentVersion": "086d7950-113f-4812-83a9-cefaabc4865d",
+  "previewStrategy": "BOUNDED_EPHEMERAL_BLOB",
+  "localBrowserChecks": {
+    "rulesActivatedVersion": 2,
+    "humanReviewAboveMinor": 20000,
+    "technicalFailureRetryable": true
+  }
+}

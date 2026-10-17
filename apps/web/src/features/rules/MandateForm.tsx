@@ -60,7 +60,7 @@ export function MandateForm({ value, onChange, disabled, showErrors }: { value: 
         <legend className="mb-1 text-sm font-semibold text-slate-900">{t('When Oli should ask a person')}</legend>
         <Toggle
           label={t('Allow human approval of exceptions')}
-          description={t('Between {from} and {to}, an owner or approver can decide.', { from: formatMoney(value.automaticLimitMinor, cur), to: formatMoney(value.hardLimitMinor, cur) })}
+          description={t('Between {from} and {to}, an owner or approver can decide.', { from: formatMoney(value.reviewAboveMinor, cur), to: formatMoney(value.hardLimitMinor, cur) })}
           checked={value.humanApprovalEnabled}
           onChange={(v) => set({ humanApprovalEnabled: v })}
         />
