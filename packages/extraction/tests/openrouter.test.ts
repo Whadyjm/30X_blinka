@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
-import { EXTRACTION_CONFIG_VERSION, EXTRACTION_MODELS, ExtractionError, extractInvoiceWithOpenRouter } from '../src/openrouter.ts';
+import { EXTRACTION_CONFIG_VERSION, EXTRACTION_MODELS, PDF_EXTRACTION_MODELS, ExtractionError, extractInvoiceWithOpenRouter } from '../src/openrouter.ts';
 
 const image = new Uint8Array(readFileSync(new URL('../../../fixtures/invoices/001.png', import.meta.url)));
 const input = { apiKey: 'test-only-not-a-real-key', documentSha256: 'a'.repeat(64), images: [{ mimeType: 'image/png' as const, bytes: image }] };
@@ -16,17 +16,32 @@ const success = (model: string, extraction: unknown = candidate) => Response.jso
 });
 const modelOf = (init?: RequestInit) => (JSON.parse(String(init?.body)) as { model: string }).model;
 
-test('PDF privado usa file base64 y Mistral OCR, sin reutilizar lectura Cloudflare como evidencia independiente', async () => {
+test('PDF privado usa modelo nativo y bytes originales, sin reutilizar lectura Cloudflare como evidencia independiente', async () => {
   const bytes = new Uint8Array(readFileSync(new URL('../../../fixtures/invoices/001.pdf', import.meta.url)));
   const result = await extractInvoiceWithOpenRouter({ ...input, images: [], pdf: { bytes } }, { fetch: async (_url, init) => {
     const body = JSON.parse(String(init?.body));
-    assert.equal(body.plugins[0].pdf.engine, 'mistral-ocr');
+    assert.equal(body.plugins[0].pdf.engine, 'native');
+    assert.equal(body.model, PDF_EXTRACTION_MODELS[0]);
+    assert.deepEqual(body.reasoning, { effort: 'low' });
     assert.equal(body.messages[1].content[1].file.file_data.startsWith('data:application/pdf;base64,'), true);
     return success(body.model);
   } });
   assert.equal(result.extraction.amountMinor, 20000);
   await assert.rejects(extractInvoiceWithOpenRouter({ ...input, images: [], pdf: { bytes: image } }), /INVALID_PDF/);
   await assert.rejects(extractInvoiceWithOpenRouter({ ...input, pdf: { bytes } }), /INVALID_PDF/);
+});
+
+test('PDF nativo respalda con otro lector de archivos bajo el mismo límite de intentos', async () => {
+  const bytes = new Uint8Array(readFileSync(new URL('../../../fixtures/invoices/001.pdf', import.meta.url)));
+  const seen: string[] = [];
+  const result = await extractInvoiceWithOpenRouter({ ...input, images: [], pdf: { bytes } }, { fetch: async (_url, init) => {
+    const body = JSON.parse(String(init?.body)); seen.push(body.model);
+    assert.equal(body.plugins[0].pdf.engine, 'native');
+    assert.equal(body.messages[1].content[1].file.file_data, 'data:application/pdf;base64,' + Buffer.from(bytes).toString('base64'));
+    return seen.length === 1 ? new Response(null, { status: 429 }) : success(body.model);
+  } });
+  assert.deepEqual(seen, PDF_EXTRACTION_MODELS.slice(0, 2));
+  assert.equal(result.model, PDF_EXTRACTION_MODELS[1]);
 });
 
 test('A lee imagen con schema estricto y sin políticas ni etiquetas de evaluación', async () => {

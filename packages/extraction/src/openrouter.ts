@@ -9,7 +9,8 @@ export const EXTRACTION_MODELS = [
 ] as const;
 
 // Bump when models, prompt, response schema or PDF engine change; never cache a decision.
-export const EXTRACTION_CONFIG_VERSION = 'invoice-json-v4-supplier-role-rate-fallback-20261017';
+export const PDF_EXTRACTION_MODELS = ['google/gemini-3.8-flash', 'google/gemini-3.7-flash', 'google/gemini-3.1-flash-lite'] as const;
+export const EXTRACTION_CONFIG_VERSION = 'invoice-json-v5-native-pdf-20261017';
 export const IMAGE_OCR_MODEL = 'qwen/qwen3.8-flash';
 export const IMAGE_OCR_CONFIG_VERSION = 'qwen-image-transcript-v2-20261017';
 // Verified against OpenRouter /models: GLM requires reasoning; DeepSeek and MiniMax do not.
@@ -187,7 +188,7 @@ function errorIssueCodes(raw: unknown): string[] {
     : metadata?.raw ? JSON.stringify(metadata.raw).slice(0, 16384) : '';
   const diagnostic = `${message ?? ''} ${metadata?.error_type ?? ''} ${nested}`;
   return ([
-    ['FILE_PARSER_ERROR', /file.?pars|\bpdf\b|\bocr\b/i],
+    ['FILE_PARSER_ERROR', /file.{0,20}pars|pars.{0,20}(?:file|document)|\bpdf\b|\bocr\b/i],
     ['UPSTREAM_RATE_LIMIT', /rate.?limit|too many requests|quota|capacity/i],
     ['UPSTREAM_CREDIT_LIMIT', /credit|insufficient balance|payment required/i],
     ['UPSTREAM_AUTH_ERROR', /api.?key|unauthorized|authentication/i],
@@ -322,7 +323,7 @@ export async function extractInvoiceWithOpenRouter(options: Options, dependencie
   const fetchImpl = dependencies.fetch ?? fetch;
   const deadline = Date.now() + (dependencies.totalTimeoutMs ?? 40000);
   const attempts: ExtractionAttempt[] = [];
-  for (const [modelIndex, model] of EXTRACTION_MODELS.entries()) {
+  for (const [modelIndex, model] of (options.pdf ? PDF_EXTRACTION_MODELS : EXTRACTION_MODELS).entries()) {
     if (options.signal?.aborted) throw new ExtractionError('ABORTED', attempts);
     const remaining = Math.min(dependencies.attemptTimeoutMs ?? 12000, deadline - Date.now());
     if (remaining <= 0) break;
@@ -336,13 +337,13 @@ export async function extractInvoiceWithOpenRouter(options: Options, dependencie
         headers: { Authorization: `Bearer ${options.apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
-          // A different PDF engine from the separate Cloudflare text read.
-          ...(options.pdf ? { plugins: [{ id: 'file-parser', pdf: { engine: 'mistral-ocr' } }] } : {}),
+          // Original PDF goes to a file-capable model; Cloudflare text remains the separate read.
+          ...(options.pdf ? { plugins: [{ id: 'file-parser', pdf: { engine: 'native' } }] } : {}),
           messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content }],
           temperature: 0,
           // Reasoning and visible JSON share this budget; excluding reasoning alone cannot fix truncation.
           max_tokens: 4096,
-          reasoning: REASONING[modelIndex],
+          reasoning: options.pdf ? { effort: 'low' } : REASONING[modelIndex],
           stream: false,
           provider: { require_parameters: true, sort: 'price' },
           response_format: {
