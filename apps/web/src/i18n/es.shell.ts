@@ -51,6 +51,15 @@ export const esShell: Record<string, string> = {
   // home
   'Approved invoices': 'Facturas aprobadas',
   'Hi {name}': 'Hola, {name}',
+  'Hi {name}, what are we resolving today?': 'Hola {name}, ¿qué resolvemos hoy?',
+  'What are we resolving today?': '¿Qué resolvemos hoy?',
+  'I review invoices against your mandate, monitor budgets, and flag what needs your approval.':
+    'Reviso facturas contra tus reglas, monitoreo presupuestos y señalo lo que necesita tu aprobación.',
+  'Conversation with Oli': 'Conversación con Oli',
+  'The engine is extracting data, matching agreements, and checking policy limits.':
+    'El motor está extrayendo datos, comparando acuerdos y verificando límites de política.',
+  'View bills progress': 'Ver progreso de facturas',
+  'Oli Assistant': 'Asistente Oli',
   'Hi there': 'Hola',
   Summary: 'Resumen',
   'Needs you': 'Te necesitan',
@@ -67,7 +76,7 @@ export const esShell: Record<string, string> = {
   'Nothing due in the next two weeks.': 'Nada vence en las próximas dos semanas.',
 
   // onboarding
-  'Your mandate': 'Tu mandato',
+  'Your mandate': 'Tus reglas',
   'Who can be paid': 'A quién se puede pagar',
   'Review & activate': 'Revisar y activar',
   'Oli is ready. Upload your first invoice.': 'Oli está listo. Sube tu primera factura.',
@@ -93,4 +102,35 @@ export const esShell: Record<string, string> = {
   Back: 'Atrás',
   Continue: 'Continuar',
   'Activate Oli': 'Activar a Oli',
+  'Activate & continue': 'Activar y continuar',
+  'First invoice': 'Primera factura',
+  'Upload your first invoice (optional)': 'Sube tu primera factura (opcional)',
+  'Test Oli right away with an invoice, or skip and do it later.': 'Prueba a Oli de inmediato con una factura o salta este paso y hazlo más tarde.',
+  'Skip for now': 'Omitir por ahora',
+  'Go to dashboard': 'Ir al inicio',
+  'Upload & continue': 'Subir y continuar',
+  'Load sample invoice': 'Cargar factura de ejemplo',
+  'Load sample invoice (Acme Cloud Services · $320)': 'Cargar factura de ejemplo (Acme Cloud Services · $320)',
+  'Invoice uploaded! Oli is reviewing it.': '¡Factura subida! Oli la está revisando.',
+  'Oli is ready. Welcome aboard!': 'Oli está listo. ¡Bienvenido!',
+  'Drag and drop your invoice here, or browse': 'Arrastra y suelta tu factura aquí, o examina tus archivos',
+  'Supports PDF, PNG, JPG up to 5 MB': 'Admite PDF, PNG y JPG de hasta 5 MB',
+  'Invoice received': 'Factura recibida',
+  'Oli policy engine is extracting data and verifying rules in real time.': 'El motor de Oli está extrayendo datos y verificando las reglas en tiempo real.',
+  'Zero false approvals': 'Cero aprobaciones indebidas',
+  'Strict policy validation on every invoice.': 'Validación estricta de políticas en cada factura.',
+  'Pure autonomy': 'Autonomía estricta',
+  'Approves within mandate, escalates what needs you.': 'Aprueba dentro de tus reglas y escala solo lo que requiere tu atención.',
+  'Full audit trail': 'Trazabilidad total',
+  'Append-only logs for every single action.': 'Registro inmutable e incremental de cada acción.',
+  'Nice to meet you, {name}!': '¡Mucho gusto, {name}!',
+  'Your autonomous finance policy engine': 'Tu motor autónomo de políticas financieras',
+  'Tell Oli about your company and set up autonomous financial governance in minutes.': 'Cuéntale a Oli sobre tu empresa y configura tus reglas financieras en minutos.',
+  'Mandate activated': 'Reglas activadas',
+  'Uploading and analyzing...': 'Subiendo y analizando...',
+
+  // session gate (no sign-in screen)
+  'No active session': 'Sin sesión activa',
+  'The API requires a session and this build has no sign-in screen. Start the API with a session, or run the UI on the mock data (npm run dev:mock).':
+    'La API exige una sesión y esta versión no tiene pantalla de inicio de sesión. Inicia la API con una sesión, o usa la interfaz con datos simulados (npm run dev:mock).',
 };

@@ -1,6 +1,6 @@
 # Whady: conectar el inicio conversacional de Oli
 
-Responsabilidad frontend: llevar la composición de [/propuesta/](https://oli30x.ultramare.dev/propuesta/) a la app y sustituir sus respuestas locales por este contrato. El prototipo sigue siendo una referencia visual independiente; no se conectó ni se modificó `apps/web` en este trabajo.
+Home ya consume el chat real con este contrato: historial privado, adjuntos recibidos antes del mensaje, tarjetas del servidor y propuestas que requieren confirmación explícita. El prototipo [/propuesta/](https://oli30x.ultramare.dev/propuesta/) sigue como referencia visual independiente. Las correcciones están implementadas localmente; no se desplegaron en esta revisión. [Comprobaciones y límites](evaluations/frontend-integration-fixes-20261017.json).
 
 Backend: `/api/v1`, misma sesión/cookie y `X-CSRF-Token` en memoria. Modelo fijo `deepseek/deepseek-v4.1-flash`, clave exclusivamente en el Worker. Las reglas, lecturas y cambios de D1 son responsabilidad del servidor.
 
@@ -14,13 +14,13 @@ reales y extracción simulada; no se presenta como medición OCR en producción.
 
 ## Tarea lista para implementar
 
-- [ ] Añadir métodos tipados al cliente HTTP y validar con los esquemas de `@oli/contracts` indicados abajo.
-- [ ] Composer con texto, sugerencias, adjuntos removibles y drag/drop. Reutilizar `<Oli />` del paquete de la mascota; sin botón play/pausa.
-- [ ] Guardar el `conversationId` retornado, recuperar historial y distinguir turnos fallidos/en curso. El frontend nunca envía el historial ni roles al modelo.
-- [ ] Renderizar texto seguro y tarjetas según `type`, usando cifras/estados de las tarjetas como hechos. No interpretar el texto del asistente como una orden ejecutada.
+- [x] Métodos usados por Home tipados y validados con `@oli/contracts`: mensajes, conversaciones, historial, intake y consulta/confirmación/cancelación de propuestas. El alta directa por formulario con `POST /chat/actions` sigue pendiente; el modelo puede preparar la propuesta y Home permite revisarla y confirmarla.
+- [x] Composer con texto, sugerencias, adjuntos removibles y drag/drop. Reutilizar `<Oli />` del paquete de la mascota; sin botón play/pausa.
+- [x] Guardar el `conversationId` retornado, recuperar historial y distinguir turnos fallidos/en curso. El frontend nunca envía el historial ni roles al modelo.
+- [x] Renderizar texto seguro y tarjetas según `type`, usando cifras/estados de las tarjetas como hechos. No interpretar el texto del asistente como una orden ejecutada.
 - [ ] Flujo proveedor desconocido: explicar el bloqueo, recoger datos de proveedor/acuerdo y mostrar confirmación explícita. Mantener la factura original.
-- [ ] Mostrar antes/después de las propuestas, vencimiento y botones Confirmar/Cancelar. Tras confirmar, usar el resultado del servidor y refrescar las queries afectadas.
-- [ ] Mantener lista/estados/gráfico y botón de carga clásicos. Los datos de ejemplo del prototipo no se importan a la app.
+- [x] Mostrar antes/después de las propuestas, vencimiento y botones Confirmar/Cancelar. Tras confirmar, usar el resultado del servidor y refrescar las queries afectadas.
+- [x] Mantener lista/estados/gráfico y botón de carga clásicos. Los datos de ejemplo del prototipo no se importan a la app.
 - [ ] Comprobar móvil, teclado, carga/fallo/reintento y que los datos inciertos o proveedores prohibidos no tengan un atajo para aprobar.
 
 ## Rutas y esquemas

@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { Bot, CheckSquare, FileText, Home, Inbox, LogOut, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
+import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { env } from '@/config/env';
@@ -14,13 +15,22 @@ import { cn } from '@/lib/cn';
 type NavItem = { to: string; label: string; icon: typeof Home; end?: boolean; badge?: number };
 
 export function AppLayout() {
+  const nav = useNavigate();
+  const qc = useQueryClient();
   const { data: me } = useMe();
   const approvals = useApprovals();
   const inbox = useInbox();
   const pending = approvals.data?.filter((a) => a.state === 'PENDING').length ?? 0;
   const [open, setOpen] = useState(false);
-  const qc = useQueryClient();
-  const nav = useNavigate();
+
+  const signOut = async () => {
+    try {
+      await api.logout();
+    } finally {
+      qc.clear();
+      nav('/login');
+    }
+  };
 
   const items: NavItem[] = [
     { to: '/app', label: 'Home', icon: Home, end: true },
@@ -33,15 +43,6 @@ export function AppLayout() {
     ...(env.features.agentAccess ? [{ to: '/app/agent-access', label: 'Agent access', icon: Bot }] : []),
     ...(env.features.chat ? [{ to: '/app/chat', label: 'Chat', icon: MessageCircle }] : []),
   ];
-
-  const signOut = async () => {
-    try {
-      await api.logout();
-    } finally {
-      qc.clear();
-      nav('/login');
-    }
-  };
 
   const links = (
     <nav aria-label={t('Main')} className="flex flex-col gap-1">
@@ -69,6 +70,7 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <DemoBanner />
       <div className="flex flex-1">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-white p-4 lg:flex">
           <Link to="/app" className="mb-6 px-1">

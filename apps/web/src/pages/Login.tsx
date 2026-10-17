@@ -31,7 +31,8 @@ export function Login() {
     try {
       const m = kind === 'demo' ? await api.loginDemo() : await api.login({ email: email.trim(), password });
       qc.setQueryData(qk.me, m);
-      nav(from, { replace: true });
+      qc.invalidateQueries({ queryKey: qk.mandate });
+      nav(kind === 'demo' ? '/onboarding' : from, { replace: true });
     } catch (e) {
       setError(errorMessage(e));
     } finally {

@@ -134,6 +134,54 @@ const CATALOG: Record<string, ReasonInfo> = {
     tone: 'ok',
     humanApprovable: false,
   },
+  EXTRACTION: {
+    label: 'Extraction & corroboration',
+    rule: 'Critical fields must match across independent readings',
+    tone: 'ok',
+    humanApprovable: false,
+  },
+  DUPLICATE_HASH: {
+    label: 'Cryptographic hash check',
+    rule: 'Identical file content must not exist in history',
+    tone: 'block',
+    humanApprovable: false,
+  },
+  DUPLICATE_NUMBER: {
+    label: 'Invoice number check',
+    rule: 'Vendor must not submit the same invoice number twice',
+    tone: 'block',
+    humanApprovable: false,
+  },
+  VENDOR: {
+    label: 'Vendor authorization',
+    rule: 'Vendor must be approved under current policy',
+    tone: 'ok',
+    humanApprovable: false,
+  },
+  AGREEMENT: {
+    label: 'Vendor agreement',
+    rule: 'Amount, currency and concept must match agreed terms',
+    tone: 'ok',
+    humanApprovable: false,
+  },
+  AMOUNT_LIMIT: {
+    label: 'Approval limit check',
+    rule: 'Amount must stay within automatic approval limits',
+    tone: 'ok',
+    humanApprovable: true,
+  },
+  BUDGET: {
+    label: 'Budget check',
+    rule: 'Monthly budget must have enough room for this bill',
+    tone: 'ok',
+    humanApprovable: false,
+  },
+  INVOICE_DATES: {
+    label: 'Invoice dates check',
+    rule: 'Due date must be on or after invoice issuance',
+    tone: 'warn',
+    humanApprovable: false,
+  },
 };
 
 export function humanize(code: string): string {

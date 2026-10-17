@@ -1,11 +1,14 @@
-import { Link } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { Ban, CheckCircle2, Hand } from 'lucide-react';
+import { api } from '@/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { buttonClass } from '@/components/ui/Button';
 import { Beam } from '@/components/ui/Beam';
 import { brand } from '@/config/brand';
-import { useMe } from '@/hooks/queries';
+import { qk, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 
 // Title/body are English i18n keys, translated at render time.
@@ -16,9 +19,25 @@ const OUTCOMES = [
 ];
 
 export function Landing() {
+  const nav = useNavigate();
+  const qc = useQueryClient();
   const me = useMe();
   const signedIn = !!me.data;
-  const cta = signedIn ? '/app' : '/login';
+  const [loading, setLoading] = useState(false);
+
+  const handleMeetOli = async () => {
+    setLoading(true);
+    try {
+      const m = await api.loginDemo();
+      qc.setQueryData(qk.me, m);
+      qc.invalidateQueries({ queryKey: qk.mandate });
+      nav('/onboarding');
+    } catch {
+      nav('/onboarding');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-hairline bg-white">
@@ -26,7 +45,7 @@ export function Landing() {
           <Logo />
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <Link to={cta} className={buttonClass('secondary', 'sm')}>
+            <Link to={signedIn ? '/app' : '/login'} className={buttonClass('secondary', 'sm')}>
               {signedIn ? t('Open app') : t('Sign in')}
             </Link>
           </div>
@@ -41,9 +60,14 @@ export function Landing() {
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Beam>
-              <Link to={cta} className={buttonClass('primary', 'lg')}>
+              <button
+                type="button"
+                onClick={() => void handleMeetOli()}
+                disabled={loading}
+                className={buttonClass('primary', 'lg')}
+              >
                 {brand.cta}
-              </Link>
+              </button>
             </Beam>
             <a href="#outcomes" className={buttonClass('secondary', 'lg')}>
               {t('See how it decides')}
