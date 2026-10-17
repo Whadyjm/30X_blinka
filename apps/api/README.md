@@ -4,6 +4,12 @@ Backend P0 del reto en la cuenta **Tiamat** (`fbaa64f96579f93b2db32a1eb12ff6c9`)
 App compartida: **https://oli30x.ultramare.dev/app**; API en ese mismo origen, bajo `/api`.
 Worker alternativo: https://oli-api.tiamat-agency.workers.dev. Contrato: [docs/API.md](../../docs/API.md).
 
+Conversación con DeepSeek V4.1 Flash usando el mismo `OPENROUTER_API_KEY`: herramientas
+de consulta y propuestas confirmables; historial privado, límites de uso y alta guiada
+de proveedor con reevaluación acotada de la factura original. Requiere migración0003.
+Ver [contrato y tarea de Whady](../../docs/CONVERSATION_FRONTEND_HANDOFF.md).
+La UI de conversación aún debe conectarse; `/propuesta/` conserva sus datos de ejemplo.
+
 Implementa sesión demo con cookie HttpOnly/CSRF, reglas y activación OWNER, proveedores,
 acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamiento,
 revisión humana, dashboard y evaluación vacía. La UI de Whady debe conectarse a estas rutas.

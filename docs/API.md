@@ -3,6 +3,8 @@
 Estado: **endpoints P0 implementados en `apps/api`; contratos y motor en `packages/contracts` y `packages/domain`**.
 El cliente de `apps/web` consume estas rutas y valida los esquemas compartidos;
 ver [integración y operación del frontend](../apps/web/README.md).
+La extensión conversacional tiene contratos en `packages/contracts` y rutas en el Worker;
+ver [tarea y contrato de conversación para Whady](CONVERSATION_FRONTEND_HANDOFF.md).
 
 El [motor puro](../packages/domain/README.md) ya evalúa las reglas del onboarding;
 ver [datos y activación](ONBOARDING_POLICY.md). Su resultado es un candidato interno:
@@ -27,8 +29,9 @@ El núcleo P0 es: reglas configurables → cargar factura ficticia → extraer p
 importe, moneda y vencimiento → decidir → registrar y explicar → revisión humana cuando corresponde.
 `APPROVE` significa aprobado para **pago simulado**. No se mueve dinero.
 
-Delegation Insights es P1. Hermes y el chat quedan fuera del MVP por decisión de Oscar;
-la orquestación del procesamiento vive en el Worker. Agent Access, Clearance, registro público
+Delegation Insights es P1. Hermes queda fuera del MVP. Oscar autorizó la extensión
+conversacional con herramientas acotadas y confirmación de cambios; la orquestación vive
+en el Worker. Agent Access, Clearance, registro público
 y pagos reales no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
 No se requiere una pantalla de registro.
 
@@ -696,7 +699,7 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 > Yo mantengo el contrato de backend. Si te falta algún dato o acción para una pantalla,
 > dímelo para incorporarlo; no cambies los nombres o formatos por tu cuenta.
 > El norte sigue siendo `master_files/RETO_BLINKA.md`. Primero conectamos reglas,
-> carga/listado/detalle de facturas y aprobaciones. Las delegaciones quedan para P1; Hermes y chat están fuera del MVP.
+> carga/listado/detalle de facturas y aprobaciones. Las delegaciones quedan para P1 y Hermes queda fuera del MVP. La extensión de chat autorizada se documenta en CONVERSATION_FRONTEND_HANDOFF.md.
 
 ### Checklist de integración
 

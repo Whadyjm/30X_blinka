@@ -36,5 +36,17 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   assert.equal(detail.status, 'DECIDED'); assert.equal(detail.latestDecision.action, 'ESCALATE');
   assert.equal(detail.approvalRequest, null); assert.equal(detail.decisions.length, 1);
   assert.equal(await db.prepare('SELECT count(*) AS n FROM budget_reservations').first('n'), 0);
+  fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
+    .reply(200, { choices: [{ finish_reason: 'tool_calls', message: { content: null, tool_calls: [
+      { id: 'runtime-budget', type: 'function', function: { name: 'get_budget', arguments: JSON.stringify({ period: 'CURRENT_MONTH' }) } },
+    ] } }] });
+  fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
+    .reply(200, { choices: [{ finish_reason: 'stop', message: { content: 'Este es el presupuesto registrado.' } }] });
+  const chat = await runtime.dispatchFetch(`${origin}/api/v1/chat/messages`, { method: 'POST',
+    headers: { ...headers, 'Content-Type': 'application/json', 'Idempotency-Key': crypto.randomUUID() },
+    body: JSON.stringify({ conversationId: null, text: '¿Cómo va mi presupuesto?', invoiceIds: [] }) });
+  const reply = await chat.json(); assert.equal(chat.status, 200, JSON.stringify(reply));
+  assert.equal(reply.data.cards[0].type, 'BUDGET');
+  assert.equal(await db.prepare('SELECT count(*) AS n FROM chat_turns WHERE state = ?').bind('COMPLETED').first('n'), 1);
   fetchMock.assertNoPendingInterceptors();
 });

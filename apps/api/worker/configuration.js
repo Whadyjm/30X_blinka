@@ -95,15 +95,7 @@ export async function mutateDirectory(request, env, session, kind, resourceId) {
     id: resourceId ?? id(vendor ? 'vendor' : 'agr'), createdAt: old?.created_at ?? now() };
   if (!vendor && !await stmt(env.DB, 'SELECT id FROM vendors WHERE org_id = ? AND id = ?', orgId, data.vendorId).first()) throw new HttpError(404, 'NOT_FOUND');
   const guardId = id('guard');
-  let mutation;
-  if (vendor) mutation = resourceId
-    ? stmt(env.DB, 'UPDATE vendors SET name = ?, normalized_name = ?, allowed = ?, external_ref = ? WHERE id = ? AND org_id = ?', data.name, normalizeName(data.name), Number(data.allowed), data.externalRef, data.id, orgId)
-    : stmt(env.DB, 'INSERT INTO vendors(id, org_id, name, normalized_name, allowed, external_ref, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', data.id, orgId, data.name, normalizeName(data.name), Number(data.allowed), data.externalRef, data.createdAt);
-  else mutation = resourceId
-    ? stmt(env.DB, `UPDATE agreements SET vendor_id = ?, currency = ?, amount_minor = ?, tolerance_minor = ?, frequency = ?, concept = ?, active = ? WHERE id = ? AND org_id = ?`,
-      data.vendorId, data.currency, data.amountMinor, data.toleranceMinor, data.frequency, data.concept, Number(data.active), data.id, orgId)
-    : stmt(env.DB, `INSERT INTO agreements(id, org_id, vendor_id, currency, amount_minor, tolerance_minor, frequency, concept, active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      data.id, orgId, data.vendorId, data.currency, data.amountMinor, data.toleranceMinor, data.frequency, data.concept, Number(data.active), data.createdAt);
+  const mutation = directoryMutation(env.DB, orgId, kind, data, resourceId);
   try {
     await env.DB.batch([guard(env.DB, orgId, revision, guardId), mutation,
       audit(env.DB, orgId, session.user.id, resourceId ? 'DIRECTORY_UPDATED' : 'DIRECTORY_CREATED', data.id, { kind, ...input }), clearGuard(env.DB, guardId)]);
@@ -112,6 +104,18 @@ export async function mutateDirectory(request, env, session, kind, resourceId) {
     throw error;
   }
   return json({ data }, resourceId ? 200 : 201);
+}
+
+// Shared by ordinary forms and confirmed chat actions; callers supply authorization and transaction guards.
+export function directoryMutation(db, orgId, kind, data, resourceId = null) {
+  if (kind === 'vendors') return resourceId
+    ? stmt(db, 'UPDATE vendors SET name = ?, normalized_name = ?, allowed = ?, external_ref = ? WHERE id = ? AND org_id = ?', data.name, normalizeName(data.name), Number(data.allowed), data.externalRef, data.id, orgId)
+    : stmt(db, 'INSERT INTO vendors(id, org_id, name, normalized_name, allowed, external_ref, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', data.id, orgId, data.name, normalizeName(data.name), Number(data.allowed), data.externalRef, data.createdAt);
+  return resourceId
+    ? stmt(db, `UPDATE agreements SET vendor_id = ?, currency = ?, amount_minor = ?, tolerance_minor = ?, frequency = ?, concept = ?, active = ? WHERE id = ? AND org_id = ?`,
+      data.vendorId, data.currency, data.amountMinor, data.toleranceMinor, data.frequency, data.concept, Number(data.active), data.id, orgId)
+    : stmt(db, `INSERT INTO agreements(id, org_id, vendor_id, currency, amount_minor, tolerance_minor, frequency, concept, active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      data.id, orgId, data.vendorId, data.currency, data.amountMinor, data.toleranceMinor, data.frequency, data.concept, Number(data.active), data.createdAt);
 }
 export async function budgets(db, orgId, key) {
   return (await stmt(db, 'SELECT * FROM budget_periods WHERE org_id = ? AND period_key = ? ORDER BY currency', orgId, key).all()).results.map(budgetDto);

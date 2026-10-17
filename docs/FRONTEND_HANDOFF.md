@@ -9,6 +9,10 @@ proyecta a los componentes existentes mediante `src/api/view-model.ts`; esa proy
 no concede permisos ni calcula decisiones. Ver [operación y tests](../apps/web/README.md).
 El listado siguiente documenta los cambios aplicados al cliente original.
 
+La siguiente tarea de Whady es [conectar la capa conversacional](CONVERSATION_FRONTEND_HANDOFF.md):
+composer, tarjetas del servidor, adjuntos por el pipeline actual y confirmaciones de propuestas.
+La referencia visual `/propuesta/` sigue siendo independiente y demostrativa.
+
 ## Ajustes concretos en el cliente
 
 - `apps/web/src/api/http-api.ts`: login es `POST /session` con email/password;
@@ -30,7 +34,8 @@ El listado siguiente documenta los cambios aplicados al cliente original.
   ampliar el timeout del comando o recuperar el estado mediante polling. Si la conexión
   expira, consultar antes de volver a pedir procesamiento; no volver a subir automáticamente.
 - `/evaluation/summary` devuelve `data: null`; no mostrar una precisión end-to-end ficticia.
-  Agent Access, Clearance, chat y delegaciones no tienen endpoints P0.
+  Agent Access, Clearance y delegaciones no tienen endpoints P0. Chat es una extensión
+  separada documentada en el handoff conversacional, no una ruta de los mocks originales.
 
 ## Desarrollo y acceso
 

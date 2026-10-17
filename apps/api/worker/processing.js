@@ -48,7 +48,7 @@ export async function snapshot(db, orgId, invoiceId, attempt = 0) {
   } };
 }
 
-export function decisionStatements(db, orgId, evaluation, storedRead, actorId = null) {
+export function decisionStatements(db, orgId, evaluation, storedRead, actorId = null, approvalId = id('apr')) {
   const d = PolicyDecisionSchema.parse(evaluation.candidate);
   const sql = [stmt(db, `INSERT INTO decisions (id, org_id, invoice_id, action, policy_version_id, budget_period_id,
     reason_codes_json, evidence_json, human_explanation, needs_human_approval, actor_kind, actor_id, created_at)
@@ -60,7 +60,7 @@ export function decisionStatements(db, orgId, evaluation, storedRead, actorId = 
   audit(db, orgId, actorId, 'INVOICE_DECIDED', d.invoiceId, { decisionId: d.id, action: d.action, reasons: d.reasons }, d.checkedAt)];
   if (d.needsHumanApproval) sql.push(stmt(db, `INSERT INTO approval_requests
     (id, org_id, invoice_id, decision_id, policy_version_id, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    id('apr'), orgId, d.invoiceId, d.id, d.policyVersionId, d.humanExplanation, d.checkedAt));
+    approvalId, orgId, d.invoiceId, d.id, d.policyVersionId, d.humanExplanation, d.checkedAt));
   return sql;
 }
 

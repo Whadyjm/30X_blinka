@@ -6,6 +6,8 @@ import { HttpError, id, json, now, periodKey, readBytes, stmt } from './http.js'
 import { agreementDto, approvalDto, decisionDto, getInvoice, invoiceRows, vendorDto } from './repository.js';
 import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
+import { chatHistory, chatMessage, listConversations } from './chat.js';
+import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -25,6 +27,19 @@ export async function handleApi(request, env) {
     const session = await authenticate(request, env); const orgId = session.organization.id;
     if (path === '/me' && method === 'GET') { const { tokenHash, ...data } = session; return json({ data }); }
     if (path === '/session' && method === 'DELETE') return await logout(request, env, session);
+    if (path === '/chat/messages' && method === 'POST') return await chatMessage(request, env, session);
+    if (path === '/chat/conversations' && method === 'GET') return await listConversations(env, session);
+    const chat = path.match(/^\/chat\/conversations\/([^/]+)$/);
+    if (chat && method === 'GET') return await chatHistory(env, session, chat[1]);
+    if (path === '/chat/actions' && method === 'POST') return await prepareActionRequest(request, env, session);
+    const chatAction = path.match(/^\/chat\/actions\/([^/]+)(?:\/(confirm|cancel))?$/);
+    if (chatAction) {
+      if (method === 'GET' && !chatAction[2]) return json({ data: actionDto(await getAction(env, session, chatAction[1])) });
+      if (method === 'POST' && chatAction[2] === 'confirm') return await confirmAction(request, env, session, chatAction[1]);
+      if (method === 'POST' && chatAction[2] === 'cancel') return await cancelAction(request, env, session, chatAction[1]);
+    }
+    const intake = path.match(/^\/invoices\/([^/]+)\/intake$/);
+    if (intake && method === 'GET') return json({ data: await inspectInvoice(env, session, intake[1]) });
     if (path === '/mandate' && method === 'GET') {
       const { active, draft } = await mandateState(env.DB, orgId); return json({ data: { active, draft } });
     }
