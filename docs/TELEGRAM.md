@@ -65,7 +65,12 @@ enviar nuevamente el mismo archivo como un mensaje nuevo sí crea una entrada y 
 La extracción, corroboración, política y reserva atómica son las existentes. Las imágenes continúan
 requiriendo revisión mientras no haya OCR independiente. No hay pagos reales ni aprobación por comandos.
 
-La respuesta final incluye decisión, explicación y enlace privado a la factura. Un error de notificación
+La respuesta final cuenta en primera persona qué llegó y qué ocurrió, con un motivo breve
+y un botón al detalle privado. `worker/telegram-invoice.js` traduce la acción y los motivos
+registrados a lenguaje cotidiano; no vuelve a decidir ni llama a otro modelo. Oculta referencias
+provisionales, URLs largas y vistas previas de enlaces. Los resultados de cambios confirmados
+usan el mismo resumen. El detalle auditable permanece en la factura.
+Un error de notificación
 reintenta la respuesta guardada sin reevaluar la factura. Telegram no ofrece una clave idempotente para
 `sendMessage`: una caída después de enviar y antes de confirmar puede repetir una notificación, pero no
 sus efectos financieros. Tras cinco intentos fallidos el recibo queda FAILED en D1 y emite un log estructurado;

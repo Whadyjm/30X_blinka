@@ -191,11 +191,12 @@ test('Telegram: reintentos no duplican documento/decisión/reserva; otro envío 
   assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM budget_reservations').first('n'), 1);
   const invoice = (await (await s.api('/invoices')).json()).data[0];
   assert.equal(invoice.source, 'TELEGRAM'); assert.equal(invoice.latestDecision.action, 'APPROVE');
-  assert.match(s.sent.at(-1).text, /Factura aprobada/);
+  assert.match(s.sent.at(-1).text, /Quedó aprobada/);
+  assert.equal(s.sent.at(-1).reply_markup.inline_keyboard[0][0].url, `${origin}/app/bills/${invoice.id}`);
   await s.webhook(s.update(event.message)); await s.drain();
   assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM invoices').first('n'), 2);
   assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM budget_reservations').first('n'), 1);
-  assert.match(s.sent.at(-1).text, /Factura bloqueada/);
+  assert.match(s.sent.at(-1).text, /La bloqueé porque esta factura ya está registrada/);
 });
 
 test('Telegram: fallo de respuesta reintenta notificación sin volver a procesar', async t => {
@@ -284,7 +285,7 @@ test('Telegram: modelo propone, sí escrito no ejecuta, solo botón propio confi
   await s.click(offer.confirm, offer.messageId + 1); await s.drain();
   assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM vendors').first('n'), baseline);
   await s.click(offer.confirm, offer.messageId); await s.drain();
-  assert.match(s.sent.at(-1).text, /Cambio confirmado/);
+  assert.match(s.sent.at(-1).text, /Listo, guardé el cambio/);
   await s.click(offer.confirm, offer.messageId); await s.drain();
   assert.equal(await s.DB.prepare('SELECT count(*) AS n FROM vendors').first('n'), baseline + 1);
   assert.equal(await s.DB.prepare("SELECT count(*) AS n FROM audit_events WHERE type = 'CHAT_ACTION_CONFIRMED'").first('n'), 1);

@@ -103,8 +103,10 @@ test('Email: MIME→inbox inmediato→pipeline existente→Telegram, origen EMAI
   assert.equal(inbox.messages[0].state, 'COMPLETED');
   const a = inbox.messages[0].attachments[0]; assert.equal(a.decision, 'APPROVE');
   assert.equal((await s.api(`/invoices/${a.invoiceId}`)).data.source, 'EMAIL');
-  assert.equal(s.reads, 1); assert.match(s.sent.at(-1).text, /Factura de octubre/);
-  assert.match(s.sent.at(-1).text, /200.00 USD/); assert.match(s.sent.at(-1).text, /\/app\/inbox/);
+  assert.equal(s.reads, 1); assert.match(s.sent.at(-1).text, /Me llegó por correo una factura de Demo Cloud Hosting/);
+  assert.match(s.sent.at(-1).text, /200.00 USD/); assert.match(s.sent.at(-1).text, /Quedó aprobada/);
+  assert.equal(s.sent.at(-1).reply_markup.inline_keyboard[0][0].url, `${origin}/app/bills/${a.invoiceId}`);
+  assert.deepEqual(s.sent.at(-1).link_preview_options, { is_disabled: true });
   assert.equal(await s.DB.prepare('SELECT last_invoice_id FROM telegram_conversations WHERE connection_id = ?').bind('tg_email').first('last_invoice_id'), a.invoiceId);
   assert.equal((await s.api(`/inbox/${inbox.messages[0].id}/read`, 'POST')).status, 204);
   assert.equal((await s.api('/inbox')).data.unreadCount, 0);
@@ -176,7 +178,9 @@ test('Email: imágenes pegadas en Gmail llegan a inbox y Telegram sin autoaproba
     assert.equal(invoice.source, 'EMAIL'); assert.equal(invoice.file.mimeType, mime);
     assert.equal(await s.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
     assert.equal(s.reads, 1); assert.equal(s.sent.length, 1);
-    assert.match(s.sent[0].text, /Factura pegada en el cuerpo/);
+    assert.match(s.sent[0].text, /Me llegó por correo/);
+    assert.doesNotMatch(s.sent[0].text, /corroboración|autorización automática|excepción genérica/);
+    assert.equal(s.sent[0].reply_markup.inline_keyboard[0][0].url, `${origin}/app/bills/${invoice.id}`);
   }
 });
 

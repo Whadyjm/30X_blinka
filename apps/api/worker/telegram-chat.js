@@ -1,6 +1,8 @@
 import { chatMessage } from './chat.js';
 import { cancelAction, confirmAction, inspectInvoice } from './chat-actions.js';
 import { HttpError, now, stmt } from './http.js';
+import { invoiceSummary, money } from './telegram-invoice.js';
+export { money } from './telegram-invoice.js';
 
 export async function telegramConnection(env, connectionId) {
   return stmt(env.DB, `SELECT c.*, m.role, o.name AS org_name, o.timezone, o.default_currency,
@@ -39,11 +41,6 @@ export function telegramParts(text) {
 const labels = { name: 'Nombre', allowed: 'Autorizado', externalRef: 'Referencia', vendorId: 'Proveedor',
   currency: 'Moneda', amountMinor: 'Importe', toleranceMinor: 'Tolerancia',
   frequency: 'Frecuencia', concept: 'Concepto', active: 'Activo' };
-export function money(value, currency) {
-  const exp = new Intl.NumberFormat('es', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
-  const base = 10n ** BigInt(exp), n = BigInt(value);
-  return `${n / base}${exp ? `.${String(n % base).padStart(exp, '0')}` : ''} ${currency}`;
-}
 const fields = (value, currency = value?.currency) => Object.entries(value ?? {}).filter(([key]) => Object.hasOwn(labels, key))
   .map(([key, v]) => `${labels[key]}: ${v === null ? 'sin referencia' : v === true ? 'sí' : v === false ? 'no'
     : ['amountMinor', 'toleranceMinor'].includes(key) && currency ? money(v, currency)
@@ -114,7 +111,7 @@ export async function telegramAction(env, row, payload) {
       : await cancelAction(request, env, sessionFor(connection), offer.action_id);
     const result = (await response.json()).data;
     return [{ text: payload.callback.confirm
-      ? `Cambio confirmado y registrado.${result.invoice ? `\n${result.invoice.latestDecision?.humanExplanation ?? 'Factura reevaluada.'}` : ''}`
+      ? `Listo, guardé el cambio.${result.invoice ? `\n${invoiceSummary(result.invoice)}` : ''}`
       : 'Propuesta cancelada. No se aplicó el cambio.' }];
   } catch (error) {
     if (!(error instanceof HttpError) || error.status >= 500) throw error;
