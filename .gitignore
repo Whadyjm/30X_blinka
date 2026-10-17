@@ -7,3 +7,5 @@ dist/
 !.dev.vars.example
 .DS_Store
 __pycache__/
+*.log
+coverage/
