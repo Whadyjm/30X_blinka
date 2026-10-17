@@ -1,5 +1,13 @@
 /** Spanish: Bills, bill detail, approvals, evaluation, upload, decision trace, extraction, badges. */
 export const esBills: Record<string, string> = {
+  'Reanalyze invoice': 'Reanalizar factura',
+  'Reanalyzing…': 'Reanalizando…',
+  'Invoice reanalyzed': 'Factura reanalizada',
+  'An authorized or manually rejected invoice keeps its recorded resolution.': 'Las facturas autorizadas o rechazadas por una persona conservan su resolución registrada.',
+  'Only an owner can reanalyze invoices.': 'Solo el propietario puede reanalizar facturas.',
+  'A completed document reading is needed before reanalyzing.': 'Hace falta una lectura completa del documento antes de reanalizar.',
+  'Checks the current rules using the saved reading. The original document and earlier decisions stay unchanged.': 'Comprueba las reglas actuales con la lectura guardada. Conserva el documento original y las decisiones anteriores.',
+  'Analysis updated. The previous decision is in the history.': 'Análisis actualizado. La decisión anterior está en el historial.',
   // Bills page
   Bills: 'Facturas',
   'Upload invoices and see what Oli decided — and why.': 'Sube facturas y ve qué decidió Oli, y por qué.',

@@ -19,6 +19,23 @@ const response = (data: unknown) => Response.json({ data });
 afterEach(() => vi.restoreAllMocks());
 
 describe('HTTP shared contract boundary', () => {
+  it('reanalyzes with current policy/decision guards and retains its key after a lost response', async () => {
+    const keys: string[] = []; let attempts = 0;
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
+      if (String(url).endsWith('/me')) return response(session);
+      expect(String(url)).toBe('/api/v1/invoices/test-id/reevaluate');
+      const headers = new Headers(init?.headers);
+      expect(headers.get('X-CSRF-Token')).toBe('csrf-test');
+      expect(JSON.parse(String(init?.body))).toEqual({ expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId });
+      keys.push(headers.get('Idempotency-Key')!);
+      if (++attempts === 1) throw new TypeError('lost response');
+      return response(detail);
+    } });
+    const input = { expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId };
+    await expect(api.reevaluateInvoice('test-id', input)).rejects.toMatchObject({ code: 'NETWORK' });
+    expect((await api.reevaluateInvoice('test-id', input)).decision?.id).toBe(detail.latestDecision.id);
+    expect(keys[0]).toBeTruthy(); expect(keys[1]).toBe(keys[0]);
+  });
   it('uses /session, memory-only CSRF, private file URL, canonical decisions and DELETE logout', async () => {
     const calls: Array<{ path: string; method?: string; headers: Headers }> = [];
     const fetchImpl: typeof fetch = async (input, init) => {
@@ -92,7 +109,7 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
       choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(current) } }] }));
     const env = { DB, INVOICES: await runtime.getR2Bucket('INVOICES'), DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner',
       DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: async () => ({ format: 'markdown',
-        data: `EMISOR / SUPPLIER\n${current.vendorName}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };
+        data: `EMISOR / SUPPLIER\n${current.vendorName}\nNúmero / Number\n${current.invoiceNumber}\nEmisión / Issued\n${current.issuedAt}\nPeriodo de servicio\n${current.servicePeriod}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nCONCEPTO / DESCRIPTION\n${current.description}\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };
     let cookie = ''; let loseUpload = false;
     const fetchImpl: typeof fetch = async (input, init) => {
       const headers = new Headers(init?.headers); headers.set('Origin', 'https://oli.invalid'); if (cookie) headers.set('Cookie', cookie);

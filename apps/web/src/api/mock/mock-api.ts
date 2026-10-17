@@ -178,6 +178,8 @@ function decide(d: Db, inv: InvoiceDetail, at: string) {
   const meta = d.meta[inv.id];
   const agentRevoked = !!meta?.agentRevoked;
   const decision = mockEvaluate(inv.extracted as ExtractedInvoice, ctxFor(d, inv.id, agentRevoked, at), d.mandateActive?.version ?? 1);
+  decision.id = nextId(d, 'dec');
+  decision.policyVersionId = d.mandateActive?.id;
   if (inv.decision) inv.decisionHistory.unshift(inv.decision);
   inv.decision = decision;
   inv.status = decision.decision === 'APPROVE' ? 'APPROVED' : decision.decision === 'BLOCK' ? 'BLOCKED' : 'NEEDS_APPROVAL';
@@ -537,6 +539,22 @@ export const mockApi: OliApi = {
   },
   async processInvoice() {
     await lag(); // idempotent no-op: the mock pipeline advances on its own
+  },
+  async reevaluateInvoice(id, input) {
+    await lag(); const d = auth(); requireOwner(d);
+    const inv = d.invoices.find(i => i.id === id);
+    if (!inv) throw new ApiError({ status: 404, code: 'NOT_FOUND', message: 'Invoice not found.' });
+    if (inv.decision?.id !== input.expectedDecisionId) throw new ApiError({ status: 409, code: 'DECISION_CHANGED', message: 'Refresh the invoice before reanalyzing.' });
+    if (d.mandateActive?.id !== input.expectedPolicyVersionId) throw new ApiError({ status: 409, code: 'POLICY_CHANGED', message: 'Refresh the current policy.' });
+    if (!inv.extracted || inv.decision?.decision === 'APPROVE' || inv.decisionHistory.some(h => h.decision === 'APPROVE')
+      || ['APPROVED', 'REJECTED'].includes(inv.approval?.state ?? '')) {
+      throw new ApiError({ status: 409, code: 'APPROVAL_NOT_ALLOWED', message: 'This invoice cannot be reopened.' });
+    }
+    for (const approval of d.approvals.filter(a => a.invoiceId === id && a.state === 'PENDING')) approval.state = 'INVALIDATED';
+    if (inv.approval?.state === 'PENDING') inv.approval = { ...inv.approval, state: 'INVALIDATED' };
+    decide(d, inv, nowIso());
+    audit(inv, 'INVOICE_REEVALUATED', 'user', SEED_USER.name);
+    persist(); return { ...inv, fileUrl: fileUrls.get(id) ?? null };
   },
   invoiceFileUrl: (inv) => inv.fileUrl ?? '',
 

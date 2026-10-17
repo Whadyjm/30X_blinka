@@ -2,7 +2,7 @@ import { z } from 'zod';
 import {
   ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
-  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema,
+  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema,
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
 } from '@oli/contracts';
 import { HealthSchema } from '@/contracts';
@@ -154,6 +154,10 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     async processInvoice(id) {
       // A timeout is ambiguous: the server may still be working. Callers keep polling this same invoice.
       parse('/process', envelope(z.union([InvoiceDetailSchema, InvoiceSchema])), await raw('POST', `/invoices/${encodeURIComponent(id)}/process`, { timeoutMs: 90000 }));
+    },
+    async reevaluateInvoice(id, input) {
+      const path = `/invoices/${encodeURIComponent(id)}/reevaluate`;
+      return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ReevaluateInvoiceSchema.parse(input))).data);
     },
     invoiceFileUrl: invoice => invoice.fileUrl ?? `${opts.base}/invoices/${encodeURIComponent(invoice.id)}/file`,
     async listApprovals() {

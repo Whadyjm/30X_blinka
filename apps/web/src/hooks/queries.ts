@@ -70,6 +70,13 @@ export function useProcessInvoice() {
   return useMutation({ mutationFn: (id: string) => api.processInvoice(id), onSettled: () => invalidateMoney(qc) });
 }
 
+export function useReevaluateInvoice() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (input: { id: string; expectedDecisionId: string; expectedPolicyVersionId: string }) =>
+    api.reevaluateInvoice(input.id, { expectedDecisionId: input.expectedDecisionId, expectedPolicyVersionId: input.expectedPolicyVersionId }),
+    onSettled: () => invalidateMoney(qc) });
+}
+
 export function useApprovals() {
   return useQuery({ queryKey: qk.approvals, queryFn: () => api.listApprovals(), staleTime: 10_000 });
 }

@@ -5,7 +5,7 @@ import { Miniflare } from 'miniflare';
 import { InvoiceDetailSchema, SessionSchema } from '@oli/contracts';
 import worker from '../worker/index.js';
 import { processInvoice, snapshot } from '../worker/processing.js';
-import { corroboratePdfText } from '../worker/document.js';
+import { corroboratePdfText, READER_VERSION } from '../worker/document.js';
 import { clearGuard, guard, id, now, originCheck, periodKey, stmt } from '../worker/http.js';
 
 const origin = 'https://oli.invalid';
@@ -349,4 +349,77 @@ test('un checkpoint pendiente del lector anterior se relee y no autoriza con con
   assert.equal(result.data.status, 'FAILED');
   assert.equal(result.data.latestDecision, null);
   assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 0 });
+});
+
+const reanalysisInput = detail => ({ expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId });
+
+test('reanálisis usa reglas actuales, conserva extracción/historial y solo reserva una vez con replay', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  await DB.prepare("UPDATE vendors SET allowed=0 WHERE id='vendor_demo_cloud'").run();
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read(extraction(), { provenance: { configVersion: READER_VERSION } }))).data;
+  assert.equal(first.latestDecision.action, 'BLOCK');
+  const originalRead = await stmt(DB, 'SELECT extracted_json FROM invoices WHERE id=?', invoice.id).first('extracted_json');
+  await DB.prepare("UPDATE vendors SET allowed=1 WHERE id='vendor_demo_cloud'").run();
+  const key = crypto.randomUUID(); const options = { method: 'POST', key, data: reanalysisInput(first) };
+  const updated = await api(`/invoices/${invoice.id}/reevaluate`, options);
+  assert.equal(updated.status, 200, JSON.stringify(updated));
+  assert.equal(updated.data.latestDecision.action, 'APPROVE');
+  assert.equal(updated.data.decisions.length, 2); assert.deepEqual(updated.data.decisions[0], first.decisions[0]);
+  assert.equal(await stmt(DB, 'SELECT extracted_json FROM invoices WHERE id=?', invoice.id).first('extracted_json'), originalRead);
+  assert.deepEqual((await api(`/invoices/${invoice.id}/reevaluate`, options)).data, updated.data);
+  const again = await api(`/invoices/${invoice.id}/reevaluate`, { ...options, key: crypto.randomUUID(), data: reanalysisInput(updated.data) });
+  assert.equal(again.status, 409); assert.equal(again.error.code, 'APPROVAL_NOT_ALLOWED');
+  assert.deepEqual(await ledger(), { reserved: 20000, reservations: 1, decisions: 2 });
+});
+
+test('reanálisis invalida la solicitud anterior y concurrencia no publica dos decisiones', async t => {
+  const { env, DB, api, upload, read } = await setup(t);
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read(extraction({ vendorName: 'Acme Accounting (ficticio)', amountMinor: 45000, description: 'Contabilidad mensual ficticia' }), { provenance: { configVersion: READER_VERSION } }))).data;
+  assert.equal(first.approvalRequest.state, 'PENDING');
+  const options = { method: 'POST', data: reanalysisInput(first), key: crypto.randomUUID() };
+  const results = await Promise.all([api(`/invoices/${invoice.id}/reevaluate`, options), api(`/invoices/${invoice.id}/reevaluate`, options)]);
+  assert.ok(results.every(r => r.status === 200), JSON.stringify(results));
+  assert.equal(results[0].data.latestDecision.id, results[1].data.latestDecision.id);
+  assert.equal(results[0].data.decisions.length, 2);
+  assert.equal(await stmt(DB, 'SELECT state FROM approval_requests WHERE id=?', first.approvalRequest.id).first('state'), 'INVALIDATED');
+  assert.equal(await DB.prepare("SELECT count(*) n FROM approval_requests WHERE state='PENDING'").first('n'), 1);
+  assert.equal(await DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+});
+
+test('reanálisis rechaza autoridad ajena, estado obsoleto y datos inyectados; lectura antigua sigue en revisión', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id, read(extraction({ vendorName: 'Acme Accounting (ficticio)', amountMinor: 45000, description: 'Contabilidad mensual ficticia' })))).data;
+  const path = `/invoices/${invoice.id}/reevaluate`, input = reanalysisInput(first);
+  assert.equal((await api(path, { method: 'POST', key: crypto.randomUUID(), data: { ...input, expectedDecisionId: 'stale' } })).error.code, 'DECISION_CHANGED');
+  assert.equal((await api(path, { method: 'POST', key: crypto.randomUUID(), data: { ...input, expectedPolicyVersionId: 'stale' } })).error.code, 'POLICY_CHANGED');
+  assert.equal((await api(path, { method: 'POST', key: crypto.randomUUID(), data: { ...input, extraction: extraction() } })).status, 400);
+  const reviewed = await api(path, { method: 'POST', key: crypto.randomUUID(), data: input });
+  assert.equal(reviewed.status, 200, JSON.stringify(reviewed));
+  assert.equal(reviewed.data.latestDecision.action, 'ESCALATE'); assert.equal(reviewed.data.approvalRequest.state, 'INVALIDATED');
+  assert.equal(reviewed.data.latestDecision.needsHumanApproval, false);
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+  await DB.prepare("UPDATE memberships SET role='APPROVER' WHERE user_id='user_demo_owner'").run();
+  assert.equal((await api(path, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(reviewed.data) })).status, 403);
+});
+
+test('reanálisis no revierte un rechazo humano ni resuelve otra identidad por su cuenta', async t => {
+  const { env, DB, api, upload, read, ledger } = await setup(t);
+  const invoice = await upload();
+  const first = (await processInvoice(env, 'org_demo', invoice.id,
+    read(extraction({ vendorName: 'Acme Accounting (ficticio)', amountMinor: 45000, description: 'Contabilidad mensual ficticia' }), { provenance: { configVersion: READER_VERSION } }))).data;
+  const rejected = await api(`/approvals/${first.approvalRequest.id}/decision`, { method: 'POST', key: crypto.randomUUID(),
+    data: { action: 'REJECT', comment: 'Rechazo humano que debe conservarse.', ...reanalysisInput(first) } });
+  assert.equal(rejected.status, 200);
+  const result = await api(`/invoices/${invoice.id}/reevaluate`, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(rejected.data.invoice) });
+  assert.equal(result.status, 409); assert.equal(result.error.code, 'APPROVAL_NOT_ALLOWED');
+  const unknown = await upload();
+  const blocked = (await processInvoice(env, 'org_demo', unknown.id,
+    read(extraction({ vendorName: 'Proveedor nuevo de test' }), { provenance: { configVersion: READER_VERSION } }))).data;
+  await DB.prepare("INSERT INTO vendors(id,org_id,name,normalized_name,allowed) VALUES ('new-test-vendor','org_demo','Proveedor nuevo de test','proveedor nuevo de test',1)").run();
+  const changed = await api(`/invoices/${unknown.id}/reevaluate`, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(blocked) });
+  assert.equal(changed.status, 409); assert.equal(changed.error.code, 'INVOICE_IDENTITY_CHANGED');
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 3 });
 });

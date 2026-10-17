@@ -402,7 +402,7 @@ Referencias a proveedor/acuerdo deben pertenecer a la empresa de la sesión.
 
 Repetir `process` devuelve el trabajo/resultado existente y nunca reserva dos veces.
 Los fallos técnicos transitorios vuelven a `RECEIVED` con `processingError.retryable=true` mientras esperan el siguiente intento automático. Hay como máximo tres intentos por factura, con espera de 30/120 segundos; repetir el endpoint no reinicia ese límite. Al agotarlo o ante un error permanente, queda `FAILED` con `retryable=false`.
-Una factura ya decidida no se reevalúa por llamar `process`; P1 usa `/reevaluate` explícito.
+Una factura ya decidida no se reevalúa por llamar `process`; el endpoint explícito `/reevaluate` descrito abajo vuelve a comprobar las reglas.
 
 Un documento ilegible puede terminar `DECIDED` con `ESCALATE` y explicación de datos faltantes.
 Una caída técnica nunca crea una aprobación nueva: el trabajo se recupera o termina `FAILED`. Ante fallo de polling,
@@ -411,6 +411,24 @@ mantener la última información conocida y mostrar el error de conexión.
 Subir el mismo documento como factura nueva debe producir un registro auditable bloqueado como
 duplicado cuando se confirme. Repetir la misma solicitud HTTP con la misma clave de idempotencia
 devuelve el mismo registro original; son dos situaciones distintas.
+
+### Reanalizar con las reglas actuales
+
+`POST /invoices/:id/reevaluate` requiere OWNER, sesión/CSRF, `Idempotency-Key` y body
+`{ expectedDecisionId, expectedPolicyVersionId }` (ambos obligatorios). Devuelve
+`200 Envelope<InvoiceDetail>`. Reutiliza la lectura guardada y ejecuta el motor con el
+proveedor, acuerdo, política y presupuesto actuales; no invoca OCR ni al modelo.
+Agrega una decisión y un evento `INVOICE_REEVALUATED`; mantiene el documento, la extracción
+y todas las decisiones anteriores. Invalida cualquier solicitud humana pendiente anterior
+y crea una nueva solo si el resultado actual la permite. Una nueva aprobación reserva
+atómicamente mediante los triggers originales; el replay devuelve la misma respuesta.
+
+No reabre facturas ya reservadas ni aprobadas/rechazadas por una persona (`409 APPROVAL_NOT_ALLOWED`).
+Exige una factura decidida con lectura completa; no reinicia trabajos FAILED ni su límite de intentos.
+Lecturas de una versión antigua permanecen en revisión por seguridad. Un cambio de identidad de
+proveedor/acuerdo requiere el flujo de alta/confirmación (`409 INVOICE_IDENTITY_CHANGED`),
+y cambios concurrentes devuelven `409 DECISION_CHANGED`/`POLICY_CHANGED` para actualizar la pantalla.
+El botón del detalle explica que reanaliza reglas y deshabilita los casos protegidos.
 
 Filtros de `GET /invoices`: `status?`, `action?`, `vendorId?`, `needsHumanApproval?` y paginación.
 Los filtros se combinan con AND; `action` consulta la última decisión.
@@ -663,7 +681,7 @@ type DelegationProposal = {
 | POST | `/delegations/proposals/detect` | Sin body | `200 Envelope<DelegationProposal[]>` |
 | POST | `/delegations/proposals/:id/reject` | `{ comment }` | `200 Envelope<DelegationProposal>` |
 | POST | `/delegations/proposals/:id/activate` | `{ expectedActivePolicyVersionId, confirmed: true }` | `200 Envelope<{ proposal: DelegationProposal; policy: PolicyVersion }>` |
-| POST | `/invoices/:id/reevaluate` | `{ expectedPolicyVersionId }` | Misma forma 200/202 de `process` |
+
 
 Mutaciones de propuestas requieren OWNER. Activación y reevaluación llevan `Idempotency-Key`;
 la detección no duplica propuestas equivalentes. Sin evidencia suficiente devuelve `data=[]`.

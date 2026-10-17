@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, RotateCcw } from 'lucide-react';
 import { ApiError, errorMessage } from '@/api';
 import { Button } from '@/components/ui/Button';
 import { OutcomeBadge, ReasonChips, SourceBadge } from '@/components/Badges';
@@ -11,7 +11,7 @@ import { Orb } from '@/components/ui/Orb';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
-import { useInvoice, useMe, useProcessInvoice } from '@/hooks/queries';
+import { useInvoice, useMandate, useMe, useProcessInvoice, useReevaluateInvoice } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { dueLabel, formatDate, formatDateTime } from '@/lib/dates';
@@ -28,6 +28,7 @@ const EVENT_LABEL: Record<string, string> = {
   APPROVAL_REJECTED: 'Rejected by a reviewer',
   APPROVAL_REVALIDATION_FAILED: 'Re-check failed — not approved',
   BUDGET_RESERVED: 'Budget reserved',
+  INVOICE_REEVALUATED: 'Invoice reanalyzed',
 };
 
 export function BillDetail() {
@@ -35,6 +36,8 @@ export function BillDetail() {
   const q = useInvoice(id);
   const me = useMe();
   const process = useProcessInvoice();
+  const reevaluate = useReevaluateInvoice();
+  const mandate = useMandate();
 
   if (q.isLoading) return <PageLoading label={t('Loading invoice')} />;
   if (q.isError) {
@@ -49,6 +52,13 @@ export function BillDetail() {
   const pendingApproval = inv.approval?.state === 'PENDING' ? inv.approval : null;
   const role = me.data?.role;
   const canDecide = role === 'owner' || role === 'approver';
+  const resolved = d?.decision === 'APPROVE' || inv.decisionHistory.some(h => h.decision === 'APPROVE')
+    || ['APPROVED', 'REJECTED'].includes(inv.approval?.state ?? '');
+  const reanalysisHint = resolved ? 'An authorized or manually rejected invoice keeps its recorded resolution.'
+    : role !== 'owner' ? 'Only an owner can reanalyze invoices.'
+      : !d?.id || !inv.extracted ? 'A completed document reading is needed before reanalyzing.'
+        : 'Checks the current rules using the saved reading. The original document and earlier decisions stay unchanged.';
+  const canReevaluate = role === 'owner' && !resolved && !!d?.id && !!inv.extracted && !!mandate.data?.active?.id && outcome !== 'PROCESSING';
 
   return (
     <>
@@ -129,6 +139,16 @@ export function BillDetail() {
               )}
 
               {outcome === 'NEEDS_REVIEW' && !pendingApproval && <NotApprovable inv={inv} />}
+              <div className="space-y-2 border-t border-hairline pt-4">
+                <Button variant="secondary" icon={<RotateCcw className="size-4" aria-hidden />} loading={reevaluate.isPending}
+                  disabled={!canReevaluate} aria-describedby="reanalysis-hint"
+                  onClick={() => reevaluate.mutate({ id: inv.id, expectedDecisionId: d!.id!, expectedPolicyVersionId: String(mandate.data!.active!.id) })}>
+                  {t(reevaluate.isPending ? 'Reanalyzing…' : 'Reanalyze invoice')}
+                </Button>
+                <p id="reanalysis-hint" className="text-sm text-slate-600">{t(reanalysisHint)}</p>
+                {reevaluate.isError && <InlineAlert>{errorMessage(reevaluate.error)}</InlineAlert>}
+                {reevaluate.isSuccess && <p role="status" className="text-sm text-slate-600">{t('Analysis updated. The previous decision is in the history.')}</p>}
+              </div>
             </div>
           </Card>
 

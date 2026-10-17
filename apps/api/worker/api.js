@@ -6,6 +6,7 @@ import { HttpError, id, json, now, periodKey, readBytes, stmt } from './http.js'
 import { agreementDto, approvalPage, dashboardInvoiceData, getInvoice, invoicePage, vendorDto } from './repository.js';
 import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
+import { reevaluateInvoice } from './reevaluation.js';
 import { enqueueInvoice } from './jobs.js';
 import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
@@ -69,8 +70,9 @@ export async function handleApi(request, env) {
       const q = query(url, InvoiceQuerySchema);
       return json(await invoicePage(env.DB, orgId, q));
     }
-    const invoice = path.match(/^\/invoices\/([^/]+)(?:\/(process|file))?$/);
+    const invoice = path.match(/^\/invoices\/([^/]+)(?:\/(process|file|reevaluate))?$/);
     if (invoice) {
+      if (method === 'POST' && invoice[2] === 'reevaluate') return await reevaluateInvoice(request, env, session, invoice[1]);
       if (method === 'GET' && !invoice[2]) return json({ data: await getInvoice(env.DB, orgId, invoice[1]) });
       if (method === 'GET' && invoice[2] === 'file') return await invoiceFile(env, orgId, invoice[1]);
       if (method === 'POST' && invoice[2] === 'process') {

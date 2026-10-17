@@ -13,6 +13,10 @@ export const DecisionActionSchema = z.enum(['APPROVE', 'BLOCK', 'ESCALATE']);
 export const InvoiceStatusSchema = z.enum([
   'RECEIVED', 'PARSING', 'READY', 'PROCESSING', 'DECIDED', 'FAILED',
 ]);
+export const ReevaluateInvoiceSchema = z.strictObject({
+  expectedDecisionId: IdSchema,
+  expectedPolicyVersionId: IdSchema,
+});
 export const RoleSchema = z.enum(['OWNER', 'APPROVER']);
 export const ApprovalStateSchema = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'INVALIDATED']);
 export const PaginationSchema = z.strictObject({
