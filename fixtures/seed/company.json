@@ -1,0 +1,512 @@
+{
+  "datasetVersion": "oli-invoices-v1",
+  "synthetic": true,
+  "organization": {
+    "id": "org_demo_aurora",
+    "name": "Aurora Demo Labs LLC",
+    "defaultCurrency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "policy": {
+    "id": "pol_demo_v1",
+    "version": 1,
+    "status": "ACTIVE",
+    "rules": {
+      "currency": "USD",
+      "automaticLimitMinor": 30000,
+      "hardLimitMinor": 100000,
+      "monthlyBudgetMinor": 200000,
+      "requireAllowedVendor": true,
+      "requireAgreement": true,
+      "humanApprovalEnabled": true,
+      "reviewAboveMinor": 30000,
+      "processDaysBeforeDue": 0,
+      "scopedDelegations": []
+    },
+    "activatedAt": "2026-10-01T12:00:00Z",
+    "activatedBy": "usr_demo_owner"
+  },
+  "vendors": [
+    {
+      "id": "ven_demo_1",
+      "name": "Nimbo Cloud Demo",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_2",
+      "name": "Lumen Design Demo",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_3",
+      "name": "Brisa Support Demo",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_4",
+      "name": "Faro Translation Demo",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_5",
+      "name": "Acme Accounting Demo",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_6",
+      "name": "Delta Supplies Demo",
+      "allowed": false,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "ven_demo_7",
+      "name": "Costa Logistics Demo",
+      "allowed": false,
+      "externalRef": null,
+      "createdAt": "2026-10-01T12:00:00Z"
+    }
+  ],
+  "agreements": [
+    {
+      "id": "agr_demo_001",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0001",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_002",
+      "vendorId": "ven_demo_2",
+      "currency": "USD",
+      "amountMinor": 7500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0002",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_003",
+      "vendorId": "ven_demo_3",
+      "currency": "USD",
+      "amountMinor": 12000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0003",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_004",
+      "vendorId": "ven_demo_4",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0004",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_005",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0005",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_006",
+      "vendorId": "ven_demo_2",
+      "currency": "USD",
+      "amountMinor": 8000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0006",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_007",
+      "vendorId": "ven_demo_3",
+      "currency": "USD",
+      "amountMinor": 15000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0007",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_008",
+      "vendorId": "ven_demo_4",
+      "currency": "USD",
+      "amountMinor": 29999,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0008",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_009",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0009",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_010",
+      "vendorId": "ven_demo_2",
+      "currency": "USD",
+      "amountMinor": 22500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0010",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_011",
+      "vendorId": "ven_demo_3",
+      "currency": "USD",
+      "amountMinor": 18000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0011",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_012",
+      "vendorId": "ven_demo_4",
+      "currency": "USD",
+      "amountMinor": 6000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0012",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_013",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0013",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_014",
+      "vendorId": "ven_demo_2",
+      "currency": "USD",
+      "amountMinor": 27500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0014",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_015",
+      "vendorId": "ven_demo_3",
+      "currency": "USD",
+      "amountMinor": 30000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0015",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_016",
+      "vendorId": "ven_demo_5",
+      "currency": "USD",
+      "amountMinor": 45000,
+      "toleranceMinor": 0,
+      "frequency": "MONTHLY",
+      "concept": "Contabilidad mensual de demostración",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_021",
+      "vendorId": "ven_demo_2",
+      "currency": "USD",
+      "amountMinor": 75000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0021",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_028",
+      "vendorId": "ven_demo_6",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0028",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_030",
+      "vendorId": "ven_demo_7",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0030",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_031",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 40000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0031",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_032",
+      "vendorId": "ven_demo_3",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Soporte técnico mensual de demostración",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_034",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0034",
+      "active": false,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_035",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0035",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_036",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0036",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_037",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0037",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_038",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0038",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_039",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0039",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_040",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0040",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_041",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 30000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0041",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_042",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 30001,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0042",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_043",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 100000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0043",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_044",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 100001,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0044",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_045",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0045",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_046",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0046",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_047",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0047",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_048",
+      "vendorId": "ven_demo_1",
+      "currency": "EUR",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0048",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_049",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0049",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    },
+    {
+      "id": "agr_demo_050",
+      "vendorId": "ven_demo_1",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Servicio de prueba - orden 0050",
+      "active": true,
+      "createdAt": "2026-10-01T12:00:00Z"
+    }
+  ],
+  "defaultBudget": {
+    "id": "bud_demo_2026-10_USD",
+    "currency": "USD",
+    "periodKey": "2026-10",
+    "limitMinor": 200000,
+    "reservedMinor": 0,
+    "availableMinor": 200000
+  },
+  "demoOwner": {
+    "id": "usr_demo_owner",
+    "role": "OWNER"
+  }
+}

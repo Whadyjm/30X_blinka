@@ -1,0 +1,34 @@
+{
+  "name": "@oli/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test tests/*.test.mjs",
+    "test:extraction:live": "node scripts/extraction-smoke.mjs",
+    "test:extraction:corpus": "node scripts/evaluate-extraction.mjs --run",
+    "types": "wrangler types --include-runtime=false",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:remote": "wrangler d1 migrations apply DB --remote",
+    "db:seed:local": "wrangler d1 execute DB --local --file ../../packages/database/seed/demo.sql",
+    "db:seed:remote": "wrangler d1 execute DB --remote --file ../../packages/database/seed/demo.sql",
+    "secret:openrouter": "wrangler secret put OPENROUTER_API_KEY",
+    "secrets:list": "wrangler secret list",
+    "test:runtime": "wrangler deploy --dry-run --outdir .wrangler/runtime && node --test tests/runtime.mjs"
+  },
+  "dependencies": {
+    "@oli/extraction": "link:../../packages/extraction",
+    "@oli/contracts": "link:../../packages/contracts",
+    "@oli/domain": "link:../../packages/domain"
+  },
+  "devDependencies": {
+    "wrangler": "4.151.1",
+    "miniflare": "4.20260730.0"
+  }
+}

@@ -1,0 +1,462 @@
+{
+  "scope": "LIVE_SYNTHETIC_INTEGRATION_SMOKE",
+  "source": "apps/api/scripts/smoke-invoice-flow.mjs",
+  "evaluatedAt": "2026-10-17T03:28:35.218Z",
+  "documentSha256": "7b5f5ca37043200a33ef50eb5c7f63fbce9839a02502c8c085af7fa1f76b72cd",
+  "invoice": {
+    "id": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+    "status": "DECIDED",
+    "source": "HUMAN_UPLOAD",
+    "file": {
+      "name": "accounting.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2621,
+      "url": "/api/v1/invoices/inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea/file"
+    },
+    "vendorId": "vendor_demo_acme",
+    "vendorName": "Acme Accounting (ficticio)",
+    "agreementId": "agr_demo_acme",
+    "invoiceNumber": "INTEGRATION-ACCOUNTING-001",
+    "amountMinor": 45000,
+    "currency": "USD",
+    "issuedAt": "2026-10-16",
+    "dueDate": "2026-10-31",
+    "servicePeriod": "2026-10",
+    "description": "Contabilidad mensual ficticia",
+    "extractionWarnings": [],
+    "latestDecision": {
+      "id": "dec_8a7dba22-2fbe-4e98-8890-8b99dcdc7db8",
+      "invoiceId": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+      "action": "APPROVE",
+      "reasons": [
+        "HUMAN_APPROVED"
+      ],
+      "humanExplanation": "Aprobación simulada autorizada por una persona: Autorización OWNER simulada para verificar la integración con datos ficticios.",
+      "policyVersionId": "pol_demo_v1",
+      "policyVersion": 1,
+      "checkedAt": "2026-10-17T03:28:34.752Z",
+      "needsHumanApproval": false,
+      "actor": {
+        "kind": "HUMAN",
+        "userId": "user_demo_owner"
+      },
+      "facts": {
+        "amountMinor": 45000,
+        "currency": "USD",
+        "automaticLimitMinor": 30000,
+        "hardLimitMinor": 100000,
+        "budgetAvailableBeforeMinor": 180000,
+        "vendorAllowed": true,
+        "agreementId": "agr_demo_acme"
+      },
+      "trace": [
+        {
+          "rule": "EXTRACTION",
+          "outcome": "PASS",
+          "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+          "evidence": {
+            "status": "CROSS_CHECKED",
+            "issues": ""
+          }
+        },
+        {
+          "rule": "VENDOR",
+          "outcome": "PASS",
+          "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+          "evidence": {
+            "vendorId": "vendor_demo_acme",
+            "allowed": true,
+            "requireAllowedVendor": true
+          }
+        },
+        {
+          "rule": "AGREEMENT",
+          "outcome": "PASS",
+          "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+          "evidence": {
+            "agreementId": "agr_demo_acme",
+            "amountMinor": 45000,
+            "agreedAmountMinor": 45000,
+            "toleranceMinor": 0,
+            "currency": "USD",
+            "agreedCurrency": "USD",
+            "description": "Contabilidad mensual ficticia",
+            "agreedConcept": "Contabilidad mensual ficticia"
+          }
+        },
+        {
+          "rule": "CURRENCY",
+          "outcome": "PASS",
+          "explanation": "La moneda coincide con el mandato.",
+          "evidence": {
+            "currency": "USD"
+          }
+        },
+        {
+          "rule": "HARD_LIMIT",
+          "outcome": "PASS",
+          "explanation": "El importe no supera el techo absoluto.",
+          "evidence": {
+            "amountMinor": 45000,
+            "hardLimitMinor": 100000
+          }
+        },
+        {
+          "rule": "BUDGET",
+          "outcome": "PASS",
+          "explanation": "El presupuesto disponible cubre el importe.",
+          "evidence": {
+            "amountMinor": 45000,
+            "availableMinor": 180000,
+            "reservedMinor": 20000,
+            "budgetLimitMinor": 200000,
+            "policyMonthlyBudgetMinor": 200000
+          }
+        },
+        {
+          "rule": "AUTO_LIMIT",
+          "outcome": "ESCALATE",
+          "explanation": "El importe supera el límite automático.",
+          "evidence": {
+            "amountMinor": 45000,
+            "automaticLimitMinor": 30000
+          }
+        },
+        {
+          "rule": "HUMAN_REVIEW",
+          "outcome": "ESCALATE",
+          "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+          "evidence": {
+            "amountMinor": 45000,
+            "reviewAboveMinor": 30000,
+            "humanApprovalEnabled": true
+          }
+        },
+        {
+          "rule": "HUMAN_REVIEW",
+          "outcome": "PASS",
+          "explanation": "Autorización OWNER simulada para verificar la integración con datos ficticios.",
+          "evidence": {
+            "userId": "user_demo_owner",
+            "previousDecisionId": "dec_f422b89a-7d56-4e87-9bf0-cf5b1ec64e07"
+          }
+        }
+      ],
+      "simulated": true
+    },
+    "approvalRequest": {
+      "id": "apr_26ca7644-c768-4ecd-8476-b2ec59401137",
+      "invoiceId": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+      "decisionId": "dec_f422b89a-7d56-4e87-9bf0-cf5b1ec64e07",
+      "policyVersionId": "pol_demo_v1",
+      "state": "APPROVED",
+      "reason": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+      "canApprove": false,
+      "reviewerId": "user_demo_owner",
+      "reviewComment": "Autorización OWNER simulada para verificar la integración con datos ficticios.",
+      "createdAt": "2026-10-17T03:28:15.933Z",
+      "decidedAt": "2026-10-17T03:28:34.752Z"
+    },
+    "processingError": null,
+    "createdAt": "2026-10-17T03:28:06.195Z",
+    "updatedAt": "2026-10-17T03:28:34.752Z",
+    "extraction": {
+      "vendorName": "Acme Accounting (ficticio)",
+      "invoiceNumber": "INTEGRATION-ACCOUNTING-001",
+      "amountMinor": 45000,
+      "currency": "USD",
+      "issuedAt": "2026-10-16",
+      "dueDate": "2026-10-31",
+      "servicePeriod": "2026-10",
+      "description": "Contabilidad mensual ficticia",
+      "extractionWarnings": [],
+      "evidence": [
+        {
+          "field": "vendorName",
+          "source": "page:1",
+          "quote": "Acme Accounting (ficticio)"
+        },
+        {
+          "field": "invoiceNumber",
+          "source": "page:1",
+          "quote": "Número / Number | INTEGRATION-ACCOUNTING-001"
+        },
+        {
+          "field": "amountMinor",
+          "source": "page:1",
+          "quote": "TOTAL A COBRAR\nUSD 450.00"
+        },
+        {
+          "field": "currency",
+          "source": "page:1",
+          "quote": "Moneda / Currency | USD"
+        },
+        {
+          "field": "issuedAt",
+          "source": "page:1",
+          "quote": "Emisión / Issued | 2026-10-16"
+        },
+        {
+          "field": "dueDate",
+          "source": "page:1",
+          "quote": "Vencimiento / Due | 2026-10-31"
+        },
+        {
+          "field": "servicePeriod",
+          "source": "page:1",
+          "quote": "Periodo de servicio | 2026-10"
+        },
+        {
+          "field": "description",
+          "source": "page:1",
+          "quote": "Contabilidad mensual ficticia"
+        }
+      ]
+    },
+    "decisions": [
+      {
+        "id": "dec_f422b89a-7d56-4e87-9bf0-cf5b1ec64e07",
+        "invoiceId": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+        "action": "ESCALATE",
+        "reasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "humanExplanation": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T03:28:15.933Z",
+        "needsHumanApproval": true,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 45000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 200000,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_acme"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_demo_acme",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_acme",
+              "amountMinor": 45000,
+              "agreedAmountMinor": 45000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Contabilidad mensual ficticia",
+              "agreedConcept": "Contabilidad mensual ficticia"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 45000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 45000,
+              "availableMinor": 200000,
+              "reservedMinor": 0,
+              "budgetLimitMinor": 200000,
+              "policyMonthlyBudgetMinor": 200000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "ESCALATE",
+            "explanation": "El importe supera el límite automático.",
+            "evidence": {
+              "amountMinor": 45000,
+              "automaticLimitMinor": 30000
+            }
+          },
+          {
+            "rule": "HUMAN_REVIEW",
+            "outcome": "ESCALATE",
+            "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+            "evidence": {
+              "amountMinor": 45000,
+              "reviewAboveMinor": 30000,
+              "humanApprovalEnabled": true
+            }
+          }
+        ],
+        "simulated": true
+      },
+      {
+        "id": "dec_8a7dba22-2fbe-4e98-8890-8b99dcdc7db8",
+        "invoiceId": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+        "action": "APPROVE",
+        "reasons": [
+          "HUMAN_APPROVED"
+        ],
+        "humanExplanation": "Aprobación simulada autorizada por una persona: Autorización OWNER simulada para verificar la integración con datos ficticios.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T03:28:34.752Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "HUMAN",
+          "userId": "user_demo_owner"
+        },
+        "facts": {
+          "amountMinor": 45000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 180000,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_acme"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_demo_acme",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_acme",
+              "amountMinor": 45000,
+              "agreedAmountMinor": 45000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Contabilidad mensual ficticia",
+              "agreedConcept": "Contabilidad mensual ficticia"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 45000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 45000,
+              "availableMinor": 180000,
+              "reservedMinor": 20000,
+              "budgetLimitMinor": 200000,
+              "policyMonthlyBudgetMinor": 200000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "ESCALATE",
+            "explanation": "El importe supera el límite automático.",
+            "evidence": {
+              "amountMinor": 45000,
+              "automaticLimitMinor": 30000
+            }
+          },
+          {
+            "rule": "HUMAN_REVIEW",
+            "outcome": "ESCALATE",
+            "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+            "evidence": {
+              "amountMinor": 45000,
+              "reviewAboveMinor": 30000,
+              "humanApprovalEnabled": true
+            }
+          },
+          {
+            "rule": "HUMAN_REVIEW",
+            "outcome": "PASS",
+            "explanation": "Autorización OWNER simulada para verificar la integración con datos ficticios.",
+            "evidence": {
+              "userId": "user_demo_owner",
+              "previousDecisionId": "dec_f422b89a-7d56-4e87-9bf0-cf5b1ec64e07"
+            }
+          }
+        ],
+        "simulated": true
+      }
+    ]
+  },
+  "budgets": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 200000,
+      "reservedMinor": 65000,
+      "availableMinor": 135000
+    }
+  ],
+  "note": "Una ejecución puntual con datos ficticios; no mide precisión OCR del corpus ni mueve dinero."
+}

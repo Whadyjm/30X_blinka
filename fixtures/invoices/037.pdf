@@ -1,0 +1,60 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 2003 >>
+stream
+0.0706 0.4196 0.3725 rg 0 780 612 12 re f
+BT /F1 25 Tf 0.0902 0.1686 0.2275 rg 42 719 Td (FACTURA / INVOICE) Tj ET
+BT /F1 10 Tf 0.0706 0.4196 0.3725 rg 42 702 Td (DOCUMENTO FICTICIO - SOLO PRUEBAS - SIN VALOR FISCAL) Tj ET
+BT /F1 9 Tf 0.3255 0.3961 0.4471 rg 42 651 Td (EMISOR / SUPPLIER) Tj ET
+BT /F1 16 Tf 0.0902 0.1686 0.2275 rg 42 623 Td (Nimbo Cloud Demo) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 42 601 Td (Cliente: Aurora Demo Labs LLC) Tj ET
+0.8118 0.8510 0.8706 rg 42 580 528 1 re f
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 540 Td (Número / Number) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 539 Td (INV-0037) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 513 Td (Emisión / Issued) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 512 Td (2026-10-01) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 486 Td (Vencimiento / Due) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 485 Td (2026-10-15) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 459 Td (Periodo de servicio) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 458 Td (2026-10) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 432 Td (Acuerdo / Agreement) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 431 Td (agr_demo_037) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 405 Td (Moneda / Currency) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 255 404 Td (USD) Tj ET
+0.9176 0.9451 0.9490 rg 42 341 528 30 re f
+BT /F1 10 Tf 0.0902 0.1686 0.2275 rg 54 352 Td (CONCEPTO / DESCRIPTION) Tj ET
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 54 313 Td (Servicio de prueba - orden 0037) Tj ET
+0.9176 0.9451 0.9490 rg 42 202 528 69 re f
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 54 245 Td (TOTAL A COBRAR) Tj ET
+BT /F1 17 Tf 0.0902 0.1686 0.2275 rg 255 237 Td (USD 250.00) Tj ET
+BT /F1 9 Tf 0.3255 0.3961 0.4471 rg 54 213 Td (Importe final; no se añaden impuestos ni cargos adicionales.) Tj ET
+0.8118 0.8510 0.8706 rg 42 64 528 1 re f
+BT /F1 9 Tf 0.3255 0.3961 0.4471 rg 42 38 Td (Empresas y servicios inventados. No realizar pagos. No contiene datos bancarios.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2398
+%%EOF

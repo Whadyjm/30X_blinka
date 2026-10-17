@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "oli-api",
+  "account_id": "fbaa64f96579f93b2db32a1eb12ff6c9",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-10-16",
+  "workers_dev": true,
+  "preview_urls": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "oli-demo",
+      "database_id": "349afff1-8b3b-4673-929b-ce6936c68d3a",
+      "migrations_dir": "../../packages/database/migrations"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
+  },
+  "r2_buckets": [
+    {
+      "binding": "INVOICES",
+      "bucket_name": "oli-invoice-tests"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "DEMO_ORG_ID": "org_demo",
+    "DEMO_USER_ID": "user_demo_owner"
+  }
+}

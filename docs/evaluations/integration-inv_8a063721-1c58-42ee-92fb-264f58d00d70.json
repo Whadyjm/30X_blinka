@@ -1,0 +1,174 @@
+{
+  "scope": "LIVE_SYNTHETIC_INTEGRATION_SMOKE",
+  "source": "apps/api/scripts/smoke-invoice-flow.mjs",
+  "evaluatedAt": "2026-10-17T03:25:53.445Z",
+  "documentSha256": "3fc5dff2d5055372f0b12ded5cc008587062e4b4346b5528183a3ce3196ea7c0",
+  "invoice": {
+    "id": "inv_8a063721-1c58-42ee-92fb-264f58d00d70",
+    "status": "DECIDED",
+    "source": "HUMAN_UPLOAD",
+    "file": {
+      "name": "hosting.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2617,
+      "url": "/api/v1/invoices/inv_8a063721-1c58-42ee-92fb-264f58d00d70/file"
+    },
+    "vendorId": null,
+    "vendorName": "Demo Cloud Hosting (ficticio)",
+    "agreementId": null,
+    "invoiceNumber": "INTEGRATION-HOSTING-001",
+    "amountMinor": 20000,
+    "currency": "USD",
+    "issuedAt": "2026-10-16",
+    "dueDate": "2026-10-31",
+    "servicePeriod": "2026-10",
+    "description": "Hosting mensual ficticio",
+    "extractionWarnings": [],
+    "latestDecision": {
+      "id": "dec_0f037ff5-607a-4f8f-bdc5-47020a87ec21",
+      "invoiceId": "inv_8a063721-1c58-42ee-92fb-264f58d00d70",
+      "action": "ESCALATE",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "humanExplanation": "Requiere revisión. La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+      "policyVersionId": "pol_demo_v1",
+      "policyVersion": 1,
+      "checkedAt": "2026-10-17T03:25:53.098Z",
+      "needsHumanApproval": false,
+      "actor": {
+        "kind": "SYSTEM",
+        "userId": null
+      },
+      "facts": {
+        "amountMinor": 20000,
+        "currency": "USD",
+        "automaticLimitMinor": 30000,
+        "hardLimitMinor": 100000,
+        "budgetAvailableBeforeMinor": null,
+        "vendorAllowed": null,
+        "agreementId": null
+      },
+      "trace": [
+        {
+          "rule": "EXTRACTION",
+          "outcome": "ESCALATE",
+          "explanation": "La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+          "evidence": {
+            "status": "REVIEW_REQUIRED",
+            "issues": "FIELD_MISMATCH:vendorName, FIELD_MISMATCH:amountMinor, FIELD_MISMATCH:currency, FIELD_MISMATCH:dueDate"
+          }
+        }
+      ],
+      "simulated": true
+    },
+    "approvalRequest": null,
+    "processingError": null,
+    "createdAt": "2026-10-17T03:25:43.378Z",
+    "updatedAt": "2026-10-17T03:25:53.098Z",
+    "extraction": {
+      "vendorName": "Demo Cloud Hosting (ficticio)",
+      "invoiceNumber": "INTEGRATION-HOSTING-001",
+      "amountMinor": 20000,
+      "currency": "USD",
+      "issuedAt": "2026-10-16",
+      "dueDate": "2026-10-31",
+      "servicePeriod": "2026-10",
+      "description": "Hosting mensual ficticio",
+      "extractionWarnings": [],
+      "evidence": [
+        {
+          "field": "vendorName",
+          "source": "page:1",
+          "quote": "Demo Cloud Hosting (ficticio)"
+        },
+        {
+          "field": "invoiceNumber",
+          "source": "page:1",
+          "quote": "INTEGRATION-HOSTING-001"
+        },
+        {
+          "field": "amountMinor",
+          "source": "page:1",
+          "quote": "TOTAL A COBRAR | USD 200.00"
+        },
+        {
+          "field": "currency",
+          "source": "page:1",
+          "quote": "Moneda / Currency | USD"
+        },
+        {
+          "field": "issuedAt",
+          "source": "page:1",
+          "quote": "Emisión / Issued | 2026-10-16"
+        },
+        {
+          "field": "dueDate",
+          "source": "page:1",
+          "quote": "Vencimiento / Due | 2026-10-31"
+        },
+        {
+          "field": "servicePeriod",
+          "source": "page:1",
+          "quote": "Periodo de servicio | 2026-10"
+        },
+        {
+          "field": "description",
+          "source": "page:1",
+          "quote": "Hosting mensual ficticio"
+        }
+      ]
+    },
+    "decisions": [
+      {
+        "id": "dec_0f037ff5-607a-4f8f-bdc5-47020a87ec21",
+        "invoiceId": "inv_8a063721-1c58-42ee-92fb-264f58d00d70",
+        "action": "ESCALATE",
+        "reasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "humanExplanation": "Requiere revisión. La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T03:25:53.098Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 20000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": null,
+          "vendorAllowed": null,
+          "agreementId": null
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "ESCALATE",
+            "explanation": "La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.",
+            "evidence": {
+              "status": "REVIEW_REQUIRED",
+              "issues": "FIELD_MISMATCH:vendorName, FIELD_MISMATCH:amountMinor, FIELD_MISMATCH:currency, FIELD_MISMATCH:dueDate"
+            }
+          }
+        ],
+        "simulated": true
+      }
+    ]
+  },
+  "budgets": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 200000,
+      "reservedMinor": 0,
+      "availableMinor": 200000
+    }
+  ],
+  "note": "Una ejecución puntual con datos ficticios; no mide precisión OCR del corpus ni mueve dinero."
+}

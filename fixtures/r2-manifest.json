@@ -1,0 +1,519 @@
+{
+  "datasetVersion": "oli-invoices-v1",
+  "synthetic": true,
+  "accountId": "fbaa64f96579f93b2db32a1eb12ff6c9",
+  "accountName": "Tiamat.agency@gmail.com's Account",
+  "bucket": "oli-invoice-tests",
+  "datasetPrefix": "datasets/oli-invoices-v1",
+  "resultsPrefix": "runs/oli-invoices-v1",
+  "publicAccess": false,
+  "extractorInputPrefix": "datasets/oli-invoices-v1/invoices/",
+  "referencePrefix": "datasets/oli-invoices-v1/reference/",
+  "manifestKey": "datasets/oli-invoices-v1/reference/r2-manifest.json",
+  "objects": [
+    {
+      "source": "invoices/001.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/001.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2581,
+      "sha256": "0edb3dba5f1d03c483aa8d1053baac77994458be747f19b4b42fae8c7b0a989f",
+      "md5": "0d280e90dab3cf658b650ee630c11734"
+    },
+    {
+      "source": "invoices/001.png",
+      "key": "datasets/oli-invoices-v1/invoices/001.png",
+      "contentType": "image/png",
+      "sizeBytes": 79048,
+      "sha256": "4f8f1487c0ec793a729cff139366b1a51d03a0c62393a2e0105f6d941ecddc95",
+      "md5": "f5d35a7b9c14c7673bf79ad2190c38f0"
+    },
+    {
+      "source": "invoices/002.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/002.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "6090de190c7039d3215eb480e947bf32096df9939f27b4656ddae285c7f8e1f1",
+      "md5": "92eb9d5b6f1dc150a8ccb82e86389a8b"
+    },
+    {
+      "source": "invoices/003.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/003.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "d61642f720e442fc7b78e50564ed002bcb75c9091d86bdd7df4a8a4f3f41f291",
+      "md5": "54c059448c86587199901f1be526aa53"
+    },
+    {
+      "source": "invoices/004.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/004.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2587,
+      "sha256": "69026440bb1693f481b3b06f868591b50ac0cef357eca92417aa8c6e591e1c49",
+      "md5": "cc94e7215ae8e419a396624938ee7429"
+    },
+    {
+      "source": "invoices/005.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/005.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "30845275aad9dcfb37b40d4555e9bc4decb75a8354293c88da5e56942136d2ae",
+      "md5": "8bbd243cbd0e90df57f83bab3a814e35"
+    },
+    {
+      "source": "invoices/006.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/006.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "ee2f4f5cdbc98e64a2ec916357b9bc79bd7f21c01506bef913e9d32c6080b63a",
+      "md5": "f39b14de0b172c4b7a04db6b25f210b8"
+    },
+    {
+      "source": "invoices/007.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/007.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "046b27eaee79f75cf7ab57ec1589baab535584d14d670b832ff41e90312b514b",
+      "md5": "e96c4fd433710ba136a3b7ac5554fc9b"
+    },
+    {
+      "source": "invoices/008.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/008.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2587,
+      "sha256": "2b6cfab59622474f329d287309054bc64e26f4420093669754ed380ef9468301",
+      "md5": "a37d2a14656ce5c3012c3de316718f88"
+    },
+    {
+      "source": "invoices/009.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/009.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "a116a458baea445f3a8d3993be5c285a1ab22fc99f7384afcb78650702e66d15",
+      "md5": "74fd042d9c39b92e84634f21913951c7"
+    },
+    {
+      "source": "invoices/010.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/010.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2583,
+      "sha256": "07e37c8048b601b2f146f5cce9d8f3bb103e3b4d26506b0b8344b52582312007",
+      "md5": "37133ccd7538641b2c1d19f101b20874"
+    },
+    {
+      "source": "invoices/011.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/011.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "1c2f9caa4f100c8fb46d3d10bf52613e5c6b69e209620710e0fbeb6f83343b8c",
+      "md5": "2f1f5fe48fc69c679d778d748c5effbd"
+    },
+    {
+      "source": "invoices/012.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/012.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2586,
+      "sha256": "96ad0c2b1ad20101273f5e68e15ece80e65c07892eed04573d39f070cd1aedbf",
+      "md5": "fdc5f3a89afdc2a70ca627f37d081675"
+    },
+    {
+      "source": "invoices/013.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/013.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2581,
+      "sha256": "3cc581d6b834ed487b6e1d9062a9d5b526051bfa45b0e9da82d27c355d516c1a",
+      "md5": "949ab76de69dfe4c2be298c2f7113452"
+    },
+    {
+      "source": "invoices/014.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/014.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2583,
+      "sha256": "ad289f02ad314011d79c35695df1654d0b0195f0731be1e325d87e1e70a76edc",
+      "md5": "dc0b46041b30c1c1a18830113455e14a"
+    },
+    {
+      "source": "invoices/015.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/015.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "bf54b32858c0c0707768353e48f686398599bf4bd13b8289098c9fdaa8d2ca48",
+      "md5": "c60ad2142b94bc42444a814fbf2c0786"
+    },
+    {
+      "source": "invoices/016.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/016.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2591,
+      "sha256": "edc3b51c3a9f396e6a26d7a03974793aacd6145f92732b7f06f9a6726f24a153",
+      "md5": "25d02e509f00f8a7887cbf101429c91a"
+    },
+    {
+      "source": "invoices/016.png",
+      "key": "datasets/oli-invoices-v1/invoices/016.png",
+      "contentType": "image/png",
+      "sizeBytes": 80190,
+      "sha256": "7396892b12f0de2ae8838201f928fdeba39ba79a285f0e97bb131c1597003214",
+      "md5": "fdae7904d8c5bc8bb718902ba7efc33e"
+    },
+    {
+      "source": "invoices/017.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/017.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2591,
+      "sha256": "298dffd923d7b4f468d805055263cf293df073d68c277fb3428710c54acaf77e",
+      "md5": "27f3b1b21a26336584142bbe99d134f8"
+    },
+    {
+      "source": "invoices/018.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/018.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2591,
+      "sha256": "30f8d96b397b251b48a53a3a943ee4e25a8b7a436654bb249f38636f656c945c",
+      "md5": "e460694de45746135b72aa7d5c7148f3"
+    },
+    {
+      "source": "invoices/019.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/019.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2591,
+      "sha256": "6997c1b97e8087166f25936a88669d0780c4b682702a5f4b8a2f761b1bf4ecca",
+      "md5": "7d3163579244b9ce1650d988c5ccab82"
+    },
+    {
+      "source": "invoices/020.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/020.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2591,
+      "sha256": "f49d0f565a58329344a1829c6bf79aec3b207d58fcaed4ad084c8265f8ad1048",
+      "md5": "57feed11670c3b2f5c1757220e92b0da"
+    },
+    {
+      "source": "invoices/021.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/021.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2583,
+      "sha256": "94a081fee7d43b0bcb2e65d6d484598ddba46a7d0daea2391f50fe1953e53dc3",
+      "md5": "8bc81645cae1a268ba731a3b042c1aae"
+    },
+    {
+      "source": "invoices/022.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/022.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2587,
+      "sha256": "69026440bb1693f481b3b06f868591b50ac0cef357eca92417aa8c6e591e1c49",
+      "md5": "cc94e7215ae8e419a396624938ee7429"
+    },
+    {
+      "source": "invoices/022.png",
+      "key": "datasets/oli-invoices-v1/invoices/022.png",
+      "contentType": "image/png",
+      "sizeBytes": 79010,
+      "sha256": "c3296864bdce78de7d177ce045b50a274108879bba533df62a7ce79da1e8391a",
+      "md5": "3d8670b942018f74ca59cada189cbe50"
+    },
+    {
+      "source": "invoices/023.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/023.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "fe4641ec9ffcfbfc96fd66d83c5914f16a8c6f8e5361f71253e5237f6e3fe2f9",
+      "md5": "4b91e767ae5b12585bda04b9ec09d034"
+    },
+    {
+      "source": "invoices/024.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/024.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2695,
+      "sha256": "89dfca08ee74dcf0d5b9dc07d6f24ee636fe3eb9491c5a6d17bcacce11f858fe",
+      "md5": "ab2c54bfc9ee146a78fe44902c6a5990"
+    },
+    {
+      "source": "invoices/025.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/025.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2585,
+      "sha256": "8473b1983f7dc869781fbb93f7ca203d5a21d9b45600de97b2f65e1f25570b25",
+      "md5": "3727aad547e41a9f0a2b9c4bf78ff968"
+    },
+    {
+      "source": "invoices/025.png",
+      "key": "datasets/oli-invoices-v1/invoices/025.png",
+      "contentType": "image/png",
+      "sizeBytes": 79800,
+      "sha256": "b298c0ea6cff7da2e26b7eebc0b745e3079dcee076db72b2a977fc6da9f167c8",
+      "md5": "01baa1c788badca23b4c0d7dbf609446"
+    },
+    {
+      "source": "invoices/026.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/026.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "e97ed7682231b55ad8fd8c9a46633c4f3cbf7cb7eec8c3fcc653df3df2325151",
+      "md5": "e0695f94724343c249fbddfea81e9325"
+    },
+    {
+      "source": "invoices/027.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/027.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2587,
+      "sha256": "b190c7a18b75b278789e8443fbaa41de2053c8cc0f71783092a9f5e34a88a63c",
+      "md5": "761b08b12d3c5c1589ffbc9f09a9059e"
+    },
+    {
+      "source": "invoices/027.png",
+      "key": "datasets/oli-invoices-v1/invoices/027.png",
+      "contentType": "image/png",
+      "sizeBytes": 82391,
+      "sha256": "3035d5ef4538fc2cb92683f5f2fa338ed9611997399fa09e455e126e66dfa5f6",
+      "md5": "da7a54bc5815cfca1aa5ce9cd9177573"
+    },
+    {
+      "source": "invoices/028.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/028.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2585,
+      "sha256": "e46becc3f7f4b8cb05f12838d413a129ff6bd443bd968ed9cfeafd4908122a7b",
+      "md5": "6d4dc519f96d5118a7f36839159dc7da"
+    },
+    {
+      "source": "invoices/029.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/029.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "2ad6079e3e1edaa2bc823bd026e9cc9a3eee328f199301cda200962e9b1eadd4",
+      "md5": "5b7072314cb989cbfdfccf7b0af38a19"
+    },
+    {
+      "source": "invoices/030.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/030.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2586,
+      "sha256": "b43c76cef308383dee61affe92777355221e88edb0e8586796df8da4f6010a37",
+      "md5": "6fe98fefc25cd7033ee052ca174ec7f1"
+    },
+    {
+      "source": "invoices/031.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/031.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "94b64ade3a733c275b9fde72f8f9f8e0c3d39077791749a7fdc6db2d2e9e468b",
+      "md5": "fcdb68c7a4349320a434535ad8ca43ac"
+    },
+    {
+      "source": "invoices/031.png",
+      "key": "datasets/oli-invoices-v1/invoices/031.png",
+      "contentType": "image/png",
+      "sizeBytes": 80678,
+      "sha256": "78ac2b2f5c6bf3ae87e45e47ed52b7e5d6218cac20e8e7c6e7d6a5c7f778fa1a",
+      "md5": "9a0cf46447500f80567d5bfba660309c"
+    },
+    {
+      "source": "invoices/032.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/032.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2589,
+      "sha256": "bc782f21572cc887becaf51fe2df5e1782d08bca6750406da26ec160d0a76c34",
+      "md5": "b9e36d10149c07469257e624b430779b"
+    },
+    {
+      "source": "invoices/033.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/033.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2586,
+      "sha256": "4831cceed700badc582562e99e626f15579027c91c20848bb50cf48a32e4b58e",
+      "md5": "18682ffaaf2f67dc78c649781cbe8473"
+    },
+    {
+      "source": "invoices/034.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/034.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "ce4154aa4c5966a8834d514af43d62d5f0cdee7daf54011526da809caaced266",
+      "md5": "191a1d660445dbcdd1cf0f5507677e6a"
+    },
+    {
+      "source": "invoices/035.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/035.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "ac65c403a0ee417d565fc88b93e14c1d666f616191bdd491f747735649305d48",
+      "md5": "70bb9714b82ad5ccf8f21804c75d72e5"
+    },
+    {
+      "source": "invoices/035.png",
+      "key": "datasets/oli-invoices-v1/invoices/035.png",
+      "contentType": "image/png",
+      "sizeBytes": 81337,
+      "sha256": "a81f7a176a1fbc4ab6244d1eb652fbb8b81c0d57b90c6ffd3714f2f30a58a8ea",
+      "md5": "403a8dfa9fad997e1493b00104067c1b"
+    },
+    {
+      "source": "invoices/036.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/036.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "6d622cd24531be96b453e338c27304ed017136f0ac651d713da8d9d91ab1374c",
+      "md5": "9713dbd22698149ed6575e96a4429f40"
+    },
+    {
+      "source": "invoices/037.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/037.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "1ecacc39a4cb5b49ed7e2aebeddc7a539939398ebda675f62cac0a0caf6e0d35",
+      "md5": "40db12e4a0282e266aa7254fb1626ccc"
+    },
+    {
+      "source": "invoices/038.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/038.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2609,
+      "sha256": "b9b732ebc29a9a90e8b362cd0b0ef8fc44412acaaac0c0b48792ce6aefefa86d",
+      "md5": "9bb204a48f0fd1eee06914fff6c1fb46"
+    },
+    {
+      "source": "invoices/038.png",
+      "key": "datasets/oli-invoices-v1/invoices/038.png",
+      "contentType": "image/png",
+      "sizeBytes": 84911,
+      "sha256": "c310840f3222124a6c4b12ea7e2a665c51c7ba5ea3a2b0bf644bc8bda7eb03d3",
+      "md5": "c9f2e051e43683e1391e42da0d9bb08b"
+    },
+    {
+      "source": "invoices/039.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/039.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2711,
+      "sha256": "360993abbf3a3a6ddf2294f6bab23c59dcc57ec159efb3bcba95dfa487cb78cb",
+      "md5": "aae964739ac32a26bc21d513f378877a"
+    },
+    {
+      "source": "invoices/039.png",
+      "key": "datasets/oli-invoices-v1/invoices/039.png",
+      "contentType": "image/png",
+      "sizeBytes": 88926,
+      "sha256": "b7f82eb30a2a3d300d857edab8bd80be5ec2c3f83947a1daeb78d0199aa449b6",
+      "md5": "e752ee2dcf13c53e189dee5959f7daa3"
+    },
+    {
+      "source": "invoices/040.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/040.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2801,
+      "sha256": "2b5077fad32bacf086d16d7c5d30a960ec32cf0eb5ba602fc50b6d3109541871",
+      "md5": "33d262b0c9b03390e51726b164be87a9"
+    },
+    {
+      "source": "invoices/040.png",
+      "key": "datasets/oli-invoices-v1/invoices/040.png",
+      "contentType": "image/png",
+      "sizeBytes": 90092,
+      "sha256": "b36bf9b8b0d6134a3046ace03a527a20633ad5206519717c1a87f8fe583c35b6",
+      "md5": "2710695d278005c7b1cfb802c54bbf74"
+    },
+    {
+      "source": "invoices/041.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/041.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "4820de04b2f229c17d7b8bd6c01826b61af1edc315117038383c33b205f2696c",
+      "md5": "d111de8b162e52671640adf3850d6e08"
+    },
+    {
+      "source": "invoices/042.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/042.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "9ebdacb3df2d7f19cc302fb961409060c06bccbbcae0fd688a569dee3bbf3868",
+      "md5": "61f9cd00f61429e88486bf3a336ef0f1"
+    },
+    {
+      "source": "invoices/043.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/043.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "8a2d4b71bf8bd9a19933cfcedae5920ac1139351c6b98544a8e0b7c772947a45",
+      "md5": "522584ef3b75c1bb713fafb744da8c12"
+    },
+    {
+      "source": "invoices/044.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/044.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2584,
+      "sha256": "6324cca54348b103ed54f7c5f37b7601f8f434b3a41a56401ef28101e8ba8221",
+      "md5": "e1b04729c222e8b5329d8dcf28bc84a3"
+    },
+    {
+      "source": "invoices/045.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/045.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "5e09d80a9453a6f1c76f2fabcc2a91ce7b84f5744e0d3d16fb11a5a5a2e2a2ca",
+      "md5": "22c9a785ee6c1d3d65e626eaaad4ed5e"
+    },
+    {
+      "source": "invoices/046.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/046.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "87083b46d842965d432e376c248c2e37561d2dddcdf79b714099ac1128737e80",
+      "md5": "49975046791cc55c60957b7d6142c16d"
+    },
+    {
+      "source": "invoices/047.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/047.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2583,
+      "sha256": "b626a7580295d2c2e10a419ff10ec5c16a56c157a449142fefd9bfb0aaaf04d7",
+      "md5": "bcf193ffa0f9edb0b281397c89936b2b"
+    },
+    {
+      "source": "invoices/048.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/048.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2582,
+      "sha256": "36601bf124bb5e4c1bf6ddebb812363d3845efafb8c035f6e553c7312bc8d6e1",
+      "md5": "306d46728a5aa1015484b0b5e803f2ae"
+    },
+    {
+      "source": "invoices/049.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/049.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2580,
+      "sha256": "1fcc5f8843a90f72d9f678211459771ddbaf78d1fae3c335272c025bea1c2411",
+      "md5": "44ca45337a4e69baa02d2a7956c1bd82"
+    },
+    {
+      "source": "invoices/050.pdf",
+      "key": "datasets/oli-invoices-v1/invoices/050.pdf",
+      "contentType": "application/pdf",
+      "sizeBytes": 2583,
+      "sha256": "837aa700d09a39f6b9559461effe874cf399abc02ca745ac9f149e0ce21d94c5",
+      "md5": "b6aea9cf7cc370b96a52add63a5aad6c"
+    },
+    {
+      "source": "README.md",
+      "key": "datasets/oli-invoices-v1/reference/README.md",
+      "contentType": "text/markdown; charset=utf-8",
+      "sizeBytes": 8390,
+      "sha256": "63d7db0c5c039744e3e12c160e10e22f26a5eb3247c4fa196ff31aa4c02a1e9d",
+      "md5": "71ec2994aff5f8bf4436ba84f464e293"
+    },
+    {
+      "source": "scenarios/invoices.json",
+      "key": "datasets/oli-invoices-v1/reference/scenarios/invoices.json",
+      "contentType": "application/json",
+      "sizeBytes": 144759,
+      "sha256": "17495bd32b89ee17c2552b3c2d494a9dbbb5f2ec4d6e0caa00e38cd7f55d079a",
+      "md5": "7e570f7532b52995f6e427eb6640c055"
+    },
+    {
+      "source": "seed/company.json",
+      "key": "datasets/oli-invoices-v1/reference/seed/company.json",
+      "contentType": "application/json",
+      "sizeBytes": 13623,
+      "sha256": "ac06e95c19edb4b5a1495f0d12ec44f8dc22e066daef0c252787c07dff250720",
+      "md5": "301e72c528ada17725e93746d382250a"
+    }
+  ]
+}

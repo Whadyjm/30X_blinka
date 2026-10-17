@@ -1,6 +1,13 @@
 # Contrato API v1 — Oscar ↔ Whady
 
-Estado: **contrato de backend v1 definido por Oscar; todavía sin endpoints implementados**.
+Estado: **endpoints P0 implementados en `apps/api`; contratos y motor en `packages/contracts` y `packages/domain`**.
+La UI de Whady consume estas rutas; todavía debe conectarse y verificarse desde el navegador.
+
+El [motor puro](../packages/domain/README.md) ya evalúa las reglas del onboarding;
+ver [datos y activación](ONBOARDING_POLICY.md). Su resultado es un candidato interno:
+solo la decisión confirmada junto con la reserva atómica de D1 se expone como aprobación.
+El Worker construye el contexto desde la empresa de la sesión y confirma decisión, reserva,
+auditoría y revisión en un batch D1 con control de concurrencia.
 
 Oscar implementa backend, persistencia y reglas. Whady implementa todo el frontend.
 Este documento permite que ambos trabajen con los mismos payloads desde ahora.
@@ -19,8 +26,9 @@ El núcleo P0 es: reglas configurables → cargar factura ficticia → extraer p
 importe, moneda y vencimiento → decidir → registrar y explicar → revisión humana cuando corresponde.
 `APPROVE` significa aprobado para **pago simulado**. No se mueve dinero.
 
-Delegation Insights y chat son P1. Agent Access, Clearance, registro público y pagos reales
-no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
+Delegation Insights es P1. Hermes y el chat quedan fuera del MVP por decisión de Oscar;
+la orquestación del procesamiento vive en el Worker. Agent Access, Clearance, registro público
+y pagos reales no forman parte de este contrato MVP. Se comienza con una empresa ficticia y una cuenta demo.
 No se requiere una pantalla de registro.
 
 ## 2. Convenciones comunes
@@ -93,9 +101,10 @@ Otros permisos se incorporarán explícitamente si fueran necesarios.
 
 ## 4. Modelos que consume el frontend
 
-Estos son DTOs HTTP, no filas SQL. Oscar implementará sus validaciones compartidas en
-`packages/contracts`; Whady puede crear mocks con estas formas mientras existe el scaffold.
-No mantener una segunda definición divergente cuando el paquete esté disponible.
+Estos son DTOs HTTP, no filas SQL. Las validaciones y tipos compartidos P0 están en
+[`packages/contracts`](../packages/contracts/README.md); Whady debe importar sus tipos
+para los mocks. Los bloques de este documento sirven de referencia; los tipos de código
+se infieren de los esquemas compartidos, sin mantener una segunda definición divergente.
 
 ```ts
 type DecisionAction = 'APPROVE' | 'BLOCK' | 'ESCALATE';
@@ -259,6 +268,11 @@ type InvoiceDetail = Invoice & {
 El frontend recibe el importe extraído incluso si es ambiguo; solo usa `latestDecision`
 para mostrar el resultado oficial. No calcula «aprobado» comparando el importe con un límite.
 Solo `APPROVE` persistido después de reservar presupuesto permite mostrar aprobación simulada.
+La extracción requiere corroboración de campos críticos según
+[`EXTRACTION_SAFETY.md`](./EXTRACTION_SAFETY.md). Una discrepancia se muestra con
+`extractionWarnings` y la explicación/traza; no crea por sí misma una excepción humana autorizable.
+No hay campos HTTP nuevos obligatorios. `CROSS_CHECKED` es un resultado interno de comparación,
+no una decisión financiera ni una garantía de lectura correcta.
 
 ## 5. Mapa P0 y comportamiento de endpoints
 
@@ -267,7 +281,7 @@ excepto health. Se devuelve `404` tanto para recurso inexistente como para recur
 
 | Método | Ruta | Entrada | Respuesta de éxito |
 |---|---|---|---|
-| GET | `/api/health` | — | `200 { data: { ok: true, service: "oli-api" } }` |
+| GET | `/api/health` | — | `200 { ok: true, service: "oli-api" }` |
 | GET | `/mandate` | — | `200 Envelope<{ active: PolicyVersion \| null; draft: MandateDraft \| null }>` |
 | PUT | `/mandate/draft` | Ver abajo | `200 Envelope<MandateDraft>` |
 | POST | `/mandate/activate` | Ver abajo | `200 Envelope<PolicyVersion>` |
@@ -346,6 +360,8 @@ La demo empieza con `requireAllowedVendor=true`, `requireAgreement=true`,
 Desactivar un requisito solo se hace mediante activación explícita del OWNER; no por chat.
 `processDaysBeforeDue=0` en P0: se evalúa al procesar, sin scheduler. No mostrar controles de
 programación hasta implementar P1. Fechas futuras/vencidas se muestran; no se simulan pagos futuros.
+El esquema de entrada P0 rechaza `processDaysBeforeDue` distinto de cero y delegaciones no vacías
+hasta que se implementen esas funciones; no acepta configuraciones que el sistema todavía no aplica.
 
 El presupuesto se modifica activando mandato, no escribiendo reservas desde el navegador.
 Actualizar el límite del mes conserva las reservas existentes; no puede quedar por debajo
@@ -569,7 +585,8 @@ Las reservas no son transferencias ni importes bancarios pagados.
 
 Sin mandato: `/mandate` devuelve `active=null`; el front muestra configuración inicial.
 Procesar sin mandato activo devuelve `409 MANDATE_REQUIRED`, sin aprobar.
-Sin ejecución de pruebas: `/evaluation/summary` devuelve `{ data: null }` y la UI dice «Sin evaluación».
+`/evaluation/summary` devuelve `{ data: null }`: todavía no hay una evaluación end-to-end del corpus
+publicada como métrica del producto. La UI dice «Sin evaluación».
 No mostrar porcentajes o resultados inventados como si fueran mediciones.
 
 ## 8. Errores y estados de UI
@@ -604,7 +621,7 @@ por ejemplo `rules.hardLimitMinor`. `requestId` permite investigar sin exponer s
 no son errores HTTP. Un `409` al aprobar nunca se interpreta como aprobación exitosa.
 Validar además el MIME/contenido del archivo en servidor, no solo su extensión.
 
-## 9. P1 reservado: delegaciones y chat
+## 9. P1 reservado: delegaciones
 
 No integrar estas pantallas a datos reales hasta que P0 esté probado. Formas reservadas:
 
@@ -637,7 +654,6 @@ type DelegationProposal = {
 | POST | `/delegations/proposals/:id/reject` | `{ comment }` | `200 Envelope<DelegationProposal>` |
 | POST | `/delegations/proposals/:id/activate` | `{ expectedActivePolicyVersionId, confirmed: true }` | `200 Envelope<{ proposal: DelegationProposal; policy: PolicyVersion }>` |
 | POST | `/invoices/:id/reevaluate` | `{ expectedPolicyVersionId }` | Misma forma 200/202 de `process` |
-| POST | `/chat` | `{ message }` | `200 Envelope<{ reply: string }>` |
 
 Mutaciones de propuestas requieren OWNER. Activación y reevaluación llevan `Idempotency-Key`;
 la detección no duplica propuestas equivalentes. Sin evidencia suficiente devuelve `data=[]`.
@@ -650,7 +666,8 @@ Propuesta de versión anterior: `409 POLICY_CHANGED`, estado `STALE`.
 Activar no aprueba facturas ni las reevalúa automáticamente; el owner pide reevaluación explícita.
 Reevaluar solo casos pendientes sin aprobación/reserva previa; si ya están resueltos,
 `409 APPROVAL_NOT_ALLOWED`. Cada resultado nuevo se agrega al historial.
-Chat no modifica políticas, no autoriza facturas y no sustituye formularios de confirmación.
+Chat queda fuera del MVP, sin endpoint que integrar actualmente. Si se incorpora después,
+consultará hechos registrados; no modificará políticas ni sustituirá la autorización formal.
 
 ## 10. Cómo trabajar juntos y compartir este contrato
 
@@ -673,7 +690,7 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 > Yo mantengo el contrato de backend. Si te falta algún dato o acción para una pantalla,
 > dímelo para incorporarlo; no cambies los nombres o formatos por tu cuenta.
 > El norte sigue siendo `master_files/RETO_BLINKA.md`. Primero conectamos reglas,
-> carga/listado/detalle de facturas y aprobaciones. Delegaciones/chat quedan para después.
+> carga/listado/detalle de facturas y aprobaciones. Las delegaciones quedan para P1; Hermes y chat están fuera del MVP.
 
 ### Checklist de integración
 
@@ -684,5 +701,14 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 - [ ] Se integra el contrato a `main`; cada uno continúa su implementación en su rama.
 - [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
 
-Estado actual: este archivo especifica comportamiento futuro. No demuestra que login,
-endpoints, base de datos, extracción o pruebas estén implementados.
+Estado actual: P0 tiene endpoints, sesión demo, R2 privado, extracción, motor y persistencia.
+D1 remoto `oli-demo` y Worker `oli-api` pertenecen a Tiamat; ver [operación y comprobaciones](../apps/api/README.md).
+Los tests de integración usan D1/R2 locales reales y proveedores simulados; los smoke tests vivos
+se registran por separado. PDF usa Mistral OCR y una lectura PDF_TEXT separada de Cloudflare;
+el parser conservador acepta etiquetas conocidas y escala layouts desconocidos. PNG/JPEG
+se extraen pero escalan mientras no haya OCR independiente. No confundir estos límites con
+una evaluación OCR de los 50 documentos. Los tipos P1 de delegaciones siguen reservados.
+
+El API es del mismo origen. En desarrollo, Whady debe usar un proxy `/api` hacia el Worker
+o servir el frontend junto al API; no copiar la contraseña ni secretos al bundle. No hay CORS abierto.
+`CONFIGURATION_CONFLICT` (409) indica que un proveedor/acuerdo cambió o su identidad está en uso.

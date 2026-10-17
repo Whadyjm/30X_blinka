@@ -1,0 +1,302 @@
+{
+  "scope": "LIVE_SYNTHETIC_INTEGRATION_SMOKE",
+  "source": "apps/api/scripts/smoke-invoice-flow.mjs",
+  "evaluatedAt": "2026-10-17T03:28:18.448Z",
+  "documentSha256": "23ef2ae74e4f61b4ca3d16bcb7f55fd65b718b1643f51a135fc72847d8ee3a9a",
+  "invoice": {
+    "id": "inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55",
+    "status": "DECIDED",
+    "source": "HUMAN_UPLOAD",
+    "file": {
+      "name": "hosting.pdf",
+      "mimeType": "application/pdf",
+      "sizeBytes": 2617,
+      "url": "/api/v1/invoices/inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55/file"
+    },
+    "vendorId": "vendor_demo_cloud",
+    "vendorName": "Demo Cloud Hosting (ficticio)",
+    "agreementId": "agr_demo_cloud",
+    "invoiceNumber": "INTEGRATION-HOSTING-002",
+    "amountMinor": 20000,
+    "currency": "USD",
+    "issuedAt": "2026-10-17",
+    "dueDate": "2026-10-31",
+    "servicePeriod": "2026-10",
+    "description": "Hosting mensual ficticio",
+    "extractionWarnings": [],
+    "latestDecision": {
+      "id": "dec_99b5c75b-911a-434d-a05b-97ecd3ffaf7a",
+      "invoiceId": "inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55",
+      "action": "APPROVE",
+      "reasons": [
+        "POLICY_ALLOWED"
+      ],
+      "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+      "policyVersionId": "pol_demo_v1",
+      "policyVersion": 1,
+      "checkedAt": "2026-10-17T03:28:18.163Z",
+      "needsHumanApproval": false,
+      "actor": {
+        "kind": "SYSTEM",
+        "userId": null
+      },
+      "facts": {
+        "amountMinor": 20000,
+        "currency": "USD",
+        "automaticLimitMinor": 30000,
+        "hardLimitMinor": 100000,
+        "budgetAvailableBeforeMinor": 200000,
+        "vendorAllowed": true,
+        "agreementId": "agr_demo_cloud"
+      },
+      "trace": [
+        {
+          "rule": "EXTRACTION",
+          "outcome": "PASS",
+          "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+          "evidence": {
+            "status": "CROSS_CHECKED",
+            "issues": ""
+          }
+        },
+        {
+          "rule": "VENDOR",
+          "outcome": "PASS",
+          "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+          "evidence": {
+            "vendorId": "vendor_demo_cloud",
+            "allowed": true,
+            "requireAllowedVendor": true
+          }
+        },
+        {
+          "rule": "AGREEMENT",
+          "outcome": "PASS",
+          "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+          "evidence": {
+            "agreementId": "agr_demo_cloud",
+            "amountMinor": 20000,
+            "agreedAmountMinor": 20000,
+            "toleranceMinor": 0,
+            "currency": "USD",
+            "agreedCurrency": "USD",
+            "description": "Hosting mensual ficticio",
+            "agreedConcept": "Hosting mensual ficticio"
+          }
+        },
+        {
+          "rule": "CURRENCY",
+          "outcome": "PASS",
+          "explanation": "La moneda coincide con el mandato.",
+          "evidence": {
+            "currency": "USD"
+          }
+        },
+        {
+          "rule": "HARD_LIMIT",
+          "outcome": "PASS",
+          "explanation": "El importe no supera el techo absoluto.",
+          "evidence": {
+            "amountMinor": 20000,
+            "hardLimitMinor": 100000
+          }
+        },
+        {
+          "rule": "BUDGET",
+          "outcome": "PASS",
+          "explanation": "El presupuesto disponible cubre el importe.",
+          "evidence": {
+            "amountMinor": 20000,
+            "availableMinor": 200000,
+            "reservedMinor": 0,
+            "budgetLimitMinor": 200000,
+            "policyMonthlyBudgetMinor": 200000
+          }
+        },
+        {
+          "rule": "AUTO_LIMIT",
+          "outcome": "PASS",
+          "explanation": "El importe está dentro de ambos umbrales automáticos.",
+          "evidence": {
+            "amountMinor": 20000,
+            "automaticLimitMinor": 30000,
+            "reviewAboveMinor": 30000
+          }
+        }
+      ],
+      "simulated": true
+    },
+    "approvalRequest": null,
+    "processingError": null,
+    "createdAt": "2026-10-17T03:28:06.177Z",
+    "updatedAt": "2026-10-17T03:28:18.163Z",
+    "extraction": {
+      "vendorName": "Demo Cloud Hosting (ficticio)",
+      "invoiceNumber": "INTEGRATION-HOSTING-002",
+      "amountMinor": 20000,
+      "currency": "USD",
+      "issuedAt": "2026-10-17",
+      "dueDate": "2026-10-31",
+      "servicePeriod": "2026-10",
+      "description": "Hosting mensual ficticio",
+      "extractionWarnings": [],
+      "evidence": [
+        {
+          "field": "vendorName",
+          "source": "page:1",
+          "quote": "Demo Cloud Hosting (ficticio)"
+        },
+        {
+          "field": "invoiceNumber",
+          "source": "page:1",
+          "quote": "INTEGRATION-HOSTING-002"
+        },
+        {
+          "field": "amountMinor",
+          "source": "page:1",
+          "quote": "TOTAL A COBRAR | USD 200.00"
+        },
+        {
+          "field": "currency",
+          "source": "page:1",
+          "quote": "Moneda / Currency | USD"
+        },
+        {
+          "field": "issuedAt",
+          "source": "page:1",
+          "quote": "Emisión / Issued | 2026-10-17"
+        },
+        {
+          "field": "dueDate",
+          "source": "page:1",
+          "quote": "Vencimiento / Due | 2026-10-31"
+        },
+        {
+          "field": "servicePeriod",
+          "source": "page:1",
+          "quote": "Periodo de servicio | 2026-10"
+        },
+        {
+          "field": "description",
+          "source": "page:1",
+          "quote": "Hosting mensual ficticio"
+        }
+      ]
+    },
+    "decisions": [
+      {
+        "id": "dec_99b5c75b-911a-434d-a05b-97ecd3ffaf7a",
+        "invoiceId": "inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55",
+        "action": "APPROVE",
+        "reasons": [
+          "POLICY_ALLOWED"
+        ],
+        "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+        "policyVersionId": "pol_demo_v1",
+        "policyVersion": 1,
+        "checkedAt": "2026-10-17T03:28:18.163Z",
+        "needsHumanApproval": false,
+        "actor": {
+          "kind": "SYSTEM",
+          "userId": null
+        },
+        "facts": {
+          "amountMinor": 20000,
+          "currency": "USD",
+          "automaticLimitMinor": 30000,
+          "hardLimitMinor": 100000,
+          "budgetAvailableBeforeMinor": 200000,
+          "vendorAllowed": true,
+          "agreementId": "agr_demo_cloud"
+        },
+        "trace": [
+          {
+            "rule": "EXTRACTION",
+            "outcome": "PASS",
+            "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+            "evidence": {
+              "status": "CROSS_CHECKED",
+              "issues": ""
+            }
+          },
+          {
+            "rule": "VENDOR",
+            "outcome": "PASS",
+            "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+            "evidence": {
+              "vendorId": "vendor_demo_cloud",
+              "allowed": true,
+              "requireAllowedVendor": true
+            }
+          },
+          {
+            "rule": "AGREEMENT",
+            "outcome": "PASS",
+            "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+            "evidence": {
+              "agreementId": "agr_demo_cloud",
+              "amountMinor": 20000,
+              "agreedAmountMinor": 20000,
+              "toleranceMinor": 0,
+              "currency": "USD",
+              "agreedCurrency": "USD",
+              "description": "Hosting mensual ficticio",
+              "agreedConcept": "Hosting mensual ficticio"
+            }
+          },
+          {
+            "rule": "CURRENCY",
+            "outcome": "PASS",
+            "explanation": "La moneda coincide con el mandato.",
+            "evidence": {
+              "currency": "USD"
+            }
+          },
+          {
+            "rule": "HARD_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe no supera el techo absoluto.",
+            "evidence": {
+              "amountMinor": 20000,
+              "hardLimitMinor": 100000
+            }
+          },
+          {
+            "rule": "BUDGET",
+            "outcome": "PASS",
+            "explanation": "El presupuesto disponible cubre el importe.",
+            "evidence": {
+              "amountMinor": 20000,
+              "availableMinor": 200000,
+              "reservedMinor": 0,
+              "budgetLimitMinor": 200000,
+              "policyMonthlyBudgetMinor": 200000
+            }
+          },
+          {
+            "rule": "AUTO_LIMIT",
+            "outcome": "PASS",
+            "explanation": "El importe está dentro de ambos umbrales automáticos.",
+            "evidence": {
+              "amountMinor": 20000,
+              "automaticLimitMinor": 30000,
+              "reviewAboveMinor": 30000
+            }
+          }
+        ],
+        "simulated": true
+      }
+    ]
+  },
+  "budgets": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 200000,
+      "reservedMinor": 20000,
+      "availableMinor": 180000
+    }
+  ],
+  "note": "Una ejecución puntual con datos ficticios; no mide precisión OCR del corpus ni mueve dinero."
+}
