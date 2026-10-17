@@ -7,7 +7,7 @@ const copy = {
   thinking: ['Déjame pensarlo.', 'Las ideas también necesitan un poco de espacio.'],
   focused: ['Punto por punto.', 'A veces, el detalle lo cambia todo.'],
   understanding: ['Ahora lo veo.', 'Las pequeñas piezas empiezan a encajar.'],
-  happy: ['Qué bueno verte.', 'Hay cosas que se dicen con una sonrisa.'],
+  happy: ['Qué bueno verte.', 'Hay cosas que se dicen con una mirada.'],
   celebrating: ['¡Lo conseguimos!', 'Las buenas noticias mueven algo por dentro.'],
 };
 let oli;

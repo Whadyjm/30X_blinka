@@ -1,18 +1,19 @@
 const base = {
   face: 1, left: 0, right: 0, eyeWidth: 0.087, eyeHeight: 0.18,
-  spacing: 0.245, eyeY: -0.18, eyeCurve: 0.035, slant: 0,
-  smile: 0.12, mouthWidth: 0.34, mouthOpen: 0, mouthShift: 0,
+  spacing: 0.245, eyeY: 0.04, eyeCurve: 0.035, slant: 0,
+  browWidth: 0.14, browGap: 0.12, browCurve: 0.045, browSlant: 0,
+  browLeft: 0, browRight: 0,
   energy: 0.3, spin: 0.10, tilt: 0, sx: 1, sy: 1, hop: 0, lookX: 0, lookY: 0,
 };
 const pose = overrides => Object.freeze({ ...base, ...overrides });
 export const STATES = Object.freeze({
   idle: pose({ face: 0, energy: 0.2 }),
-  listening: pose({ eyeHeight: 0.215, eyeWidth: 0.093, spacing: 0.27, smile: 0.055, mouthWidth: 0.23, tilt: -0.19, sy: 1.045, sx: 0.98, spin: 0.065 }),
-  thinking: pose({ left: 0.08, right: 0.52, eyeHeight: 0.19, slant: -0.15, smile: -0.025, mouthWidth: 0.19, mouthShift: 0.13, tilt: 0.15, lookX: -0.08, lookY: -0.055, energy: 0.58, spin: 0.23 }),
-  focused: pose({ left: 0.54, right: 0.54, eyeCurve: -0.035, slant: -0.21, spacing: 0.23, mouthWidth: 0.19, smile: 0.015, eyeY: -0.17, sy: 0.95, sx: 1.035, energy: 0.18, spin: 0.045 }),
-  understanding: pose({ eyeWidth: 0.10, eyeHeight: 0.22, smile: 0.11, mouthWidth: 0.35, mouthOpen: 0.075, sy: 1.055, sx: 0.975, lookY: -0.035, spin: 0.10 }),
-  happy: pose({ left: 0.25, right: 0.25, eyeCurve: 0.085, eyeWidth: 0.10, eyeHeight: 0.17, smile: 0.13, mouthWidth: 0.43, mouthOpen: 0.12, tilt: -0.095, sy: 0.97, sx: 1.035, energy: 0.48 }),
-  celebrating: pose({ left: 0.45, right: 0.45, eyeCurve: 0.095, eyeWidth: 0.11, smile: 0.09, mouthWidth: 0.46, mouthOpen: 0.23, energy: 0.9, spin: 0.19, sy: 1.025 }),
+  listening: pose({ eyeHeight: 0.215, eyeWidth: 0.093, spacing: 0.27, browLeft: 0.035, browRight: 0.015, browCurve: 0.065, tilt: -0.19, sy: 1.045, sx: 0.98, spin: 0.065 }),
+  thinking: pose({ left: 0.08, right: 0.52, eyeHeight: 0.19, slant: -0.15, browLeft: 0.105, browRight: -0.025, browSlant: 0.16, tilt: 0.15, lookX: -0.08, lookY: -0.055, energy: 0.58, spin: 0.23 }),
+  focused: pose({ left: 0.54, right: 0.54, eyeCurve: -0.035, slant: -0.21, spacing: 0.23, browCurve: 0.012, browSlant: -0.32, browGap: 0.09, sy: 0.95, sx: 1.035, energy: 0.18, spin: 0.045 }),
+  understanding: pose({ eyeWidth: 0.10, eyeHeight: 0.22, browLeft: 0.035, browRight: 0.035, browCurve: 0.075, sy: 1.055, sx: 0.975, lookY: -0.035, spin: 0.10 }),
+  happy: pose({ left: 0.25, right: 0.25, eyeCurve: 0.085, eyeWidth: 0.10, eyeHeight: 0.17, browCurve: 0.08, browSlant: 0.12, tilt: -0.095, sy: 0.97, sx: 1.035, energy: 0.48 }),
+  celebrating: pose({ left: 0.45, right: 0.45, eyeCurve: 0.095, eyeWidth: 0.11, browCurve: 0.09, browLeft: 0.06, browRight: 0.06, energy: 0.9, spin: 0.19, sy: 1.025 }),
 });
 
 export function stateName(value) {
@@ -44,6 +45,8 @@ export function expressionAt(state, time, out = {}) {
       out.hop += nod * 0.055;
       out.sy -= nod * 0.035;
       out.lookY += nod * 0.045;
+      out.browLeft += nod * 0.035;
+      out.browRight += nod * 0.035;
       break;
     }
     case 'thinking': {
@@ -51,7 +54,8 @@ export function expressionAt(state, time, out = {}) {
       out.lookX += glance * 0.07;
       out.tilt += Math.sin(t * 1.35) * 0.09;
       out.right += Math.sin(t * 1.9) * 0.13;
-      out.mouthShift += glance * 0.045;
+      out.browLeft += glance * 0.035;
+      out.browRight -= glance * 0.015;
       out.hop = Math.sin(t * 2.1) * 0.025;
       break;
     }
@@ -62,14 +66,15 @@ export function expressionAt(state, time, out = {}) {
       out.tilt = scan * 0.035;
       out.left += pulse(t % 4.8, 2.8, 1.1) * 0.17;
       out.right += pulse(t % 4.8, 2.8, 1.1) * 0.17;
+      out.browSlant -= pulse(t % 4.8, 2.8, 1.1) * 0.12;
       break;
     }
     case 'understanding': {
       const aha = pulse(t % 5.4, 0, 1.45);
       out.eyeHeight += aha * 0.045;
-      out.mouthWidth -= aha * 0.23;
-      out.mouthOpen += aha * 0.14;
-      out.smile = out.smile * (1 - aha) - aha * 0.10;
+      out.browLeft += aha * 0.09;
+      out.browRight += aha * 0.09;
+      out.browCurve += aha * 0.02;
       out.hop = -aha * 0.12 + pulse(t % 5.4, 2.5, 0.65) * 0.045;
       out.sy += aha * 0.06;
       out.tilt = -Math.sin(t * 1.3) * 0.05;
@@ -80,7 +85,8 @@ export function expressionAt(state, time, out = {}) {
       out.left += beam * 0.65; out.right += beam * 0.65;
       out.tilt += Math.sin(t * 2.4) * 0.105;
       out.hop = -Math.abs(Math.sin(t * 2.4)) * 0.045;
-      out.mouthOpen += beam * 0.045;
+      out.browLeft += beam * 0.04;
+      out.browRight += beam * 0.04;
       break;
     }
     case 'celebrating': {
@@ -92,7 +98,8 @@ export function expressionAt(state, time, out = {}) {
       out.tilt = Math.sin(t * 2.4) * 0.19;
       out.left += Math.sin(t * 2.4) * 0.32;
       out.right += Math.sin(t * 2.4) * 0.32;
-      out.mouthOpen += leap * 0.055;
+      out.browLeft += leap * 0.045;
+      out.browRight += leap * 0.045;
       break;
     }
   }
@@ -125,29 +132,30 @@ export function createParticles(count = 1500) {
     };
   });
   // Additional particles, never borrowed from any latitude of the body.
-  const faceCount = Math.round(count * 0.24);
-  const eyeCount = Math.floor(faceCount * 0.30);
-  const mouthCount = faceCount - eyeCount * 2;
-  const face = Array.from({ length: faceCount }, (_, i) => {
-    const role = i < eyeCount ? -1 : i < eyeCount * 2 ? 1 : 2;
-    const j = role === -1 ? i : role === 1 ? i - eyeCount : i - eyeCount * 2;
-    return {
-      bx: 0, by: 0, bz: 1.10, x: 0, y: 0, z: 1.10, role,
-      u: (j + 0.5) / (role === 2 ? mouthCount : eyeCount), angle: j * 2.3999632297,
-      size: 0.90 + rand() * 0.25, phase: rand() * Math.PI * 2, drift: rand(),
-    };
-  });
+  const faceCount = Math.round(count * 0.20);
+  const eyeCount = Math.floor(faceCount * 0.36);
+  const browCount = faceCount - eyeCount * 2;
+  // Roles: ±1 eyes, ±2 eyebrows. There is no mouth particle group.
+  const groups = [[-1, eyeCount], [1, eyeCount], [-2, Math.floor(browCount / 2)], [2, Math.ceil(browCount / 2)]];
+  const face = groups.flatMap(([role, length]) => Array.from({ length }, (_, j) => ({
+    bx: 0, by: 0, bz: 1.10, x: 0, y: 0, z: 1.10, role,
+    u: (j + 0.5) / length, angle: j * 2.3999632297,
+    size: 0.90 + rand() * 0.25, phase: rand() * Math.PI * 2, drift: rand(),
+  })));
   return body.concat(face);
 }
 
 // Filled sunflower ovals, no pupil. Blink geometry is applied after pose easing.
 export function faceTarget(p, pose, blink, out) {
-  if (p.role === 2) {
-    const a = p.u * Math.PI * 2;
-    const x = Math.sin(a) * pose.mouthWidth;
-    const arc = 1 - (x / pose.mouthWidth) ** 2;
-    out.x = x + pose.mouthShift;
-    out.y = 0.17 + pose.smile * arc + Math.max(0, Math.cos(a)) * pose.mouthOpen + Math.sin(p.angle) * 0.013;
+  if (Math.abs(p.role) === 2) {
+    const side = Math.sign(p.role);
+    const u = p.u * 2 - 1;
+    const x = u * pose.browWidth;
+    const lift = side < 0 ? pose.browLeft : pose.browRight;
+    out.x = side * pose.spacing + x;
+    out.y = pose.eyeY - pose.eyeHeight - pose.browGap - lift
+      - pose.browCurve * (1 - u * u) + pose.browSlant * x * side
+      + Math.sin(p.angle) * 0.012 * Math.sqrt(1 - u * u);
   } else {
     const closed = Math.max(p.role < 0 ? pose.left : pose.right, blink);
     const radius = Math.sqrt(p.u);

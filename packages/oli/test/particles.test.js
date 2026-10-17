@@ -7,10 +7,10 @@ test('the complete body is preserved, with additional facial particles', () => {
   assert.deepEqual(a, b);
   const body = a.filter(p => !p.role);
   assert.equal(body.length, 1600);
-  assert.equal(a.length, 1984);
+  assert.equal(a.length, 1920);
   for (const p of body) assert.ok(Math.hypot(p.x, p.y, p.z) <= 1.001);
   assert.ok(body.filter(p => p.by > 0.5).length > 300, 'lower hemisphere remains populated');
-  assert.ok(a.some(p => p.role === -1) && a.some(p => p.role === 1) && a.some(p => p.role === 2));
+  assert.ok(a.some(p => p.role === -1) && a.some(p => p.role === 1) && a.some(p => p.role === -2) && a.some(p => p.role === 2));
   const before = structuredClone(body);
   for (const state of Object.keys(STATES)) {
     const pose = expressionAt(state, 1);
@@ -53,10 +53,26 @@ test('every active emotion visibly closes and reopens its eyes, including happy 
   assert.equal(blinkAt('idle', 1.62), 0);
 });
 
+test('the face contains only eyes and two eyebrows that stay above their eyes during acting', () => {
+  const particles = createParticles(1600).filter(p => p.role);
+  assert.deepEqual([...new Set(particles.map(p => p.role))].sort(), [-1, -2, 1, 2]);
+  for (const state of Object.keys(STATES)) {
+    for (let t = 0; t < 6; t += 0.2) {
+      const pose = expressionAt(state, t);
+      for (const side of [-1, 1]) {
+        const targets = role => particles.filter(p => p.role === role).map(p => faceTarget(p, pose, blinkAt(state, t), {}));
+        const eyeTop = Math.min(...targets(side).map(p => p.y));
+        const browBottom = Math.max(...targets(side * 2).map(p => p.y));
+        assert.ok(browBottom < eyeTop - 0.02, `${state}: eyebrow must remain separate from the eye`);
+      }
+    }
+  }
+});
+
 test('particle allocation bounds include the additional face budget', () => {
   for (const n of [-10, 0, NaN, Infinity, 100000]) {
     const points = createParticles(n);
-    assert.ok(points.length >= 99 && points.length <= 4960);
+    assert.ok(points.length >= 96 && points.length <= 4800);
     assert.ok(points.filter(p => !p.role).length <= 4000);
   }
 });
