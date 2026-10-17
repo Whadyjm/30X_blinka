@@ -65,6 +65,7 @@ type Options = {
 };
 type Dependencies = {
   fetch?: typeof fetch;
+  onHttpError?: (status: number, body: unknown) => void;
   attemptTimeoutMs?: number;
   totalTimeoutMs?: number;
 };
@@ -198,11 +199,12 @@ function errorIssueCodes(raw: unknown): string[] {
   ] as const).filter(([, pattern]) => pattern.test(diagnostic)).map(([code]) => code);
 }
 
-async function classifyHttpError(response: Response) {
+async function classifyHttpError(response: Response, observe?: Dependencies['onHttpError']) {
   const issueCodes = [`HTTP_${response.status}`];
   let retryable = retryableStatus(response.status);
   try {
     const raw = await boundedJson(response, 64 * 1024);
+    observe?.(response.status, raw);
     issueCodes.push(...errorIssueCodes(raw));
     const envelope = z.object({ error: ProviderError }).safeParse(raw);
     // An error hint can only try the next bounded reader; it never accepts output or authorizes an invoice.
@@ -259,7 +261,7 @@ export async function transcribeImageWithOpenRouter(options: {
       }),
     });
     if (!response.ok) {
-      const { issueCodes, retryable } = await classifyHttpError(response);
+      const { issueCodes, retryable } = await classifyHttpError(response, dependencies.onHttpError);
       attempts.push({ model: IMAGE_OCR_MODEL, outcome: 'HTTP_ERROR', httpStatus: response.status, issueCodes, durationMs: Math.round(performance.now() - started) });
       throw new ExtractionError(retryable ? 'ALL_MODELS_UNAVAILABLE' : requestErrorCode(response.status), attempts,
         { stage: 'IMAGE_OCR', issueCodes });
@@ -356,7 +358,7 @@ export async function extractInvoiceWithOpenRouter(options: Options, dependencie
     }
     if (!response.ok) {
       // Classify a bounded error without returning provider prose, document text or credentials.
-      const { issueCodes, retryable } = await classifyHttpError(response);
+      const { issueCodes, retryable } = await classifyHttpError(response, dependencies.onHttpError);
       if (options.signal?.aborted) throw new ExtractionError('ABORTED', attempts);
       attempts.push({ model, outcome: 'HTTP_ERROR', httpStatus: response.status, issueCodes,
         durationMs: Math.round(performance.now() - started) });

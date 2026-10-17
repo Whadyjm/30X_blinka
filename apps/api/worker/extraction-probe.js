@@ -73,16 +73,30 @@ export async function handleDocumentProbe(request, env, read = readDocument) {
   if (request.method !== 'POST') return json({ error: { code: 'METHOD_NOT_ALLOWED' } }, 405);
   const mimeType = request.headers.get('Content-Type')?.split(';')[0].trim();
   if (!['application/pdf', 'image/png', 'image/jpeg'].includes(mimeType)) return json({ error: { code: 'UNSUPPORTED_FILE_TYPE' } }, 415);
+  const diagnostic = request.headers.get('X-Oli-Provider-Diagnostic') === '1';
+  const providerErrors = [];
+  const redact = value => {
+    let text = typeof value === 'string' ? value : JSON.stringify(value ?? null);
+    for (const secret of [env.OPENROUTER_API_KEY, env.EXTRACTION_PROBE_TOKEN].filter(Boolean)) text = text.replaceAll(secret, '[REDACTED]');
+    return text.slice(0, 1600);
+  };
+  const onHttpError = diagnostic ? (status, body) => {
+    if (providerErrors.length >= 3) return;
+    const error = body?.error;
+    providerErrors.push({ status, message: redact(error?.message ?? (typeof error === 'string' ? error : null)),
+      type: redact(error?.metadata?.error_type), raw: redact(error?.metadata?.raw) });
+  } : undefined;
   try {
     const bytes = await readImage(request);
     if (bytes === null) return json({ error: { code: 'DOCUMENT_TOO_LARGE' } }, 413);
     validateDocument(bytes, mimeType);
     const documentSha256 = await sha256(bytes);
-    const data = await read(env, { mimeType }, bytes, documentSha256);
-    return json({ data });
+    const data = await read(env, { mimeType }, bytes, documentSha256, { onHttpError });
+    return json({ data, ...(diagnostic ? { providerErrors } : {}) });
   } catch (error) {
     if (error instanceof HttpError) return json({ error: { code: error.code } }, error.status);
-    if (error instanceof ExtractionError) return json({ error: { code: error.code, attempts: error.attempts, diagnostic: error.diagnostic } }, 502);
+    if (error instanceof ExtractionError) return json({ error: { code: error.code, attempts: error.attempts, diagnostic: error.diagnostic },
+      ...(diagnostic ? { providerErrors } : {}) }, 502);
     return json({ error: { code: 'DOCUMENT_READ_FAILED' } }, 500);
   }
 }

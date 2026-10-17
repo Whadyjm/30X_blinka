@@ -219,7 +219,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (cached.PRIMARY) return cached.PRIMARY;
     const began = performance.now();
     const result = await extractInvoiceWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) });
+      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) }, { onHttpError: options.onHttpError });
     const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, result,
       durationMs: Math.round(performance.now() - began) };
     await options.checkpoint?.('PRIMARY', artifact);
@@ -230,7 +230,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (imageOcr) {
       const began = performance.now();
       const ocr = await transcribeImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-        image: { mimeType: file.mimeType, bytes } });
+        image: { mimeType: file.mimeType, bytes } }, { onHttpError: options.onHttpError });
       const parsed = parsePdfText(ocr.text);
       if (ocr.issues.length || /\[ILLEGIBLE\]/i.test(ocr.text)) parsed.issues.push(ocrIssue);
       const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType,
