@@ -1,6 +1,9 @@
 import { useState } from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { Bot, CheckSquare, FileText, Home, Inbox, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { Link, NavLink, Outlet, useNavigate } from 'react-router';
+import { useQueryClient } from '@tanstack/react-query';
+import { Bot, CheckSquare, FileText, Home, LogOut, Menu, MessageCircle, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { api } from '@/api';
+import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { env } from '@/config/env';
@@ -15,8 +18,7 @@ export function AppLayout() {
   const loc = useLocation();
   const isHome = loc.pathname === '/app';
   const { data: me } = useMe();
-  const approvals = useApprovals(!isHome);
-  const inbox = useInbox();
+  const approvals = useApprovals();
   const pending = approvals.data?.filter((a) => a.state === 'PENDING').length ?? 0;
   // Every hook must run before the early return below: returning first changes the hook count when the
   // route moves between /app and /app/*, and React throws "Rendered more hooks than during the previous render".
