@@ -1,0 +1,12 @@
+{
+  "name": "@oli/mascot",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/Oli.tsx",
+    "./canvas": { "types": "./src/renderer.d.ts", "default": "./src/renderer.js" }
+  },
+  "scripts": { "test": "node --test test/*.test.js" },
+  "peerDependencies": { "react": ">=18" }
+}

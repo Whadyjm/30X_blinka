@@ -8,7 +8,7 @@ import {
   ExtractedInvoiceSchema, InvoiceQuerySchema, InvoiceSchema, MAX_INVOICE_BYTES,
   MandateRulesSchema, MinorUnitsSchema, PaginationSchema, PolicyDecisionSchema,
   ReviewApprovalSchema, SaveMandateDraftSchema, UpdateVendorSchema,
-  UploadFileMetadataSchema, checkExtraction,
+  UploadFileMetadataSchema, LoginInputSchema, checkExtraction,
 } from '../src/index.ts';
 
 const document = readFileSync(new URL('../../../docs/API.md', import.meta.url), 'utf8');
@@ -18,6 +18,16 @@ const draft = SaveMandateDraftSchema.parse(examples.find((value) => 'rules' in v
 const received = InvoiceSchema.parse(
   examples.find((value) => (value.data as { source?: string } | undefined)?.source === 'HUMAN_UPLOAD')!.data,
 );
+
+test('el identificador de login admite correo o usuario acotado sin campos de autoridad', () => {
+  for (const email of ['owner@oli-demo.invalid', 'admin']) {
+    assert.equal(LoginInputSchema.safeParse({ email, password: 'test-only' }).success, true);
+  }
+  for (const email of ['', 'bad email', '@@@', 'a'.repeat(65)]) {
+    assert.equal(LoginInputSchema.safeParse({ email, password: 'test-only' }).success, false);
+  }
+  assert.equal(LoginInputSchema.safeParse({ email: 'admin', password: 'test-only', role: 'OWNER' }).success, false);
+});
 
 test('los ejemplos JSON publicados respetan los esquemas compartidos', () => {
   const invoiceEnvelope = z.strictObject({ data: InvoiceSchema });

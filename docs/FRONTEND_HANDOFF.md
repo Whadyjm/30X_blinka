@@ -1,9 +1,17 @@
-# Conectar el frontend de Whady
+# Integración del frontend de Whady
 
-Backend desplegado: `https://oli-api.tiamat-agency.workers.dev`.
+Dirección compartida: **https://oli30x.ultramare.dev/app**.
+La UI y el API `/api/*` comparten el origen `https://oli30x.ultramare.dev`.
+El acceso `https://oli-api.tiamat-agency.workers.dev` también sigue disponible.
 Contrato canónico: [API.md](API.md), esquemas en `packages/contracts`.
-El frontend publicado en `main` como `24fab85` todavía usa formas distintas;
-integrar este PR no cambia automáticamente el cliente HTTP ni sus mocks.
+El cliente de `apps/web` ya implementa este contrato. Valida DTOs compartidos y los
+proyecta a los componentes existentes mediante `src/api/view-model.ts`; esa proyección
+no concede permisos ni calcula decisiones. Ver [operación y tests](../apps/web/README.md).
+El listado siguiente documenta los cambios aplicados al cliente original.
+
+La siguiente tarea de Whady es [conectar la capa conversacional](CONVERSATION_FRONTEND_HANDOFF.md):
+composer, tarjetas del servidor, adjuntos por el pipeline actual y confirmaciones de propuestas.
+La referencia visual `/propuesta/` sigue siendo independiente y demostrativa.
 
 ## Ajustes concretos en el cliente
 
@@ -26,7 +34,8 @@ integrar este PR no cambia automáticamente el cliente HTTP ni sus mocks.
   ampliar el timeout del comando o recuperar el estado mediante polling. Si la conexión
   expira, consultar antes de volver a pedir procesamiento; no volver a subir automáticamente.
 - `/evaluation/summary` devuelve `data: null`; no mostrar una precisión end-to-end ficticia.
-  Agent Access, Clearance, chat y delegaciones no tienen endpoints P0.
+  Agent Access, Clearance y delegaciones no tienen endpoints P0. Chat es una extensión
+  separada documentada en el handoff conversacional, no una ruta de los mocks originales.
 
 ## Desarrollo y acceso
 
@@ -62,3 +71,36 @@ smoke tests vivos registrados aparte en `docs/evaluations/integration-*.json`. L
 lectura PDF viva escaló por texto concatenado; su decisión se conserva. Tras corregir
 el parser se confirmó APPROVE de USD 200 y ESCALATE de USD 450, seguido de autorización
 OWNER simulada; reserva total USD 650. Ninguna transferencia de dinero.
+
+## Integración aplicada
+
+- Login/logout por `/session`, CSRF en memoria y errores HTTP tipados.
+- Envelopes y paginación canónicos, PATCH de proveedores/acuerdos, presupuesto real.
+- Revisión/borrador/política de la configuración que la persona revisó; activación explícita.
+- Claves de reintento por acción, process con timeout de 90s, polling limitado y actualización manual.
+- Aprobaciones con IDs esperados y permiso del servidor; correcciones sin botón de aprobación.
+- PDF privado y decisiones previas conservadas; evaluación sin resultados devuelve null.
+- Formulario P0 sin programación ni excepciones de acuerdo que el backend no permite.
+- Assets de Vite y API en el mismo Worker/origen HTTPS; mock solo al seleccionarlo explícitamente.
+
+La tabla anterior de tests del backend es su referencia original. El cliente añade seis tests,
+incluyendo un recorrido contra el Worker con D1/R2 reales y proveedores simulados.
+
+## Comprobación en navegador (17 de octubre)
+
+Se condujo Chrome sobre la web publicada, sin sustituir el proveedor ni las respuestas HTTP:
+login, selección de dos PDF ficticios, procesamiento, detalle y autorización humana de USD450
+con comentario. La decisión ESCALATE anterior permanece en el historial; D1 confirma la reserva.
+La factura nueva de USD200 quedó en revisión porque el modelo emitió advertencias incluso
+sobre características esperadas de una demo. Esas advertencias se conservaron y no hubo
+botón para sobreescribirlas. La reserva total de la base pasó de USD650 a USD1100.
+
+El documento privado responde PDF con caché privada; la vista previa usa un Blob efímero,
+limitado a 5MiB y revocado al salir, conservando el sandbox del archivo original. Las
+comprobaciones y resultados reales se guardan en `docs/evaluations/frontend-browser-20261017.json`.
+La activación de reglas y la presentación de FAILED reintentable también se probaron en la
+base local aislada; no se modificaron las reglas remotas para conseguir resultados favorables.
+
+La comprobación visual final en Chrome confirmó inicio y detalle a 1440px y 390px
+sin overflow horizontal, PDF visible, historial presente, evaluación vacía y ninguna
+excepción JavaScript observada. El reporte del navegador conserva esos resultados.

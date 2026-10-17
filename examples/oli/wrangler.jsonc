@@ -1,0 +1,21 @@
+{
+  "$schema": "../../apps/api/node_modules/wrangler/config-schema.json",
+  "name": "oli-mascot-demo",
+  "account_id": "fbaa64f96579f93b2db32a1eb12ff6c9",
+  "compatibility_date": "2026-10-17",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    { "pattern": "oli30x.ultramare.dev/oli", "zone_name": "ultramare.dev" },
+    { "pattern": "oli30x.ultramare.dev/oli/*", "zone_name": "ultramare.dev" }
+  ],
+  "assets": {
+    "directory": ".wrangler/domain-assets",
+    "html_handling": "force-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "observability": {
+    "enabled": true,
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+  }
+}

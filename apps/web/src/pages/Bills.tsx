@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router';
 import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { Card, EmptyState, ErrorState, PageHeader, Skeleton } from '@/components/ui/Card';
 import { UploadZone } from '@/features/invoices/UploadZone';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
@@ -13,6 +14,7 @@ const FILTERS: Array<{ key: 'ALL' | Outcome; label: string }> = [
   { key: 'ALL', label: 'All' },
   { key: 'APPROVED', label: 'Approved' },
   { key: 'NEEDS_APPROVAL', label: 'Needs approval' },
+  { key: 'NEEDS_REVIEW', label: 'Needs review' },
   { key: 'BLOCKED', label: 'Blocked' },
   { key: 'PROCESSING', label: 'Processing' },
 ];
@@ -49,7 +51,8 @@ export function Bills() {
 
   return (
     <>
-      <PageHeader title={t('Bills')} subtitle={t('Upload invoices and see what Oli decided — and why.')} />
+      <PageHeader title={t('Bills')} subtitle={t('Upload invoices and see what Oli decided — and why.')}
+        actions={<Button variant="secondary" onClick={() => void invoices.refresh()} loading={invoices.isFetching}>{t('Refresh')}</Button>} />
       <UploadZone invoices={all} />
 
       <Card className="mt-8">

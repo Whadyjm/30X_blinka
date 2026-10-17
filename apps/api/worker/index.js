@@ -17,6 +17,7 @@ export default {
       return Response.json({ ok: true, service: "oli-api" });
     }
 
-    return new Response("Not found", { status: 404 });
+    if (new URL(request.url).pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
+    return env.ASSETS ? env.ASSETS.fetch(request) : new Response('Not found', { status: 404 });
   },
 };

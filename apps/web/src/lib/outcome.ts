@@ -5,23 +5,21 @@ import { t } from '@/i18n';
  * What the user sees. Derived ONLY from what the server returned (decision / approval / status).
  * Fail-closed on display: anything not clearly decided is "PROCESSING" or "FAILED", never "APPROVED".
  */
-export type Outcome = 'PROCESSING' | 'FAILED' | 'APPROVED' | 'BLOCKED' | 'NEEDS_APPROVAL' | 'REJECTED';
+export type Outcome = 'PROCESSING' | 'FAILED' | 'APPROVED' | 'BLOCKED' | 'NEEDS_APPROVAL' | 'NEEDS_REVIEW' | 'REJECTED';
 
 type OutcomeInput = Pick<InvoiceSummary, 'status' | 'decision' | 'approval'>;
 
 export function getOutcome(inv: OutcomeInput): Outcome {
   const approval = inv.approval?.state;
-  if (approval === 'APPROVED') return 'APPROVED';
-  if (approval === 'REJECTED') return 'REJECTED';
   if (inv.status === 'FAILED') return 'FAILED';
 
   switch (inv.decision?.decision) {
     case 'APPROVE':
       return 'APPROVED';
     case 'BLOCK':
-      return 'BLOCKED';
+      return approval === 'REJECTED' ? 'REJECTED' : 'BLOCKED';
     case 'ESCALATE':
-      return 'NEEDS_APPROVAL';
+      return approval === 'PENDING' && inv.approval?.canDecide === true ? 'NEEDS_APPROVAL' : 'NEEDS_REVIEW';
   }
 
   // No decision object (compact list endpoints): fall back to the business status the server sent.
@@ -51,6 +49,7 @@ export const OUTCOME_LABEL: Record<Outcome, string> = {
   APPROVED: 'Approved',
   BLOCKED: 'Blocked',
   NEEDS_APPROVAL: 'Needs approval',
+  NEEDS_REVIEW: 'Needs review',
   REJECTED: 'Rejected',
 };
 

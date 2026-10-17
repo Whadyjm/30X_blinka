@@ -2,6 +2,7 @@
 export const esCore: Record<string, string> = {
   // language switcher
   Language: 'Idioma',
+  'Email or username': 'Correo o usuario',
 
   // brand
   'Your bills, handled.': 'Tus facturas, resueltas.',
@@ -109,4 +110,21 @@ export const esCore: Record<string, string> = {
   'Too many requests. Please wait a moment.': 'Demasiadas solicitudes. Espera un momento.',
   'The server had a problem. Nothing was approved.': 'El servidor tuvo un problema. No se aprobó nada.',
   'Request failed.': 'La solicitud falló.',
+  'This feature is not available yet.': 'Esta función todavía no está disponible.',
+  'Enter zero or a positive amount.': 'Introduce cero o un importe positivo.',
+  'The review threshold must be between zero and the automatic limit.': 'El umbral de revisión debe estar entre cero y el límite automático.',
+  'Human review above': 'Revisión humana por encima de',
+  'Amounts above this threshold need a person, even below the automatic limit.': 'Los importes por encima de este umbral necesitan una persona, incluso dentro del límite automático.',
+  'Only amount exceptions within the ceiling and available budget can be authorized. Agreement discrepancies require correction.': 'Solo se pueden autorizar excepciones de importe dentro del techo y del presupuesto disponible. Las diferencias con el acuerdo requieren corrección.',
+  'Sign in with your demo credentials. No real money is moved.': 'Entra con tus credenciales de demo. No se mueve dinero real.',
+  'Needs review': 'Requiere revisión',
+  'Needs correction or clarification': 'Requiere corrección o aclaración',
+  'Refresh': 'Actualizar',
+  'Loading original document…': 'Cargando documento original…',
+  'Retry upload': 'Reintentar carga',
+  'Retry processing': 'Reintentar procesamiento',
+  'Clarify the possible duplicate and upload a corrected document. This cannot be approved with an exception.': 'Aclara el posible duplicado y sube un documento corregido. No se puede aprobar mediante una excepción.',
+  'Correct the document or agreement before processing a corrected invoice.': 'Corrige el documento o el acuerdo antes de procesar una factura corregida.',
+  'A permitted exception was authorized after revalidation': 'Se autorizó una excepción permitida tras revalidar las reglas',
+  'A reviewer rejected this request': 'Una persona rechazó esta solicitud',
 };

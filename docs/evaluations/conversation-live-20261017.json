@@ -1,0 +1,414 @@
+{
+  "scope": "LIVE_CONVERSATION_API",
+  "checkedAt": "2026-10-17T14:22:48.748Z",
+  "workerVersion": "d75b1918-93f9-4a1d-b14a-39ba3539c829",
+  "results": [
+    {
+      "path": "/session",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 823
+    },
+    {
+      "path": "/dashboard",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 282,
+      "response": {
+        "data": {
+          "counts": {
+            "total": 5,
+            "approved": 3,
+            "blocked": 0,
+            "escalated": 2,
+            "needsHumanApproval": 0,
+            "processing": 0,
+            "failed": 0
+          },
+          "budgets": [
+            {
+              "id": "budget_demo_current",
+              "currency": "USD",
+              "periodKey": "2026-10",
+              "limitMinor": 200000,
+              "reservedMinor": 110000,
+              "availableMinor": 90000
+            }
+          ],
+          "generatedAt": "2026-10-17T14:22:49.796Z",
+          "simulated": true
+        }
+      }
+    },
+    {
+      "path": "/chat/messages",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 2880,
+      "response": {
+        "data": {
+          "conversationId": "chat_47c6b383-bdde-4d44-919c-10480e3d5c30",
+          "turnId": "turn_f866a953-81bd-495c-88b5-2792f69d1ece",
+          "text": "Presupuesto registrado para **2026-10** (Lumen Atlas):\n\n| Concepto | Importe |\n|---|---|\n| Límite del mes | USD 2.000,00 |\n| Reservado | USD 1.100,00 |\n| **Disponible** | **USD 900,00** |\n\nNotas:\n- Son cifras **presupuestarias/reservadas**, no pagos: aquí no hay transferencias.\n- El reservado (USD 1.100,00) corresponde a compromisos ya aprobados/reservados del periodo; el disponible es el margen que queda dentro del límite.\n\nPróximos pasos posibles:\n1. Ver qué compone lo reservado (facturas del mes) o los proveedores con acuerdo activo.\n2. Si tienes una factura nueva, adjúntala con el clip para su análisis.\n\n¿Quieres que desglose el reservado por proveedor o por factura?",
+          "cards": [
+            {
+              "type": "BUDGET",
+              "periodKey": "2026-10",
+              "budgets": [
+                {
+                  "id": "budget_demo_current",
+                  "currency": "USD",
+                  "periodKey": "2026-10",
+                  "limitMinor": 200000,
+                  "reservedMinor": 110000,
+                  "availableMinor": 90000
+                }
+              ]
+            }
+          ],
+          "actions": [],
+          "createdAt": "2026-10-17T14:22:52.646Z",
+          "model": "deepseek/deepseek-v4.1-flash"
+        }
+      }
+    },
+    {
+      "path": "/chat/messages",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 3015,
+      "response": {
+        "data": {
+          "conversationId": "chat_47c6b383-bdde-4d44-919c-10480e3d5c30",
+          "turnId": "turn_64cfd64f-a878-482f-ab93-a590c1db96ae",
+          "text": "Propuesta creada, **pendiente de confirmación** (no ejecutada):\n\n**Tarjeta de cambio — Alta de proveedor**\n| Campo | Valor |\n|---|---|\n| Acción | CREATE_VENDOR |\n| ID de propuesta | act_8006f8a7-c712-4179-93e8-9b0c879cb993 |\n| Nombre | Demo Chat QA e2c57de2 |\n| allowed | false (no permitido para pagos) |\n| externalRef | CHAT-SMOKE |\n| Acuerdos | ninguno |\n| Estado | PENDING (expira 2026-10-17 14:32 UTC) |\n\nSolo el botón de confirmación en tu interfaz puede ejecutarlo; un \"sí\" en el chat no lo ejecuta.\n\nPróximos pasos:\n1. Si los datos son correctos, confirma la tarjeta en la UI.\n2. Si algo debe cambiar (nombre exacto, externalRef), dímelo y preparo otra propuesta — esta quedará sin efecto al expirar.",
+          "cards": [],
+          "actions": [
+            {
+              "id": "act_8006f8a7-c712-4179-93e8-9b0c879cb993",
+              "proposal": {
+                "kind": "CREATE_VENDOR",
+                "data": {
+                  "name": "Demo Chat QA e2c57de2",
+                  "allowed": false,
+                  "externalRef": "CHAT-SMOKE"
+                }
+              },
+              "before": null,
+              "status": "PENDING",
+              "createdAt": "2026-10-17T14:22:54.158Z",
+              "expiresAt": "2026-10-17T14:32:54.158Z"
+            }
+          ],
+          "createdAt": "2026-10-17T14:22:55.654Z",
+          "model": "deepseek/deepseek-v4.1-flash"
+        }
+      }
+    },
+    {
+      "path": "/vendors?page=1&pageSize=100",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 146,
+      "response": {
+        "data": [
+          {
+            "id": "vendor_demo_cloud",
+            "name": "Demo Cloud Hosting (ficticio)",
+            "allowed": true,
+            "externalRef": "DEMO-CLOUD",
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          },
+          {
+            "id": "vendor_demo_blocked",
+            "name": "Proveedor no permitido (ficticio)",
+            "allowed": false,
+            "externalRef": null,
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          },
+          {
+            "id": "vendor_demo_acme",
+            "name": "Acme Accounting (ficticio)",
+            "allowed": true,
+            "externalRef": "DEMO-ACME",
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          }
+        ],
+        "pagination": {
+          "page": 1,
+          "pageSize": 100,
+          "total": 3
+        }
+      }
+    },
+    {
+      "path": "/chat/actions/act_8006f8a7-c712-4179-93e8-9b0c879cb993/confirm",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 315,
+      "response": {
+        "data": {
+          "action": {
+            "id": "act_8006f8a7-c712-4179-93e8-9b0c879cb993",
+            "proposal": {
+              "kind": "CREATE_VENDOR",
+              "data": {
+                "name": "Demo Chat QA e2c57de2",
+                "allowed": false,
+                "externalRef": "CHAT-SMOKE"
+              }
+            },
+            "before": null,
+            "status": "CONFIRMED",
+            "createdAt": "2026-10-17T14:22:54.158Z",
+            "expiresAt": "2026-10-17T14:32:54.158Z"
+          },
+          "vendor": {
+            "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "name": "Demo Chat QA e2c57de2",
+            "allowed": false,
+            "externalRef": "CHAT-SMOKE",
+            "createdAt": "2026-10-17T14:22:56.080Z"
+          },
+          "agreement": null,
+          "invoice": null
+        }
+      }
+    },
+    {
+      "path": "/chat/actions/act_8006f8a7-c712-4179-93e8-9b0c879cb993/confirm",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 145,
+      "response": {
+        "data": {
+          "action": {
+            "id": "act_8006f8a7-c712-4179-93e8-9b0c879cb993",
+            "proposal": {
+              "kind": "CREATE_VENDOR",
+              "data": {
+                "name": "Demo Chat QA e2c57de2",
+                "allowed": false,
+                "externalRef": "CHAT-SMOKE"
+              }
+            },
+            "before": null,
+            "status": "CONFIRMED",
+            "createdAt": "2026-10-17T14:22:54.158Z",
+            "expiresAt": "2026-10-17T14:32:54.158Z"
+          },
+          "vendor": {
+            "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "name": "Demo Chat QA e2c57de2",
+            "allowed": false,
+            "externalRef": "CHAT-SMOKE",
+            "createdAt": "2026-10-17T14:22:56.080Z"
+          },
+          "agreement": null,
+          "invoice": null
+        }
+      }
+    },
+    {
+      "path": "/chat/actions",
+      "method": "POST",
+      "status": 201,
+      "durationMs": 379,
+      "response": {
+        "data": {
+          "id": "act_0f2890c0-8983-41c7-9952-9d2f965d8e80",
+          "proposal": {
+            "kind": "UPDATE_VENDOR",
+            "targetId": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "data": {
+              "externalRef": "CHAT-SMOKE-VERIFIED"
+            }
+          },
+          "before": {
+            "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "name": "Demo Chat QA e2c57de2",
+            "allowed": false,
+            "externalRef": "CHAT-SMOKE",
+            "createdAt": "2026-10-17T14:22:56.080Z"
+          },
+          "status": "PENDING",
+          "createdAt": "2026-10-17T14:22:56.640Z",
+          "expiresAt": "2026-10-17T14:32:56.640Z"
+        }
+      }
+    },
+    {
+      "path": "/chat/actions/act_0f2890c0-8983-41c7-9952-9d2f965d8e80/confirm",
+      "method": "POST",
+      "status": 200,
+      "durationMs": 396,
+      "response": {
+        "data": {
+          "action": {
+            "id": "act_0f2890c0-8983-41c7-9952-9d2f965d8e80",
+            "proposal": {
+              "kind": "UPDATE_VENDOR",
+              "targetId": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+              "data": {
+                "externalRef": "CHAT-SMOKE-VERIFIED"
+              }
+            },
+            "before": {
+              "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+              "name": "Demo Chat QA e2c57de2",
+              "allowed": false,
+              "externalRef": "CHAT-SMOKE",
+              "createdAt": "2026-10-17T14:22:56.080Z"
+            },
+            "status": "CONFIRMED",
+            "createdAt": "2026-10-17T14:22:56.640Z",
+            "expiresAt": "2026-10-17T14:32:56.640Z"
+          },
+          "vendor": {
+            "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "name": "Demo Chat QA e2c57de2",
+            "allowed": false,
+            "externalRef": "CHAT-SMOKE-VERIFIED",
+            "createdAt": "2026-10-17T14:22:56.080Z"
+          },
+          "agreement": null,
+          "invoice": null
+        }
+      }
+    },
+    {
+      "path": "/vendors?page=1&pageSize=100",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 147,
+      "response": {
+        "data": [
+          {
+            "id": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+            "name": "Demo Chat QA e2c57de2",
+            "allowed": false,
+            "externalRef": "CHAT-SMOKE-VERIFIED",
+            "createdAt": "2026-10-17T14:22:56.080Z"
+          },
+          {
+            "id": "vendor_demo_cloud",
+            "name": "Demo Cloud Hosting (ficticio)",
+            "allowed": true,
+            "externalRef": "DEMO-CLOUD",
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          },
+          {
+            "id": "vendor_demo_blocked",
+            "name": "Proveedor no permitido (ficticio)",
+            "allowed": false,
+            "externalRef": null,
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          },
+          {
+            "id": "vendor_demo_acme",
+            "name": "Acme Accounting (ficticio)",
+            "allowed": true,
+            "externalRef": "DEMO-ACME",
+            "createdAt": "2026-10-17T02:36:22.202Z"
+          }
+        ],
+        "pagination": {
+          "page": 1,
+          "pageSize": 100,
+          "total": 4
+        }
+      }
+    },
+    {
+      "path": "/dashboard",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 260,
+      "response": {
+        "data": {
+          "counts": {
+            "total": 5,
+            "approved": 3,
+            "blocked": 0,
+            "escalated": 2,
+            "needsHumanApproval": 0,
+            "processing": 0,
+            "failed": 0
+          },
+          "budgets": [
+            {
+              "id": "budget_demo_current",
+              "currency": "USD",
+              "periodKey": "2026-10",
+              "limitMinor": 200000,
+              "reservedMinor": 110000,
+              "availableMinor": 90000
+            }
+          ],
+          "generatedAt": "2026-10-17T14:22:57.496Z",
+          "simulated": true
+        }
+      }
+    },
+    {
+      "path": "/invoices/inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55/intake",
+      "method": "GET",
+      "status": 200,
+      "durationMs": 269,
+      "response": {
+        "data": {
+          "type": "INVOICE",
+          "invoice": {
+            "id": "inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55",
+            "vendorId": "vendor_demo_cloud",
+            "vendorName": "Demo Cloud Hosting (ficticio)",
+            "agreementId": "agr_demo_cloud",
+            "status": "DECIDED",
+            "amountMinor": 20000,
+            "currency": "USD"
+          },
+          "intake": {
+            "status": "KNOWN_VENDOR",
+            "canOnboard": false,
+            "canResume": false,
+            "expectedDecisionId": "dec_99b5c75b-911a-434d-a05b-97ecd3ffaf7a",
+            "suggestedVendorName": "Demo Cloud Hosting (ficticio)",
+            "suggestedAgreement": {
+              "currency": "USD",
+              "amountMinor": 20000,
+              "concept": "Hosting mensual ficticio",
+              "servicePeriod": "2026-10"
+            }
+          }
+        }
+      }
+    },
+    {
+      "path": "/session",
+      "method": "DELETE",
+      "status": 204,
+      "durationMs": 174
+    }
+  ],
+  "summary": {
+    "model": "deepseek/deepseek-v4.1-flash",
+    "modelReadTools": true,
+    "modelProposedChange": true,
+    "vendorId": "vendor_c3843d02-8718-4345-8c61-620e2d37b4ec",
+    "vendorAllowed": false,
+    "confirmationRequired": true,
+    "replayStable": true,
+    "updateConfirmed": true,
+    "dashboardCountsUnchanged": true,
+    "budgetUnchanged": true,
+    "knownVendorRecognized": true
+  },
+  "finishedAt": "2026-10-17T14:22:58.005Z",
+  "note": "Live DeepSeek tool calls, explicit OWNER confirmation and directory writes on fictitious data. One new disallowed QA vendor persists for audit. Budget and financial decision counts unchanged. Full invoice onboarding/reevaluation safety was tested locally with real D1/R2 and simulated document extraction; this is not an OCR corpus evaluation.",
+  "postVerification": {
+    "invoices": 5,
+    "decisions": 7,
+    "reservedMinor": 110000,
+    "conversationListStatus": 200
+  }
+}

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy",
+    "deploy": "npm --prefix ../web run build && wrangler deploy",
     "test": "node --test tests/*.test.mjs",
     "test:extraction:live": "node scripts/extraction-smoke.mjs",
     "test:extraction:corpus": "node scripts/evaluate-extraction.mjs --run",
@@ -20,7 +20,8 @@
     "db:seed:remote": "wrangler d1 execute DB --remote --file ../../packages/database/seed/demo.sql",
     "secret:openrouter": "wrangler secret put OPENROUTER_API_KEY",
     "secrets:list": "wrangler secret list",
-    "test:runtime": "wrangler deploy --dry-run --outdir .wrangler/runtime && node --test tests/runtime.mjs"
+    "test:runtime": "npm --prefix ../web run build && wrangler deploy --dry-run --outdir .wrangler/runtime && node --test tests/runtime.mjs",
+    "build:web": "npm --prefix ../web run build"
   },
   "dependencies": {
     "@oli/extraction": "link:../../packages/extraction",

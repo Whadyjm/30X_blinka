@@ -1,7 +1,14 @@
 # Oli API
 
 Backend P0 del reto en la cuenta **Tiamat** (`fbaa64f96579f93b2db32a1eb12ff6c9`).
-Worker: **https://oli-api.tiamat-agency.workers.dev**. Contrato: [docs/API.md](../../docs/API.md).
+App compartida: **https://oli30x.ultramare.dev/app**; API en ese mismo origen, bajo `/api`.
+Worker alternativo: https://oli-api.tiamat-agency.workers.dev. Contrato: [docs/API.md](../../docs/API.md).
+
+Conversación con DeepSeek V4.1 Flash usando el mismo `OPENROUTER_API_KEY`: herramientas
+de consulta y propuestas confirmables; historial privado, límites de uso y alta guiada
+de proveedor con reevaluación acotada de la factura original. Requiere migración0003.
+Ver [contrato y tarea de Whady](../../docs/CONVERSATION_FRONTEND_HANDOFF.md).
+La UI de conversación aún debe conectarse; `/propuesta/` conserva sus datos de ejemplo.
 
 Implementa sesión demo con cookie HttpOnly/CSRF, reglas y activación OWNER, proveedores,
 acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamiento,
@@ -176,3 +183,12 @@ reutiliza la factura y la decisión, sin nuevas reservas. Los informes quedan en
 Fuentes: [PDF en OpenRouter](https://openrouter.ai/docs/guides/overview/multimodal/pdfs),
 [lectura PDF de Cloudflare](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/how-it-works/),
 [binding toMarkdown](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/usage/binding/).
+
+## Web y API en el mismo origen
+
+`ASSETS` sirve el build Vite de `apps/web/dist`. El comando `pnpm deploy` construye
+primero el frontend (instalar antes sus dependencias con `npm --prefix ../web ci`).
+Las rutas `/api/*` ejecutan el Worker antes del fallback SPA, incluyendo errores 401/404.
+La web usa cookies privadas y CSRF en memoria; no se abre CORS ni se reescribe Origin.
+Para desarrollo: `npm --prefix ../web run dev:live` junto con `pnpm dev`, bindings locales
+y el origen explícito `DEV_WEB_ORIGIN` de `.dev.vars`. Ver `apps/web/README.md`.

@@ -58,6 +58,7 @@ export function Login() {
             <p className="text-sm text-ash">{brand.tagline}</p>
           </div>
           <Card className="p-6">
+            {env.apiMode === 'mock' ? <>
             <Button size="lg" beam className="w-full" loading={busy === 'demo'} disabled={busy !== null} onClick={() => void run('demo')}>
               {t('Enter the demo organization')}
             </Button>
@@ -66,9 +67,10 @@ export function Login() {
             <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
               <span className="h-px flex-1 bg-hairline" /> {t('or sign in')} <span className="h-px flex-1 bg-hairline" />
             </div>
+            </> : <p className="mb-5 text-sm text-ash">{t('Sign in with your demo credentials. No real money is moved.')}</p>}
 
             <form onSubmit={submit} className="space-y-4" noValidate>
-              <TextField label={t('Email')} type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <TextField label={t('Email or username')} type="text" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <TextField label={t('Password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               {error && <InlineAlert>{error}</InlineAlert>}
               <Button type="submit" variant="secondary" className="w-full" loading={busy === 'login'} disabled={busy !== null || !email || !password}>

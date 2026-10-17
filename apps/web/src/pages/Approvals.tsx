@@ -105,7 +105,7 @@ function PendingCard({ a }: { a: ApprovalRequest }) {
             <ReasonChips reasons={a.reasons.length ? a.reasons : (inv?.decision?.reasons ?? [])} />
           </div>
         </div>
-        <ApprovalPanel approvalId={a.id} canDecide={a.canDecide ?? true} cannotDecideReason={a.cannotDecideReason} />
+        <ApprovalPanel approvalId={a.id} expectedDecisionId={a.decisionId} expectedPolicyVersionId={a.policyVersionId} canDecide={a.canDecide ?? false} cannotDecideReason={a.cannotDecideReason} />
         <Link to={`/app/bills/${a.invoiceId}`} className="inline-block text-sm text-ink underline underline-offset-2">
           {t('Open full decision trace')}
         </Link>

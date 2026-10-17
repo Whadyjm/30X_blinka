@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import { useRef } from 'react';
 import { api, ApiError } from '@/api';
-import type { ApprovalDecisionInput, MandateDraftInput } from '@/contracts';
+import type { ApprovalDecisionInput, FinanceMandate, MandateDraftInput } from '@/contracts';
 import { isInFlight } from '@/lib/outcome';
 import type { AgreementInput, VendorInput } from '@/contracts';
 
@@ -16,7 +17,8 @@ export const qk = {
   agents: ['agents'] as const,
 };
 
-const POLL_MS = 1500;
+const POLL_MS = 2000;
+const POLL_WINDOW_MS = 60000;
 
 export function useMe() {
   return useQuery({ queryKey: qk.me, queryFn: () => api.me(), staleTime: 60_000, retry: false });
@@ -36,19 +38,36 @@ export function useAgreements(enabled = true) {
 
 /** Polls while anything is still being processed, then stops by itself. */
 export function useInvoices() {
-  return useQuery({
+  const started = useRef<number | null>(null);
+  const query = useQuery({
     queryKey: qk.invoices,
-    queryFn: () => api.listInvoices({ limit: 200 }),
-    refetchInterval: (q) => (q.state.data?.some((i) => isInFlight(i)) ? POLL_MS : false),
+    queryFn: () => api.listInvoices(),
+    refetchInterval: (q) => {
+      if (!q.state.data?.some(isInFlight)) { started.current = null; return false; }
+      started.current ??= Date.now();
+      return Date.now() - started.current < POLL_WINDOW_MS ? POLL_MS : false;
+    },
   });
+  return { ...query, refresh: () => { started.current = Date.now(); return query.refetch(); } };
 }
 
 export function useInvoice(id: string) {
-  return useQuery({
+  const started = useRef<number | null>(null);
+  const query = useQuery({
     queryKey: qk.invoice(id),
     queryFn: () => api.getInvoice(id),
-    refetchInterval: (q) => (q.state.data && isInFlight(q.state.data) ? POLL_MS : false),
+    refetchInterval: (q) => {
+      if (!q.state.data || !isInFlight(q.state.data)) { started.current = null; return false; }
+      started.current ??= Date.now();
+      return Date.now() - started.current < POLL_WINDOW_MS ? POLL_MS : false;
+    },
   });
+  return { ...query, refresh: () => { started.current = Date.now(); return query.refetch(); } };
+}
+
+export function useProcessInvoice() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: string) => api.processInvoice(id), onSettled: () => invalidateMoney(qc) });
 }
 
 export function useApprovals() {
@@ -90,7 +109,8 @@ export function useSaveMandateDraft() {
 export function useActivateMandate() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (draftId?: string) => api.activateMandate({ draftId, confirm: true }),
+    mutationFn: (draft?: FinanceMandate) => api.activateMandate({ draftId: draft?.id, confirm: true,
+      expectedRevision: draft?.revision, expectedActivePolicyVersionId: draft?.basedOnPolicyVersionId ?? null }),
     onSuccess: () => invalidateMoney(qc),
   });
 }

@@ -18,6 +18,8 @@ export type ReasonInfo = {
 };
 
 const CATALOG: Record<string, ReasonInfo> = {
+  HUMAN_APPROVED: { label: 'Approved by a reviewer', rule: 'A permitted exception was authorized after revalidation', tone: 'ok', humanApprovable: false },
+  HUMAN_REJECTED: { label: 'Rejected by a reviewer', rule: 'A reviewer rejected this request', tone: 'block', humanApprovable: false },
   ALLOWED_VENDOR: {
     label: 'Vendor is authorized',
     rule: 'Vendor must be on the allowed list',
@@ -40,19 +42,19 @@ const CATALOG: Record<string, ReasonInfo> = {
     label: 'Possible duplicate',
     rule: 'Similar vendor, amount and date to an earlier invoice',
     tone: 'warn',
-    humanApprovable: true,
+    humanApprovable: false,
   },
   AGREEMENT_MISMATCH: {
     label: 'Differs from agreement',
     rule: 'Amount, currency and frequency must match the vendor agreement (within tolerance)',
     tone: 'warn',
-    humanApprovable: true,
+    humanApprovable: false,
   },
   MISSING_AGREEMENT: {
     label: 'No agreement on file',
     rule: 'An active agreement is required for this vendor',
     tone: 'warn',
-    humanApprovable: true,
+    humanApprovable: false,
   },
   AMOUNT_ABOVE_AUTO_LIMIT: {
     label: 'Above automatic limit',

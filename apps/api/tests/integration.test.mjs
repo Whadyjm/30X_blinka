@@ -68,6 +68,24 @@ test('sesión protegida, CSRF, origen y logout; no acepta autoridad del navegado
   assert.equal((await api('/me')).status, 401);
 });
 
+test('el usuario demo solo entra por alias configurado y contraseña correcta', async t => {
+  const { api, env } = await setup(t);
+  const credentials = { email: 'admin', password: env.DEMO_PASSWORD };
+  const signIn = (data) => api('/session', { method: 'POST', data });
+  assert.equal((await signIn(credentials)).status, 401, 'no existe un alias implícito');
+  env.DEMO_USERNAME = 'admin';
+  assert.equal((await signIn({ ...credentials, password: 'wrong' })).status, 401);
+  assert.equal((await signIn({ ...credentials, email: 'someone-else' })).status, 401);
+  const logged = await signIn(credentials);
+  assert.equal(logged.status, 200);
+  SessionSchema.parse(logged.data);
+  assert.equal(logged.data.user.id, env.DEMO_USER_ID);
+  assert.equal(logged.data.user.email, 'owner@oli-demo.invalid');
+  assert.equal(logged.data.role, 'OWNER');
+  env.DEMO_ORG_ID = 'nonexistent-org';
+  assert.equal((await signIn(credentials)).status, 401, 'el alias no omite la pertenencia a la empresa');
+});
+
 test('onboarding guarda borrador y activa versión/budget con idempotencia y sin mutar v1', async t => {
   const { api, DB } = await setup(t);
   const before = (await api('/mandate')).data.active;

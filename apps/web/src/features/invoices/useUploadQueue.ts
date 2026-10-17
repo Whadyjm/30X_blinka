@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { api, errorMessage } from '@/api';
+import { api, ApiError, errorMessage } from '@/api';
 import { UPLOAD } from '@/config/env';
 import { qk } from '@/hooks/queries';
 import { t } from '@/i18n';
@@ -12,6 +12,7 @@ export type UploadItem = {
   phase: 'queued' | 'uploading' | 'submitted' | 'error';
   invoiceId?: string;
   error?: string;
+  retryable?: boolean;
 };
 
 const CONCURRENCY = 2;
@@ -33,6 +34,7 @@ export function useUploadQueue() {
   const [items, setItems] = useState<UploadItem[]>([]);
   const pending = useRef<Array<{ key: string; file: File }>>([]);
   const active = useRef(0);
+  const filesByKey = useRef(new Map<string, File>());
 
   const patch = useCallback((key: string, p: Partial<UploadItem>) => setItems((xs) => xs.map((x) => (x.key === key ? { ...x, ...p } : x))), []);
 
@@ -43,7 +45,8 @@ export function useUploadQueue() {
       patch(job.key, { phase: 'uploading' });
       void (async () => {
         try {
-          const inv = await api.uploadInvoice(job.file);
+          const inv = await api.uploadInvoice(job.file, job.key);
+          filesByKey.current.delete(job.key);
           patch(job.key, { phase: 'submitted', invoiceId: inv.id });
           // Make the row appear (and start polling) immediately, then ask the server to evaluate.
           void qc.invalidateQueries({ queryKey: qk.invoices });
@@ -54,7 +57,9 @@ export function useUploadQueue() {
             patch(job.key, { error: errorMessage(e) });
           }
         } catch (e) {
-          patch(job.key, { phase: 'error', error: errorMessage(e) });
+          const retryable = e instanceof ApiError && (e.isNetwork || e.status >= 500 || e.status === 429);
+          if (!retryable) filesByKey.current.delete(job.key);
+          patch(job.key, { phase: 'error', error: errorMessage(e), retryable });
         } finally {
           active.current--;
           void qc.invalidateQueries({ queryKey: qk.invoices });
@@ -72,7 +77,7 @@ export function useUploadQueue() {
         const key = `u${++counter}`;
         const err = validateFile(file);
         fresh.push({ key, name: file.name, size: file.size, phase: err ? 'error' : 'queued', error: err ?? undefined });
-        if (!err) pending.current.push({ key, file });
+        if (!err) { filesByKey.current.set(key, file); pending.current.push({ key, file }); }
       }
       setItems((xs) => [...fresh, ...xs]);
       void pump();
@@ -80,7 +85,17 @@ export function useUploadQueue() {
     [pump],
   );
 
-  const clearFinished = useCallback(() => setItems((xs) => xs.filter((x) => x.phase === 'queued' || x.phase === 'uploading')), []);
+  const retry = useCallback((key: string) => {
+    const file = filesByKey.current.get(key);
+    if (!file) return;
+    patch(key, { phase: 'queued', error: undefined });
+    pending.current.push({ key, file });
+    void pump();
+  }, [patch, pump]);
+  const clearFinished = useCallback(() => setItems((xs) => {
+    for (const item of xs) if (!['queued', 'uploading'].includes(item.phase)) filesByKey.current.delete(item.key);
+    return xs.filter(x => x.phase === 'queued' || x.phase === 'uploading');
+  }), []);
 
-  return { items, add, clearFinished };
+  return { items, add, clearFinished, retry };
 }

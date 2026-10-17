@@ -34,7 +34,10 @@ export const SessionSchema = z.strictObject({
   role: RoleSchema,
   csrfToken: z.string().min(1),
 });
-export const LoginInputSchema = z.strictObject({ email: z.email(), password: z.string().min(1) });
+export const LoginInputSchema = z.strictObject({
+  email: z.union([z.email(), z.string().regex(/^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/)]),
+  password: z.string().min(1),
+});
 
 export const CreateVendorSchema = z.strictObject({
   name: NameSchema,
@@ -386,3 +389,76 @@ export function checkExtraction(input: {
   }
   return { status: issues.length === 0 ? 'CROSS_CHECKED' : 'REVIEW_REQUIRED', extraction, issues };
 }
+
+// Conversational v1: the model may prepare actions; only authenticated UI confirmation executes them.
+const ChatIdSchema = z.string().min(1).max(100);
+const ChatVendorInputSchema = CreateVendorSchema.extend({ name: NameSchema.max(200), externalRef: z.string().trim().min(1).max(200).nullable() });
+const ChatAgreementInputSchema = CreateAgreementSchema.extend({ concept: NameSchema.max(300) });
+export const ChatActionInputSchema = z.discriminatedUnion('kind', [
+  z.strictObject({ kind: z.literal('CREATE_VENDOR'), data: ChatVendorInputSchema }),
+  z.strictObject({ kind: z.literal('UPDATE_VENDOR'), targetId: ChatIdSchema, data: ChatVendorInputSchema.partial().refine(v => Object.keys(v).length > 0) }),
+  z.strictObject({ kind: z.literal('CREATE_AGREEMENT'), data: ChatAgreementInputSchema }),
+  z.strictObject({ kind: z.literal('UPDATE_AGREEMENT'), targetId: ChatIdSchema, data: ChatAgreementInputSchema.partial().refine(v => Object.keys(v).length > 0) }),
+  z.strictObject({ kind: z.literal('ONBOARD_INVOICE_VENDOR'), invoiceId: ChatIdSchema,
+    expectedDecisionId: ChatIdSchema, vendor: ChatVendorInputSchema,
+    agreement: ChatAgreementInputSchema.omit({ vendorId: true }).nullable() }),
+  z.strictObject({ kind: z.literal('RESUME_INVOICE'), invoiceId: ChatIdSchema, expectedDecisionId: ChatIdSchema }),
+]);
+export const ChatActionSchema = z.strictObject({
+  id: ChatIdSchema, proposal: ChatActionInputSchema,
+  before: z.union([VendorSchema, AgreementSchema, z.null()]),
+  status: z.enum(['PENDING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
+  createdAt: TimestampSchema, expiresAt: TimestampSchema,
+});
+export const ChatMessageInputSchema = z.strictObject({
+  conversationId: ChatIdSchema.nullable(), text: z.string().trim().max(4000),
+  invoiceIds: z.array(ChatIdSchema).max(4),
+}).refine(v => v.text.length > 0 || v.invoiceIds.length > 0, 'Escribe un mensaje o adjunta una factura.');
+export const ChatPeriodSchema = z.union([PeriodKeySchema, z.enum(['CURRENT_MONTH', 'PREVIOUS_MONTH'])]);
+export const ChatToolInputSchemas = {
+  list_invoices: z.strictObject({ action: DecisionActionSchema.optional() }),
+  inspect_invoice: z.strictObject({ invoiceId: ChatIdSchema }),
+  list_vendors: z.strictObject({}),
+  list_agreements: z.strictObject({ vendorId: ChatIdSchema.optional() }),
+  get_budget: z.strictObject({ period: ChatPeriodSchema }),
+  summarize_invoices: z.strictObject({ period: ChatPeriodSchema, query: z.string().trim().min(1).max(100).nullable() }),
+  prepare_change: z.strictObject({ proposal: ChatActionInputSchema }),
+};
+export const ChatToolParameters = Object.fromEntries(Object.entries(ChatToolInputSchemas).map(([name, schema]) => [name, z.toJSONSchema(schema)]));
+export const InvoiceIntakeSchema = z.strictObject({
+  status: z.enum(['PROCESSING', 'FAILED', 'EXTRACTION_REVIEW', 'UNKNOWN_VENDOR', 'DISALLOWED_VENDOR', 'AMBIGUOUS_VENDOR', 'KNOWN_VENDOR']),
+  canOnboard: z.boolean(), canResume: z.boolean(), expectedDecisionId: ChatIdSchema.nullable(),
+  suggestedVendorName: z.string().nullable(),
+  suggestedAgreement: z.strictObject({ currency: CurrencySchema.nullable(), amountMinor: PositiveMinorUnitsSchema.nullable(),
+    concept: z.string().nullable(), servicePeriod: PeriodKeySchema.nullable() }).nullable(),
+});
+export const ChatCardSchema = z.discriminatedUnion('type', [
+  z.strictObject({ type: z.literal('INVOICE'), invoice: InvoiceDetailSchema, intake: InvoiceIntakeSchema }),
+  z.strictObject({ type: z.literal('INVOICES'), invoices: z.array(InvoiceSchema).max(20), truncated: z.boolean() }),
+  z.strictObject({ type: z.literal('VENDORS'), vendors: z.array(VendorSchema).max(20), truncated: z.boolean() }),
+  z.strictObject({ type: z.literal('AGREEMENTS'), agreements: z.array(AgreementSchema).max(20), truncated: z.boolean() }),
+  z.strictObject({ type: z.literal('BUDGET'), periodKey: PeriodKeySchema, budgets: z.array(BudgetPeriodSchema) }),
+  z.strictObject({ type: z.literal('SPEND'), periodKey: PeriodKeySchema, query: z.string().nullable(),
+    periodBasis: z.literal('SERVICE_PERIOD_OR_ISSUE_DATE'), amountBasis: z.literal('EXTRACTED_AMOUNTS_NOT_PAYMENTS'), totals: z.array(z.strictObject({
+      currency: CurrencySchema, count: MinorUnitsSchema, invoicedMinor: MinorUnitsSchema,
+      approvedMinor: MinorUnitsSchema, blockedMinor: MinorUnitsSchema,
+    })) }),
+]);
+export const ChatReplySchema = z.strictObject({
+  conversationId: ChatIdSchema, turnId: ChatIdSchema, text: z.string().max(8000),
+  cards: z.array(ChatCardSchema).max(12), actions: z.array(ChatActionSchema).max(4),
+  createdAt: TimestampSchema, model: z.literal('deepseek/deepseek-v4.1-flash'),
+});
+export const ConfirmChatActionSchema = z.strictObject({ confirmed: z.literal(true) });
+export const ChatActionResultSchema = z.strictObject({ action: ChatActionSchema,
+  vendor: VendorSchema.nullable(), agreement: AgreementSchema.nullable(), invoice: InvoiceDetailSchema.nullable() });
+export const ChatHistorySchema = z.strictObject({ id: ChatIdSchema,
+  turns: z.array(z.strictObject({ id: ChatIdSchema, text: z.string(), invoiceIds: z.array(ChatIdSchema),
+    state: z.enum(['PROCESSING', 'COMPLETED', 'FAILED']), reply: ChatReplySchema.nullable(), errorCode: z.string().nullable(), createdAt: TimestampSchema })).max(20),
+});
+export const ChatConversationsSchema = z.array(z.strictObject({ id: ChatIdSchema, createdAt: TimestampSchema, updatedAt: TimestampSchema })).max(20);
+export type ChatReply = z.infer<typeof ChatReplySchema>;
+export type ChatAction = z.infer<typeof ChatActionSchema>;
+export type ChatActionInput = z.infer<typeof ChatActionInputSchema>;
+export type ChatCard = z.infer<typeof ChatCardSchema>;
+export type ChatActionResult = z.infer<typeof ChatActionResultSchema>;

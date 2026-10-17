@@ -79,7 +79,8 @@ export function Onboarding() {
       } else if (step === 1 && draft) {
         setShowErrors(true);
         if (hasErrors(validateMandate(draft))) return;
-        await save.mutateAsync(draft);
+        const saved = await save.mutateAsync(draft);
+        setDraft(toDraftInput(saved));
         setStep(2);
       } else if (step === 2) {
         setStep(3);
@@ -94,7 +95,7 @@ export function Onboarding() {
   const finish = async () => {
     setError(null);
     try {
-      await activate.mutateAsync(undefined);
+      await activate.mutateAsync(save.data ?? mandate.data?.draft ?? undefined);
       toast.success(t('Oli is ready. Upload your first invoice.'));
       nav('/app/bills', { replace: true });
     } catch (e) {

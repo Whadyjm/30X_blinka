@@ -19,6 +19,7 @@
     "test:contract": "vitest run tests/contract"
   },
   "dependencies": {
+    "@oli/contracts": "file:../../packages/contracts",
     "@tanstack/react-query": "5.104.3",
     "border-beam": "1.4.1",
     "clsx": "2.1.1",
@@ -35,6 +36,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.1.2",
+    "miniflare": "^4.20260730.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vite": "8.3.4",

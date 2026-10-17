@@ -51,26 +51,26 @@ function TraceRow({ step, index, fallbackVersion, fallbackAt }: { step: TraceSte
         {(step.observed || step.expected) && (
           <dl className="mt-1.5 flex flex-wrap gap-x-5 gap-y-1 text-sm">
             {step.field && (
-              <div className="flex gap-1.5">
+              <div className="flex min-w-0 gap-1.5">
                 <dt className="text-slate-500">{t('Checked')}</dt>
                 <dd className="text-ink">{step.field}</dd>
               </div>
             )}
             {step.observed && (
-              <div className="flex gap-1.5">
+              <div className="flex min-w-0 gap-1.5">
                 <dt className="text-slate-500">{t('Found')}</dt>
-                <dd className="text-data text-ink">{step.observed}</dd>
+                <dd className="min-w-0 break-words text-data text-ink">{step.observed}</dd>
               </div>
             )}
             {step.expected && (
-              <div className="flex gap-1.5">
+              <div className="flex min-w-0 gap-1.5">
                 <dt className="text-slate-500">{t('Rule')}</dt>
                 <dd className="text-data text-ink">{step.expected}</dd>
               </div>
             )}
           </dl>
         )}
-        {step.evidence && <p className="mt-1 text-sm italic text-slate-600">“{step.evidence}”</p>}
+        {step.evidence && <p className="mt-1 break-words text-sm italic text-slate-600 [overflow-wrap:anywhere]">“{step.evidence}”</p>}
         <p className="caption mt-1.5 normal-case tracking-normal">
           {version != null && version !== '' ? t('Policy v{n}', { n: String(version) }) : t('Policy version n/a')}
           {at ? ` · ${formatDateTime(at)}` : ''}
