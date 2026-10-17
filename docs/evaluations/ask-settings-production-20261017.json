@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-17T20:48:36.499Z",
+  "host": "https://oli30x.ultramare.dev",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "composerHeight": 54,
+  "webConversations": 4,
+  "closedTabReopensWithSameHistory": true,
+  "closePersistsAfterReload": true,
+  "askOliSeparateFromDashboard": true,
+  "dashboardContainsOriginalOverview": true,
+  "telegramHasNoSubtabs": true,
+  "telegramHiddenByDefault": true,
+  "settingsTogglePersists": true,
+  "botConnectionUnchanged": true,
+  "telegramHiddenAgainAfterOff": true,
+  "apiMutationsFromUI": [],
+  "note": "Solo inicio/cierre de sesión; ningún mensaje enviado, conversación borrada ni propuesta confirmada",
+  "deploymentVersion": "439df245-534b-4c50-beb5-278ee885845d",
+  "mergedPRs": [
+    9,
+    10
+  ],
+  "backend": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "e6b8a01ff07c8249d9d1ead255b106f1ff077a5e83dee13da0bd91636dfe4bbb",
+    "note": "Runtime code exact; Wrangler repackaged source map metadata."
+  },
+  "databaseMigrationsApplied": []
+}
