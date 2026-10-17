@@ -1,0 +1,152 @@
+{
+  "checkedAt": "2026-10-17T17:34:47.515Z",
+  "scope": "REFERENCE_GATE_TAXONOMY_AUDIT_NO_NEW_READER_CALLS",
+  "source": "docs/evaluations/image-readers-2026-10-17T17-32-13-725Z.json",
+  "sourceSha256": "1526aa1646ba3b2578b07bbd7626c82fd24fa6d7c9981238902f7ced01e0775e",
+  "correction": {
+    "caseId": "case_025",
+    "previousMustRequireReadingReview": true,
+    "correctedMustRequireReadingReview": false,
+    "reason": "Both reads match all eight immutable reference fields exactly, including visible Nimbo Cloud Derno. Required review concerns business identity similarity, handled by the financial engine, not an OCR mismatch. No gold fields, expected financial action or reader output changed."
+  },
+  "originalSummary": {
+    "attempted": 27,
+    "successfulReads": 27,
+    "failures": 0,
+    "primaryAllEightExact": 24,
+    "secondaryAllEightExact": 23,
+    "actualCrossChecked": 0,
+    "enabledCrossChecked": 11,
+    "falseCrossChecks": 1,
+    "ocrReportedCostUsd": 0.002768483999999999,
+    "primaryReportedCostUsd": 0.004786847999999999,
+    "medianReadDurationMs": 3708,
+    "financialDecisions": "NOT_EVALUATED",
+    "automaticApprovals": "NOT_EVALUATED"
+  },
+  "correctedSummary": {
+    "attempted": 27,
+    "successfulReads": 27,
+    "failures": 0,
+    "primaryAllEightExact": 24,
+    "secondaryAllEightExact": 23,
+    "actualCrossChecked": 0,
+    "enabledCrossChecked": 11,
+    "falseCrossChecks": 0,
+    "ocrReportedCostUsd": 0.002768483999999999,
+    "primaryReportedCostUsd": 0.004786847999999999,
+    "medianReadDurationMs": 3708,
+    "financialDecisions": "NOT_EVALUATED",
+    "automaticApprovals": "NOT_EVALUATED"
+  },
+  "gateFlags": [
+    {
+      "caseId": "case_001",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_016",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_022",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_025",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_027",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_031",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_035",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_038",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_039",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "case_040",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "holdout_004",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "holdout_005",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_001",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_002",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_003",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_004",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_005",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_006",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_007",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_008",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_009",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_010",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_011",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_012",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_013",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_014",
+      "falseCrossCheck": false
+    },
+    {
+      "caseId": "image_015",
+      "falseCrossCheck": false
+    }
+  ]
+}

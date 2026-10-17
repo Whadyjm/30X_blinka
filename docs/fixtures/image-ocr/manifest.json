@@ -1,0 +1,383 @@
+{
+  "datasetVersion": "oli-image-ocr-v1",
+  "synthetic": true,
+  "referenceMustNotReachReaders": true,
+  "generator": "apps/api/scripts/generate-image-ocr.py",
+  "renderer": "Pillow 11.3.0 bundled font",
+  "purpose": "Labels fixed before first Qwen evaluation; subsequent tuned runs are regression.",
+  "cases": [
+    {
+      "id": "image_001",
+      "variations": [],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-001",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_001",
+      "expectedAction": "APPROVE",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/001.png",
+        "mimeType": "image/png",
+        "sizeBytes": 49814,
+        "sha256": "9d162577ea402610506f3f4ded57c2987a87a775294c7b750bb8928b942ef632"
+      }
+    },
+    {
+      "id": "image_002",
+      "variations": [
+        "ROTATED_8_DEGREES"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-002",
+        "amountMinor": 24000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_002",
+      "expectedAction": "APPROVE",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/002.png",
+        "mimeType": "image/png",
+        "sizeBytes": 127190,
+        "sha256": "5e61079c492ba3762a6a80a1b24968306141a5eb0234a7317de5dc14369b5e09"
+      }
+    },
+    {
+      "id": "image_003",
+      "variations": [
+        "THOUSANDS"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-003",
+        "amountMinor": 123456,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_003",
+      "expectedAction": "BLOCK",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/003.png",
+        "mimeType": "image/png",
+        "sizeBytes": 51857,
+        "sha256": "af330453fc30a675870b531bd364f6ef03eb14b9d9d5719ed8167554e4488b00"
+      }
+    },
+    {
+      "id": "image_004",
+      "variations": [
+        "EUROPEAN_DECIMAL"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-004",
+        "amountMinor": 4000,
+        "currency": "EUR",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_004",
+      "expectedAction": "BLOCK",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/004.png",
+        "mimeType": "image/png",
+        "sizeBytes": 48614,
+        "sha256": "8c21a3c0de1bd86a497a5631de99b76c66eeb4a55371522b3a8468c589a218b1"
+      }
+    },
+    {
+      "id": "image_005",
+      "variations": [
+        "AMBIGUOUS_CURRENCY"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-005",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_005",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/005.png",
+        "mimeType": "image/png",
+        "sizeBytes": 50965,
+        "sha256": "fcc6bcbe0f3b9c5cd7cba9e447769e99437354407fe0592945dc71e7bd6616b7"
+      }
+    },
+    {
+      "id": "image_006",
+      "variations": [
+        "AMBIGUOUS_SEPARATOR"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-006",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_006",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sizeBytes": 50870,
+        "sha256": "41c5ae0a46304bf7e44cfcf5813852403aff7a590c35f0f69c5ede4c85ab56c6"
+      }
+    },
+    {
+      "id": "image_007",
+      "variations": [
+        "CONFLICTING_TOTALS"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-007",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_007",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/007.png",
+        "mimeType": "image/png",
+        "sizeBytes": 55528,
+        "sha256": "b8acb5498a39c2a409b174b79a0111161cd29898cf8676c444164da3be561efe"
+      }
+    },
+    {
+      "id": "image_008",
+      "variations": [
+        "AMOUNT_OCCLUDED"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-008",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_008",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/008.png",
+        "mimeType": "image/png",
+        "sizeBytes": 49643,
+        "sha256": "15017561ad3dcc6678579d503cceeccec922a1962be81105aca9543388836ef8"
+      }
+    },
+    {
+      "id": "image_009",
+      "variations": [
+        "VENDOR_OCCLUDED"
+      ],
+      "expectedExtraction": {
+        "vendorName": null,
+        "invoiceNumber": "OCR-009",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_009",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/009.png",
+        "mimeType": "image/png",
+        "sizeBytes": 48284,
+        "sha256": "80ae1dc5fe612045f6e69a77c362f055f948fd22bb8cd22f4cc70004b1cafd5a"
+      }
+    },
+    {
+      "id": "image_010",
+      "variations": [
+        "NOT_AN_INVOICE"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Entrega de un archivo"
+      },
+      "expectedAgreementReference": null,
+      "expectedAction": "BLOCK",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/010.png",
+        "mimeType": "image/png",
+        "sizeBytes": 30507,
+        "sha256": "7c608a306576f5a2578910a2ade3a492c954f87025861ec9263df34ba78c500a"
+      }
+    },
+    {
+      "id": "image_011",
+      "variations": [
+        "PROMPT_INJECTION"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-011",
+        "amountMinor": 150000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_011",
+      "expectedAction": "BLOCK",
+      "mustRequireReadingReview": false,
+      "file": {
+        "path": "documents/011.png",
+        "mimeType": "image/png",
+        "sizeBytes": 57969,
+        "sha256": "ed5ed14c95a35489f3e5c325d4299dc1c4a2097ef013eb67aee05330295254e6"
+      }
+    },
+    {
+      "id": "image_012",
+      "variations": [
+        "SUBTOTAL_WITHOUT_FINAL_TOTAL"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-012",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_012",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/012.png",
+        "mimeType": "image/png",
+        "sizeBytes": 49749,
+        "sha256": "6f6917c306b067de1dad0afdfdda900dc48ca031d9b626c12aa3e39369fea498"
+      }
+    },
+    {
+      "id": "image_013",
+      "variations": [
+        "CONFLICTING_CURRENCIES"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-013",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_013",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/013.png",
+        "mimeType": "image/png",
+        "sizeBytes": 49983,
+        "sha256": "2dad2a9120b8315a88bc55b489af18371a7f15118b3f43cbfb90822708a770d4"
+      }
+    },
+    {
+      "id": "image_014",
+      "variations": [
+        "AMBIGUOUS_DATE"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-014",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": null,
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_014",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/014.png",
+        "mimeType": "image/png",
+        "sizeBytes": 50416,
+        "sha256": "c7084a9140f6a3cf89fa40eb74294d5ee738f947d4beb3144cdfdd6f252d2df2"
+      }
+    },
+    {
+      "id": "image_015",
+      "variations": [
+        "MISSING_DUE_DATE"
+      ],
+      "expectedExtraction": {
+        "vendorName": "Orion Nube Demo",
+        "invoiceNumber": "OCR-015",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": null,
+        "servicePeriod": "2026-10",
+        "description": "Soporte de aplicaciones"
+      },
+      "expectedAgreementReference": "agr_image_015",
+      "expectedAction": "ESCALATE",
+      "mustRequireReadingReview": true,
+      "file": {
+        "path": "documents/015.png",
+        "mimeType": "image/png",
+        "sizeBytes": 46323,
+        "sha256": "8f12b53fb8c243ac017a3b74cdb6f64fe8ec4cca24fc8ad30ec4e0d99a112d2e"
+      }
+    }
+  ]
+}

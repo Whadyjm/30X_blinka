@@ -14,13 +14,23 @@ independiente. El contrato `checkExtraction()` mantiene sus cuatro campos críti
 adicionales se convierten en advertencias bloqueantes antes de invocarlo. No se infiere una moneda
 por defecto ni se reparan respuestas JSON truncadas.
 
+El parser `labelled-v5` reconoce etiquetas explícitas en español/inglés, filas Markdown de
+clave/valor y textos que la conversión pegó a encabezados o pies conocidos. Una moneda ISO
+explícita en el total puede corroborar la moneda cuando no existe una etiqueta separada; `$`
+solo no basta. Encabezados o descripciones idénticos repetidos entre páginas pueden coincidir;
+duplicados en la misma página y totales repetidos siguen siendo inciertos. Subtotales no se
+convierten en totales finales. Se conservan los totales de tablas no interpretadas como posibles
+contradicciones. La nueva versión invalida artefactos de lectores anteriores; no modifica
+decisiones históricas. La [comparación controlada](evaluations/pdf-parser-v5-paired.json) separa
+la cobertura del parser de las llamadas reales al modelo y del procesamiento financiero.
+
 Los importes se convierten con `BigInt`, exponentes de moneda y formatos explícitos de separadores.
 `1,234.56` y `1.234,56` son formatos reconocibles; `1,234`/`1.234` ambiguos requieren revisión.
 Las observaciones informativas del modelo son tres etiquetas acotadas separadas de las advertencias;
 ninguna advertencia recibida se elimina. El modelo tiene un presupuesto de salida de 4096 tokens
 con el control de razonamiento compatible con cada proveedor.
 
-El límite de bytes no acredita un límite de páginas PDF: falta validar un máximo de páginas antes del OCR. Las imágenes siguen sin OCR independiente: no se autoaprueban. Tampoco se promete cubrir diseños
+El límite de bytes no acredita un límite de páginas PDF: falta validar un máximo de páginas antes del OCR. Para imágenes se incorpora el canal Qwen descrito abajo; su modo de despliegue determina si solo se mide o permite evaluar reglas. Tampoco se promete cubrir diseños
 arbitrarios ni verificar aritmética de líneas que no se hayan extraído. Las mediciones del corpus
 están en [INVOICE_CORPUS_EVALUATION.md](INVOICE_CORPUS_EVALUATION.md); los tests unitarios no las sustituyen.
 
@@ -38,6 +48,36 @@ exactitud y nunca sustituye la corroboración y los controles del motor. Las res
 requieren el tipo en un enum cerrado; el nuevo prompt/schema invalida la caché anterior.
 
 ## 1. Decisión de arquitectura
+
+### Segunda lectura de imágenes elegida por Oscar
+
+PNG/JPEG usan el lector primario DeepSeek (con los respaldos existentes) y una llamada separada
+a `qwen/qwen3.8-flash`, ambos vía OpenRouter y con `OPENROUTER_API_KEY`. Qwen recibe únicamente
+la imagen original y una instrucción de transcripción literal: no recibe el candidato, acuerdos,
+políticas ni referencias esperadas del corpus. No se añade ninguna cuenta de Google ni un VPS.
+
+Qwen transcribe texto; el parser del servidor interpreta etiquetas, importes y fechas y compara
+los ocho campos con el candidato primario. Los marcadores de ilegibilidad, recorte o ambigüedad
+se convierten en advertencias bloqueantes. El servidor genera hash, identidad y versión de lectura.
+La transcripción, proveedor, modelo y uso reportado quedan en la procedencia para auditoría.
+Las citas o ausencia de marcadores del modelo no acreditan exactitud. Los lectores pueden coincidir
+en un error y ambos dependen de la disponibilidad de OpenRouter.
+
+`IMAGE_OCR_MODE` es configuración del servidor: `OFF` no hace la segunda llamada; `SHADOW`
+la registra y conserva una advertencia que impide autoevaluar; `ENABLED` permite evaluar únicamente
+cuando coinciden los campos y no existen advertencias. El motor, la revisión humana y las reservas
+atómicas de D1 siguen siendo obligatorios. Los PDF mantienen el canal independiente de texto
+Workers AI; no se reemplaza por una segunda lectura del mismo OCR de PDF.
+
+Cada intento de procesamiento hace como máximo una llamada a Qwen, con 12 s y 4096 tokens de
+salida como límites. Una respuesta truncada, otro modelo o un fallo no se reparan ni se reemplazan
+por un modelo más favorable. Los reintentos durables reutilizan la lectura que ya tuvo éxito;
+las versiones nuevas invalidan los artefactos anteriores. No se cachea una decisión financiera.
+
+El protocolo inicial con envoltura JSON tuvo fallos de tipo y se conserva su evaluación fallida.
+El protocolo actual pide texto literal acotado, sin reparar aquellas respuestas. El parser
+`labelled-v6` tolera espacio vacío entre una etiqueta explícita y su valor; no ignora contradicciones.
+Las mediciones de lectores, comparación y decisiones se documentan separadamente.
 
 Usar extracción híbrida y verificaciones deterministas. No considerar una respuesta JSON,
 una cita ni un porcentaje de confianza generado por el modelo como prueba de exactitud.

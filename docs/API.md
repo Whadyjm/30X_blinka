@@ -780,8 +780,10 @@ D1 remoto `oli-demo` y Worker `oli-api` pertenecen a Tiamat; ver [operación y c
 Los tests de integración usan D1/R2 locales reales y proveedores simulados; los smoke tests vivos
 se registran por separado. PDF usa Mistral OCR y una lectura PDF_TEXT separada de Cloudflare;
 el parser conservador acepta etiquetas conocidas y escala layouts desconocidos. PNG/JPEG
-se extraen pero escalan mientras no haya OCR independiente. No confundir estos límites con
-una evaluación OCR de los 50 documentos. Los tipos P1 de delegaciones siguen reservados.
+usan una transcripción separada de Qwen vía OpenRouter, comparada por el servidor con la
+extracción primaria; una discrepancia o incertidumbre mantiene revisión. Consultar modos,
+resultados medidos y límites en [EXTRACTION_SAFETY.md](EXTRACTION_SAFETY.md). No confundir
+los tests de contrato con una evaluación OCR de los 50 documentos. Los tipos P1 de delegaciones siguen reservados.
 
 El API es del mismo origen. En desarrollo, Whady debe usar un proxy `/api` hacia el Worker
 o servir el frontend junto al API; no copiar la contraseña ni secretos al bundle. No hay CORS abierto.

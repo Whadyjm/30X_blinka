@@ -2,6 +2,115 @@
 
 Se conservan todas las corridas del 17 de octubre de 2026, incluidas las fallidas y la aprobación indebida original. La nueva ejecución completa se presenta por separado.
 
+## Segunda lectura de imágenes con Qwen
+
+Oscar eligió `qwen/qwen3.8-flash` vía OpenRouter, usando la misma clave que el lector primario.
+Activado con `IMAGE_OCR_MODE=ENABLED`, Worker `3c7adbb7-c619-4d49-8b62-0867a2bef940`, parser
+`labelled-v6`, transcripción `qwen-image-transcript-v2-20261017`. Los PDF mantienen su segunda
+lectura de texto. No se abrieron cuentas de Google ni se añadieron servidores.
+
+La [corrida final de lectores](evaluations/image-readers-2026-10-17T17-32-13-725Z.json) se midió
+primero en sombra sobre 27 imágenes: diez PNG originales, dos imágenes adicionales y quince
+[casos adversarios](fixtures/image-ocr/README.md). Completó 27/27 lecturas sin fallos técnicos.
+24/27 candidatos primarios y 23/27 lecturas secundarias coinciden en los ocho campos exactos
+con sus referencias. No se cambiaron los campos esperados para aumentar estos resultados.
+
+Once lecturas podrían pasar el gate al habilitar el canal; las otras dieciséis conservan revisión.
+La corrida original marca una falsa corroboración por un error del harness: exigía revisar el
+**OCR** de 025 porque el nombre visible es parecido al de un proveedor. Ambos lectores obtuvieron
+exactamente `Nimbo Cloud Derno`, como la referencia: la aclaración pertenece a identidad comercial.
+La [auditoría separada](evaluations/image-readers-reference-audit-20261017.json) conserva el reporte
+original y corrige ese indicador a cero sin modificar lecturas, campos gold ni la acción financiera
+esperada `ESCALATE`. Esta distinción no habilita coincidencias difusas ni altas automáticas.
+
+La mediana de lectura fue 3,708 s. Coste reportado de Qwen USD 0,002768484 y del primario
+USD 0,004786848 en esta corrida; incluyen efectos de caché del proveedor. No son una tarifa fija
+por imagen ni incluyen uso no reportado de corridas anteriores. La lectura en sombra no ejecutó
+el motor ni creó reservas.
+
+El [replay financiero de las diez imágenes originales](evaluations/invoices-image-replay-2026-10-17T17-34-47-782Z.json)
+reutilizó esas lecturas reales en el servicio original con D1/R2 locales aislados. Retiró únicamente
+la advertencia de modo sombra del servidor para probar la configuración habilitada: 10/10 acciones,
+motivos y necesidad humana correctos, 1 APPROVE simulado, 4 BLOCK y 5 ESCALATE, cero aprobaciones
+indebidas observadas, 10 replays y documentos privados verificados. 025 escaló por identidad como
+exige su referencia. No hubo llamadas nuevas a modelos; la mediana local de 0,3615 s no es latencia OCR.
+
+La [prueba JPEG en producción](evaluations/image-ocr-production-canary-20261017.json) completó
+subida, cola, ambos lectores, comparación, decisión y replay en 9,772 s. El gate de extracción pasó
+y el motor bloqueó al proveedor ficticio Orion por `UNKNOWN_VENDOR`/`MISSING_AGREEMENT`, sin crear
+proveedores ni acuerdos. D1 confirmó el trabajo `DONE`, una sola decisión, cero reservas y el
+canal `OCR` con Qwen en modo `ENABLED`. Se verificó el archivo privado. Es un caso, no una
+prueba de carga ni una garantía de precisión universal.
+
+Se conservan las corridas previas: [protocolo JSON inicial interrumpido](evaluations/image-readers-2026-10-17T17-24-54-655Z.json),
+13 intentos, cinco lecturas exitosas y ocho fallos de salida; [primera transcripción literal](evaluations/image-readers-2026-10-17T17-28-52-508Z.json),
+27/27 lecturas pero solo cinco corroboraciones suficientes antes de corregir el espacio entre
+etiqueta y descripción. No se repararon respuestas truncadas ni se descartaron advertencias.
+Estos datos ya se emplearon para ajustar el código: las corridas finales son regresión.
+
+Dos lectores pueden coincidir en un error y comparten OpenRouter. Permanecen pendientes
+una evaluación nueva realmente reservada, aritmética completa de líneas y límite de páginas PDF
+antes del OCR. Los tests automatizados no sustituyen estas mediciones.
+La [verificación de código y despliegue](evaluations/image-ocr-validation-20261017.json) registra
+los hashes de origen, las pruebas ejecutadas y la separación de sus alcances.
+
+## Parser independiente ampliado: `labelled-v5`
+
+Desplegado en `oli-api` y `oli30x.ultramare.dev`, versión
+`e4e66995-422d-4e2c-9e69-b5990b6f0dea`. Los hashes de código del reporte identifican
+el cambio local sobre `abeab03`; el identificador del Worker fija la versión remota medida.
+
+La [comparación controlada antes/después](evaluations/pdf-parser-v5-paired.json) usa 56
+[conversiones reales congeladas](fixtures/pdf-text-regression/README.md), los mismos candidatos
+históricos y los parsers v4/v5. La ejecución del comparador es offline: no repite OCR ni mide
+decisiones financieras. Ninguna referencia esperada se pasa a los lectores.
+
+| Medida sobre textos idénticos | v4 | v5 |
+| --- | --- | --- |
+| Seis PDF adicionales: ocho campos secundarios exactos | 0/6 | 6/6 |
+| Seis PDF adicionales: gate `CROSS_CHECKED` | 0/6 | 4/6 |
+| 50 PDF originales: ocho campos secundarios exactos | 49/50 | 49/50 |
+| Mediana CPU local del parser, 5600 muestras | 0,0142 ms | 0,0203 ms |
+
+La abstención de 038 continúa: importe sin moneda no se convierte a unidades menores.
+En 006 se conserva el importe nulo por totales contradictorios; 007 carece de los campos
+críticos de una factura. Ambos siguen en revisión de extracción. La mejora medida es cobertura,
+no aceleración: el parser añade una pequeña fracción de milisegundo. El microbenchmark no incluye
+conversión, modelo, red, motor ni D1, y las dos lecturas ya se ejecutaban en paralelo.
+
+La [nueva corrida remota de los ocho documentos adicionales](evaluations/invoices-holdout-2026-10-17T16-48-33-516Z.json)
+confirma 8/8 candidatos con ocho campos exactos, 4/8 `CROSS_CHECKED`, cuatro revisiones y cero
+vulneraciones de los casos que deben requerir revisión. 004/005 son imágenes sin OCR independiente;
+006 conserva la contradicción y 007 se clasifica como `DELIVERY_NOTE`. Los cuatro que se corroboran
+son 001/002/003/008: esto habilita evaluar todas las reglas, no aprobar. En particular 001/008 superan
+el límite duro original y 003 usa otra moneda. Aquí no se ejecutó el motor ni se sembraron sus acuerdos.
+Mediana de lectura 3,6185 s, máximo 5,887 s; ocho intentos, coste exitoso parcial reportado USD 0,0174616.
+
+La [nueva corrida completa de 50 PDF](evaluations/invoices-pdf-2026-10-17T16-48-33-680Z.json)
+usó lectores remotos `labelled-v5` y procesamiento original con D1/R2 locales aislados por escenario:
+50/50 lecturas válidas, 50/50 decisiones/motivos/necesidad humana correctos, 17 APPROVE, 14 BLOCK y
+19 ESCALATE. Cero aprobaciones indebidas observadas entre las 17 aprobadas; 50/50 replays y archivos
+privados verificados, 50 decisiones explicadas, sin fallos técnicos ni errores del harness.
+Los candidatos mantienen 49/50 documentos con ocho campos exactos por la abstención de 038.
+Autonomía correcta 31/50 (62%), igual al corpus original: la ganancia de cobertura aparece en los
+formatos adicionales, no en cambiar resultados financieros que ya eran correctos.
+
+Mediana de lectura 4,6435 s y de procesamiento aislado completo 5,1525 s, máximo 13,968 s.
+Hubo otras verificaciones locales concurrentes durante parte de la corrida: estos tiempos no son
+un benchmark controlado contra las corridas anteriores y no prueban aceleración. Se registraron
+50 llamadas exitosas a DeepSeek y coste exitoso parcial USD 0,106098724. Esta prueba no equivale
+a 50 recorridos por navegador/Queues remotos ni acredita disponibilidad o precisión universal.
+
+Estos documentos ya se usaron para ajustar el parser: son regresión, no un conjunto reservado nuevo
+ni una garantía sobre cualquier diseño. Siguen pendientes OCR independiente de imágenes,
+verificación del desglose aritmético y límite previo de páginas PDF.
+
+Validación automatizada: API 100/100 en serie, dominio 78/78, contratos 28/28 y Worker empaquetado
+1/1. Una ejecución paralela de API falló en un caso con `PROCESSING_FAILED` y decisión nula;
+ese caso pasó aislado y en la suite en serie. La causa no se determinó y no se oculta como éxito
+de aquella corrida. Los [detalles de verificación](evaluations/pdf-parser-v5-validation.json)
+separan esa incidencia de las métricas de lectura y decisión anteriores.
+
 ## Regresión con clasificación de documento
 
 [Corrida de 50 PDF con clasificación](evaluations/invoices-pdf-2026-10-17T16-24-08-411Z.json).
@@ -110,8 +219,8 @@ están en [la auditoría de referencia](evaluations/invoices-holdout-reference-a
 Se conserva el 6/8 original y se separa el 7/8 frente a la referencia corregida. En004 el modelo
 confundió el nombre y se abstuvo sobre fechas legibles: es un error real, no una etiqueta ajustada.
 
-Los diseños nuevos no fueron corroborados suficientemente por el parser de etiquetas y quedaron
-en revisión. Falta ampliar/verificar esa cobertura, añadir OCR independiente para imágenes,
+En esa corrida los diseños nuevos no fueron corroborados suficientemente y quedaron
+en revisión. La ampliación parcial se mide arriba; todavía falta añadir OCR independiente para imágenes,
 validar aritmética de subtotal/impuestos/descuentos y limitar páginas PDF antes del OCR. También
 faltan pruebas de carga y alertas automáticas externas; hay logs estructurados, recuperación y
 consultas operativas documentadas. El resultado 50/50 de decisiones en el corpus original no acredita

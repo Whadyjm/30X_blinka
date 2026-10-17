@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-10-17T16:53:41.842Z",
+  "scope": "AUTOMATED_CHECKS_AND_RELEASE_IDENTITY_NOT_OCR_METRICS",
+  "workerVersion": "e4e66995-422d-4e2c-9e69-b5990b6f0dea",
+  "workerDocumentSha256": "542feffb02e8c1bf01132f425f030049a1b46d9651f0e00d553b5c2085198aa9",
+  "checks": [
+    {
+      "command": "node --test --test-concurrency=1 tests/*.test.mjs",
+      "cwd": "apps/api",
+      "passed": 100,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:runtime",
+      "cwd": "apps/api",
+      "passed": 1,
+      "failed": 0,
+      "note": "Includes web build, deployment dry run and packaged Worker in workerd; provider mocked."
+    },
+    {
+      "command": "npm test",
+      "cwd": "packages/domain",
+      "passed": 78,
+      "failed": 0
+    },
+    {
+      "command": "npm test",
+      "cwd": "packages/contracts",
+      "passed": 28,
+      "failed": 0
+    }
+  ],
+  "earlierParallelApiRun": {
+    "passed": 99,
+    "failed": 1,
+    "test": "tipo no factura bloquea y tipo incierto escala aun con datos financieros completos, sin reservas",
+    "file": "apps/api/tests/integration.test.mjs:528",
+    "observation": "PROCESSING_FAILED left latestDecision null; assertion attempted .action. Occurred while other evaluation/check processes were running.",
+    "rootCause": "NOT_DETERMINED",
+    "isolatedReplay": {
+      "passed": 1,
+      "failed": 0
+    },
+    "serialFullReplay": {
+      "passed": 100,
+      "failed": 0
+    }
+  },
+  "pairedReport": "docs/evaluations/pdf-parser-v5-paired.json",
+  "remoteReaderReport": "docs/evaluations/invoices-holdout-2026-10-17T16-48-33-516Z.json",
+  "fullLocalProcessingReport": "docs/evaluations/invoices-pdf-2026-10-17T16-48-33-680Z.json",
+  "limits": [
+    "No fresh unseen layouts evaluated; the 56 captured PDF layouts are regression cases.",
+    "Independent image OCR, line-item arithmetic and pre-OCR PDF page limits remain pending.",
+    "No demonstrated whole-pipeline acceleration or load/availability guarantee.",
+    "Financial persistence in corpus evaluation is local isolated D1/R2; no 50-case remote Queue/browser test."
+  ],
+  "gitPublication": "Current task changes remain local and uncommitted; deployment is identified by Worker version and source hashes."
+}

@@ -15,40 +15,48 @@ const root = new URL('../../../', import.meta.url);
 const corpusBytes = readFileSync(new URL('fixtures/scenarios/invoices.json', root));
 const corpus = JSON.parse(corpusBytes);
 const seed = JSON.parse(readFileSync(new URL('fixtures/seed/company.json', root)));
-const token = readFileSync(new URL('.env.extraction-probe', root), 'utf8').trim();
-assert.ok(token.length >= 32);
+const imageReplayPath = process.argv[3]?.match(/^--image-replay=(docs\/evaluations\/image-readers-[\w.-]+\.json)$/)?.[1];
+const imageReplay = imageReplayPath ? JSON.parse(readFileSync(new URL(imageReplayPath, root))) : null;
+if (imageReplay) assert.equal(imageReplay.scope, 'REAL_REMOTE_IMAGE_READERS_AND_LOCAL_COMPARISON_ONLY');
+const token = imageReplay ? 'offline-replay-only-no-network' : readFileSync(new URL('.env.extraction-probe', root), 'utf8').trim();
+assert.ok(imageReplay || token.length >= 32);
 assert.equal(corpus.cases.length, 50);
 const selection = process.argv[3]?.match(/^--cases=(case_\d{3}(?:,case_\d{3})*)$/)?.[1].split(',');
-assert.ok(!process.argv[3] || selection, 'Optional selection: --cases=case_010,case_014');
+assert.ok(!process.argv[3] || selection || imageReplay, 'Optional: --cases=case_010,case_014 or --image-replay=docs/evaluations/image-readers-....json');
 assert.equal(process.argv.length <= 4, true);
 assert.ok(!selection || selection.every(id => corpus.cases.some(c => c.id === id)));
-const scenarios = corpus.cases.filter(c => !selection || selection.includes(c.id));
+const scenarios = imageReplay ? corpus.cases.filter(c => c.variants.some(v => v.mimeType === 'image/png'))
+  .map(c => ({ ...c, file: c.variants.find(v => v.mimeType === 'image/png') }))
+  : corpus.cases.filter(c => !selection || selection.includes(c.id));
 assert.equal(periodKey(seed.organization.timezone), corpus.evaluationTime.slice(0, 7), 'Corpus contexts must match current processing month; do not silently change labels');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 for (const scenario of scenarios) {
-  assert.match(scenario.file.path, /^invoices\/\d{3}\.pdf$/);
+  assert.match(scenario.file.path, /^invoices\/\d{3}\.(pdf|png)$/);
   assert.equal(hash(readFileSync(new URL('fixtures/' + scenario.file.path, root))), scenario.file.sha256);
 }
 const runId = new Date().toISOString().replace(/[:.]/g, '-');
 const statePath = resolve(new URL('../.wrangler/corpus/' + runId, import.meta.url).pathname);
 mkdirSync(statePath, { recursive: true });
-const output = new URL(`docs/evaluations/invoices-pdf-${runId}.json`, root);
+const output = new URL(`docs/evaluations/invoices-${imageReplay ? 'image-replay' : 'pdf'}-${runId}.json`, root);
 const base = 'https://oli-api.tiamat-agency.workers.dev';
 const origin = 'https://oli-evaluation.invalid';
 const report = { runId, startedAt: new Date().toISOString(), finishedAt: null,
-  scope: 'REAL_PDF_READERS_LOCAL_API_PROCESSING_D1_R2', safetyGate: 'Any approved invoice must match all eight reference fields and expected action', datasetVersion: corpus.datasetVersion,
-  selection: selection ?? 'ALL_50',
-  manifestSha256: hash(corpusBytes), target: base, remoteWorkerVersion: process.env.EVALUATION_WORKER_VERSION ?? null,
+  scope: imageReplay ? 'FROZEN_REAL_IMAGE_READS_LOCAL_API_PROCESSING_D1_R2' : 'REAL_PDF_READERS_LOCAL_API_PROCESSING_D1_R2', safetyGate: 'Any approved invoice must match all eight reference fields and expected action', datasetVersion: corpus.datasetVersion,
+  selection: imageReplay ? 'TEN_PNG_VARIANTS' : selection ?? 'ALL_50',
+  manifestSha256: hash(corpusBytes), target: imageReplay ? 'LOCAL_ISOLATED_D1_R2' : base, remoteWorkerVersion: imageReplay?.workerVersion ?? process.env.EVALUATION_WORKER_VERSION ?? null,
   code: Object.fromEntries(['apps/api/worker/document.js', 'apps/api/worker/processing.js', 'packages/extraction/src/openrouter.ts', 'packages/domain/src/index.ts']
     .map(path => [path, hash(readFileSync(new URL(path, root)))])),
-  limits: { documents: scenarios.length, concurrency: selection ? 1 : 2, maximumModelCalls: scenarios.length * 3, retriesPerDocument: 0 },
+  limits: { documents: scenarios.length, concurrency: selection || imageReplay ? 1 : 2, maximumModelCalls: imageReplay ? 0 : scenarios.length * 3, retriesPerDocument: 0 },
   context: { perCaseIsolatedD1: true, productionDatabaseWrites: false, persistedLocalState: statePath,
     priorInvoices: 'Labelled synthetic historical context, not newly measured OCR',
     openingReservedBudget: 'Established with explicit synthetic fixture decisions and the original D1 reservation triggers; no counter edits',
     clock: 'Current API clock; corpus evaluationTime belongs to the same budget month',
-    processingEntry: 'Original processInvoice service with a server-only adapter to the authenticated remote readDocument probe; upload/detail/document APIs unchanged',
+    processingEntry: imageReplay ? 'Original processInvoice with frozen real image reads; no fresh provider calls. Upload/detail/private document APIs and atomic reservation triggers are exercised locally.'
+      : 'Original processInvoice service with a server-only adapter to the authenticated remote readDocument probe; upload/detail/document APIs unchanged',
     browser: 'Not run for all 50; API details and private document bytes verified',
-    cost: 'Reported successful responses only; excludes failed/interrupted calls and possibly separately billed PDF conversion' },
+    cost: imageReplay ? 'No new provider calls; sourceReaderReportedCostUsd refers only to the original source report, not another charge.' : 'Reported successful responses only; excludes failed/interrupted calls and possibly separately billed PDF conversion',
+    imageReplay: imageReplay ? { source: imageReplayPath, sha256: hash(readFileSync(new URL(imageReplayPath, root))),
+      remoteWorkerVersion: imageReplay.workerVersion, mode: 'Only the server-owned shadow warning is removed in isolated local processing; other warnings remain.' } : null },
   results: [], summary: null };
 const save = () => { const serialized = JSON.stringify(report, null, 2) + '\n'; assert.equal(serialized.includes(token), false); writeFileSync(output, serialized); };
 save();
@@ -140,7 +148,7 @@ async function evaluateCase(scenario) {
     const login = await api('/session', { method: 'POST', data: { email: 'corpus-owner@oli-demo.invalid', password: env.DEMO_PASSWORD } });
     cookie = login.response.headers.get('Set-Cookie').split(';')[0]; csrf = login.payload.data.csrfToken;
     const bytes = readFileSync(new URL('fixtures/' + scenario.file.path, root));
-    const form = new FormData(); form.append('file', new Blob([bytes], { type: 'application/pdf' }), scenario.file.path.split('/').at(-1));
+    const form = new FormData(); form.append('file', new Blob([bytes], { type: scenario.file.mimeType }), scenario.file.path.split('/').at(-1));
     const uploaded = (await api('/invoices', { method: 'POST', body: form, headers: { 'Idempotency-Key': randomUUID() } })).payload.data;
     row.invoiceId = uploaded.id;
     row.openingLedger = { reservedMinor: await q('SELECT coalesce(sum(reserved_minor),0) AS n FROM budget_periods').first('n'),
@@ -148,6 +156,15 @@ async function evaluateCase(scenario) {
     let measuredRead = null;
     const remoteRead = async (_env, file, actualBytes, expectedHash) => {
       assert.equal(hash(actualBytes), scenario.file.sha256);
+      if (imageReplay) {
+        const source = imageReplay.results.find(r => r.caseId === scenario.id);
+        assert.ok(source && !source.error && source.enabledRead, 'Missing successful frozen reader result');
+        assert.equal(source.file.sha256, expectedHash);
+        measuredRead = structuredClone(source.enabledRead);
+        assert.equal(measuredRead.documentSha256, expectedHash);
+        row.readDurationMs = 0;
+        return measuredRead;
+      }
       const readStart = Date.now();
       const response = await fetch(base + '/api/internal/document-probe', { method: 'POST', signal: AbortSignal.timeout(65000),
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': file.mimeType }, body: actualBytes });
@@ -205,8 +222,10 @@ try {
   // Validate every isolated context before spending any model calls.
   for (const scenario of scenarios) prepared.set(scenario.id, await prepare(await runtime.getD1Database(scenario.id), scenario));
   console.log(JSON.stringify({ preparedContexts: prepared.size, paidCallsStarted: 0 }));
-  assert.equal((await fetch(base + '/api/health')).status, 200);
-  assert.equal((await fetch(base + '/api/internal/document-probe', { method: 'POST' })).status, 401);
+  if (!imageReplay) {
+    assert.equal((await fetch(base + '/api/health')).status, 200);
+    assert.equal((await fetch(base + '/api/internal/document-probe', { method: 'POST' })).status, 401);
+  }
   let next = 0;
   await Promise.all(Array.from({ length: report.limits.concurrency }, async () => {
     while (next < scenarios.length) await evaluateCase(scenarios[next++]);
@@ -231,7 +250,8 @@ try {
     decisionAccuracy: rows.filter(r => r.correct).length / rows.length,
     correctAutonomy: rows.filter(r => r.correct && r.detail.latestDecision.action !== 'ESCALATE').length / rows.length,
     medianDurationMs: times.length % 2 ? times[Math.floor(times.length / 2)] : (times[times.length / 2 - 1] + times[times.length / 2])/2, maxDurationMs: times.at(-1),
-    successfulResponsesReportedCostUsd: returned.reduce((sum,r) => sum + (r.read.provenance.usage?.costUsd ?? 0),0),
+    successfulResponsesReportedCostUsd: imageReplay ? 0 : returned.reduce((sum,r) => sum + (r.read.provenance.usage?.costUsd ?? 0),0),
+    sourceReaderReportedCostUsd: imageReplay ? returned.reduce((sum,r) => sum + (r.read.provenance.usage?.costUsd ?? 0) + (r.read.provenance.imageOcr?.usage?.costUsd ?? 0),0) : null,
     successfulModels: Object.fromEntries([...new Set(returned.map(r => r.read.provenance.model))].map(m => [m, returned.filter(r => r.read.provenance.model === m).length])) };
   save(); console.log(JSON.stringify({ output: output.pathname, summary: report.summary }, null, 2));
   if(report.summary.harnessErrors || report.summary.unsafeApprovals || report.summary.fullyCorrect !== scenarios.length || returned.some(r => r.read.documentType !== 'INVOICE'))process.exitCode=1;

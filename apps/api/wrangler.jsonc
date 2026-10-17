@@ -38,6 +38,7 @@
     "binding": "AI"
   },
   "vars": {
+    "IMAGE_OCR_MODE": "ENABLED",
     "EMAIL_BASE_ADDRESS": "oli@ultramare.dev",
     "PUBLIC_APP_URL": "https://oli30x.ultramare.dev",
     "DEMO_ORG_ID": "org_demo",

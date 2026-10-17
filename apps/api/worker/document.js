@@ -1,4 +1,4 @@
-import { EXTRACTION_CONFIG_VERSION, ExtractionError, extractInvoiceWithOpenRouter } from '@oli/extraction';
+import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_CONFIG_VERSION, IMAGE_OCR_MODEL, ExtractionError, extractInvoiceWithOpenRouter, transcribeImageWithOpenRouter } from '@oli/extraction';
 import { CurrencySchema, DateSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
 import { normalizeInvoiceNumber } from '@oli/domain';
 import { HttpError, id } from './http.js';
@@ -12,9 +12,11 @@ export function validateDocument(bytes, mimeType) {
   }
 }
 
-export const READER_VERSION = `labelled-v4:${EXTRACTION_CONFIG_VERSION}`;
+const PDF_PARSER_VERSION = 'labelled-v6';
+export const READER_VERSION = `${PDF_PARSER_VERSION}:${EXTRACTION_CONFIG_VERSION}:${IMAGE_OCR_CONFIG_VERSION}`;
 const MAX_TEXT_BYTES = 128 * 1024;
 const referenceIssue = 'INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN';
+const ocrIssue = 'INDEPENDENT_OCR_UNCERTAIN';
 const fieldNames = ['vendorName', 'invoiceNumber', 'amountMinor', 'currency', 'issuedAt', 'dueDate', 'servicePeriod', 'description'];
 const noFields = () => Object.fromEntries(fieldNames.map(field => [field, null]));
 const normalizedText = value => value?.normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase() || null;
@@ -55,50 +57,89 @@ export function parseMoneyMinor(value, currency) {
 const labels = [
   ['vendorName', 'EMISOR\\s*\\/\\s*SUPPLIER|Proveedor(?=\\s*[:|]|\\s*$)|Supplier(?=\\s*[:|]|\\s*$)'],
   ['client', 'Cliente\\s*:|Customer\\s*:'],
-  ['invoiceNumber', 'N[úu]mero\\s*\\/\\s*Number|Invoice number(?=\\s*[:|]|\\s*$)'],
-  ['issuedAt', 'Emisi[oó]n\\s*\\/\\s*Issued|Issue date(?=\\s*[:|]|\\s*$)|Issued date(?=\\s*[:|]|\\s*$)'],
+  ['invoiceNumber', 'N[úu]mero\\s*\\/\\s*Number|(?:Invoice number|N[úu]mero)(?=\\s*[:|]|\\s*$)'],
+  ['issuedAt', 'Emisi[oó]n\\s*\\/\\s*Issued|(?:Issue date|Issued date|Emisi[oó]n)(?=\\s*[:|]|\\s*$)'],
   ['dueDate', 'Vencimiento\\s*\\/\\s*Due|Due date(?=\\s*[:|]|\\s*$)|Vencimiento(?=\\s*[:|]|\\s*$)'],
   ['servicePeriod', 'Periodo de servicio|Service period(?=\\s*[:|]|\\s*$)'],
-  ['agreementReference', 'Acuerdo\\s*\\/\\s*Agreement|Agreement reference(?=\\s*[:|]|\\s*$)'],
+  ['agreementReference', 'Acuerdo\\s*\\/\\s*Agreement|(?:Agreement reference|Acuerdo)(?=\\s*[:|]|\\s*$)'],
   ['currency', 'Moneda\\s*\\/\\s*Currency|Currency(?=\\s*[:|]|\\s*$)|Moneda(?=\\s*[:|]|\\s*$)'],
-  ['description', 'CONCEPTO\\s*\\/\\s*DESCRIPTION|Description(?=\\s*[:|]|\\s*$)'],
+  ['description', 'CONCEPTO\\s*\\/\\s*DESCRIPTION|(?:Description|Concepto)(?=\\s*[:|]|\\s*$)'],
+  ['subtotal', 'Sub[\\s-]*total(?: a cobrar)?(?=\\s*[:|]|\\s*$)'],
   ['amountMinor', 'TOTAL A COBRAR|Invoice total(?=\\s*[:|]|\\s*$)|Total(?=\\s*[:|]|\\s*$)'],
   ['footer', 'Importe final\\s*;'],
 ];
 // Split the corpus's compound labels even when vector text items touch. Generic aliases stay line-anchored.
-const boundary = /EMISOR\s*\/\s*SUPPLIER|Cliente\s*:|N[úu]mero\s*\/\s*Number|Emisi[oó]n\s*\/\s*Issued|Vencimiento\s*\/\s*Due|Periodo de servicio|Acuerdo\s*\/\s*Agreement|Moneda\s*\/\s*Currency|CONCEPTO\s*\/\s*DESCRIPTION|TOTAL A COBRAR|Importe final\s*;/gi;
+const boundary = /EMISOR\s*\/\s*SUPPLIER|Cliente\s*:|N[úu]mero\s*\/\s*Number|Emisi[oó]n\s*\/\s*Issued|Vencimiento\s*\/\s*Due|Periodo de servicio|Acuerdo\s*\/\s*Agreement|Moneda\s*\/\s*Currency|CONCEPTO\s*\/\s*DESCRIPTION|Sub[\s-]*total(?: a cobrar)?\s*:|(?<!sub)TOTAL A COBRAR|Importe final\s*;/gi;
 const labelPatterns = labels.map(([field, pattern]) => [field, new RegExp(`^(?:${pattern})\\s*[:|]?\\s*(.*)$`, 'i')]);
 const clean = value => value.replace(/^[#*|\s]+|[*|\s]+$/g, '').trim();
 const provided = value => value && !/^(?:NO INDICAD[OA]|N\/A|NOT PROVIDED|NONE|NULL)$/i.test(value) ? value : null;
+const matchLabel = line => labelPatterns.map(([field, pattern]) => [field, line.match(pattern)]).find(([, match]) => match);
+// Conversion can join separate PDF text items. Single-language labels require an explicit colon.
+const colonBoundary = /(?:Proveedor|Supplier|Cliente|Customer|Invoice number|N[úu]mero|Issue date|Issued date|Emisi[oó]n|Due date|Vencimiento|Service period|Agreement reference|Acuerdo|Currency|Moneda|Description|Concepto|Sub[\s-]*total(?: a cobrar)?|(?<![\p{L}-])(?:Invoice total|Total))\s*:/giu;
+const sectionBoundary = /Datos de prueba\b|P[áa]gina\s+\d+\s+de\s+\d+\b|Detalle de (?:servicio|factura)\b|Unidades\s+Precio\s+Importe\b|Horas\s*:|Fecha de entrega\s*:|Recibido\s*:/gi;
 
-// shortcut: explicit labelled PDF layouts only; scans and unfamiliar layouts require review.
+function pdfLines(text) {
+  return text.replace(/\*\*([^*\n]+)\*\*/g, '$1').split(/\r?\n/).flatMap(line => {
+    if (/^\s*\|.*\|\s*$/.test(line)) {
+      const cells = line.trim().slice(1, -1).split('|').map(clean);
+      // Only explicit key/value rows; item tables and header rows carry no field authority.
+      if (cells.length % 2 || cells.some((cell, i) => i % 2 === 0
+        ? !matchLabel(cell) || matchLabel(cell)[1][1] !== '' : !cell || !!matchLabel(cell))) return ['', `UNPARSED_TABLE: ${line}`, ''];
+      return cells.filter((_, i) => i % 2 === 0).map((cell, i) => `${cell.replace(/:$/, '')}: ${cells[i * 2 + 1]}`);
+    }
+    return line;
+  }).flatMap(line => line.replace(boundary, match => `\n${match}`)
+    .replace(colonBoundary, match => `\n${match}`)
+    .replace(sectionBoundary, match => `\n${match}`).split('\n')).map(clean);
+}
+
+// shortcut: explicit labelled text/key-value tables only; scans and unfamiliar layouts require review.
 // Each field comes exclusively from independent document text, never candidate values or fixture metadata.
 export function parsePdfText(text) {
   const fields = noFields();
   if (typeof text !== 'string' || text.length > MAX_TEXT_BYTES || new TextEncoder().encode(text).length > MAX_TEXT_BYTES) {
     return { fields, agreementReference: null, issues: [] };
   }
-  const lines = text.replace(boundary, match => `\n${match}`).split(/\r?\n/).map(clean).filter(Boolean);
+  const lines = pdfLines(text);
   const values = Object.fromEntries(labels.map(([field]) => [field, []]));
-  let active = null;
+  let active = null, page = 0;
   for (const line of lines) {
-    const labelled = labelPatterns.map(([field, pattern]) => [field, line.match(pattern)]).find(([, match]) => match);
+    if (!line && active && !values[active].at(-1).value.trim()) continue;
+    if (/^Page\s+\d+$/i.test(line)) { page++; active = null; continue; }
+    if (!line || /^(?:Datos de prueba\b|P[áa]gina\s+\d+\s+de\s+\d+\b|Detalle de (?:servicio|factura)\b|Unidades\s+Precio\s+Importe\b)/i.test(line)) {
+      active = null; continue;
+    }
+    const labelled = matchLabel(line);
     if (labelled) {
-      active = labelled[0]; values[active].push(labelled[1][1]);
+      active = labelled[0]; values[active].push({ value: labelled[1][1], page });
+    } else if (/^[\p{L}][^:]{0,60}:/u.test(line)) {
+      active = null;
     } else if (active) {
-      const chunks = values[active]; chunks[chunks.length - 1] += ` ${line}`;
+      const chunks = values[active]; chunks[chunks.length - 1].value += ` ${line}`;
     }
   }
-  const unique = field => values[field].length === 1 ? provided(clean(values[field][0])) : null;
+  const unique = field => {
+    const entries = values[field];
+    if (entries.length === 1) return provided(clean(entries[0].value));
+    // Repeated page headers/descriptions may agree; same-page duplicates and monetary claims stay uncertain.
+    if (!['vendorName', 'invoiceNumber', 'description'].includes(field) || !entries.length
+      || entries.some(entry => entry.page === 0) || new Set(entries.map(entry => entry.page)).size !== entries.length) return null;
+    const candidates = entries.map(entry => provided(clean(entry.value)));
+    return candidates.every(value => value === candidates[0]) ? candidates[0] : null;
+  };
   fields.vendorName = unique('vendorName');
   fields.invoiceNumber = unique('invoiceNumber');
   fields.description = unique('description');
   for (const [field, schema] of [['currency', CurrencySchema], ['issuedAt', DateSchema], ['dueDate', DateSchema], ['servicePeriod', PeriodKeySchema]]) {
     const value = unique(field); fields[field] = schema.safeParse(value).success ? value : null;
   }
+  const totalCurrencies = values.amountMinor.map(entry => provided(clean(entry.value))?.match(/^([A-Z]{3})\s+\d[\d.,]*$/)?.[1] ?? null);
+  if (!values.currency.length && totalCurrencies.length && totalCurrencies.every(value => value === totalCurrencies[0])
+    && CurrencySchema.safeParse(totalCurrencies[0]).success) fields.currency = totalCurrencies[0];
+  if (totalCurrencies.some(value => value && value !== fields.currency)) fields.currency = null;
   fields.amountMinor = parseMoneyMinor(unique('amountMinor'), fields.currency);
   // Any competing total claim stays ambiguous, including a second total in free-form notes.
-  if (lines.filter(line => /\btotal\b/i.test(line)).length !== 1) fields.amountMinor = null;
+  if (lines.reduce((count, line) => count + [...line.matchAll(/\btotal\b/gi)].length, 0) !== 1) fields.amountMinor = null;
   const reference = unique('agreementReference');
   const validReference = reference && /^[\p{L}\p{N}_.:-]{1,200}$/u.test(reference) ? reference : null;
   const uncertainReference = values.agreementReference.length > 1 || (!!reference && !validReference);
@@ -106,7 +147,7 @@ export function parsePdfText(text) {
 }
 function corroborationFor(secondary, documentSha256) {
   const { vendorName, amountMinor, currency, dueDate } = secondary.fields;
-  return { documentSha256, readId: secondary.readId, method: 'PDF_TEXT', fields: { vendorName, amountMinor, currency, dueDate } };
+  return { documentSha256, readId: secondary.readId, method: secondary.method ?? 'PDF_TEXT', fields: { vendorName, amountMinor, currency, dueDate } };
 }
 export function corroboratePdfText(text, documentSha256) {
   return corroborationFor({ ...parsePdfText(text), readId: id('pdftext') }, documentSha256);
@@ -121,7 +162,15 @@ function validArtifact(artifact, kind, documentSha256, mimeType) {
   } else {
     if (!IdSchema.safeParse(artifact.readId).success || !ExtractedInvoiceSchema.safeParse({ ...artifact.fields, extractionWarnings: [], evidence: [] }).success
       || !(artifact.agreementReference === null || (typeof artifact.agreementReference === 'string' && /^[\p{L}\p{N}_.:-]{1,200}$/u.test(artifact.agreementReference)))
-      || !Array.isArray(artifact.issues) || artifact.issues.some(issue => issue !== referenceIssue)) return null;
+      || !Array.isArray(artifact.issues) || artifact.issues.some(issue => ![referenceIssue, ocrIssue].includes(issue))) return null;
+    if (mimeType === 'application/pdf') {
+      if (artifact.method !== 'PDF_TEXT') return null;
+    } else if (artifact.method !== 'OCR' || artifact.ocr?.model !== IMAGE_OCR_MODEL
+      || artifact.ocr.configVersion !== IMAGE_OCR_CONFIG_VERSION || artifact.ocr.documentSha256 !== documentSha256
+      || artifact.ocr.readId !== artifact.readId || typeof artifact.ocr.text !== 'string'
+      || !artifact.ocr.text.trim() || !Array.isArray(artifact.ocr.issues)
+      || artifact.ocr.issues.some(issue => !['ILLEGIBLE_TEXT', 'AMBIGUOUS_LAYOUT', 'CROPPED_DOCUMENT'].includes(issue))
+      || new TextEncoder().encode(artifact.ocr.text).length > MAX_TEXT_BYTES) return null;
   }
   return artifact;
 }
@@ -144,10 +193,11 @@ async function readPdfText(env, bytes) {
 export async function readDocument(env, file, bytes, documentSha256, options = {}) {
   validateDocument(bytes, file.mimeType);
   const pdf = file.mimeType === 'application/pdf';
+  const imageOcr = !pdf && ['SHADOW', 'ENABLED'].includes(env.IMAGE_OCR_MODE);
   const started = performance.now();
   const cached = {
     PRIMARY: validArtifact(options.artifacts?.PRIMARY, 'PRIMARY', documentSha256, file.mimeType),
-    SECONDARY: pdf ? validArtifact(options.artifacts?.SECONDARY, 'SECONDARY', documentSha256, file.mimeType) : null,
+    SECONDARY: pdf || imageOcr ? validArtifact(options.artifacts?.SECONDARY, 'SECONDARY', documentSha256, file.mimeType) : null,
   };
   const primaryTask = async () => {
     if (cached.PRIMARY) return cached.PRIMARY;
@@ -161,12 +211,23 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
   };
   const secondaryTask = async () => {
     if (cached.SECONDARY) return cached.SECONDARY;
+    if (imageOcr) {
+      const began = performance.now();
+      const ocr = await transcribeImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
+        image: { mimeType: file.mimeType, bytes } });
+      const parsed = parsePdfText(ocr.text);
+      if (ocr.issues.length || /\[ILLEGIBLE\]/i.test(ocr.text)) parsed.issues.push(ocrIssue);
+      const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType,
+        readId: ocr.readId, method: 'OCR', ...parsed, ocr, durationMs: Math.round(performance.now() - began) };
+      await options.checkpoint?.('SECONDARY', artifact);
+      return artifact;
+    }
     if (!pdf || !env.AI) return null;
     const began = performance.now();
     let parsed;
     try { parsed = await readPdfText(env, bytes); }
     catch (error) { return { error: error?.message === 'PDF_TEXT_TIMEOUT' ? 'PDF_TEXT_TIMEOUT' : 'PDF_TEXT_UNAVAILABLE' }; }
-    const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, readId: id('pdftext'),
+    const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, readId: id('pdftext'), method: 'PDF_TEXT',
       ...parsed, durationMs: Math.round(performance.now() - began) };
     await options.checkpoint?.('SECONDARY', artifact);
     return artifact;
@@ -179,6 +240,8 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
   if (secondaryResult.value?.error) throw new ExtractionError('INDEPENDENT_READ_UNAVAILABLE', primary.attempts ?? [],
     { stage: 'SECONDARY', issueCodes: [secondaryResult.value.error] });
   const secondary = secondaryResult.value?.fields ? secondaryResult.value : null;
+  if (secondary?.ocr && primary.model === secondary.ocr.model) throw new ExtractionError('INVALID_OUTPUT', secondary.ocr.attempts,
+    { stage: 'IMAGE_OCR', issueCodes: ['SAME_READER_MODEL'] });
   const extraction = ExtractedInvoiceSchema.parse(primary.extraction);
   const discrepancies = secondary ? fieldNames.filter(field => {
     const primaryValue = extraction[field], separateValue = secondary.fields[field];
@@ -187,12 +250,14 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     return primaryValue !== separateValue;
   }) : [];
   extraction.extractionWarnings.push(...(secondary?.issues ?? []), ...discrepancies.map(field => `INDEPENDENT_READ_MISMATCH:${field}`));
+  if (imageOcr && env.IMAGE_OCR_MODE !== 'ENABLED') extraction.extractionWarnings.push('INDEPENDENT_IMAGE_OCR_SHADOW');
   return { extraction, documentType: DocumentTypeSchema.parse(primary.documentType), primaryReadId: primary.readId, documentSha256, corroboration: secondary ? corroborationFor(secondary, documentSha256) : null,
     agreementReference: secondary?.agreementReference ?? null,
-    provenance: { model: primary.model, provider: primary.provider, pdfTextParser: pdf ? 'labelled-v4' : null,
+    provenance: { model: primary.model, provider: primary.provider, pdfTextParser: pdf ? PDF_PARSER_VERSION : null,
       documentClassification: { documentType: primary.documentType, source: 'PRIMARY_READER',
         documentSha256, primaryReadId: primary.readId, version: READER_VERSION },
       configVersion: READER_VERSION, attempts: primary.attempts, usage: primary.usage, advisories: primary.advisories ?? [],
+      imageOcr: secondary?.ocr ?? null, imageOcrMode: imageOcr ? env.IMAGE_OCR_MODE : 'OFF',
       corroborationError: secondary ? null : secondaryResult.value?.error ?? (pdf ? 'PDF_TEXT_UNAVAILABLE' : 'INDEPENDENT_IMAGE_OCR_UNAVAILABLE'),
       independentDisagreements: discrepancies, independentIssues: secondary?.issues ?? [], cache: { PRIMARY: !!cached.PRIMARY, SECONDARY: !!cached.SECONDARY },
       timings: { totalMs: Math.round(performance.now() - started), primaryMs: primaryResult.value.durationMs, secondaryMs: secondary?.durationMs ?? null } } };

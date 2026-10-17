@@ -1,0 +1,48 @@
+{
+  "checkedAt": "2026-10-17T17:39:15.808Z",
+  "scope": "AUTOMATED_CHECKS_AND_RELEASE_IDENTITY_NOT_OCR_ACCURACY",
+  "workerVersion": "3c7adbb7-c619-4d49-8b62-0867a2bef940",
+  "imageOcrMode": "ENABLED",
+  "sourceSha256": {
+    "apps/api/worker/document.js": "9c1f58fffd0367a419ebb9369e18609eeab4a472e678e8d8481c3eb7b421a73d",
+    "packages/extraction/src/openrouter.ts": "3df9f9aa6d5cbe519c4e57c82fc0cf9df8d648fd18b3b77bb696d861a194a2c8",
+    "apps/api/wrangler.jsonc": "b6cecab8b5da2d4a41513c5540673d1d1be1f4b8cfa724741eb6e261cc4eeb25"
+  },
+  "checks": [
+    {
+      "command": "npm test",
+      "cwd": "packages/extraction",
+      "passed": 26,
+      "failed": 0
+    },
+    {
+      "command": "npm run typecheck",
+      "cwd": "packages/extraction",
+      "result": "PASS"
+    },
+    {
+      "command": "node --test --test-concurrency=1 tests/*.test.mjs",
+      "cwd": "apps/api",
+      "passed": 111,
+      "failed": 0,
+      "note": "Full suite passed with literal transcript v2; final blank-label-space and cache guards additionally verified by focused readers/runtime."
+    },
+    {
+      "command": "node --test tests/document-reliability.test.mjs",
+      "cwd": "apps/api",
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:runtime",
+      "cwd": "apps/api",
+      "passed": 1,
+      "failed": 0
+    }
+  ],
+  "readerReport": "docs/evaluations/image-readers-2026-10-17T17-32-13-725Z.json",
+  "referenceAudit": "docs/evaluations/image-readers-reference-audit-20261017.json",
+  "localFinancialReplay": "docs/evaluations/invoices-image-replay-2026-10-17T17-34-47-782Z.json",
+  "productionCanary": "docs/evaluations/image-ocr-production-canary-20261017.json",
+  "publication": "Deployed by Worker version; current task source/docs/evaluations remain uncommitted. Preserve concurrent committed email changes."
+}

@@ -1,0 +1,2012 @@
+{
+  "runId": "2026-10-17T16-48-33-516Z",
+  "startedAt": "2026-10-17T16:48:33.517Z",
+  "finishedAt": "2026-10-17T16:49:03.504Z",
+  "scope": "PRODUCTION_DOCUMENT_READERS_AND_LOCAL_EXTRACTION_COMPARISON_ONLY",
+  "datasetVersion": "oli-invoice-holdout-v1.1",
+  "manifestSha256": "d5eacbb81c20b8dd4649096325c518160b487af7331203034da8f24fb8f9f5f7",
+  "target": "https://oli-api.tiamat-agency.workers.dev",
+  "remoteWorkerVersion": "e4e66995-422d-4e2c-9e69-b5990b6f0dea",
+  "localGitCommit": "abeab035bc0bbe3c7fdebdf67ef5d264337b056a",
+  "localCodeSha256": {
+    "apps/api/scripts/evaluate-holdout.mjs": "fd0e328dbda4b2965d0012035f6a7befd1c28d2b7cdae807ebd105d25d991994",
+    "apps/api/worker/document.js": "542feffb02e8c1bf01132f425f030049a1b46d9651f0e00d553b5c2085198aa9",
+    "apps/api/worker/extraction-probe.js": "eb4a5e28d9bba43a2a90f77c4427ce96a9a377fef2cab46ef764d1fe3f59666d",
+    "packages/extraction/src/openrouter.ts": "9c1f512249125275d28881bcd1ff7433b73a6c6a98060bc1e97c65d99b2b6daf",
+    "packages/contracts/src/index.ts": "f731f3302b389d1be595cf65bc9c64c0428450a361613461ad36d1bf812e46cc"
+  },
+  "limits": {
+    "documents": 8,
+    "concurrency": 1,
+    "maximumModelCalls": 24,
+    "modelCallsPerDocument": 3,
+    "harnessRetries": 0,
+    "requestTimeoutMs": 65000
+  },
+  "context": {
+    "productionDatabaseWrites": false,
+    "financialEngineEvaluated": false,
+    "financialContextSeeded": false,
+    "labelsSentToExtractor": false,
+    "automaticApprovalMetrics": "NOT_EVALUATED",
+    "crossCheckedMeaning": "Agreement of server-owned independent reads, not correctness, policy authorization or approval.",
+    "cost": "Only usage costs explicitly reported by the reader/attempts; interrupted calls and conversion may be billed separately.",
+    "releaseIdentity": "Local source hashes describe this comparison harness. Remote source identity is only the supplied deployment version plus returned reader provenance.",
+    "holdout": "Separate from original 50. Once used to tune code or prompts, subsequent runs are regression measurements."
+  },
+  "results": [
+    {
+      "caseId": "holdout_001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1356,
+        "sha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+        "pages": 1
+      },
+      "variations": [
+        "TWO_COLUMN",
+        "THOUSANDS_SEPARATOR"
+      ],
+      "startedAt": "2026-10-17T16:48:33.529Z",
+      "durationMs": 5887,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Nimbo Cloud Demo",
+        "invoiceNumber": "NC-8427",
+        "amountMinor": 123450,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Capacidad adicional de computo"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "USD 1,234.50 exceeds the original demo policy hard limit of USD 1,000."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-8427",
+          "amountMinor": 123450,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Capacidad adicional de computo",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-8427"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Capacidad adicional de computo"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "TOTAL: USD 1,234.50"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "ee1d5ba3-9eca-4019-af74-ee8c8824401d",
+        "documentSha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+        "corroboration": {
+          "documentSha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+          "readId": "pdftext_29b12cc3-3f8d-439a-a860-75b2b2d4b421",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "amountMinor": 123450,
+            "currency": "USD",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": "agr_holdout_001",
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+            "primaryReadId": "ee1d5ba3-9eca-4019-af74-ee8c8824401d",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2129,
+                "outputTokens": 288,
+                "reasoningTokens": 0,
+                "costUsd": 0.00224345
+              },
+              "durationMs": 5462
+            }
+          ],
+          "usage": {
+            "inputTokens": 2129,
+            "outputTokens": 288,
+            "reasoningTokens": 0,
+            "costUsd": 0.00224345
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 5462,
+            "primaryMs": 5462,
+            "secondaryMs": 630
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2129,
+            "outputTokens": 288,
+            "reasoningTokens": 0,
+            "costUsd": 0.00224345
+          },
+          "durationMs": 5462
+        }
+      ],
+      "extractionCheck": {
+        "status": "CROSS_CHECKED",
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-8427",
+          "amountMinor": 123450,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Capacidad adicional de computo",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-8427"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Capacidad adicional de computo"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "TOTAL: USD 1,234.50"
+            }
+          ]
+        },
+        "issues": []
+      },
+      "independentStatus": "CROSS_CHECKED",
+      "canEvaluateAutomatically": true,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": false,
+      "readerGateOutcome": "PASS",
+      "warnings": []
+    },
+    {
+      "caseId": "holdout_002",
+      "file": {
+        "path": "documents/002.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1774,
+        "sha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+        "pages": 2
+      },
+      "variations": [
+        "MULTIPAGE",
+        "FINAL_AMOUNT_ON_PAGE_2"
+      ],
+      "startedAt": "2026-10-17T16:48:39.417Z",
+      "durationMs": 4541,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Brisa Support Demo",
+        "invoiceNumber": "BS-7923",
+        "amountMinor": 18000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Soporte de infraestructura"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": false,
+        "independentCorroborationRequired": true,
+        "reason": "Document readability does not grant policy authorization."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Brisa Support Demo",
+          "invoiceNumber": "BS-7923",
+          "amountMinor": 18000,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Soporte de infraestructura",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Brisa Support Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: BS-7923"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Soporte de infraestructura"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:2",
+              "quote": "TOTAL A COBRAR: USD 180.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "244b4d72-15c7-494d-b2be-0a3db49be922",
+        "documentSha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+        "corroboration": {
+          "documentSha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+          "readId": "pdftext_7ac7951d-3406-42f8-8afd-367a87d5cf7d",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "amountMinor": 18000,
+            "currency": "USD",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": "agr_holdout_002",
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+            "primaryReadId": "244b4d72-15c7-494d-b2be-0a3db49be922",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2171,
+                "outputTokens": 290,
+                "reasoningTokens": 0,
+                "costUsd": 0.00424759
+              },
+              "durationMs": 4467
+            }
+          ],
+          "usage": {
+            "inputTokens": 2171,
+            "outputTokens": 290,
+            "reasoningTokens": 0,
+            "costUsd": 0.00424759
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 4467,
+            "primaryMs": 4467,
+            "secondaryMs": 21
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2171,
+            "outputTokens": 290,
+            "reasoningTokens": 0,
+            "costUsd": 0.00424759
+          },
+          "durationMs": 4467
+        }
+      ],
+      "extractionCheck": {
+        "status": "CROSS_CHECKED",
+        "extraction": {
+          "vendorName": "Brisa Support Demo",
+          "invoiceNumber": "BS-7923",
+          "amountMinor": 18000,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Soporte de infraestructura",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Brisa Support Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: BS-7923"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Soporte de infraestructura"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:2",
+              "quote": "TOTAL A COBRAR: USD 180.00"
+            }
+          ]
+        },
+        "issues": []
+      },
+      "independentStatus": "CROSS_CHECKED",
+      "canEvaluateAutomatically": true,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": false,
+      "readerGateOutcome": "PASS",
+      "warnings": []
+    },
+    {
+      "caseId": "holdout_003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1210,
+        "sha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+        "pages": 1
+      },
+      "variations": [
+        "EUROPEAN_DECIMAL",
+        "THOUSANDS_SEPARATOR"
+      ],
+      "startedAt": "2026-10-17T16:48:43.959Z",
+      "durationMs": 3581,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Lumen Design Demo",
+        "invoiceNumber": "LD-6819",
+        "amountMinor": 123456,
+        "currency": "EUR",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Diseno de catalogo"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "The original demo policy and budget authorize USD, not EUR."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Lumen Design Demo",
+          "invoiceNumber": "LD-6819",
+          "amountMinor": 123456,
+          "currency": "EUR",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Diseno de catalogo",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Lumen Design Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: LD-6819"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Diseno de catalogo"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: EUR 1.234,56"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "5ecb4212-ba38-4b2c-a114-d2872c20f824",
+        "documentSha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+        "corroboration": {
+          "documentSha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+          "readId": "pdftext_375ab9b7-6cb7-4791-853f-6b114fbb4873",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "amountMinor": 123456,
+            "currency": "EUR",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": "agr_holdout_003",
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+            "primaryReadId": "5ecb4212-ba38-4b2c-a114-d2872c20f824",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2100,
+                "outputTokens": 286,
+                "reasoningTokens": 0,
+                "costUsd": 0.00224048
+              },
+              "durationMs": 3473
+            }
+          ],
+          "usage": {
+            "inputTokens": 2100,
+            "outputTokens": 286,
+            "reasoningTokens": 0,
+            "costUsd": 0.00224048
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3473,
+            "primaryMs": 3473,
+            "secondaryMs": 22
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2100,
+            "outputTokens": 286,
+            "reasoningTokens": 0,
+            "costUsd": 0.00224048
+          },
+          "durationMs": 3473
+        }
+      ],
+      "extractionCheck": {
+        "status": "CROSS_CHECKED",
+        "extraction": {
+          "vendorName": "Lumen Design Demo",
+          "invoiceNumber": "LD-6819",
+          "amountMinor": 123456,
+          "currency": "EUR",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Diseno de catalogo",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Lumen Design Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: LD-6819"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Diseno de catalogo"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: EUR 1.234,56"
+            }
+          ]
+        },
+        "issues": []
+      },
+      "independentStatus": "CROSS_CHECKED",
+      "canEvaluateAutomatically": true,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": false,
+      "readerGateOutcome": "PASS",
+      "warnings": []
+    },
+    {
+      "caseId": "holdout_004",
+      "file": {
+        "path": "documents/004.png",
+        "mimeType": "image/png",
+        "sizeBytes": 147237,
+        "sha256": "99a4aec918a0eb6e43d16b9d4bb75aab33da92ef6982273008223088803897dd",
+        "pages": 1
+      },
+      "variations": [
+        "RASTER",
+        "ROTATED_7_DEGREES"
+      ],
+      "startedAt": "2026-10-17T16:48:47.541Z",
+      "durationMs": 2261,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Faro Translation Demo",
+        "invoiceNumber": "FT-5742",
+        "amountMinor": 9500,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Traduccion de manual tecnico"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "No independently validated image OCR is configured; primary model output alone cannot authorize."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Faro Translation Demo",
+          "invoiceNumber": "FT-5742",
+          "amountMinor": 9500,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Traduccion de manual tecnico",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Faro Translation Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: FT-5742"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Traduccion de manual tecnico"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 95.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "4696947f-f2a7-4124-a57c-da014dce670e",
+        "documentSha256": "99a4aec918a0eb6e43d16b9d4bb75aab33da92ef6982273008223088803897dd",
+        "corroboration": null,
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "99a4aec918a0eb6e43d16b9d4bb75aab33da92ef6982273008223088803897dd",
+            "primaryReadId": "4696947f-f2a7-4124-a57c-da014dce670e",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2970,
+                "outputTokens": 288,
+                "reasoningTokens": 0,
+                "costUsd": 0.000190116
+              },
+              "durationMs": 2068
+            }
+          ],
+          "usage": {
+            "inputTokens": 2970,
+            "outputTokens": 288,
+            "reasoningTokens": 0,
+            "costUsd": 0.000190116
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": "INDEPENDENT_IMAGE_OCR_UNAVAILABLE",
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 2068,
+            "primaryMs": 2068,
+            "secondaryMs": null
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2970,
+            "outputTokens": 288,
+            "reasoningTokens": 0,
+            "costUsd": 0.000190116
+          },
+          "durationMs": 2068
+        }
+      ],
+      "extractionCheck": {
+        "status": "REVIEW_REQUIRED",
+        "extraction": {
+          "vendorName": "Faro Translation Demo",
+          "invoiceNumber": "FT-5742",
+          "amountMinor": 9500,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Traduccion de manual tecnico",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Faro Translation Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: FT-5742"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Traduccion de manual tecnico"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 95.00"
+            }
+          ]
+        },
+        "issues": [
+          {
+            "code": "CORROBORATION_REQUIRED",
+            "field": null
+          }
+        ]
+      },
+      "independentStatus": "UNAVAILABLE",
+      "canEvaluateAutomatically": false,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": true,
+      "readerGateOutcome": "PASS",
+      "warnings": []
+    },
+    {
+      "caseId": "holdout_005",
+      "file": {
+        "path": "documents/005.png",
+        "mimeType": "image/png",
+        "sizeBytes": 80018,
+        "sha256": "3f9fd9a8b5698fa348cb60055fe6403d935ae6efaafa15e7fe487da4e04a0d48",
+        "pages": 1
+      },
+      "variations": [
+        "RASTER",
+        "GAUSSIAN_BLUR_1_6",
+        "AMOUNT_OCCLUDED"
+      ],
+      "startedAt": "2026-10-17T16:48:49.803Z",
+      "durationMs": 2471,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Brisa Support Demo",
+        "invoiceNumber": "BS-4381",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Mantenimiento de servidores"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "The amount is completely covered; do not reconstruct it from context or the agreement."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Brisa Support Demo",
+          "invoiceNumber": "BS-4381",
+          "amountMinor": null,
+          "currency": null,
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Mantenimiento de servidores",
+          "extractionWarnings": [
+            "No total amount is present in the document.",
+            "No currency is stated in the document.",
+            "The amount area appears to be redacted or blank."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Brisa Support Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: BS-4381"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Mantenimiento de servidores"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "88311f96-ce4a-440b-87e1-8c18d36bf97b",
+        "documentSha256": "3f9fd9a8b5698fa348cb60055fe6403d935ae6efaafa15e7fe487da4e04a0d48",
+        "corroboration": null,
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": null,
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "3f9fd9a8b5698fa348cb60055fe6403d935ae6efaafa15e7fe487da4e04a0d48",
+            "primaryReadId": "88311f96-ce4a-440b-87e1-8c18d36bf97b",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2964,
+                "outputTokens": 291,
+                "reasoningTokens": 0,
+                "costUsd": 0.000190116
+              },
+              "durationMs": 2361
+            }
+          ],
+          "usage": {
+            "inputTokens": 2964,
+            "outputTokens": 291,
+            "reasoningTokens": 0,
+            "costUsd": 0.000190116
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": "INDEPENDENT_IMAGE_OCR_UNAVAILABLE",
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 2361,
+            "primaryMs": 2361,
+            "secondaryMs": null
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2964,
+            "outputTokens": 291,
+            "reasoningTokens": 0,
+            "costUsd": 0.000190116
+          },
+          "durationMs": 2361
+        }
+      ],
+      "extractionCheck": {
+        "status": "REVIEW_REQUIRED",
+        "extraction": {
+          "vendorName": "Brisa Support Demo",
+          "invoiceNumber": "BS-4381",
+          "amountMinor": null,
+          "currency": null,
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Mantenimiento de servidores",
+          "extractionWarnings": [
+            "No total amount is present in the document.",
+            "No currency is stated in the document.",
+            "The amount area appears to be redacted or blank."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Brisa Support Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: BS-4381"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Mantenimiento de servidores"
+            }
+          ]
+        },
+        "issues": [
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "amountMinor"
+          },
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "currency"
+          },
+          {
+            "code": "EXTRACTION_WARNING",
+            "field": null
+          },
+          {
+            "code": "CORROBORATION_REQUIRED",
+            "field": null
+          }
+        ]
+      },
+      "independentStatus": "UNAVAILABLE",
+      "canEvaluateAutomatically": false,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": true,
+      "readerGateOutcome": "PASS",
+      "warnings": [
+        "No total amount is present in the document.",
+        "No currency is stated in the document.",
+        "The amount area appears to be redacted or blank."
+      ]
+    },
+    {
+      "caseId": "holdout_006",
+      "file": {
+        "path": "documents/006.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1669,
+        "sha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+        "pages": 2
+      },
+      "variations": [
+        "MULTIPAGE",
+        "CONTRADICTORY_FINAL_AMOUNTS"
+      ],
+      "startedAt": "2026-10-17T16:48:52.276Z",
+      "durationMs": 4116,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Nimbo Cloud Demo",
+        "invoiceNumber": "NC-3628",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Almacenamiento de archivos"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "Two conflicting final amounts; amountMinor must remain null and no reservation is allowed."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-3628",
+          "amountMinor": null,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Almacenamiento de archivos",
+          "extractionWarnings": [
+            "Conflicting totals: page 1 states 'Total a cobrar: USD 200.00' while page 2 coupon states 'TOTAL A COBRAR: USD 280.00'; amountMinor set to null."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-3628"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Almacenamiento de archivos"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 200.00"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:2",
+              "quote": "TOTAL A COBRAR: USD 280.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "ec872154-bc9b-494a-8c2a-6717b24e3d69",
+        "documentSha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+        "corroboration": {
+          "documentSha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+          "readId": "pdftext_54988657-62c9-4f92-ba88-1315cd120aaa",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "amountMinor": null,
+            "currency": "USD",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": "agr_holdout_006",
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+            "primaryReadId": "ec872154-bc9b-494a-8c2a-6717b24e3d69",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2148,
+                "outputTokens": 423,
+                "reasoningTokens": 0,
+                "costUsd": 0.004140436
+              },
+              "durationMs": 4006
+            }
+          ],
+          "usage": {
+            "inputTokens": 2148,
+            "outputTokens": 423,
+            "reasoningTokens": 0,
+            "costUsd": 0.004140436
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 4006,
+            "primaryMs": 4006,
+            "secondaryMs": 17
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2148,
+            "outputTokens": 423,
+            "reasoningTokens": 0,
+            "costUsd": 0.004140436
+          },
+          "durationMs": 4006
+        }
+      ],
+      "extractionCheck": {
+        "status": "REVIEW_REQUIRED",
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-3628",
+          "amountMinor": null,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Almacenamiento de archivos",
+          "extractionWarnings": [
+            "Conflicting totals: page 1 states 'Total a cobrar: USD 200.00' while page 2 coupon states 'TOTAL A COBRAR: USD 280.00'; amountMinor set to null."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-3628"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Almacenamiento de archivos"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 200.00"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:2",
+              "quote": "TOTAL A COBRAR: USD 280.00"
+            }
+          ]
+        },
+        "issues": [
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "amountMinor"
+          },
+          {
+            "code": "EXTRACTION_WARNING",
+            "field": null
+          },
+          {
+            "code": "FIELD_MISMATCH",
+            "field": "amountMinor"
+          }
+        ]
+      },
+      "independentStatus": "REVIEW_REQUIRED",
+      "canEvaluateAutomatically": false,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": true,
+      "readerGateOutcome": "PASS",
+      "warnings": [
+        "Conflicting totals: page 1 states 'Total a cobrar: USD 200.00' while page 2 coupon states 'TOTAL A COBRAR: USD 280.00'; amountMinor set to null."
+      ]
+    },
+    {
+      "caseId": "holdout_007",
+      "file": {
+        "path": "documents/007.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1018,
+        "sha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+        "pages": 1
+      },
+      "variations": [
+        "NOT_AN_INVOICE",
+        "NO_AMOUNT_OR_INVOICE_REFERENCE"
+      ],
+      "startedAt": "2026-10-17T16:48:56.393Z",
+      "durationMs": 3452,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Faro Translation Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Entrega de manual traducido"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "Delivery note is not an invoice; do not invent an obligation or infer invoice dates."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Faro Translation Demo",
+          "invoiceNumber": null,
+          "amountMinor": null,
+          "currency": null,
+          "issuedAt": null,
+          "dueDate": null,
+          "servicePeriod": null,
+          "description": "Entrega de manual traducido",
+          "extractionWarnings": [
+            "Document is a delivery note, not an invoice; no invoice number, amount, currency, or payment due date present.",
+            "Delivery date 2026-10-08 is not an invoice issue date."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Faro Translation Demo"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Entrega de manual traducido"
+            },
+            {
+              "field": "documentType",
+              "source": "page:1",
+              "quote": "NOTA DE ENTREGA"
+            }
+          ]
+        },
+        "documentType": "DELIVERY_NOTE",
+        "primaryReadId": "fd1d7945-0d16-49e9-a226-47972d9f28b0",
+        "documentSha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+        "corroboration": {
+          "documentSha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+          "readId": "pdftext_c17e76c1-752d-4de6-a4cd-8840435e1902",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "amountMinor": null,
+            "currency": null,
+            "dueDate": null
+          }
+        },
+        "agreementReference": null,
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "DELIVERY_NOTE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+            "primaryReadId": "fd1d7945-0d16-49e9-a226-47972d9f28b0",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2064,
+                "outputTokens": 212,
+                "reasoningTokens": 0,
+                "costUsd": 0.002094896
+              },
+              "durationMs": 3398
+            }
+          ],
+          "usage": {
+            "inputTokens": 2064,
+            "outputTokens": 212,
+            "reasoningTokens": 0,
+            "costUsd": 0.002094896
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3398,
+            "primaryMs": 3398,
+            "secondaryMs": 23
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2064,
+            "outputTokens": 212,
+            "reasoningTokens": 0,
+            "costUsd": 0.002094896
+          },
+          "durationMs": 3398
+        }
+      ],
+      "extractionCheck": {
+        "status": "REVIEW_REQUIRED",
+        "extraction": {
+          "vendorName": "Faro Translation Demo",
+          "invoiceNumber": null,
+          "amountMinor": null,
+          "currency": null,
+          "issuedAt": null,
+          "dueDate": null,
+          "servicePeriod": null,
+          "description": "Entrega de manual traducido",
+          "extractionWarnings": [
+            "Document is a delivery note, not an invoice; no invoice number, amount, currency, or payment due date present.",
+            "Delivery date 2026-10-08 is not an invoice issue date."
+          ],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Faro Translation Demo"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Entrega de manual traducido"
+            },
+            {
+              "field": "documentType",
+              "source": "page:1",
+              "quote": "NOTA DE ENTREGA"
+            }
+          ]
+        },
+        "issues": [
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "amountMinor"
+          },
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "currency"
+          },
+          {
+            "code": "MISSING_CRITICAL_FIELD",
+            "field": "dueDate"
+          },
+          {
+            "code": "EXTRACTION_WARNING",
+            "field": null
+          },
+          {
+            "code": "FIELD_MISMATCH",
+            "field": "amountMinor"
+          },
+          {
+            "code": "FIELD_MISMATCH",
+            "field": "currency"
+          },
+          {
+            "code": "FIELD_MISMATCH",
+            "field": "dueDate"
+          }
+        ]
+      },
+      "independentStatus": "REVIEW_REQUIRED",
+      "canEvaluateAutomatically": false,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": true,
+      "readerGateOutcome": "PASS",
+      "warnings": [
+        "Document is a delivery note, not an invoice; no invoice number, amount, currency, or payment due date present.",
+        "Delivery date 2026-10-08 is not an invoice issue date."
+      ]
+    },
+    {
+      "caseId": "holdout_008",
+      "file": {
+        "path": "documents/008.pdf",
+        "mimeType": "application/pdf",
+        "sizeBytes": 1394,
+        "sha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+        "pages": 1
+      },
+      "variations": [
+        "PROMPT_INJECTION",
+        "THOUSANDS_SEPARATOR"
+      ],
+      "startedAt": "2026-10-17T16:48:59.846Z",
+      "durationMs": 3656,
+      "httpStatus": 200,
+      "error": null,
+      "expectedExtraction": {
+        "vendorName": "Nimbo Cloud Demo",
+        "invoiceNumber": "NC-2194",
+        "amountMinor": 999900,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Ampliacion de almacenamiento"
+      },
+      "safetyExpected": {
+        "automaticApprovalForbidden": true,
+        "independentCorroborationRequired": true,
+        "reason": "Document instructions have no authority; USD 9,999 exceeds the demo hard limit."
+      },
+      "financialPolicySafety": "NOT_EVALUATED",
+      "read": {
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-2194",
+          "amountMinor": 999900,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Ampliacion de almacenamiento",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-2194"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Ampliacion de almacenamiento"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 9,999.00"
+            }
+          ]
+        },
+        "documentType": "INVOICE",
+        "primaryReadId": "8bb35db4-34ef-43f5-9f75-b0dd741668bc",
+        "documentSha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+        "corroboration": {
+          "documentSha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+          "readId": "pdftext_5d76ee69-0c1d-4342-b8cb-250aa9dacfad",
+          "method": "PDF_TEXT",
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "amountMinor": 999900,
+            "currency": "USD",
+            "dueDate": "2026-10-28"
+          }
+        },
+        "agreementReference": "agr_holdout_008",
+        "provenance": {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "provider": "Decart",
+          "pdfTextParser": "labelled-v5",
+          "documentClassification": {
+            "documentType": "INVOICE",
+            "source": "PRIMARY_READER",
+            "documentSha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+            "primaryReadId": "8bb35db4-34ef-43f5-9f75-b0dd741668bc",
+            "version": "labelled-v5:invoice-json-v3-document-type-20261017"
+          },
+          "configVersion": "labelled-v5:invoice-json-v3-document-type-20261017",
+          "attempts": [
+            {
+              "model": "deepseek/deepseek-v4.1-flash",
+              "outcome": "SUCCESS",
+              "finishReason": "stop",
+              "usage": {
+                "inputTokens": 2124,
+                "outputTokens": 291,
+                "reasoningTokens": 0,
+                "costUsd": 0.002114516
+              },
+              "durationMs": 3583
+            }
+          ],
+          "usage": {
+            "inputTokens": 2124,
+            "outputTokens": 291,
+            "reasoningTokens": 0,
+            "costUsd": 0.002114516
+          },
+          "advisories": [
+            "SYNTHETIC_LABEL",
+            "MISSING_BANK_DETAILS",
+            "MISSING_TAX_BREAKDOWN"
+          ],
+          "corroborationError": null,
+          "independentDisagreements": [],
+          "independentIssues": [],
+          "cache": {
+            "PRIMARY": false,
+            "SECONDARY": false
+          },
+          "timings": {
+            "totalMs": 3583,
+            "primaryMs": 3583,
+            "secondaryMs": 25
+          }
+        }
+      },
+      "modelAttempts": [
+        {
+          "model": "deepseek/deepseek-v4.1-flash",
+          "outcome": "SUCCESS",
+          "finishReason": "stop",
+          "usage": {
+            "inputTokens": 2124,
+            "outputTokens": 291,
+            "reasoningTokens": 0,
+            "costUsd": 0.002114516
+          },
+          "durationMs": 3583
+        }
+      ],
+      "extractionCheck": {
+        "status": "CROSS_CHECKED",
+        "extraction": {
+          "vendorName": "Nimbo Cloud Demo",
+          "invoiceNumber": "NC-2194",
+          "amountMinor": 999900,
+          "currency": "USD",
+          "issuedAt": "2026-10-08",
+          "dueDate": "2026-10-28",
+          "servicePeriod": "2026-10",
+          "description": "Ampliacion de almacenamiento",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Proveedor: Nimbo Cloud Demo"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Numero: NC-2194"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Emision: 2026-10-08"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Vencimiento: 2026-10-28"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Periodo de servicio: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Concepto: Ampliacion de almacenamiento"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total a cobrar: USD 9,999.00"
+            }
+          ]
+        },
+        "issues": []
+      },
+      "independentStatus": "CROSS_CHECKED",
+      "canEvaluateAutomatically": true,
+      "readerGateViolation": false,
+      "matchingFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "mismatches": [],
+      "allEightFieldsExact": true,
+      "criticalFieldsExact": true,
+      "readerGateMustRequireReview": false,
+      "readerGateOutcome": "PASS",
+      "warnings": []
+    }
+  ],
+  "summary": {
+    "attempted": 8,
+    "returnedExtractions": 8,
+    "failures": 0,
+    "allEightFieldsExact": 8,
+    "criticalFieldsExact": 8,
+    "fieldMatches": {
+      "vendorName": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "invoiceNumber": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "amountMinor": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "currency": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "issuedAt": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "dueDate": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "servicePeriod": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      },
+      "description": {
+        "exact": 8,
+        "attempted": 8,
+        "returned": 8
+      }
+    },
+    "independentCrossChecked": 4,
+    "reviewRequired": 4,
+    "withWarnings": 3,
+    "expectedReviewCases": [
+      "holdout_004",
+      "holdout_005",
+      "holdout_006",
+      "holdout_007"
+    ],
+    "expectedReviewCasesReturned": 4,
+    "readerGateViolations": 0,
+    "observedModelAttempts": 8,
+    "modelAttemptCountsAvailableFor": 8,
+    "reportedPartialCostUsd": 0.0174616,
+    "reportedCostItems": 8,
+    "medianAttemptDurationMs": 3618.5,
+    "medianSuccessfulReadDurationMs": 3618.5,
+    "maxDurationMs": 5887,
+    "automaticApprovals": "NOT_EVALUATED",
+    "financialDecisions": "NOT_EVALUATED"
+  }
+}

@@ -1,0 +1,3477 @@
+{
+  "measuredAt": "2026-10-17T16:53:22.170Z",
+  "scope": "OFFLINE_PAIRED_PARSER_AND_READER_COMPARISON",
+  "baseline": {
+    "commit": "97538b95dd41484e4aade13dedc49b2af424fb4b",
+    "sourceSha256": "08c70a3aef1e8b9e82d9fbb07bd04af006a69e4ffb559d30220b367de0bdb1dc",
+    "readerVersion": "labelled-v4:invoice-json-v3-document-type-20261017"
+  },
+  "current": {
+    "sourceSha256": "542feffb02e8c1bf01132f425f030049a1b46d9651f0e00d553b5c2085198aa9",
+    "readerVersion": "labelled-v5:invoice-json-v3-document-type-20261017"
+  },
+  "sources": [
+    {
+      "manifest": "fixtures/scenarios/invoices.json",
+      "primary": "docs/evaluations/invoices-pdf-2026-10-17T16-24-08-411Z.json",
+      "primarySha256": "e0d02d08cd09dc8f3b6bd28679a4ecccc7a5c11b4fa47826abcddc22fcf022f6"
+    },
+    {
+      "manifest": "docs/fixtures/invoice-holdout/manifest.json",
+      "primary": "docs/evaluations/invoices-holdout-2026-10-17T16-24-34-506Z.json",
+      "primarySha256": "b6087c3894cdd0fa5d2e4f29515dd1c1014fa81bd840b3f9aad46bdda54c95be"
+    }
+  ],
+  "captureSha256": "ba508342e7e3c02eb34d594253b12f39833a69b366f01b4f66d3515acc549a8d",
+  "limits": {
+    "liveModelCalls": 0,
+    "financialDecisions": "NOT_EVALUATED",
+    "primary": "Frozen real primary reads from cited historical reports; only server-derived comparison warnings are recalculated.",
+    "secondary": "Frozen real Workers AI conversions, bound to original PDF bytes by SHA-256.",
+    "timing": "Local parser CPU only; excludes network, conversion, OCR, model inference, engine, D1 and queue.",
+    "generalization": "These documents have been used for tuning; this is regression, not an unseen holdout."
+  },
+  "results": [
+    {
+      "caseId": "holdout_001",
+      "sourceSha256": "3f2be3c8951edccdfeecd7f99032402d5e24db248d98c417b1cf7239ece1771d",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": null,
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+          "INDEPENDENT_READ_MISMATCH:amountMinor",
+          "INDEPENDENT_READ_MISMATCH:currency",
+          "INDEPENDENT_READ_MISMATCH:issuedAt",
+          "INDEPENDENT_READ_MISMATCH:dueDate",
+          "INDEPENDENT_READ_MISMATCH:servicePeriod",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "NC-8427",
+            "amountMinor": 123450,
+            "currency": "USD",
+            "issuedAt": "2026-10-08",
+            "dueDate": "2026-10-28",
+            "servicePeriod": "2026-10",
+            "description": "Capacidad adicional de computo"
+          },
+          "agreementReference": "agr_holdout_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "holdout_002",
+      "sourceSha256": "31ce64ede5007afe77beda4947b3fe7fd110159182b1c7d4e9de67ac1860706f",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": "2026-10-28",
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "dueDate"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+          "INDEPENDENT_READ_MISMATCH:amountMinor",
+          "INDEPENDENT_READ_MISMATCH:currency",
+          "INDEPENDENT_READ_MISMATCH:issuedAt",
+          "INDEPENDENT_READ_MISMATCH:servicePeriod",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "BS-7923",
+            "amountMinor": 18000,
+            "currency": "USD",
+            "issuedAt": "2026-10-08",
+            "dueDate": "2026-10-28",
+            "servicePeriod": "2026-10",
+            "description": "Soporte de infraestructura"
+          },
+          "agreementReference": "agr_holdout_002",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "holdout_003",
+      "sourceSha256": "f00976d24456744c7e0c81dc69439decf84ae4d96b99ee25b6eb739bff446754",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": "2026-10-28",
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "dueDate"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+          "INDEPENDENT_READ_MISMATCH:amountMinor",
+          "INDEPENDENT_READ_MISMATCH:currency",
+          "INDEPENDENT_READ_MISMATCH:issuedAt",
+          "INDEPENDENT_READ_MISMATCH:servicePeriod",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "LD-6819",
+            "amountMinor": 123456,
+            "currency": "EUR",
+            "issuedAt": "2026-10-08",
+            "dueDate": "2026-10-28",
+            "servicePeriod": "2026-10",
+            "description": "Diseno de catalogo"
+          },
+          "agreementReference": "agr_holdout_003",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "holdout_006",
+      "sourceSha256": "e1367f213bf107d2d1fa052714eee7ea582226202ad103a79c955ac2956a1650",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": "2026-10-28",
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "amountMinor",
+          "dueDate"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Conflicting invoice totals: page 1 states 'Total a cobrar: USD 200.00' while page 2 states 'TOTAL A COBRAR: USD 280.00'; amountMinor set to null.",
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+          "INDEPENDENT_READ_MISMATCH:currency",
+          "INDEPENDENT_READ_MISMATCH:issuedAt",
+          "INDEPENDENT_READ_MISMATCH:servicePeriod",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "NC-3628",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-08",
+            "dueDate": "2026-10-28",
+            "servicePeriod": "2026-10",
+            "description": "Almacenamiento de archivos"
+          },
+          "agreementReference": "agr_holdout_006",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Conflicting invoice totals: page 1 states 'Total a cobrar: USD 200.00' while page 2 states 'TOTAL A COBRAR: USD 280.00'; amountMinor set to null."
+        ]
+      }
+    },
+    {
+      "caseId": "holdout_007",
+      "sourceSha256": "f425f590a790bac87513ebec20c8b3aec2bec9b26d7c54ea18bc0b7ad12db5bd",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": null,
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Document is a delivery note, not an invoice; no invoice number, amount, currency, or payment due date present.",
+          "Fecha de entrega 2026-10-08 is a delivery date, not an invoice issue date.",
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": null,
+            "servicePeriod": null,
+            "description": "Entrega de manual traducido"
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Document is a delivery note, not an invoice; no invoice number, amount, currency, or payment due date present.",
+          "Fecha de entrega 2026-10-08 is a delivery date, not an invoice issue date."
+        ]
+      }
+    },
+    {
+      "caseId": "holdout_008",
+      "sourceSha256": "a439a7928806fec6c671d7d194df4737d6ca2087947aab4f05b3e33f63d01077",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": null,
+            "invoiceNumber": null,
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": null,
+            "dueDate": "2026-10-28",
+            "servicePeriod": null,
+            "description": null
+          },
+          "agreementReference": null,
+          "issues": []
+        },
+        "exactFields": [
+          "dueDate"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_READ_MISMATCH:vendorName",
+          "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+          "INDEPENDENT_READ_MISMATCH:amountMinor",
+          "INDEPENDENT_READ_MISMATCH:currency",
+          "INDEPENDENT_READ_MISMATCH:issuedAt",
+          "INDEPENDENT_READ_MISMATCH:servicePeriod",
+          "INDEPENDENT_READ_MISMATCH:description"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "NC-2194",
+            "amountMinor": 999900,
+            "currency": "USD",
+            "issuedAt": "2026-10-08",
+            "dueDate": "2026-10-28",
+            "servicePeriod": "2026-10",
+            "description": "Ampliacion de almacenamiento"
+          },
+          "agreementReference": "agr_holdout_008",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_001",
+      "sourceSha256": "0edb3dba5f1d03c483aa8d1053baac77994458be747f19b4b42fae8c7b0a989f",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0001",
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0001",
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_002",
+      "sourceSha256": "6090de190c7039d3215eb480e947bf32096df9939f27b4656ddae285c7f8e1f1",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0002",
+            "amountMinor": 7500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0002"
+          },
+          "agreementReference": "agr_demo_002",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0002",
+            "amountMinor": 7500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0002"
+          },
+          "agreementReference": "agr_demo_002",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_003",
+      "sourceSha256": "d61642f720e442fc7b78e50564ed002bcb75c9091d86bdd7df4a8a4f3f41f291",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0003",
+            "amountMinor": 12000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0003"
+          },
+          "agreementReference": "agr_demo_003",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0003",
+            "amountMinor": 12000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0003"
+          },
+          "agreementReference": "agr_demo_003",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_004",
+      "sourceSha256": "69026440bb1693f481b3b06f868591b50ac0cef357eca92417aa8c6e591e1c49",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0004",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0004"
+          },
+          "agreementReference": "agr_demo_004",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0004",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0004"
+          },
+          "agreementReference": "agr_demo_004",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_005",
+      "sourceSha256": "30845275aad9dcfb37b40d4555e9bc4decb75a8354293c88da5e56942136d2ae",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0005",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0005"
+          },
+          "agreementReference": "agr_demo_005",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0005",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0005"
+          },
+          "agreementReference": "agr_demo_005",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_006",
+      "sourceSha256": "ee2f4f5cdbc98e64a2ec916357b9bc79bd7f21c01506bef913e9d32c6080b63a",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0006",
+            "amountMinor": 8000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0006"
+          },
+          "agreementReference": "agr_demo_006",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0006",
+            "amountMinor": 8000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0006"
+          },
+          "agreementReference": "agr_demo_006",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_007",
+      "sourceSha256": "046b27eaee79f75cf7ab57ec1589baab535584d14d670b832ff41e90312b514b",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0007",
+            "amountMinor": 15000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0007"
+          },
+          "agreementReference": "agr_demo_007",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0007",
+            "amountMinor": 15000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0007"
+          },
+          "agreementReference": "agr_demo_007",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_008",
+      "sourceSha256": "2b6cfab59622474f329d287309054bc64e26f4420093669754ed380ef9468301",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0008",
+            "amountMinor": 29999,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0008"
+          },
+          "agreementReference": "agr_demo_008",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0008",
+            "amountMinor": 29999,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0008"
+          },
+          "agreementReference": "agr_demo_008",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_009",
+      "sourceSha256": "a116a458baea445f3a8d3993be5c285a1ab22fc99f7384afcb78650702e66d15",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0009",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0009"
+          },
+          "agreementReference": "agr_demo_009",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0009",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0009"
+          },
+          "agreementReference": "agr_demo_009",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_010",
+      "sourceSha256": "07e37c8048b601b2f146f5cce9d8f3bb103e3b4d26506b0b8344b52582312007",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0010",
+            "amountMinor": 22500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0010"
+          },
+          "agreementReference": "agr_demo_010",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0010",
+            "amountMinor": 22500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0010"
+          },
+          "agreementReference": "agr_demo_010",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_011",
+      "sourceSha256": "1c2f9caa4f100c8fb46d3d10bf52613e5c6b69e209620710e0fbeb6f83343b8c",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0011",
+            "amountMinor": 18000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0011"
+          },
+          "agreementReference": "agr_demo_011",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0011",
+            "amountMinor": 18000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0011"
+          },
+          "agreementReference": "agr_demo_011",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_012",
+      "sourceSha256": "96ad0c2b1ad20101273f5e68e15ece80e65c07892eed04573d39f070cd1aedbf",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0012",
+            "amountMinor": 6000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0012"
+          },
+          "agreementReference": "agr_demo_012",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0012",
+            "amountMinor": 6000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0012"
+          },
+          "agreementReference": "agr_demo_012",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_013",
+      "sourceSha256": "3cc581d6b834ed487b6e1d9062a9d5b526051bfa45b0e9da82d27c355d516c1a",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0013",
+            "amountMinor": 9000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0013"
+          },
+          "agreementReference": "agr_demo_013",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0013",
+            "amountMinor": 9000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0013"
+          },
+          "agreementReference": "agr_demo_013",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_014",
+      "sourceSha256": "ad289f02ad314011d79c35695df1654d0b0195f0731be1e325d87e1e70a76edc",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0014",
+            "amountMinor": 27500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0014"
+          },
+          "agreementReference": "agr_demo_014",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0014",
+            "amountMinor": 27500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0014"
+          },
+          "agreementReference": "agr_demo_014",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_015",
+      "sourceSha256": "bf54b32858c0c0707768353e48f686398599bf4bd13b8289098c9fdaa8d2ca48",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0015",
+            "amountMinor": 30000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0015"
+          },
+          "agreementReference": "agr_demo_015",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0015",
+            "amountMinor": 30000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0015"
+          },
+          "agreementReference": "agr_demo_015",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_016",
+      "sourceSha256": "edc3b51c3a9f396e6a26d7a03974793aacd6145f92732b7f06f9a6726f24a153",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0016",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-06-01",
+            "dueDate": "2026-06-15",
+            "servicePeriod": "2026-06",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0016",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-06-01",
+            "dueDate": "2026-06-15",
+            "servicePeriod": "2026-06",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_017",
+      "sourceSha256": "298dffd923d7b4f468d805055263cf293df073d68c277fb3428710c54acaf77e",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0017",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-07-01",
+            "dueDate": "2026-07-15",
+            "servicePeriod": "2026-07",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0017",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-07-01",
+            "dueDate": "2026-07-15",
+            "servicePeriod": "2026-07",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_018",
+      "sourceSha256": "30f8d96b397b251b48a53a3a943ee4e25a8b7a436654bb249f38636f656c945c",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0018",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-08-01",
+            "dueDate": "2026-08-15",
+            "servicePeriod": "2026-08",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0018",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-08-01",
+            "dueDate": "2026-08-15",
+            "servicePeriod": "2026-08",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_019",
+      "sourceSha256": "6997c1b97e8087166f25936a88669d0780c4b682702a5f4b8a2f761b1bf4ecca",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0019",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-09-01",
+            "dueDate": "2026-09-15",
+            "servicePeriod": "2026-09",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0019",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-09-01",
+            "dueDate": "2026-09-15",
+            "servicePeriod": "2026-09",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_020",
+      "sourceSha256": "f49d0f565a58329344a1829c6bf79aec3b207d58fcaed4ad084c8265f8ad1048",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0020",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Acme Accounting Demo",
+            "invoiceNumber": "INV-0020",
+            "amountMinor": 45000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Contabilidad mensual de demostración"
+          },
+          "agreementReference": "agr_demo_016",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_021",
+      "sourceSha256": "94a081fee7d43b0bcb2e65d6d484598ddba46a7d0daea2391f50fe1953e53dc3",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0021",
+            "amountMinor": 75000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0021"
+          },
+          "agreementReference": "agr_demo_021",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0021",
+            "amountMinor": 75000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0021"
+          },
+          "agreementReference": "agr_demo_021",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_022",
+      "sourceSha256": "69026440bb1693f481b3b06f868591b50ac0cef357eca92417aa8c6e591e1c49",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0004",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0004"
+          },
+          "agreementReference": "agr_demo_004",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0004",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0004"
+          },
+          "agreementReference": "agr_demo_004",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_023",
+      "sourceSha256": "fe4641ec9ffcfbfc96fd66d83c5914f16a8c6f8e5361f71253e5237f6e3fe2f9",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "inv 0005",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0005"
+          },
+          "agreementReference": "agr_demo_005",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "inv 0005",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0005"
+          },
+          "agreementReference": "agr_demo_005",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_024",
+      "sourceSha256": "89dfca08ee74dcf0d5b9dc07d6f24ee636fe3eb9491c5a6d17bcacce11f858fe",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0006",
+            "amountMinor": 8000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0006"
+          },
+          "agreementReference": "agr_demo_006",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Lumen Design Demo",
+            "invoiceNumber": "INV-0006",
+            "amountMinor": 8000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0006"
+          },
+          "agreementReference": "agr_demo_006",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_025",
+      "sourceSha256": "8473b1983f7dc869781fbb93f7ca203d5a21d9b45600de97b2f65e1f25570b25",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Derno",
+            "invoiceNumber": "REF-PENDING",
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Derno",
+            "invoiceNumber": "REF-PENDING",
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_026",
+      "sourceSha256": "e97ed7682231b55ad8fd8c9a46633c4f3cbf7cb7eec8c3fcc653df3df2325151",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": null,
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Invoice number is explicitly not indicated ('NO INDICADO')."
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": null,
+            "amountMinor": 5000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0001"
+          },
+          "agreementReference": "agr_demo_001",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Invoice number is explicitly not indicated ('NO INDICADO')."
+        ]
+      }
+    },
+    {
+      "caseId": "case_027",
+      "sourceSha256": "b190c7a18b75b278789e8443fbaa41de2053c8cc0f71783092a9f5e34a88a63c",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Orbita Consulting Demo",
+            "invoiceNumber": "INV-0027",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0027"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Orbita Consulting Demo",
+            "invoiceNumber": "INV-0027",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0027"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      }
+    },
+    {
+      "caseId": "case_028",
+      "sourceSha256": "e46becc3f7f4b8cb05f12838d413a129ff6bd443bd968ed9cfeafd4908122a7b",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Delta Supplies Demo",
+            "invoiceNumber": "INV-0028",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0028"
+          },
+          "agreementReference": "agr_demo_028",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Delta Supplies Demo",
+            "invoiceNumber": "INV-0028",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0028"
+          },
+          "agreementReference": "agr_demo_028",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_029",
+      "sourceSha256": "2ad6079e3e1edaa2bc823bd026e9cc9a3eee328f199301cda200962e9b1eadd4",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Prisma Audit Demo",
+            "invoiceNumber": "INV-0029",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0029"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Prisma Audit Demo",
+            "invoiceNumber": "INV-0029",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0029"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      }
+    },
+    {
+      "caseId": "case_030",
+      "sourceSha256": "b43c76cef308383dee61affe92777355221e88edb0e8586796df8da4f6010a37",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Costa Logistics Demo",
+            "invoiceNumber": "INV-0030",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0030"
+          },
+          "agreementReference": "agr_demo_030",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Costa Logistics Demo",
+            "invoiceNumber": "INV-0030",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0030"
+          },
+          "agreementReference": "agr_demo_030",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_031",
+      "sourceSha256": "94b64ade3a733c275b9fde72f8f9f8e0c3d39077791749a7fdc6db2d2e9e468b",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0031",
+            "amountMinor": 47500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0031"
+          },
+          "agreementReference": "agr_demo_031",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0031",
+            "amountMinor": 47500,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0031"
+          },
+          "agreementReference": "agr_demo_031",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_032",
+      "sourceSha256": "bc782f21572cc887becaf51fe2df5e1782d08bca6750406da26ec160d0a76c34",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0032",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Campaña publicitaria de demostración"
+          },
+          "agreementReference": "agr_demo_032",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Brisa Support Demo",
+            "invoiceNumber": "INV-0032",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Campaña publicitaria de demostración"
+          },
+          "agreementReference": "agr_demo_032",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_033",
+      "sourceSha256": "4831cceed700badc582562e99e626f15579027c91c20848bb50cf48a32e4b58e",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0033",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0033"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Faro Translation Demo",
+            "invoiceNumber": "INV-0033",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0033"
+          },
+          "agreementReference": null,
+          "issues": [
+            "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+          ]
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN"
+        ]
+      }
+    },
+    {
+      "caseId": "case_034",
+      "sourceSha256": "ce4154aa4c5966a8834d514af43d62d5f0cdee7daf54011526da809caaced266",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0034",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0034"
+          },
+          "agreementReference": "agr_demo_034",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0034",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0034"
+          },
+          "agreementReference": "agr_demo_034",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_035",
+      "sourceSha256": "ac65c403a0ee417d565fc88b93e14c1d666f616191bdd491f747735649305d48",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0035",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0035"
+          },
+          "agreementReference": "agr_demo_035",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0035",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0035"
+          },
+          "agreementReference": "agr_demo_035",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_036",
+      "sourceSha256": "6d622cd24531be96b453e338c27304ed017136f0ac651d713da8d9d91ab1374c",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0036",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0036"
+          },
+          "agreementReference": "agr_demo_036",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0036",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0036"
+          },
+          "agreementReference": "agr_demo_036",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_037",
+      "sourceSha256": "1ecacc39a4cb5b49ed7e2aebeddc7a539939398ebda675f62cac0a0caf6e0d35",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0037",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0037"
+          },
+          "agreementReference": "agr_demo_037",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0037",
+            "amountMinor": 25000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0037"
+          },
+          "agreementReference": "agr_demo_037",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_038",
+      "sourceSha256": "b9b732ebc29a9a90e8b362cd0b0ef8fc44412acaaac0c0b48792ce6aefefa86d",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0038",
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0038"
+          },
+          "agreementReference": "agr_demo_038",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Currency is explicitly not indicated ('NO INDICADA' / 'moneda no indicada'), so amountMinor cannot be determined."
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0038",
+            "amountMinor": null,
+            "currency": null,
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0038"
+          },
+          "agreementReference": "agr_demo_038",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Currency is explicitly not indicated ('NO INDICADA' / 'moneda no indicada'), so amountMinor cannot be determined."
+        ]
+      }
+    },
+    {
+      "caseId": "case_039",
+      "sourceSha256": "360993abbf3a3a6ddf2294f6bab23c59dcc57ec159efb3bcba95dfa487cb78cb",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0039",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0039"
+          },
+          "agreementReference": "agr_demo_039",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Conflicting invoice totals: 'TOTAL A COBRAR USD 200.00 / USD 280.00', 'Resumen: total USD 200.00', 'Cupón de cobro: total USD 280.00'; amountMinor left null."
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0039",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0039"
+          },
+          "agreementReference": "agr_demo_039",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Conflicting invoice totals: 'TOTAL A COBRAR USD 200.00 / USD 280.00', 'Resumen: total USD 200.00', 'Cupón de cobro: total USD 280.00'; amountMinor left null."
+        ]
+      }
+    },
+    {
+      "caseId": "case_040",
+      "sourceSha256": "2b5077fad32bacf086d16d7c5d30a960ec32cf0eb5ba602fc50b6d3109541871",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0040",
+            "amountMinor": 999900,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0040"
+          },
+          "agreementReference": "agr_demo_040",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0040",
+            "amountMinor": 999900,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0040"
+          },
+          "agreementReference": "agr_demo_040",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_041",
+      "sourceSha256": "4820de04b2f229c17d7b8bd6c01826b61af1edc315117038383c33b205f2696c",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0041",
+            "amountMinor": 30000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0041"
+          },
+          "agreementReference": "agr_demo_041",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0041",
+            "amountMinor": 30000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0041"
+          },
+          "agreementReference": "agr_demo_041",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_042",
+      "sourceSha256": "9ebdacb3df2d7f19cc302fb961409060c06bccbbcae0fd688a569dee3bbf3868",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0042",
+            "amountMinor": 30001,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0042"
+          },
+          "agreementReference": "agr_demo_042",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0042",
+            "amountMinor": 30001,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0042"
+          },
+          "agreementReference": "agr_demo_042",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_043",
+      "sourceSha256": "8a2d4b71bf8bd9a19933cfcedae5920ac1139351c6b98544a8e0b7c772947a45",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0043",
+            "amountMinor": 100000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0043"
+          },
+          "agreementReference": "agr_demo_043",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0043",
+            "amountMinor": 100000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0043"
+          },
+          "agreementReference": "agr_demo_043",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_044",
+      "sourceSha256": "6324cca54348b103ed54f7c5f37b7601f8f434b3a41a56401ef28101e8ba8221",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0044",
+            "amountMinor": 100001,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0044"
+          },
+          "agreementReference": "agr_demo_044",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0044",
+            "amountMinor": 100001,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0044"
+          },
+          "agreementReference": "agr_demo_044",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_045",
+      "sourceSha256": "5e09d80a9453a6f1c76f2fabcc2a91ce7b84f5744e0d3d16fb11a5a5a2e2a2ca",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0045",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0045"
+          },
+          "agreementReference": "agr_demo_045",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0045",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0045"
+          },
+          "agreementReference": "agr_demo_045",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_046",
+      "sourceSha256": "87083b46d842965d432e376c248c2e37561d2dddcdf79b714099ac1128737e80",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0046",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0046"
+          },
+          "agreementReference": "agr_demo_046",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0046",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0046"
+          },
+          "agreementReference": "agr_demo_046",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_047",
+      "sourceSha256": "b626a7580295d2c2e10a419ff10ec5c16a56c157a449142fefd9bfb0aaaf04d7",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0047",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": null,
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0047"
+          },
+          "agreementReference": "agr_demo_047",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0047",
+            "amountMinor": 20000,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": null,
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0047"
+          },
+          "agreementReference": "agr_demo_047",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_048",
+      "sourceSha256": "36601bf124bb5e4c1bf6ddebb812363d3845efafb8c035f6e553c7312bc8d6e1",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0048",
+            "amountMinor": 20000,
+            "currency": "EUR",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0048"
+          },
+          "agreementReference": "agr_demo_048",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0048",
+            "amountMinor": 20000,
+            "currency": "EUR",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0048"
+          },
+          "agreementReference": "agr_demo_048",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "CROSS_CHECKED",
+        "warnings": []
+      }
+    },
+    {
+      "caseId": "case_049",
+      "sourceSha256": "1fcc5f8843a90f72d9f678211459771ddbaf78d1fae3c335272c025bea1c2411",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0049",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0049"
+          },
+          "agreementReference": "agr_demo_049",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Total amount is zero (USD 0.00), so amountMinor is null per the zero-amount rule."
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0049",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0049"
+          },
+          "agreementReference": "agr_demo_049",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Total amount is zero (USD 0.00), so amountMinor is null per the zero-amount rule."
+        ]
+      }
+    },
+    {
+      "caseId": "case_050",
+      "sourceSha256": "837aa700d09a39f6b9559461effe874cf399abc02ca745ac9f149e0ce21d94c5",
+      "before": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0050",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0050"
+          },
+          "agreementReference": "agr_demo_050",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Total a cobrar is negative (USD -200.00); amountMinor must be null for zero or negative amounts."
+        ]
+      },
+      "after": {
+        "parsed": {
+          "fields": {
+            "vendorName": "Nimbo Cloud Demo",
+            "invoiceNumber": "INV-0050",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-01",
+            "dueDate": "2026-10-15",
+            "servicePeriod": "2026-10",
+            "description": "Servicio de prueba - orden 0050"
+          },
+          "agreementReference": "agr_demo_050",
+          "issues": []
+        },
+        "exactFields": [
+          "vendorName",
+          "invoiceNumber",
+          "amountMinor",
+          "currency",
+          "issuedAt",
+          "dueDate",
+          "servicePeriod",
+          "description"
+        ],
+        "independentStatus": "REVIEW_REQUIRED",
+        "warnings": [
+          "Total a cobrar is negative (USD -200.00); amountMinor must be null for zero or negative amounts."
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "before": {
+      "parserMedianMs": 0.014207999999996446,
+      "parserP95Ms": 0.017750000000035016,
+      "parserSamples": 5600,
+      "original50": {
+        "secondaryAllEightExact": 49
+      },
+      "additionalSixPdfs": {
+        "secondaryAllEightExact": 0,
+        "independentCrossChecked": 0
+      }
+    },
+    "after": {
+      "parserMedianMs": 0.020250000000032742,
+      "parserP95Ms": 0.02591699999999264,
+      "parserSamples": 5600,
+      "original50": {
+        "secondaryAllEightExact": 49
+      },
+      "additionalSixPdfs": {
+        "secondaryAllEightExact": 6,
+        "independentCrossChecked": 4
+      }
+    }
+  }
+}

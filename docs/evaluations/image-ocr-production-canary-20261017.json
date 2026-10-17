@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-10-17T17:36:33.918Z",
+  "scope": "ONE_REAL_PRODUCTION_JPEG_UPLOAD_QUEUE_READERS_DECISION",
+  "workerVersion": "3c7adbb7-c619-4d49-8b62-0867a2bef940",
+  "target": "https://oli30x.ultramare.dev",
+  "file": {
+    "path": "docs/fixtures/image-ocr/documents/canary-001.jpg",
+    "mimeType": "image/jpeg",
+    "sha256": "de24add0868cb13ab8a191139aef1dcc713d8d39e36e42b3675690578c3cfca0",
+    "sizeBytes": 62977
+  },
+  "invoiceId": "inv_dd0ba5fb-4155-4a9c-83e7-5e2e3d7d5950",
+  "uploadStatus": 201,
+  "processStatus": 202,
+  "status": "DECIDED",
+  "action": "BLOCK",
+  "reasons": [
+    "UNKNOWN_VENDOR",
+    "MISSING_AGREEMENT"
+  ],
+  "extractionCheck": {
+    "rule": "EXTRACTION",
+    "outcome": "PASS",
+    "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+    "evidence": {
+      "status": "CROSS_CHECKED",
+      "issues": ""
+    }
+  },
+  "extraction": {
+    "vendorName": "Orion Nube Demo",
+    "invoiceNumber": "OCR-001",
+    "amountMinor": 15000,
+    "currency": "USD",
+    "issuedAt": "2026-10-08",
+    "dueDate": "2026-10-28",
+    "servicePeriod": "2026-10",
+    "description": "Soporte de aplicaciones",
+    "extractionWarnings": [],
+    "evidence": [
+      {
+        "field": "vendorName",
+        "source": "page:1",
+        "quote": "Proveedor: Orion Nube Demo"
+      },
+      {
+        "field": "invoiceNumber",
+        "source": "page:1",
+        "quote": "Numero: OCR-001"
+      },
+      {
+        "field": "issuedAt",
+        "source": "page:1",
+        "quote": "Emision: 2026-10-08"
+      },
+      {
+        "field": "dueDate",
+        "source": "page:1",
+        "quote": "Vencimiento: 2026-10-28"
+      },
+      {
+        "field": "servicePeriod",
+        "source": "page:1",
+        "quote": "Periodo de servicio: 2026-10"
+      },
+      {
+        "field": "currency",
+        "source": "page:1",
+        "quote": "Moneda: USD"
+      },
+      {
+        "field": "description",
+        "source": "page:1",
+        "quote": "Concepto: Soporte de aplicaciones"
+      },
+      {
+        "field": "amountMinor",
+        "source": "page:1",
+        "quote": "TOTAL A COBRAR: USD 150.00"
+      }
+    ]
+  },
+  "decisions": 1,
+  "idempotentReplay": true,
+  "privateFileMatches": true,
+  "durationMs": 9772,
+  "note": "Synthetic Orion supplier is absent from the production directory. Expected hard block; no vendor/agreement was created and no approval was attempted.",
+  "databaseCheck": {
+    "ocrModel": "qwen/qwen3.8-flash",
+    "ocrMode": "ENABLED",
+    "method": "OCR",
+    "decisions": 1,
+    "reservations": 0,
+    "jobState": "DONE"
+  }
+}
