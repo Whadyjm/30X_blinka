@@ -22,7 +22,7 @@ export function Login() {
   const [busy, setBusy] = useState<'login' | 'demo' | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const from = (loc.state as { from?: string } | null)?.from ?? '/app#facturas';
+  const from = (loc.state as { from?: string } | null)?.from ?? '/app';
   if (me.data) return <Navigate to={from} replace />;
 
   const run = async (kind: 'login' | 'demo') => {

@@ -1,124 +1,36 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { Link, useLocation } from 'react-router';
+import { useEffect, useRef, useState, type DragEvent, type FormEvent, type ReactNode } from 'react';
+import { Link } from 'react-router';
 import {
   ArrowRight,
   ArrowUp,
-  CheckCircle2,
-  Clock,
   Ban,
-  ExternalLink,
+  CalendarClock,
+  CheckCircle2,
   FileText,
+  Hand,
   Paperclip,
-  Plus,
-  ShieldCheck,
+  RotateCcw,
+  Sparkles,
   Upload,
   X,
 } from 'lucide-react';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Oli, type OliState } from '@/components/Oli';
-import { useMe } from '@/hooks/queries';
-import '@/styles/proposal.css';
-
-// Illustrative records for proposal mode. No API or payment authority.
-const PROPOSAL_INVOICES = [
-  {
-    id: 'acme',
-    vendor: 'Acme Accounting Demo',
-    concept: 'Contabilidad · OCT-026',
-    amount: 450,
-    status: 'review' as const,
-    reason:
-      'El importe de USD 450 supera el límite automático de USD 300. Requiere revisión de una persona autorizada; no se ha reservado presupuesto.',
-  },
-  {
-    id: 'cloud',
-    vendor: 'Cloud Hosting Demo',
-    concept: 'Infraestructura · OCT-014',
-    amount: 200,
-    status: 'approved' as const,
-    reason:
-      'Coincide con el acuerdo del proveedor, está dentro del límite automático y tiene presupuesto disponible. Autorización simulada; no se ejecutó un pago.',
-  },
-  {
-    id: 'fibra',
-    vendor: 'Fibra Norte Demo',
-    concept: 'Internet · OCT-008',
-    amount: 89,
-    status: 'approved' as const,
-    reason:
-      'Servicio mensual de internet por USD 89, coincidente con su acuerdo. Autorización simulada; no se ejecutó un pago.',
-  },
-  {
-    id: 'pixel',
-    vendor: 'Pixel Mesa Demo',
-    concept: 'Diseño · OCT-011',
-    amount: 120,
-    status: 'blocked' as const,
-    reason:
-      'El número de factura ya aparece en el historial del proveedor. Este cobro duplicado no crea otra reserva de presupuesto.',
-  },
-  {
-    id: 'linea',
-    vendor: 'Línea Studio Demo',
-    concept: 'Herramientas · OCT-003',
-    amount: 160,
-    status: 'approved' as const,
-    reason:
-      'Coincide con el acuerdo vigente y respeta el mandato. Autorización simulada; no se ejecutó un pago.',
-  },
-];
-
-const INTERNET_SEPTEMBER = {
-  vendor: 'Fibra Norte Demo',
-  amount: 89,
-  invoice: 'SEP-008',
-  period: 'septiembre de 2026',
-};
-
-const PROPOSAL_BUDGET = {
-  total: 2000,
-  reserved: PROPOSAL_INVOICES.filter((i) => i.status === 'approved').reduce((sum, i) => sum + i.amount, 0),
-};
-
-const HINTS = [
-  'Quiero agregar un proveedor…',
-  '¿Cuánto gasté en internet el mes pasado?',
-  '¿Qué facturas necesitan mi revisión?',
-  'Explícame cómo va mi presupuesto…',
-];
-
-function intentFor(text: string) {
-  const s = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-  if (/\b(paga|pagale|transferir|transfiere)\b/.test(s)) return 'help';
-  if (/proveedor/.test(s)) return /agregar|anadir|nuevo|crear|registrar|alta/.test(s) ? 'add-vendor' : 'vendors';
-  if (/factura.*fibra/.test(s)) return 'fibra';
-  if (/internet|fibra/.test(s)) return 'internet';
-  if (/presupuesto|mi mes|este mes|resumen|cuanto gaste/.test(s)) return 'budget';
-  if (/duplicad|pixel|bloquead|rechazad/.test(s)) return 'blocked';
-  if (/cloud|hosting/.test(s)) return 'cloud';
-  if (/linea studio/.test(s)) return 'linea';
-  if (/atencion|pendiente|revis|acme|aproba/.test(s)) return 'review';
-  if (/factura|subir|adjunt/.test(s)) return 'upload';
-  return 'help';
-}
-
-function validateAttachments(newFiles: File[], existingCount: number): string | null {
-  if (existingCount + newFiles.length > 4) {
-    return 'Adjunta hasta 4 facturas a la vez. Puedes quitar un archivo y volver a intentarlo.';
-  }
-  for (const f of newFiles) {
-    if (!['application/pdf', 'image/png', 'image/jpeg'].includes(f.type)) {
-      return 'Ese formato no está admitido. Prueba con un PDF, PNG o JPG.';
-    }
-    if (f.size === 0 || f.size > 5 * 1024 * 1024) {
-      return 'Cada archivo debe tener contenido y pesar como máximo 5 MB.';
-    }
-  }
-  return null;
-}
-
-const money = (n: number) =>
-  'USD ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+import { OutcomeBadge } from '@/components/Badges';
+import { buttonClass } from '@/components/ui/Button';
+import { Beam } from '@/components/ui/Beam';
+import { Card, CardHeader, EmptyState, ErrorState, Skeleton } from '@/components/ui/Card';
+import { brand } from '@/config/brand';
+import { UPLOAD } from '@/config/env';
+import { useApprovals, useInvoices, useMandate, useMe } from '@/hooks/queries';
+import { t } from '@/i18n';
+import { buildBriefing, computeStats } from '@/lib/briefing';
+import { dueLabel, isOverdue } from '@/lib/dates';
+import { formatMoney } from '@/lib/money';
+import { getOutcome } from '@/lib/outcome';
+import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
+import { InboxPreview } from '@/features/integrations/InboxPreview';
+import { useUploadQueue } from '@/features/invoices/useUploadQueue';
+import { cn } from '@/lib/cn';
 
 interface ChatTurn {
   id: string;
@@ -129,126 +41,157 @@ interface ChatTurn {
   contentNode?: ReactNode;
 }
 
-interface LocalVendor {
-  name: string;
-  service: string;
+const HINTS = [
+  '¿Qué facturas necesitan mi revisión?',
+  '¿Cómo va el presupuesto de este mes?',
+  '¿Qué facturas vencen en los próximos 14 días?',
+  '¿Hay facturas bloqueadas o duplicadas?',
+  'Arrastra una factura aquí para evaluarla…',
+];
+
+const SUGGESTIONS = [
+  { label: '📋 Facturas por revisar', query: '¿Qué facturas necesitan mi revisión?' },
+  { label: '💰 Estado del presupuesto', query: '¿Cómo va el presupuesto de este mes?' },
+  { label: '⏰ Próximos vencimientos', query: '¿Qué facturas vencen en los próximos 14 días?' },
+  { label: '🚫 Facturas bloqueadas', query: '¿Hay facturas bloqueadas o rechazadas?' },
+];
+
+function intentFor(text: string) {
+  const s = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (/\b(atencion|pendiente|revis|aproba|aprobar|autoriza)\b/.test(s)) return 'review';
+  if (/\b(presupuesto|budget|gaste|saldo|limite|disponible)\b/.test(s)) return 'budget';
+  if (/\b(vence|vencen|vencimiento|proximas|fechas|dias)\b/.test(s)) return 'due';
+  if (/\b(bloquead|duplicad|rechazad|invalida|rechazo)\b/.test(s)) return 'blocked';
+  if (/\b(subir|cargar|factura|adjunt|nueva)\b/.test(s)) return 'upload';
+  return 'help';
 }
 
 export function Home() {
   const me = useMe();
-  const location = useLocation();
+  const invoices = useInvoices();
+  const mandate = useMandate();
+  const approvals = useApprovals();
+  const uploadQueue = useUploadQueue();
 
   const [promptText, setPromptText] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [messages, setMessages] = useState<ChatTurn[]>([]);
-  const [chatActive, setChatActive] = useState(false);
   const [oliState, setOliState] = useState<OliState>('idle');
   const [busy, setBusy] = useState(false);
   const [inputError, setInputError] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [hintIndex, setHintIndex] = useState(0);
-  const [invoiceFilter, setInvoiceFilter] = useState<'all' | 'approved' | 'review' | 'blocked'>('all');
   const [isDragging, setIsDragging] = useState(false);
-  const [vendors, setVendors] = useState<LocalVendor[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragCounter = useRef(0);
 
-  const showToast = (text: string) => {
-    setToastMessage(text);
-    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-    toastTimeoutRef.current = setTimeout(() => {
-      setToastMessage(null);
-    }, 4500);
-  };
-
-  // Scroll to #facturas or #inicio if hash present or triggered
-  useEffect(() => {
-    const hash = location.hash || window.location.hash;
-    if (hash === '#facturas') {
-      const el = document.getElementById('facturas');
-      if (el) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
-      }
-    } else if (hash === '#inicio') {
-      const el = document.getElementById('inicio');
-      if (el) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth' }), 100);
-      }
-    }
-  }, [location.hash]);
-
-  // Hint rotation
+  // Rotating hints placeholder
   useEffect(() => {
     const timer = setInterval(() => {
-      if (
-        document.hidden ||
-        promptText ||
-        document.activeElement === textareaRef.current ||
-        chatActive ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ) {
+      if (document.hidden || promptText || document.activeElement === textareaRef.current || messages.length > 0) {
         return;
       }
       setHintIndex((prev) => (prev + 1) % HINTS.length);
     }, 4500);
     return () => clearInterval(timer);
-  }, [promptText, chatActive]);
+  }, [promptText, messages.length]);
 
-  // Auto-scroll chat messages
+  // Scroll to latest message
   useEffect(() => {
-    if (chatActive && messagesEndRef.current) {
+    if (messages.length > 0 && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, chatActive]);
+  }, [messages]);
+
+  if (invoices.isError) {
+    return <ErrorState error={invoices.error} onRetry={() => void invoices.refetch()} />;
+  }
+
+  const list = invoices.data ?? [];
+  const stats = computeStats(list);
+  const briefing = buildBriefing(stats);
+  const budget = mandate.data?.budget;
+  const used =
+    budget && budget.limitMinor > 0
+      ? Math.min(100, Math.round((budget.reservedMinor / budget.limitMinor) * 100))
+      : null;
+  const firstName = me.data?.user.name?.split(' ')[0];
+
+  const validateFiles = (filesList: File[]): string | null => {
+    if (attachedFiles.length + filesList.length > 4) {
+      return t('You can attach up to 4 files at a time.');
+    }
+    for (const f of filesList) {
+      if (!UPLOAD.mimeTypes.includes(f.type)) {
+        return t('Only PDF, PNG or JPEG files are accepted.');
+      }
+      if (f.size === 0 || f.size > UPLOAD.maxBytes) {
+        return t('Each file must be between 1 byte and 5 MB.');
+      }
+    }
+    return null;
+  };
 
   const handleFilesSelected = (filesList: FileList | null) => {
     if (!filesList || filesList.length === 0) return;
     const additions = Array.from(filesList);
-    const err = validateAttachments(additions, attachedFiles.length);
-    setInputError(err);
-    if (err) return;
-
+    const err = validateFiles(additions);
+    if (err) {
+      setInputError(err);
+      return;
+    }
+    setInputError(null);
     setAttachedFiles((prev) => [...prev, ...additions]);
-    setOliState('understanding');
-    showToast(
-      additions.length === 1
-        ? 'Factura adjunta. Envíala cuando quieras.'
-        : `${additions.length} facturas adjuntas. Puedes enviarlas juntas.`
-    );
+    setOliState('listening');
   };
 
   const removeFile = (index: number) => {
     setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
-    setInputError(null);
+    if (attachedFiles.length <= 1 && !promptText) {
+      setOliState('idle');
+    }
   };
 
-  const ask = async (text: string, filesToSend: File[] = []) => {
-    if (busy) return;
-    const query = text.trim();
-    const currentFiles = filesToSend.length > 0 ? filesToSend : [...attachedFiles];
-    if (!query && currentFiles.length === 0) return;
+  const handleDragEnter = (e: DragEvent) => {
+    e.preventDefault();
+    dragCounter.current++;
+    setIsDragging(true);
+  };
 
+  const handleDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+    dragCounter.current--;
+    if (dragCounter.current <= 0) {
+      setIsDragging(false);
+      dragCounter.current = 0;
+    }
+  };
+
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    dragCounter.current = 0;
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFilesSelected(e.dataTransfer.files);
+    }
+  };
+
+  const ask = async (userQuery: string, filesToSubmit: File[] = attachedFiles) => {
+    const trimmed = userQuery.trim();
+    if (!trimmed && filesToSubmit.length === 0) return;
+
+    setInputError(null);
     setBusy(true);
-    setChatActive(true);
     setPromptText('');
     setAttachedFiles([]);
-    setInputError(null);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = '';
-    }
 
-    // Add user message
     const userTurnId = 'user-' + Date.now();
-    const userMsg = query || (currentFiles.length === 1 ? 'Revisemos esta factura.' : 'Revisemos estas facturas.');
-    const userFiles = currentFiles.map((f) => ({ name: f.name, size: f.size }));
-
+    const userFiles = filesToSubmit.map((f) => ({ name: f.name, size: f.size }));
     setMessages((prev) => [
       ...prev,
-      { id: userTurnId, kind: 'user', text: userMsg, files: userFiles },
+      { id: userTurnId, kind: 'user', text: trimmed || undefined, files: userFiles },
     ]);
 
     setOliState('thinking');
@@ -257,50 +200,61 @@ export function Home() {
     const pendingTurnId = 'pending-' + Date.now();
     setMessages((prev) => [
       ...prev,
-      { id: pendingTurnId, kind: 'assistant', text: 'Un momento…', isPending: true },
+      { id: pendingTurnId, kind: 'assistant', text: t('Reviewing...'), isPending: true },
     ]);
 
-    const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 80 : 650;
-    await new Promise((r) => setTimeout(r, delay));
+    // Handle real file uploads if attached
+    if (filesToSubmit.length > 0) {
+      uploadQueue.add(filesToSubmit);
+    }
 
-    // Remove pending turn and render reply
+    await new Promise((r) => setTimeout(r, 600));
+
     const replyTurnId = 'assistant-' + Date.now();
-    const content = renderAssistantReply(query, currentFiles);
+    const content = renderAssistantReply(trimmed, filesToSubmit);
 
     setMessages((prev) =>
       prev.filter((m) => m.id !== pendingTurnId).concat({
         id: replyTurnId,
         kind: 'assistant',
         contentNode: content,
-      })
+      }),
     );
 
     setBusy(false);
-    setOliState('understanding');
+    setOliState(filesToSubmit.length > 0 ? 'happy' : 'understanding');
   };
 
-  const renderAssistantReply = (text: string, files: File[]) => {
+  const renderAssistantReply = (text: string, files: File[]): ReactNode => {
+    // 1. If files were attached, confirm real upload
     if (files.length > 0) {
       return (
-        <div>
-          <p>
+        <div className="space-y-3">
+          <p className="text-sm text-ink">
             {files.length === 1
-              ? 'Tienes un archivo listo para revisar.'
-              : `Tienes ${files.length} archivos listos para revisar.`}
+              ? t('I received your invoice and started automated analysis.')
+              : t('I received {n} invoices and started automated analysis.', { n: files.length })}
           </p>
-          {files.map((file, idx) => (
-            <div key={idx} className="review-line">
-              <span>{file.name}</span>
-              <small>{Math.ceil(file.size / 1024)} KB</small>
-            </div>
-          ))}
-          <p className="answer-note">
-            En esta propuesta no se leen ni se suben los archivos. En el flujo conectado, Oli extraería los datos,
-            comprobaría las reglas y registraría una decisión.
+          <div className="space-y-1.5">
+            {files.map((file, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between rounded-lg border border-hairline bg-bone/70 px-3 py-2 text-xs"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <FileText className="size-4 shrink-0 text-slate-500" aria-hidden />
+                  <span className="truncate text-ink">{file.name}</span>
+                </div>
+                <span className="shrink-0 text-slate-400">{Math.ceil(file.size / 1024)} KB</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-500">
+            {t('The engine is extracting data, matching agreements, and checking policy limits.')}
           </p>
-          <div className="reply-actions">
-            <Link to="/app/bills" className="outline-button">
-              Probar una carga real en la app actual <ExternalLink className="icon ml-1.5 size-3.5" />
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
+              {t('View bills progress')} <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
         </div>
@@ -309,129 +263,218 @@ export function Home() {
 
     const intent = intentFor(text);
 
-    switch (intent) {
-      case 'add-vendor':
-        return <VendorInlineForm onConfirmed={(vendor) => {
-          setVendors((prev) => [...prev, vendor]);
-          setOliState('happy');
-          showToast('Borrador de ejemplo confirmado.');
-        }} onCancelled={() => setOliState('idle')} />;
+    // 2. Intent: Review / Approvals
+    if (intent === 'review') {
+      const pendingList = approvals.data?.filter((a) => a.state === 'PENDING') ?? [];
+      const needsReviewCount = stats.needsYouCount;
 
-      case 'vendors':
+      if (needsReviewCount > 0) {
         return (
-          <div>
-            <p>
-              {vendors.length
-                ? 'Estos son los borradores que añadiste en esta propuesta:'
-                : 'Todavía no añadiste proveedores en esta propuesta. Podemos preparar el primero.'}
+          <div className="space-y-3">
+            <p className="text-sm text-ink">
+              {t('You have {n} invoices that need your review and decision.', { n: needsReviewCount })}
             </p>
-            {vendors.map((v, i) => (
-              <p key={i}>
-                {v.name} · {v.service}
-              </p>
-            ))}
-            <div className="reply-actions">
-              <button
-                type="button"
-                className="outline-button"
-                onClick={() => void ask('Quiero agregar un proveedor')}
-              >
-                Agregar proveedor
-              </button>
+            {pendingList.length > 0 && (
+              <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-bone/50 text-xs">
+                {pendingList.slice(0, 3).map((a) => (
+                  <li key={a.id} className="flex items-center justify-between p-2.5">
+                    <div className="min-w-0">
+                      <p className="truncate font-normal text-ink">{a.reason || t('Approval required')}</p>
+                      <p className="text-slate-500">{new Date(a.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <span className="rounded bg-white px-2 py-0.5 text-xs ring-1 ring-inset ring-ink">
+                      {t('Pending')}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link to="/app/approvals" className={buttonClass('primary', 'sm')}>
+                {t('Go to Approvals ({n})', { n: needsReviewCount })} <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
             </div>
           </div>
         );
+      }
 
-      case 'internet':
+      return (
+        <div className="space-y-2">
+          <p className="text-sm text-ink">
+            {t('Everything is up to date! There are no invoices waiting for your review right now.')}
+          </p>
+          <p className="text-xs text-slate-500">
+            {t('Oli will notify you if an invoice exceeds automatic limits or has agreement mismatches.')}
+          </p>
+        </div>
+      );
+    }
+
+    // 3. Intent: Budget
+    if (intent === 'budget') {
+      if (budget) {
+        const remaining = Math.max(0, budget.limitMinor - budget.reservedMinor);
+        const percent = budget.limitMinor > 0 ? Math.round((budget.reservedMinor / budget.limitMinor) * 100) : 0;
         return (
-          <InternetAnswer
-            september={INTERNET_SEPTEMBER}
-          />
-        );
-
-      case 'budget':
-        return (
-          <div>
-            <p>Tu ejemplo de octubre tiene margen para seguir operando.</p>
-            <strong className="answer-number">{money(PROPOSAL_BUDGET.total - PROPOSAL_BUDGET.reserved)} disponibles</strong>
-            <p>
-              Hay {money(PROPOSAL_BUDGET.reserved)} reservados de un presupuesto de {money(PROPOSAL_BUDGET.total)}. La
-              factura pendiente de USD 450 todavía no consume presupuesto. La duplicada de USD 120 está bloqueada.
+          <div className="space-y-3">
+            <p className="text-sm text-ink">
+              {t('Here is your budget status for period {period}:', { period: budget.periodKey })}
             </p>
-            <p className="answer-note">
-              Datos de ejemplo. Las reservas representan autorizaciones simuladas, no pagos ejecutados.
-            </p>
-          </div>
-        );
-
-      case 'blocked': {
-        const inv = PROPOSAL_INVOICES.find((i) => i.id === 'pixel');
-        return inv ? <InvoiceAnswerCard invoice={inv} /> : null;
-      }
-      case 'cloud': {
-        const inv = PROPOSAL_INVOICES.find((i) => i.id === 'cloud');
-        return inv ? <InvoiceAnswerCard invoice={inv} /> : null;
-      }
-      case 'linea': {
-        const inv = PROPOSAL_INVOICES.find((i) => i.id === 'linea');
-        return inv ? <InvoiceAnswerCard invoice={inv} /> : null;
-      }
-      case 'fibra': {
-        const inv = PROPOSAL_INVOICES.find((i) => i.id === 'fibra');
-        return inv ? <InvoiceAnswerCard invoice={inv} /> : null;
-      }
-      case 'review': {
-        const inv = PROPOSAL_INVOICES.find((i) => i.id === 'acme');
-        return inv ? <InvoiceAnswerCard invoice={inv} /> : null;
-      }
-
-      case 'upload':
-        return (
-          <div>
-            <p>
-              Puedes adjuntar un PDF, PNG o JPG desde el clip, o arrastrarlo al campo de mensaje. Hasta 4 archivos de 5
-              MB por vez.
-            </p>
-            <p className="answer-note">
-              La propuesta muestra cómo sería la interacción. Para procesar documentos usa la app actual.
-            </p>
-          </div>
-        );
-
-      default:
-        return (
-          <div>
-            <p>
-              Esta propuesta tiene tres recorridos para explorar: preparar un proveedor, consultar internet o revisar una
-              factura pendiente. ¿Por cuál empezamos?
-            </p>
-            <div className="reply-actions">
-              <button type="button" onClick={() => void ask('Quiero agregar un proveedor')}>
-                Proveedor
-              </button>
-              <button type="button" onClick={() => void ask('Gastos de internet')}>
-                Internet
-              </button>
-              <button type="button" onClick={() => void ask('Facturas pendientes')}>
-                Pendientes
-              </button>
+            <div className="rounded-lg border border-hairline bg-bone/60 p-3.5">
+              <div className="flex items-baseline justify-between text-xs">
+                <span className="text-slate-600">{t('Reserved / Limit')}</span>
+                <span className="tabular-nums text-ink">{percent}% {t('reserved')}</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-sm bg-smoke">
+                <div
+                  className={percent >= 70 ? 'h-full bg-ink' : 'h-full bg-highlighter'}
+                  style={{ width: `${Math.min(100, percent)}%` }}
+                />
+              </div>
+              <div className="mt-2 flex items-baseline justify-between text-xs">
+                <span className="text-slate-500">{t('Available to spend:')}</span>
+                <span className="text-sm font-normal tabular-nums text-ink">{formatMoney(remaining, budget.currency)}</span>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link to="/app/rules" className={buttonClass('secondary', 'sm')}>
+                {t('View rules and limits')} <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
             </div>
           </div>
         );
+      }
+      return (
+        <p className="text-sm text-ink">
+          {t('No active budget policy is configured yet. You can set limits under Rules.')}
+        </p>
+      );
     }
-  };
 
-  const handleResetChat = () => {
-    setMessages([]);
-    setChatActive(false);
-    setPromptText('');
-    setAttachedFiles([]);
-    setInputError(null);
-    setOliState('idle');
-    setBusy(false);
-    if (textareaRef.current) {
-      textareaRef.current.focus();
+    // 4. Intent: Due
+    if (intent === 'due') {
+      const upcoming = stats.upcoming;
+      const overdue = stats.overdue;
+      const totalDue = upcoming.length + overdue.length;
+
+      if (totalDue > 0) {
+        return (
+          <div className="space-y-3">
+            <p className="text-sm text-ink">
+              {overdue.length > 0
+                ? t('{o} overdue and {u} invoices due in the next 14 days.', { o: overdue.length, u: upcoming.length })
+                : t('{u} invoices due in the next 14 days.', { u: upcoming.length })}
+            </p>
+            <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-bone/50 text-xs">
+              {[...overdue, ...upcoming].slice(0, 3).map((inv) => (
+                <li key={inv.id} className="flex items-center justify-between p-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-ink">{invoiceTitle(inv)}</p>
+                    <p className={isOverdue(inv.dueDate) ? 'text-ink font-normal' : 'text-slate-500'}>
+                      {dueLabel(inv.dueDate)}
+                    </p>
+                  </div>
+                  <span className="tabular-nums text-ink">{formatMoney(inv.amountMinor, inv.currency)}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
+                {t('View all bills')} <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <p className="text-sm text-ink">
+          {t('Nothing due in the next two weeks. All payments are clear!')}
+        </p>
+      );
     }
+
+    // 5. Intent: Blocked
+    if (intent === 'blocked') {
+      const blockedCount = stats.blockedCount;
+      if (blockedCount > 0) {
+        return (
+          <div className="space-y-3">
+            <p className="text-sm text-ink">
+              {t('Oli has blocked {n} invoices due to policy rules.', { n: blockedCount })}
+            </p>
+            <p className="text-xs text-slate-500">
+              {t('Invoices are blocked when vendors are unauthorized, duplicate invoice numbers appear, or amounts exceed the hard ceiling.')}
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link to="/app/bills?outcome=BLOCKED" className={buttonClass('secondary', 'sm')}>
+                {t('View blocked invoices')} <ArrowRight className="size-3.5" aria-hidden />
+              </Link>
+            </div>
+          </div>
+        );
+      }
+      return (
+        <p className="text-sm text-ink">
+          {t('Great news: you have zero blocked invoices in your organization.')}
+        </p>
+      );
+    }
+
+    // 6. Intent: Upload
+    if (intent === 'upload') {
+      return (
+        <div className="space-y-3">
+          <p className="text-sm text-ink">
+            {t('You can upload invoices right here by attaching files or dropping them into the composer.')}
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              className={buttonClass('primary', 'sm')}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="size-3.5" aria-hidden /> {t('Choose invoice file')}
+            </button>
+            <Link to="/app/bills" className={buttonClass('secondary', 'sm')}>
+              {t('Open full bills uploader')} <ArrowRight className="size-3.5" aria-hidden />
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    // 7. General help
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-ink">
+          {t('I am Oli, your AP copilot. I review invoices against your policies, monitor budget reservations, and ask you whenever an exception requires human authorization.')}
+        </p>
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          <button
+            type="button"
+            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
+            onClick={() => void ask(t('¿Qué facturas necesitan mi revisión?'))}
+          >
+            {t('Needs approval')}
+          </button>
+          <button
+            type="button"
+            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
+            onClick={() => void ask(t('¿Cómo va el presupuesto de este mes?'))}
+          >
+            {t('Budget status')}
+          </button>
+          <button
+            type="button"
+            className="rounded-md border border-hairline bg-white px-2.5 py-1 text-xs text-slate-700 hover:border-ink hover:text-ink"
+            onClick={() => void ask(t('¿Qué facturas vencen en los próximos 14 días?'))}
+          >
+            {t('Coming due')}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const handleFormSubmit = (e: FormEvent) => {
@@ -439,642 +482,437 @@ export function Home() {
     void ask(promptText);
   };
 
-  const currentOrgName = me.data?.org?.name ?? 'Lumen Atlas, empresa de ejemplo';
-  const filteredInvoices = PROPOSAL_INVOICES.filter(
-    (i) => invoiceFilter === 'all' || i.status === invoiceFilter
-  );
-
   return (
-    <div className="proposal-page">
-      {/* Top Banner */}
-      <div className="proposal-strip">
-        <span>
-          <strong>Propuesta</strong>
-          <span className="strip-detail">Una nueva forma de trabajar con Oli</span>
-        </span>
-        <span>Datos de ejemplo</span>
-      </div>
-
-      {/* Header */}
-      <header className="site-header">
-        <Link to="/app" className="brand" aria-label="Oli, inicio de la propuesta">
-          <span className="brand-mark" aria-hidden="true">
-            O
-          </span>
-          Oli
-        </Link>
-
-        <nav className="proposal-nav" aria-label="Navegación principal">
-          <a
-            href="#inicio"
-            className={location.hash !== '#facturas' ? 'nav-active' : ''}
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-              window.history.replaceState(null, '', '#inicio');
-            }}
-          >
-            Tu espacio
-          </a>
-          <a
-            href="#facturas"
-            className={location.hash === '#facturas' ? 'nav-active' : ''}
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById('facturas')?.scrollIntoView({ behavior: 'smooth' });
-              window.history.replaceState(null, '', '#facturas');
-            }}
-          >
-            Facturas
-          </a>
-          <Link to="/app/rules">Reglas</Link>
-          <Link to="/app/approvals">Aprobaciones</Link>
-          <Link to="/app/bills" className="back-app">
-            Ver app actual <ExternalLink className="icon size-3.5" />
-          </Link>
-        </nav>
-
-        <div className="header-actions">
-          <LanguageSwitcher />
-        </div>
-      </header>
-
-      {/* Main Container */}
-      <main id="inicio">
-        {/* Workspace section */}
-        <section className={`workspace ${chatActive ? 'chat-active' : ''}`} aria-labelledby="welcome-title">
-          <div className="oli-presence">
-            <div className="oli-canvas-wrapper">
-              <Oli
-                state={oliState}
-                dark={false}
-                speed={0.72}
-                particles={2200}
-                size={chatActive ? 140 : 210}
-                label="Oli, tu asistente de finanzas"
-              />
-            </div>
+    <div className="space-y-8">
+      {/* ───────────────── 1. OLI COPILOT HERO & TEXTFIELD ───────────────── */}
+      <section
+        aria-label={t('Oli Copilot')}
+        onDragEnter={handleDragEnter}
+        onDragOver={(e) => e.preventDefault()}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={cn(
+          'relative overflow-hidden rounded-2xl border bg-white p-6 transition-all sm:p-8',
+          isDragging ? 'border-ink ring-2 ring-highlighter' : 'border-hairline shadow-sm',
+        )}
+      >
+        <div className="flex flex-col items-center text-center">
+          {/* Oli Animated Canvas Presence */}
+          <div className="relative mb-2 flex size-[120px] items-center justify-center sm:size-[140px]">
+            <Oli
+              state={oliState}
+              dark={false}
+              speed={0.75}
+              particles={1800}
+              size={140}
+              label={t('Oli Assistant')}
+            />
           </div>
 
-          <div className="welcome">
-            <h1 id="welcome-title">¿Qué resolvemos hoy?</h1>
-            <p>Cuéntame qué necesitas. Yo te ayudo con las cuentas.</p>
-          </div>
+          {/* Heading */}
+          <h1 className="text-2xl font-normal tracking-tight text-ink sm:text-3xl">
+            {firstName ? t('Hi {name}, what are we resolving today?', { name: firstName }) : t('What are we resolving today?')}
+          </h1>
+          <p className="mt-1.5 max-w-lg text-sm text-slate-500">
+            {t('I review invoices against your mandate, monitor budgets, and flag what needs your approval.')}
+          </p>
 
-          {/* Conversation history */}
-          {chatActive && (
-            <section id="conversation" className="conversation" aria-label="Conversación de ejemplo">
-              <div className="conversation-top">
-                <span>Conversación de ejemplo</span>
-                <button type="button" className="text-button" onClick={handleResetChat}>
-                  Empezar de nuevo <Plus className="icon size-3.5" />
+          {/* Chat Turn History (if active) */}
+          {messages.length > 0 && (
+            <div className="mt-6 w-full max-w-2xl space-y-3.5 text-left">
+              <div className="flex items-center justify-between border-b border-hairline pb-2">
+                <span className="text-xs font-normal text-slate-400">
+                  <Sparkles className="mr-1 inline size-3 text-highlighter" /> {t('Conversation with Oli')}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMessages([]);
+                    setOliState('idle');
+                  }}
+                  className="flex items-center gap-1 text-xs text-slate-400 hover:text-ink"
+                >
+                  <RotateCcw className="size-3" /> {t('Clear')}
                 </button>
               </div>
 
-              <div id="messages" className="chat-messages" role="log" aria-live="polite">
-                {messages.map((m) => (
-                  <div key={m.id} className={`message ${m.kind}`}>
-                    {m.kind === 'assistant' && (
-                      <div className="reply-label">
-                        <i />
-                        Oli
-                      </div>
+              <div className="max-h-[320px] space-y-3 overflow-y-auto pr-1">
+                {messages.map((turn) => (
+                  <div
+                    key={turn.id}
+                    className={cn(
+                      'flex flex-col gap-1',
+                      turn.kind === 'user' ? 'items-end' : 'items-start',
                     )}
-                    {m.text && <p>{m.text}</p>}
-                    {m.files && m.files.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {m.files.map((f, idx) => (
-                          <div key={idx} className="file-chip">
-                            <FileText className="icon size-3.5" />
-                            <span className="name">{f.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {m.contentNode}
+                  >
+                    <div
+                      className={cn(
+                        'max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed sm:max-w-[80%]',
+                        turn.kind === 'user'
+                          ? 'bg-ink text-white'
+                          : 'border border-hairline bg-bone text-ink',
+                      )}
+                    >
+                      {turn.text && <p className="whitespace-pre-wrap">{turn.text}</p>}
+
+                      {turn.files && turn.files.length > 0 && (
+                        <div className="mt-2 space-y-1">
+                          {turn.files.map((f, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center gap-2 rounded bg-white/10 px-2 py-1 text-xs"
+                            >
+                              <FileText className="size-3.5" />
+                              <span className="truncate">{f.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {turn.contentNode}
+                    </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
               </div>
-            </section>
+            </div>
           )}
 
-          {/* Composer */}
+          {/* Interactive Composer / Textfield */}
           <form
-            id="composer"
-            className={`composer ${isDragging ? 'dragging' : ''}`}
             onSubmit={handleFormSubmit}
-            onDragEnter={(e) => {
-              e.preventDefault();
-              dragCounter.current++;
-              setIsDragging(true);
-              setOliState('listening');
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
-            }}
-            onDragLeave={() => {
-              dragCounter.current = Math.max(0, dragCounter.current - 1);
-              if (!dragCounter.current) setIsDragging(false);
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              dragCounter.current = 0;
-              setIsDragging(false);
-              handleFilesSelected(e.dataTransfer.files);
-            }}
-            noValidate
+            className="mt-6 w-full max-w-2xl text-left"
           >
-            <label className="sr-only" htmlFor="prompt">
-              Escríbele a Oli o adjunta facturas de ejemplo
-            </label>
-            <textarea
-              id="prompt"
-              ref={textareaRef}
-              rows={2}
-              maxLength={1000}
-              className="proposal-prompt"
-              placeholder={HINTS[hintIndex]}
-              value={promptText}
-              onChange={(e) => {
-                setPromptText(e.target.value);
-                setOliState('listening');
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
-              }}
-              onFocus={() => setOliState('listening')}
-              onBlur={() => {
-                if (!busy) setOliState('idle');
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                  e.preventDefault();
-                  void ask(promptText);
-                }
-              }}
-              aria-describedby="composer-help"
-            />
-
-            {attachedFiles.length > 0 && (
-              <div id="attachments" className="attachments" aria-label="Archivos adjuntos">
-                {attachedFiles.map((file, idx) => (
-                  <div key={idx} className="file-chip">
-                    <FileText className="icon size-3.5" />
-                    <span className="name">{file.name}</span>
-                    <button
-                      type="button"
-                      aria-label={`Retirar ${file.name}`}
-                      onClick={() => removeFile(idx)}
+            <div className="rounded-xl border border-slate-300 bg-white p-3 transition-colors focus-within:border-ink focus-within:ring-1 focus-within:ring-ink">
+              {/* Attached file chips */}
+              {attachedFiles.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  {attachedFiles.map((f, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center gap-1.5 rounded-md bg-bone px-2 py-1 text-xs text-slate-700 ring-1 ring-inset ring-hairline"
                     >
-                      <X className="icon size-3.5" />
-                    </button>
-                  </div>
-                ))}
+                      <FileText className="size-3.5 text-slate-500" />
+                      <span className="max-w-[140px] truncate">{f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(i)}
+                        className="rounded p-0.5 text-slate-400 hover:text-ink"
+                        aria-label={t('Remove file')}
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Textarea */}
+              <textarea
+                ref={textareaRef}
+                value={promptText}
+                onChange={(e) => {
+                  setPromptText(e.target.value);
+                  setOliState(e.target.value.length > 0 ? 'listening' : 'idle');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    void ask(promptText);
+                  }
+                }}
+                placeholder={HINTS[hintIndex]}
+                rows={2}
+                className="w-full resize-none border-0 bg-transparent p-1 text-sm leading-relaxed text-ink placeholder:text-slate-400 focus:outline-none"
+              />
+
+              {/* Action bar inside textfield */}
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-slate-600 transition-colors hover:bg-bone hover:text-ink"
+                    title={t('Attach invoice (PDF, PNG, JPG)')}
+                  >
+                    <Paperclip className="size-4" />
+                    <span className="hidden sm:inline">{t('Attach invoice')}</span>
+                  </button>
+                  <span className="hidden text-xs text-slate-400 sm:inline">
+                    · {t('or drag & drop files')}
+                  </span>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept={UPLOAD.accept}
+                    className="sr-only"
+                    onChange={(e) => {
+                      handleFilesSelected(e.target.files);
+                      e.target.value = '';
+                    }}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={busy || (!promptText.trim() && attachedFiles.length === 0)}
+                  className={cn(
+                    'grid size-8 place-items-center rounded-lg transition-colors',
+                    promptText.trim() || attachedFiles.length > 0
+                      ? 'bg-highlighter text-ink hover:opacity-90'
+                      : 'bg-smoke text-slate-400 cursor-not-allowed',
+                  )}
+                  aria-label={t('Send message to Oli')}
+                >
+                  <ArrowUp className="size-4" />
+                </button>
               </div>
+            </div>
+
+            {inputError && (
+              <p className="mt-2 text-xs text-rose-600">{inputError}</p>
             )}
 
-            <div className="composer-actions">
-              <button
-                type="button"
-                className="attach-button"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Paperclip className="icon size-4" />
-                <span>Adjuntar factura</span>
-              </button>
-              <span className="drop-hint">o arrástrala aquí</span>
-
-              <button
-                id="send"
-                type="submit"
-                className="send-button"
-                disabled={busy || (!promptText.trim() && attachedFiles.length === 0)}
-                aria-label="Enviar mensaje a Oli"
-              >
-                <ArrowUp className="icon size-5" />
-              </button>
-            </div>
-
-            <div className="drop-overlay" aria-hidden="true">
-              <Upload className="icon size-7" />
-              <strong>Suelta tus facturas aquí.</strong>
-              <span>PDF, PNG o JPG · hasta 5 MB por archivo</span>
+            {/* Suggestions Chips */}
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
+              {SUGGESTIONS.map((s, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => void ask(s.query)}
+                  className="rounded-full border border-hairline bg-bone px-3 py-1 text-xs text-slate-600 transition-colors hover:border-ink hover:text-ink"
+                >
+                  {s.label}
+                </button>
+              ))}
             </div>
           </form>
+        </div>
+      </section>
 
-          <input
-            id="file-picker"
-            ref={fileInputRef}
-            className="sr-only"
-            type="file"
-            accept="application/pdf,image/png,image/jpeg"
-            multiple
-            tabIndex={-1}
-            aria-label="Seleccionar facturas de ejemplo"
-            onChange={(e) => {
-              handleFilesSelected(e.target.files);
-              e.target.value = '';
-            }}
-          />
-
-          <p id="composer-help" className="composer-help">
-            Prueba la conversación. Los archivos se quedan en tu navegador.
-          </p>
-
-          {inputError && (
-            <p id="input-error" className="input-error" role="alert">
-              {inputError}
+      {/* ───────────────── 2. LIVE DASHBOARD (APP ACTUAL) ───────────────── */}
+      <section aria-label={t('Overview')} className="space-y-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-normal text-ink">{t('Organization Overview')}</h2>
+            <p className="text-sm text-slate-500">
+              {t('Live activity evaluated against your finance mandate.')}
             </p>
-          )}
-
-          {!chatActive && (
-            <>
-              <div className="suggestions" aria-label="Ideas para empezar">
-                <button
-                  type="button"
-                  onClick={() => {
-                    void ask('Quiero agregar un proveedor');
-                    document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  <Plus className="icon size-3.5" />
-                  Agregar un proveedor
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void ask('¿Cuánto gasté en internet el mes pasado?');
-                    document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  Ver mis gastos de internet <ArrowRight className="icon size-3.5 ml-1" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void ask('¿Qué facturas necesitan mi revisión?');
-                    document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                >
-                  ¿Qué necesita mi atención? <ArrowRight className="icon size-3.5 ml-1" />
-                </button>
-              </div>
-
-              <button
-                type="button"
-                className="attention-note"
-                onClick={() => {
-                  void ask('¿Por qué está pendiente la factura de Acme Accounting Demo?');
-                  document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <span className="attention-dot" aria-hidden="true" />
-                <span>Hay una factura que necesita tu visto bueno.</span>
-                <ArrowRight className="icon size-3.5" />
-              </button>
-            </>
-          )}
-        </section>
-
-        {/* Overview section (#facturas) */}
-        <section className="overview" id="facturas" aria-labelledby="overview-title">
-          <div className="section-heading">
-            <div>
-              <h2 id="overview-title">Tus cuentas, a la vista.</h2>
-              <p>Octubre de 2026 · {currentOrgName}</p>
-            </div>
-            <button
-              type="button"
-              className="outline-button"
-              onClick={() => {
-                document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                fileInputRef.current?.click();
-              }}
-            >
-              <Upload className="icon size-4" />
-              Subir factura
-            </button>
           </div>
+          <Beam>
+            <Link to="/app/bills" className={buttonClass('primary', 'md')}>
+              <Upload className="size-4" aria-hidden /> {t('Upload invoices')}
+            </Link>
+          </Beam>
+        </div>
 
-          <div className="overview-grid">
-            <section className="invoice-panel" aria-label="Facturas de ejemplo">
-              <div className="filters" role="group" aria-label="Filtrar facturas">
-                <button
-                  type="button"
-                  className={invoiceFilter === 'all' ? 'selected' : ''}
-                  aria-pressed={invoiceFilter === 'all'}
-                  onClick={() => setInvoiceFilter('all')}
-                >
-                  Todas <span>5</span>
-                </button>
-                <button
-                  type="button"
-                  className={invoiceFilter === 'approved' ? 'selected' : ''}
-                  aria-pressed={invoiceFilter === 'approved'}
-                  onClick={() => setInvoiceFilter('approved')}
-                >
-                  Aprobadas <span>3</span>
-                </button>
-                <button
-                  type="button"
-                  className={invoiceFilter === 'review' ? 'selected' : ''}
-                  aria-pressed={invoiceFilter === 'review'}
-                  onClick={() => setInvoiceFilter('review')}
-                >
-                  Por revisar <span>1</span>
-                </button>
-                <button
-                  type="button"
-                  className={invoiceFilter === 'blocked' ? 'selected' : ''}
-                  aria-pressed={invoiceFilter === 'blocked'}
-                  onClick={() => setInvoiceFilter('blocked')}
-                >
-                  Bloqueadas <span>1</span>
-                </button>
-              </div>
+        {/* 4 Summary Stat Cards */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Stat
+            loading={invoices.isLoading}
+            label={t('Approved invoices')}
+            value={stats.approvedCount}
+            icon={<CheckCircle2 className="size-5" />}
+            tone="emerald"
+            to="/app/bills?outcome=APPROVED"
+          />
+          <Stat
+            loading={invoices.isLoading}
+            label={t('Blocked')}
+            value={stats.blockedCount}
+            icon={<Ban className="size-5" />}
+            tone="rose"
+            to="/app/bills?outcome=BLOCKED"
+          />
+          <Stat
+            loading={invoices.isLoading}
+            label={t('Needs you')}
+            value={stats.needsYouCount}
+            icon={<Hand className="size-5" />}
+            tone="amber"
+            to="/app/approvals"
+          />
+          <Stat
+            loading={invoices.isLoading}
+            label={t('Due in 14 days')}
+            value={stats.upcoming.length}
+            icon={<CalendarClock className="size-5" />}
+            tone="indigo"
+            to="/app/bills"
+          />
+        </div>
 
-              <div id="invoice-list" className="invoice-list">
-                {filteredInvoices.map((inv) => (
-                  <button
-                    key={inv.id}
-                    type="button"
-                    className="invoice-row"
-                    onClick={() => {
-                      void ask('Explícame la factura de ' + inv.vendor);
-                      document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    aria-label={`${inv.vendor}, ${money(inv.amount)}, ${
-                      inv.status === 'approved' ? 'Aprobada' : inv.status === 'review' ? 'Por revisar' : 'Bloqueada'
-                    }. Ver explicación de ejemplo.`}
-                  >
-                    <span className="invoice-icon">
-                      <FileText className="icon size-4" />
-                    </span>
-                    <span>
-                      <span className="vendor-name">{inv.vendor}</span>
-                      <span className="invoice-meta">{inv.concept}</span>
-                    </span>
-                    <span className={`invoice-status ${inv.status}`}>
-                      {inv.status === 'approved' && <CheckCircle2 className="icon size-3.5" />}
-                      {inv.status === 'review' && <Clock className="icon size-3.5" />}
-                      {inv.status === 'blocked' && <Ban className="icon size-3.5" />}
-                      {inv.status === 'approved' ? 'Aprobada' : inv.status === 'review' ? 'Por revisar' : 'Bloqueada'}
-                    </span>
-                    <span className="invoice-amount">${inv.amount.toFixed(2)}</span>
-                  </button>
-                ))}
-              </div>
+        {/* 2 Column + 1 Column Layout */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Primary Column (2 cols) */}
+          <div className="space-y-6 lg:col-span-2">
+            <InboxPreview />
 
-              <div className="invoice-footer">
-                <span>
-                  <ShieldCheck className="icon size-3.5" />
-                  Las reglas siguen al mando.
-                </span>
-                <Link to="/app/bills">
-                  Abrir vista clásica <ExternalLink className="icon size-3.5 ml-1" />
-                </Link>
-              </div>
-            </section>
-
-            {/* Right Month Panel */}
-            <aside className="month-panel" aria-labelledby="month-title">
-              <div className="month-heading">
-                <h3 id="month-title">Aprobado este mes</h3>
-                <span>USD</span>
-              </div>
-              <p className="month-total">
-                449<span>.00</span>
-              </p>
-              <p className="month-note">Autorizaciones simuladas. Sin mover dinero.</p>
-
-              <figure className="chart">
-                <figcaption className="sr-only">
-                  Facturas aprobadas de ejemplo: mayo USD310, junio350, julio330, agosto410, septiembre389 y octubre449.
-                </figcaption>
-                <div className="bars" aria-hidden="true">
-                  <div>
-                    <span>310</span>
-                    <i style={{ '--bar': '62%' } as React.CSSProperties} />
-                    <small>May</small>
-                  </div>
-                  <div>
-                    <span>350</span>
-                    <i style={{ '--bar': '70%' } as React.CSSProperties} />
-                    <small>Jun</small>
-                  </div>
-                  <div>
-                    <span>330</span>
-                    <i style={{ '--bar': '66%' } as React.CSSProperties} />
-                    <small>Jul</small>
-                  </div>
-                  <div>
-                    <span>410</span>
-                    <i style={{ '--bar': '82%' } as React.CSSProperties} />
-                    <small>Ago</small>
-                  </div>
-                  <div>
-                    <span>389</span>
-                    <i style={{ '--bar': '78%' } as React.CSSProperties} />
-                    <small>Sep</small>
-                  </div>
-                  <div className="current">
-                    <span>449</span>
-                    <i style={{ '--bar': '90%' } as React.CSSProperties} />
-                    <small>Oct</small>
-                  </div>
+            <Card>
+              <CardHeader
+                title={t('Recent activity')}
+                action={
+                  <Link to="/app/bills" className="text-sm text-ink underline underline-offset-2">
+                    {t('View all')}
+                  </Link>
+                }
+              />
+              {invoices.isLoading ? (
+                <div className="space-y-3 p-5">
+                  {[0, 1, 2].map((i) => (
+                    <Skeleton key={i} className="h-10" />
+                  ))}
                 </div>
-              </figure>
-
-              <div className="budget-label">
-                <span>Presupuesto disponible</span>
-                <strong>USD 1,551</strong>
-              </div>
-              <meter
-                min={0}
-                max={2000}
-                value={449}
-                aria-label="USD449 reservados de USD2000 de presupuesto"
-              >
-                449 de 2000
-              </meter>
-              <p className="budget-caption">USD 449 reservados de USD 2,000</p>
-
-              <button
-                type="button"
-                className="text-button month-question"
-                onClick={() => {
-                  void ask('Explícame cómo va mi presupuesto este mes');
-                  document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <span>Oli, explícame mi mes</span>
-                <ArrowRight className="icon size-3.5" />
-              </button>
-            </aside>
+              ) : list.length === 0 ? (
+                <EmptyState
+                  title={t('No invoices yet')}
+                  body={t('Upload your first invoice and Oli will review it against your rules.')}
+                  action={
+                    <Link to="/app/bills" className={buttonClass('primary')}>
+                      {t('Upload invoices')}
+                    </Link>
+                  }
+                />
+              ) : (
+                <InvoiceList invoices={list.slice(0, 6)} compact />
+              )}
+            </Card>
           </div>
-        </section>
-      </main>
 
-      {/* Footer */}
-      <footer className="site-footer">
-        <span>Propuesta para conversar con Whady.</span>
-        <span>Interacciones demostrativas · Sin cambios en tu cuenta</span>
-      </footer>
+          {/* Secondary Column (1 col) */}
+          <div className="space-y-6">
+            {/* Briefing Card */}
+            <Card className="border-obsidian bg-obsidian text-white">
+              <div className="p-5">
+                <h3 className="caption !text-slate-400">
+                  {t('{name}’s briefing', { name: brand.name })}
+                </h3>
+                {invoices.isLoading ? (
+                  <Skeleton className="mt-3 h-16 opacity-30" />
+                ) : (
+                  <ul className="mt-3 space-y-2 text-sm leading-relaxed text-white">
+                    {briefing.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </Card>
 
-      {/* Toast */}
-      {toastMessage && (
-        <div id="toast" className="toast" role="status">
-          {toastMessage}
+            {/* Budget Progress Card */}
+            {budget && used != null && (
+              <Card className="p-5">
+                <div className="flex items-baseline justify-between">
+                  <h3 className="text-sm text-ink">
+                    {t('Budget · {period}', { period: budget.periodKey })}
+                  </h3>
+                  <span className="text-xs text-slate-500">{t('{n}% reserved', { n: used })}</span>
+                </div>
+                <div
+                  className="mt-3 h-2 overflow-hidden rounded-sm bg-bone ring-1 ring-inset ring-hairline"
+                  role="progressbar"
+                  aria-valuenow={used}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={t('Budget reserved')}
+                >
+                  <div
+                    className={used >= 70 ? 'h-full bg-ink' : 'h-full bg-highlighter'}
+                    style={{ width: `${used}%` }}
+                  />
+                </div>
+                <p className="mt-2 text-sm text-slate-600">
+                  {t('{left} left of {total}', {
+                    left: formatMoney(Math.max(0, budget.limitMinor - budget.reservedMinor), budget.currency),
+                    total: formatMoney(budget.limitMinor, budget.currency),
+                  })}
+                </p>
+              </Card>
+            )}
+
+            {/* Coming Due Card */}
+            <Card>
+              <CardHeader title={t('Coming due')} />
+              {stats.upcoming.length === 0 && stats.overdue.length === 0 ? (
+                <p className="px-5 py-6 text-sm text-slate-500">
+                  {t('Nothing due in the next two weeks.')}
+                </p>
+              ) : (
+                <ul className="divide-y divide-hairline">
+                  {[...stats.overdue, ...stats.upcoming].slice(0, 5).map((inv) => (
+                    <li key={inv.id}>
+                      <Link
+                        to={`/app/bills/${inv.id}`}
+                        className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-bone"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm text-ink">{invoiceTitle(inv)}</p>
+                          <p
+                            className={`text-xs ${
+                              isOverdue(inv.dueDate)
+                                ? 'text-ink underline decoration-dotted underline-offset-2'
+                                : 'text-slate-500'
+                            }`}
+                          >
+                            {dueLabel(inv.dueDate)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm tabular-nums text-ink">
+                            {formatMoney(inv.amountMinor, inv.currency)}
+                          </p>
+                          <OutcomeBadge outcome={getOutcome(inv)} className="mt-1" />
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+          </div>
         </div>
-      )}
+      </section>
     </div>
   );
 }
 
-function VendorInlineForm({
-  onConfirmed,
-  onCancelled,
+const TONES = {
+  emerald: 'bg-highlighter text-ink',
+  rose: 'bg-ink text-white',
+  amber: 'bg-white text-ink ring-1 ring-inset ring-ink',
+  indigo: 'bg-bone text-ink',
+} as const;
+
+function Stat({
+  label,
+  value,
+  icon,
+  tone,
+  to,
+  loading,
 }: {
-  onConfirmed: (vendor: LocalVendor) => void;
-  onCancelled: () => void;
+  label: string;
+  value: number;
+  icon: ReactNode;
+  tone: keyof typeof TONES;
+  to: string;
+  loading?: boolean;
 }) {
-  const [vendorName, setVendorName] = useState('');
-  const [service, setService] = useState('');
-  const [step, setStep] = useState<'form' | 'confirm' | 'done'>('form');
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    if (!vendorName.trim() || !service.trim()) return;
-    setStep('confirm');
-  };
-
-  if (step === 'done') {
-    return (
-      <div>
-        <p>
-          {vendorName} quedó en la lista de esta propuesta. El siguiente paso sería definir su acuerdo y revisar las reglas.
-        </p>
-        <p className="answer-note">
-          Borrador local. No se creó un proveedor en tu cuenta ni se autorizó ningún pago.
-        </p>
-      </div>
-    );
-  }
-
-  if (step === 'confirm') {
-    return (
-      <div>
-        <p>
-          De acuerdo: {vendorName}, para {service}. ¿Lo guardamos como borrador?
-        </p>
-        <div className="reply-actions">
-          <button
-            type="button"
-            className="primary"
-            onClick={() => {
-              setStep('done');
-              onConfirmed({ name: vendorName.trim(), service: service.trim() });
-            }}
-          >
-            Confirmar borrador de ejemplo
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setStep('done');
-              onCancelled();
-            }}
-          >
-            Cancelar
-          </button>
-        </div>
-        <p className="answer-note">Solo en esta propuesta. Guardar un proveedor no habilita pagos.</p>
-      </div>
-    );
-  }
-
   return (
-    <div>
-      <p>Empecemos por lo esencial. ¿Cómo se llama y qué servicio te presta?</p>
-      <form onSubmit={handleSubmit} className="vendor-form">
-        <label>
-          Nombre del proveedor
-          <input
-            name="vendor"
-            required
-            maxLength={80}
-            placeholder="Ej. Faro Telecom Demo"
-            value={vendorName}
-            onChange={(e) => setVendorName(e.target.value)}
-          />
-        </label>
-        <label>
-          Servicio
-          <input
-            name="service"
-            required
-            maxLength={80}
-            placeholder="Ej. Internet de la oficina"
-            value={service}
-            onChange={(e) => setService(e.target.value)}
-          />
-        </label>
-        <button type="submit" className="inline-primary">
-          Preparar proveedor
-        </button>
-      </form>
-      <p className="answer-note">Ejemplo interactivo: no se modificará tu cuenta.</p>
-    </div>
-  );
-}
-
-function InternetAnswer({ september }: { september: typeof INTERNET_SEPTEMBER }) {
-  const [compared, setCompared] = useState(false);
-
-  return (
-    <div>
-      <p>En el ejemplo de {september.period}, tienes una factura de internet:</p>
-      <strong className="answer-number">{money(september.amount)}</strong>
-      <div className="review-line">
-        <span>{september.vendor}</span>
-        <small>{september.invoice}</small>
+    <Link
+      to={to}
+      className="rounded-2xl border border-hairline bg-white p-5 transition-colors hover:border-ink"
+    >
+      <div className={`grid size-9 place-items-center rounded-lg ${TONES[tone]}`} aria-hidden>
+        {icon}
       </div>
-      <p className="answer-note">Es el importe facturado y aprobado de ejemplo. No confirma un pago ejecutado.</p>
-      {!compared ? (
-        <div className="reply-actions">
-          <button type="button" onClick={() => setCompared(true)}>
-            Comparar con octubre
-          </button>
-        </div>
+      {loading ? (
+        <Skeleton className="mt-3 h-8 w-12" />
       ) : (
-        <p className="mt-3">En octubre también son USD 89.00: el importe del servicio no cambió.</p>
+        <p className="mt-3 text-[28px] leading-none tabular-nums text-ink">{value}</p>
       )}
-    </div>
-  );
-}
-
-function InvoiceAnswerCard({
-  invoice,
-}: {
-  invoice: (typeof PROPOSAL_INVOICES)[number];
-}) {
-  return (
-    <div>
-      <p>{invoice.vendor}</p>
-      <strong className="answer-number">{money(invoice.amount)}</strong>
-      <p>{invoice.reason}</p>
-      <div className="reply-actions">
-        <Link
-          to={invoice.status === 'review' ? '/app/approvals' : '/app/bills'}
-          className="outline-button"
-        >
-          {invoice.status === 'review'
-            ? 'Ir a aprobaciones de la app actual'
-            : 'Abrir facturas de la app actual'}{' '}
-          <ExternalLink className="icon ml-1.5 size-3.5" />
-        </Link>
-      </div>
-    </div>
+      <p className="mt-1 text-sm text-slate-500">{label}</p>
+    </Link>
   );
 }

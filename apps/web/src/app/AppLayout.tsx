@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bot, CheckSquare, FileText, Home, LogOut, Menu, MessageCircle, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { Bot, CheckSquare, FileText, Home, Inbox, LogOut, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -15,19 +15,22 @@ import { cn } from '@/lib/cn';
 type NavItem = { to: string; label: string; icon: typeof Home; end?: boolean; badge?: number };
 
 export function AppLayout() {
-  const loc = useLocation();
-  const isHome = loc.pathname === '/app';
+  const nav = useNavigate();
+  const qc = useQueryClient();
   const { data: me } = useMe();
   const approvals = useApprovals();
+  const inbox = useInbox();
   const pending = approvals.data?.filter((a) => a.state === 'PENDING').length ?? 0;
-  // Every hook must run before the early return below: returning first changes the hook count when the
-  // route moves between /app and /app/*, and React throws "Rendered more hooks than during the previous render".
   const [open, setOpen] = useState(false);
 
-  // Home (/app) renders its own full-page layout.
-  if (isHome) {
-    return <Outlet />;
-  }
+  const signOut = async () => {
+    try {
+      await api.logout();
+    } finally {
+      qc.clear();
+      nav('/login');
+    }
+  };
 
   const items: NavItem[] = [
     { to: '/app', label: 'Home', icon: Home, end: true },
@@ -67,6 +70,7 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <DemoBanner />
       <div className="flex flex-1">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-white p-4 lg:flex">
           <Link to="/app" className="mb-6 px-1">
@@ -81,6 +85,9 @@ export function AppLayout() {
                 {me?.user.email} · {me?.role ? t(me.role) : ''}
               </p>
             </div>
+            <button type="button" onClick={signOut} className="inline-flex items-center gap-1.5 text-slate-600 hover:text-ink">
+              <LogOut className="size-4" aria-hidden /> {t('Sign out')}
+            </button>
           </div>
         </aside>
 
@@ -99,6 +106,9 @@ export function AppLayout() {
           {open && (
             <div className="border-b border-hairline bg-white p-3 lg:hidden">
               {links}
+              <button type="button" onClick={signOut} className="mt-2 flex items-center gap-2 px-3 py-2 text-sm text-slate-600">
+                <LogOut className="size-4" aria-hidden /> {t('Sign out')}
+              </button>
             </div>
           )}
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">

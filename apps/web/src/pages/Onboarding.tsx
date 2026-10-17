@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { api, errorMessage } from '@/api';
+import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
@@ -60,8 +61,7 @@ export function Onboarding() {
   }, [mandate.data, draft]);
 
   if (me.isLoading) return <PageLoading />;
-  // The session gate in App.tsx guarantees a session; this only narrows the type.
-  if (!me.data) return null;
+  if (!me.data) return <Navigate to="/login" replace />;
   if (me.data.role === 'approver') return <Navigate to="/app" replace />;
   if (mandate.data?.active) return <Navigate to="/app" replace />;
 
@@ -110,6 +110,7 @@ export function Onboarding() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <DemoBanner />
       <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
           <Logo />

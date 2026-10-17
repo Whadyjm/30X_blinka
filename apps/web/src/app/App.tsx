@@ -3,9 +3,10 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { PageLoading } from '@/components/ui/Card';
 import { env } from '@/config/env';
 import { AppLayout } from './AppLayout';
-import { RequireMandate, RequireSession } from './guards';
+import { RequireAuth, RequireMandate } from './guards';
 import { Providers } from './Providers';
 import { Landing } from '@/pages/Landing';
+import { Login } from '@/pages/Login';
 import { NotFound } from '@/pages/NotFound';
 
 const Onboarding = lazy(() => import('@/pages/Onboarding').then((m) => ({ default: m.Onboarding })));
@@ -25,15 +26,14 @@ export function App() {
       <BrowserRouter>
         <Suspense fallback={<PageLoading />}>
           <Routes>
-            {/* No sign-in screen: root and /login go directly to Home (/app) */}
-            <Route path="/" element={<Navigate to="/app" replace />} />
-            <Route path="/login" element={<Navigate to="/app" replace />} />
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
 
-            <Route path="/app" element={<AppLayout />}>
-              <Route index element={<Home />} />
-              <Route element={<RequireSession />}>
-                <Route element={<RequireMandate />}>
+            <Route element={<RequireAuth />}>
+              <Route path="/onboarding" element={<Onboarding />} />
+              <Route element={<RequireMandate />}>
+                <Route path="/app" element={<AppLayout />}>
+                  <Route index element={<Home />} />
                   <Route path="bills" element={<Bills />} />
                   <Route path="bills/:id" element={<BillDetail />} />
                   <Route path="approvals" element={<Approvals />} />
@@ -45,10 +45,6 @@ export function App() {
                   {env.features.chat && <Route path="chat" element={<ComingSoon title="Chat with Oli" />} />}
                 </Route>
               </Route>
-            </Route>
-
-            <Route element={<RequireSession />}>
-              <Route path="/onboarding" element={<Onboarding />} />
             </Route>
 
             <Route path="/home" element={<Navigate to="/app" replace />} />
