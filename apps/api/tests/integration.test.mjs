@@ -275,7 +275,7 @@ test('ruta pública process usa adapter PDF real con HTTP/AI simulados, sin etiq
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     assert.equal(url, 'https://openrouter.ai/api/v1/chat/completions'); calls++;
     const payload = JSON.parse(options.body);
-    assert.equal(payload.plugins[0].pdf.engine, 'mistral-ocr');
+    assert.equal(payload.plugins[0].pdf.engine, 'native');
     assert.ok(payload.messages[1].content.some(c => c.type === 'file'));
     assert.equal(options.body.includes('Demo Cloud Hosting'), false);
     return Response.json({ model: payload.model, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction(), documentType: 'INVOICE' }) } }] });
