@@ -108,8 +108,7 @@ export async function receiveEmail(message, env) {
   const sender = clean(message.from, 254), subject = clean(parsed.subject, 200) || 'Sin asunto';
   const documents = [];
   for (const part of parsed.attachments ?? []) {
-    // Inline logos and tracking images are not invoice attachments.
-    if (part.contentId && part.disposition === 'inline' && part.mimeType !== 'application/pdf') continue;
+    // Pasted images are MIME parts too; the shared reader must classify their contents.
     const content = new Uint8Array(part.content), mime = documentMime(content);
     if (!mime) continue;
     if (!content.length || content.length > MAX_INVOICE_BYTES) { message.setReject('Cada documento debe pesar hasta 5 MB.'); return; }

@@ -131,7 +131,7 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   assert.equal(mailbox.status, 200); const address = (await mailbox.json()).data.mailbox.address;
   fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
     .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction, invoiceNumber: 'RUNTIME-EMAIL', documentType: 'INVOICE' }) } }] });
-  const raw = `From: supplier@example.invalid\r\nTo: ${address}\r\nSubject: Factura runtime email\r\nMessage-ID: <runtime-email@example.invalid>\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=oli\r\n\r\n--oli\r\nContent-Type: application/pdf\r\nContent-Disposition: attachment; filename=factura.pdf\r\nContent-Transfer-Encoding: base64\r\n\r\n${Buffer.from('%PDF-1.4 synthetic runtime email').toString('base64')}\r\n--oli--\r\n`;
+  const raw = `From: supplier@example.invalid\r\nTo: ${address}\r\nSubject: Factura runtime email\r\nMessage-ID: <runtime-email@example.invalid>\r\nMIME-Version: 1.0\r\nContent-Type: multipart/related; boundary=oli\r\n\r\n--oli\r\nContent-Type: text/html\r\n\r\n<div><img src="cid:invoice-body"></div>\r\n--oli\r\nContent-Type: image/png\r\nContent-Disposition: inline; filename=factura.png\r\nContent-ID: <invoice-body>\r\nContent-Transfer-Encoding: base64\r\n\r\n${Buffer.from([137,80,78,71,13,10,26,10,1]).toString('base64')}\r\n--oli--\r\n`;
   const incoming = await runtime.dispatchFetch(`${origin}/__test_email`, { method: 'POST', body: raw,
     headers: { 'X-Email-From': 'supplier@example.invalid', 'X-Email-To': address } });
   assert.equal((await incoming.json()).rejected, null);
@@ -143,7 +143,9 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     await new Promise(resolve => setTimeout(resolve, 50));
   }
   assert.equal(received?.attachments[0]?.status, 'DECIDED');
-  assert.equal((await (await runtime.dispatchFetch(`${origin}/api/v1/invoices/${received.attachments[0].invoiceId}`, { headers })).json()).data.source, 'EMAIL');
+  const emailInvoice = (await (await runtime.dispatchFetch(`${origin}/api/v1/invoices/${received.attachments[0].invoiceId}`, { headers })).json()).data;
+  assert.equal(emailInvoice.source, 'EMAIL'); assert.equal(emailInvoice.file.mimeType, 'image/png');
+  assert.equal(emailInvoice.latestDecision.action, 'ESCALATE');
   // Force a duplicate delivery to also cover the scheduler's fallback when jobs finish inside the receipt lease.
   await (await runtime.getQueueProducer('EMAIL_QUEUE')).send({ kind: 'EMAIL_MESSAGE', messageId: received.id });
   await waitForReply(3);
