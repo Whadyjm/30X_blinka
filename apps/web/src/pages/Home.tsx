@@ -6,12 +6,14 @@ import {
   Ban,
   CalendarClock,
   CheckCircle2,
+  CheckSquare,
   FileText,
   Hand,
   Paperclip,
   RotateCcw,
   Sparkles,
   Upload,
+  Wallet,
   X,
 } from 'lucide-react';
 import { Oli, type OliState } from '@/components/Oli';
@@ -50,10 +52,10 @@ const HINTS = [
 ];
 
 const SUGGESTIONS = [
-  { label: '📋 Facturas por revisar', query: '¿Qué facturas necesitan mi revisión?' },
-  { label: '💰 Estado del presupuesto', query: '¿Cómo va el presupuesto de este mes?' },
-  { label: '⏰ Próximos vencimientos', query: '¿Qué facturas vencen en los próximos 14 días?' },
-  { label: '🚫 Facturas bloqueadas', query: '¿Hay facturas bloqueadas o rechazadas?' },
+  { label: 'Facturas por revisar', icon: CheckSquare, query: '¿Qué facturas necesitan mi revisión?' },
+  { label: 'Estado del presupuesto', icon: Wallet, query: '¿Cómo va el presupuesto de este mes?' },
+  { label: 'Próximos vencimientos', icon: CalendarClock, query: '¿Qué facturas vencen en los próximos 14 días?' },
+  { label: 'Facturas bloqueadas', icon: Ban, query: '¿Hay facturas bloqueadas o rechazadas?' },
 ];
 
 function intentFor(text: string) {
@@ -117,7 +119,7 @@ export function Home() {
     budget && budget.limitMinor > 0
       ? Math.min(100, Math.round((budget.reservedMinor / budget.limitMinor) * 100))
       : null;
-  const firstName = me.data?.user.name?.split(' ')[0];
+  const userName = me.data?.user.name?.trim();
 
   const validateFiles = (filesList: File[]): string | null => {
     if (attachedFiles.length + filesList.length > 4) {
@@ -511,7 +513,7 @@ export function Home() {
 
           {/* Heading */}
           <h1 className="text-2xl font-normal tracking-tight text-ink sm:text-3xl">
-            {firstName ? t('Hi {name}, what are we resolving today?', { name: firstName }) : t('What are we resolving today?')}
+            {userName ? t('Hi {name}, what are we resolving today?', { name: userName }) : t('What are we resolving today?')}
           </h1>
           <p className="mt-1.5 max-w-lg text-sm text-slate-500">
             {t('I review invoices against your mandate, monitor budgets, and flag what needs your approval.')}
@@ -675,17 +677,21 @@ export function Home() {
             )}
 
             {/* Suggestions Chips */}
-            <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-              {SUGGESTIONS.map((s, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => void ask(s.query)}
-                  className="rounded-full border border-hairline bg-bone px-3 py-1 text-xs text-slate-600 transition-colors hover:border-ink hover:text-ink"
-                >
-                  {s.label}
-                </button>
-              ))}
+            <div className="mt-3.5 flex flex-wrap items-center justify-center gap-2">
+              {SUGGESTIONS.map((s, idx) => {
+                const Icon = s.icon;
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => void ask(s.query)}
+                    className="inline-flex items-center gap-2 rounded-full border border-hairline bg-bone px-3.5 py-1.5 text-xs text-slate-700 transition-all hover:border-ink hover:bg-white hover:text-ink hover:shadow-xs active:scale-[0.98]"
+                  >
+                    <Icon className="size-3.5 text-ink shrink-0" aria-hidden />
+                    <span>{s.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </form>
         </div>

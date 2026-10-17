@@ -70,7 +70,7 @@ export function Onboarding() {
     setBusy(true);
     try {
       if (step === 0) {
-        if (!org) {
+        if (!org || (owner.trim() && owner.trim() !== me.data?.user.name)) {
           const m = await api.createOrg({ name: company.trim(), defaultCurrency: currency, ownerName: owner.trim() });
           qc.setQueryData(qk.me, m);
         }
@@ -97,7 +97,7 @@ export function Onboarding() {
     try {
       await activate.mutateAsync(save.data ?? mandate.data?.draft ?? undefined);
       toast.success(t('Oli is ready. Upload your first invoice.'));
-      nav('/app/bills', { replace: true });
+      nav('/app', { replace: true });
     } catch (e) {
       setError(errorMessage(e));
     }

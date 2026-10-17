@@ -51,6 +51,15 @@ export const esShell: Record<string, string> = {
   // home
   'Approved invoices': 'Facturas aprobadas',
   'Hi {name}': 'Hola, {name}',
+  'Hi {name}, what are we resolving today?': 'Hola {name}, ¿qué resolvemos hoy?',
+  'What are we resolving today?': '¿Qué resolvemos hoy?',
+  'I review invoices against your mandate, monitor budgets, and flag what needs your approval.':
+    'Reviso facturas contra tu mandato, monitoreo presupuestos y señalo lo que necesita tu aprobación.',
+  'Conversation with Oli': 'Conversación con Oli',
+  'The engine is extracting data, matching agreements, and checking policy limits.':
+    'El motor está extrayendo datos, comparando acuerdos y verificando límites de política.',
+  'View bills progress': 'Ver progreso de facturas',
+  'Oli Assistant': 'Asistente Oli',
   'Hi there': 'Hola',
   Summary: 'Resumen',
   'Needs you': 'Te necesitan',

@@ -53,6 +53,7 @@ type Meta = { t0: number; scenario: string; fileName: string | null; agentName: 
 
 type Db = {
   signedIn: boolean;
+  userName?: string | null;
   org: { id: string; name: string; defaultCurrency: string } | null;
   role: Role;
   mandateActive: FinanceMandate | null;
@@ -108,6 +109,7 @@ function getDb(): Db {
 function emptyDb(): Db {
   return {
     signedIn: false,
+    userName: null,
     org: null,
     role: 'owner',
     mandateActive: null,
@@ -257,6 +259,7 @@ function dayOffset(n: number) {
 
 function seed(): Db {
   const d = emptyDb();
+  d.userName = SEED_USER.name;
   d.org = { ...SEED_ORG };
   d.mandateActive = { ...SEED_MANDATE, version: 1, id: 'pol_1', status: 'ACTIVE', createdAt: ago(3), createdByName: SEED_USER.name };
   d.vendors = structuredClone(SEED_VENDORS);
@@ -332,6 +335,7 @@ export const mockControls = {
   startOnboarding() {
     const fresh = emptyDb();
     fresh.signedIn = true;
+    fresh.userName = null;
     db = fresh;
     persist();
   },
@@ -344,7 +348,8 @@ export const mockControls = {
 /* ───────────────────────── api ───────────────────────── */
 
 function meOf(d: Db): Me {
-  return { user: { ...SEED_USER }, org: d.org, role: d.org ? d.role : null, demo: true };
+  const name = d.userName ?? (d.org?.id === 'org_demo' ? SEED_USER.name : d.userName ?? null);
+  return { user: { ...SEED_USER, name }, org: d.org, role: d.org ? d.role : null, demo: true };
 }
 
 export const mockApi: OliApi = {
@@ -379,6 +384,10 @@ export const mockApi: OliApi = {
     await lag();
     const d = getDb();
     d.signedIn = true;
+    d.org = null;
+    d.mandateActive = null;
+    d.mandateDraft = null;
+    d.userName = null;
     persist();
     return meOf(d);
   },
@@ -392,6 +401,9 @@ export const mockApi: OliApi = {
     await lag();
     const d = auth();
     d.org = { id: 'org_new', name: input.name, defaultCurrency: input.defaultCurrency };
+    if (input.ownerName?.trim()) {
+      d.userName = input.ownerName.trim();
+    }
     d.role = 'owner';
     persist();
     return meOf(d);
@@ -421,7 +433,7 @@ export const mockApi: OliApi = {
     if (input.automaticLimitMinor > input.hardLimitMinor) {
       throw new ApiError({ status: 422, code: 'INVALID_MANDATE', message: 'The automatic limit cannot be higher than the absolute limit.' });
     }
-    d.mandateDraft = { ...input, version: (d.mandateActive?.version ?? 0) + 1, id: 'pol_draft', status: 'DRAFT', createdAt: nowIso(), createdByName: SEED_USER.name };
+    d.mandateDraft = { ...input, version: (d.mandateActive?.version ?? 0) + 1, id: 'pol_draft', status: 'DRAFT', createdAt: nowIso(), createdByName: d.userName || SEED_USER.name };
     persist();
     return d.mandateDraft;
   },
@@ -593,12 +605,13 @@ export const mockApi: OliApi = {
     if (row.state !== 'PENDING') throw new ApiError({ status: 409, code: 'APPROVAL_NOT_PENDING', message: 'This request was already resolved.' });
 
     const at = nowIso();
+    const reviewer = d.userName || SEED_USER.name;
     if (input.decision === 'REJECT') {
       row.state = 'REJECTED';
-      Object.assign(row, { reviewerName: SEED_USER.name, decidedAt: at, justification: input.justification });
-      inv.approval = { id: row.id, state: 'REJECTED', reason: row.reason, reviewerName: SEED_USER.name, decidedAt: at, justification: input.justification };
+      Object.assign(row, { reviewerName: reviewer, decidedAt: at, justification: input.justification });
+      inv.approval = { id: row.id, state: 'REJECTED', reason: row.reason, reviewerName: reviewer, decidedAt: at, justification: input.justification };
       inv.status = 'REJECTED';
-      audit(inv, 'APPROVAL_REJECTED', 'user', SEED_USER.name, { justification: input.justification }, at);
+      audit(inv, 'APPROVAL_REJECTED', 'user', reviewer, { justification: input.justification }, at);
       persist();
       return;
     }
@@ -623,11 +636,11 @@ export const mockApi: OliApi = {
     }
 
     row.state = 'APPROVED';
-    Object.assign(row, { reviewerName: SEED_USER.name, decidedAt: at, justification: input.justification });
-    inv.approval = { id: row.id, state: 'APPROVED', reason: row.reason, reviewerName: SEED_USER.name, decidedAt: at, justification: input.justification };
+    Object.assign(row, { reviewerName: reviewer, decidedAt: at, justification: input.justification });
+    inv.approval = { id: row.id, state: 'APPROVED', reason: row.reason, reviewerName: reviewer, decidedAt: at, justification: input.justification };
     inv.status = 'APPROVED';
     d.reservedMinor += inv.amountMinor ?? 0;
-    audit(inv, 'APPROVAL_APPROVED', 'user', SEED_USER.name, { justification: input.justification, revalidated: true }, at);
+    audit(inv, 'APPROVAL_APPROVED', 'user', reviewer, { justification: input.justification, revalidated: true }, at);
     audit(inv, 'BUDGET_RESERVED', 'system', null, { amountMinor: inv.amountMinor }, at);
     persist();
   },
