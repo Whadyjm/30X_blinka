@@ -688,5 +688,7 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 - [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
 
 Estado actual: los tipos y validaciones P0 sí tienen código y pruebas de contrato.
-Este documento no demuestra que login, endpoints, base de datos, extracción ni el motor financiero
-estén implementados o probados. Los tipos P1 de delegaciones siguen reservados en esta especificación.
+La migración y el seed están en [`packages/database`](../packages/database/README.md), probados
+en D1 local; todavía no hay una base remota configurada para la app.
+Este documento no demuestra que login, endpoints, extracción ni el motor financiero estén
+implementados o probados. Los tipos P1 de delegaciones siguen reservados en esta especificación.

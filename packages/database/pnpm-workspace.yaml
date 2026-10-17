@@ -1,0 +1,3 @@
+# Solo habilita el instalador del binario oficial usado por Miniflare.
+allowBuilds:
+  workerd@1.20260730.1: true
