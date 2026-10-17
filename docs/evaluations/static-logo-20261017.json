@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-17T23:15:10.289Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "9fbfab3",
+  "version": "438f49f7-714c-455f-b840-064232fb46e2",
+  "scope": "Lecturas en producción; inicio/cierre de sesión únicamente. Sin documentos nuevos, decisiones, mensajes ni llamadas al modelo.",
+  "checks": [
+    "Health API200",
+    "Cuatro tiles originales y botón primario amarillo con Beam animado restaurados",
+    "Dashboard nuevo visible; conteos de pendientes/aprobadas/bloqueadas coinciden con API paginada; enlace de pendiente abre detalle",
+    "Escritorio1440 y móvil390 sin desbordamiento",
+    "Marca vectorial estática de Oli; encabezado sin canvas, glow ni animación; Ask Oli conserva su interfaz conversacional",
+    "Resumen enlaza al filtro correcto",
+    "Oli Skill y archivo descargable preservados"
+  ],
+  "counts": {
+    "invoices": 13,
+    "pending": 6,
+    "approved": 3,
+    "blocked": 4
+  },
+  "mutations": [],
+  "errors": [],
+  "result": "PASS",
+  "request": "Marca estática con parecido a Oli; retirar mascota animada del logo para evitar repetición en Ask Oli.",
+  "localChecks": {
+    "staticVectorMark": true,
+    "distinctiveEyesAndBrows": true,
+    "noHeaderCanvas": true,
+    "noGlowOrLogoAnimation": true,
+    "hoverKeepsMarkStatic": true,
+    "brandLinkOpensAskOli": true,
+    "publicBrandConsistent": true,
+    "viewportsWithoutOverflow": [
+      1440,
+      390,
+      320
+    ],
+    "errors": []
+  },
+  "regressionTestsPassed": 7,
+  "build": "TypeScript + Vite: PASS, local y release publicado",
+  "wranglerDryRun": "PASS",
+  "preservation": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "ff174bfacb239f2860e313aecaf30ab97ff23172b30270983d9619d01fec26d5",
+    "deployment": {
+      "id": "f08f0f54-2843-4b3c-93d0-3ac6ddfb2012",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "tiamat.agency@gmail.com",
+      "annotations": {
+        "workers/message": "Logo: marca estática inspirada en Oli, sin mascota en navegación (9fbfab3)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "438f49f7-714c-455f-b840-064232fb46e2",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-17T23:14:53.624972Z"
+    }
+  },
+  "baseVersion": "5c744a1c-d198-42d1-8465-9dae165a57ea",
+  "screenshots": ".impeccable/review/static-logo-production/"
+}
