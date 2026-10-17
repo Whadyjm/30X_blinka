@@ -1,8 +1,10 @@
 import { handleExtractionProbe } from "./extraction-probe.js";
 import { handleApi } from "./api.js";
+import { consumeTelegram, telegramWebhook } from './telegram.js';
 
 export default {
   async fetch(request, env) {
+    if (new URL(request.url).pathname === '/api/channels/telegram/webhook') return telegramWebhook(request, env);
     if (new URL(request.url).pathname.startsWith('/api/v1/')) return handleApi(request, env);
     if (new URL(request.url).pathname === "/api/internal/extraction-probe") {
       return handleExtractionProbe(request, env);
@@ -19,5 +21,8 @@ export default {
 
     if (new URL(request.url).pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
     return env.ASSETS ? env.ASSETS.fetch(request) : new Response('Not found', { status: 404 });
+  },
+  async queue(batch, env) {
+    return consumeTelegram(batch, env);
   },
 };

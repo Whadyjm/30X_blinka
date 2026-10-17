@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bot, CheckSquare, FileText, Home, LogOut, Menu, MessageCircle, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { Bot, CheckSquare, FileText, Home, LogOut, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -27,6 +27,7 @@ export function AppLayout() {
     { to: '/app/bills', label: 'Bills', icon: FileText },
     { to: '/app/approvals', label: 'Approvals', icon: CheckSquare, badge: pending },
     { to: '/app/rules', label: 'Rules', icon: SlidersHorizontal },
+    { to: '/app/integrations', label: 'Integrations', icon: Plug },
     { to: '/app/evaluation', label: 'Evaluation', icon: Trophy },
     ...(env.features.agentAccess ? [{ to: '/app/agent-access', label: 'Agent access', icon: Bot }] : []),
     ...(env.features.chat ? [{ to: '/app/chat', label: 'Chat', icon: MessageCircle }] : []),

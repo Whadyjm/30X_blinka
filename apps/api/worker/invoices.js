@@ -13,17 +13,23 @@ export async function uploadInvoice(request, env, session) {
   const entries = [...form.entries()];
   if (entries.length !== 1 || entries[0][0] !== 'file' || typeof entries[0][1] === 'string') throw new HttpError(400, 'VALIDATION_ERROR', 'Envía únicamente el campo file.');
   const file = entries[0][1];
+  return receiveInvoice(request, env, session, file);
+}
+
+// sourceEventId is server-owned metadata, never a multipart or JSON field.
+export async function receiveInvoice(request, env, session, file, sourceEventId = null) {
   if (!file.size || file.size > MAX_INVOICE_BYTES) throw new HttpError(413, 'FILE_TOO_LARGE');
   const content = new Uint8Array(await file.arrayBuffer()); validateDocument(content, file.type);
   const name = file.name.normalize('NFC').replace(/[\x00-\x1f\x7f/\\]/g, '_').trim().slice(0, 200) || 'invoice';
   const hash = await sha256(content);
-  const requestHash = await sha256(JSON.stringify({ name, mimeType: file.type, size: file.size, hash }));
+  const requestHash = await sha256(JSON.stringify({ name, mimeType: file.type, size: file.size, hash,
+    ...(sourceEventId !== null ? { sourceEventId } : {}) }));
   const idem = await idempotency(request, env.DB, session, requestHash);
   if (idem.cached) return json(idem.cached.body, idem.cached.status);
   const invoiceId = id('inv'); const orgId = session.organization.id;
   const key = `uploads/${orgId}/${invoiceId}/original`;
   const time = now();
-  const data = { id: invoiceId, status: 'RECEIVED', source: 'HUMAN_UPLOAD',
+  const data = { id: invoiceId, status: 'RECEIVED', source: sourceEventId === null ? 'HUMAN_UPLOAD' : 'TELEGRAM',
     file: { name, mimeType: file.type, sizeBytes: file.size, url: `/api/v1/invoices/${invoiceId}/file` },
     vendorId: null, vendorName: null, agreementId: null, invoiceNumber: null, amountMinor: null, currency: null,
     issuedAt: null, dueDate: null, servicePeriod: null, description: null, extractionWarnings: [], latestDecision: null,
@@ -34,7 +40,10 @@ export async function uploadInvoice(request, env, session) {
     await env.DB.batch([
       stmt(env.DB, `INSERT INTO invoices(id, org_id, file_key, file_name, file_mime_type, file_size_bytes, file_sha256, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, invoiceId, orgId, key, name, file.type, file.size, hash, time, time),
-      audit(env.DB, orgId, session.user.id, 'INVOICE_RECEIVED', invoiceId, { documentSha256: hash, sizeBytes: file.size }, time),
+      ...(sourceEventId === null ? [] : [stmt(env.DB,
+        "INSERT INTO invoice_sources(org_id, invoice_id, kind, telegram_update_id) VALUES (?, ?, 'TELEGRAM', ?)", orgId, invoiceId, sourceEventId)]),
+      audit(env.DB, orgId, session.user.id, 'INVOICE_RECEIVED', invoiceId,
+        { documentSha256: hash, sizeBytes: file.size, source: data.source, ...(sourceEventId === null ? {} : { telegramUpdateId: sourceEventId }) }, time),
       idem.save(response, 201),
     ]);
   } catch (error) {

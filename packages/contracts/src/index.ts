@@ -214,6 +214,16 @@ export const ReviewApprovalSchema = z.strictObject({
 });
 
 export const MAX_INVOICE_BYTES = 5 * 1024 * 1024;
+export const TelegramIntegrationSchema = z.strictObject({
+  available: z.boolean(),
+  connection: z.strictObject({ id: IdSchema, displayName: z.string(), connectedAt: TimestampSchema }).nullable(),
+});
+export const TelegramLinkSchema = z.strictObject({
+  url: z.string().regex(/^https:\/\/t\.me\/[A-Za-z0-9_]+\?start=[A-Za-z0-9_-]+$/),
+  expiresAt: TimestampSchema,
+});
+export type TelegramIntegration = z.infer<typeof TelegramIntegrationSchema>;
+export type TelegramLink = z.infer<typeof TelegramLinkSchema>;
 export const InvoiceMimeTypeSchema = z.enum(['application/pdf', 'image/png', 'image/jpeg']);
 export const UploadFileMetadataSchema = z.strictObject({
   name: NameSchema,
@@ -223,7 +233,7 @@ export const UploadFileMetadataSchema = z.strictObject({
 export const InvoiceSchema = z.strictObject({
   id: IdSchema,
   status: InvoiceStatusSchema,
-  source: z.literal('HUMAN_UPLOAD'),
+  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM']),
   file: UploadFileMetadataSchema.extend({
     url: z.string().regex(/^\/api\/v1\/invoices\/[^/?#]+\/file$/),
   }),

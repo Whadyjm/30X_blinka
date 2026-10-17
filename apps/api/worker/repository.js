@@ -18,7 +18,7 @@ export function approvalDto(r, activePolicyId = null) {
     reviewerId: r.reviewer_id, reviewComment: r.review_comment, createdAt: r.created_at, decidedAt: r.decided_at }) : null;
 }
 export function invoiceDto(row, decisions, approvals, activePolicyId, detail = false) {
-  const data = { id: row.id, status: row.status, source: row.source_kind,
+  const data = { id: row.id, status: row.status, source: row.channel_kind ?? row.source_kind,
     file: { name: row.file_name, mimeType: row.file_mime_type, sizeBytes: row.file_size_bytes,
       url: `/api/v1/invoices/${encodeURIComponent(row.id)}/file` },
     vendorId: row.vendor_id, vendorName: row.vendor_name, agreementId: row.agreement_id,
@@ -35,7 +35,8 @@ export function invoiceDto(row, decisions, approvals, activePolicyId, detail = f
 }
 export async function getInvoice(db, orgId, invoiceId, detail = true) {
   const result = await db.batch([
-    stmt(db, 'SELECT * FROM invoices WHERE org_id = ? AND id = ?', orgId, invoiceId),
+    stmt(db, `SELECT i.*, s.kind AS channel_kind FROM invoices i LEFT JOIN invoice_sources s
+      ON s.org_id = i.org_id AND s.invoice_id = i.id WHERE i.org_id = ? AND i.id = ?`, orgId, invoiceId),
     stmt(db, 'SELECT * FROM decisions WHERE org_id = ? AND invoice_id = ? ORDER BY created_at, rowid', orgId, invoiceId),
     stmt(db, 'SELECT * FROM approval_requests WHERE org_id = ? AND invoice_id = ? ORDER BY created_at, rowid', orgId, invoiceId),
     stmt(db, "SELECT id FROM policy_versions WHERE org_id = ? AND status = 'ACTIVE'", orgId),
@@ -46,7 +47,8 @@ export async function getInvoice(db, orgId, invoiceId, detail = true) {
 }
 export async function invoiceRows(db, orgId) {
   const results = await db.batch([
-    stmt(db, 'SELECT * FROM invoices WHERE org_id = ? ORDER BY created_at DESC, id DESC', orgId),
+    stmt(db, `SELECT i.*, s.kind AS channel_kind FROM invoices i LEFT JOIN invoice_sources s
+      ON s.org_id = i.org_id AND s.invoice_id = i.id WHERE i.org_id = ? ORDER BY i.created_at DESC, i.id DESC`, orgId),
     stmt(db, 'SELECT * FROM decisions WHERE org_id = ? ORDER BY created_at, rowid', orgId),
     stmt(db, 'SELECT * FROM approval_requests WHERE org_id = ? ORDER BY created_at, rowid', orgId),
     stmt(db, "SELECT id FROM policy_versions WHERE org_id = ? AND status = 'ACTIVE'", orgId),
