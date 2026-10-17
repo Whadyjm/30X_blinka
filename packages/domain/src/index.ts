@@ -137,6 +137,15 @@ export function evaluateInvoice(rawInvoice: PolicyInvoice, rawContext: PolicyCon
     if (sameNumber) record('DUPLICATE_NUMBER', 'BLOCK', 'El proveedor ya presentó este número de factura normalizado.',
       { priorInvoiceId: sameNumber.id, vendorId: vendor!.id, normalizedInvoiceNumber: number }, 'DUPLICATE_INVOICE');
 
+    // An uncertain earlier read may have no vendor ID; that missing identity cannot clear its invoice number.
+    const unresolvedNumber = number ? prior.find((p) => (p.vendorId === null || !vendor)
+      && normalizeInvoiceNumber(p.extraction.invoiceNumber) === number
+      && (p.extraction.vendorName === null || normalizeText(p.extraction.vendorName) === normalizeText(ex.vendorName))) : undefined;
+    if (unresolvedNumber && !sameNumber) record('UNRESOLVED_DUPLICATE_NUMBER', 'ESCALATE',
+      'Una factura previa tiene este número y un proveedor coincidente o sin resolver; aclarar el antecedente antes de autorizar.',
+      { priorInvoiceId: unresolvedNumber.id, normalizedInvoiceNumber: number,
+        extractedVendorName: ex.vendorName, priorVendorName: unresolvedNumber.extraction.vendorName }, 'POSSIBLE_DUPLICATE');
+
     const possible = prior.find((p) => (!vendor || p.vendorId === vendor.id)
       && ex.amountMinor === p.extraction.amountMinor && ex.currency === p.extraction.currency
       && ex.issuedAt !== null && ex.issuedAt === p.extraction.issuedAt

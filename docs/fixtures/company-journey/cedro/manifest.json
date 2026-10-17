@@ -1,0 +1,872 @@
+{
+  "datasetVersion": "company-journey-v1",
+  "synthetic": true,
+  "company": {
+    "slug": "cedro",
+    "name": "Cedro Logistics Demo LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "rules": {
+    "currency": "USD",
+    "automaticLimitMinor": 50000,
+    "hardLimitMinor": 150000,
+    "monthlyBudgetMinor": 220000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 50000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  },
+  "vendors": [
+    {
+      "key": "v01",
+      "name": "Alder Route Systems Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v02",
+      "name": "Copper Kite Freight Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v03",
+      "name": "Juniper Ledger Services Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v04",
+      "name": "Mosaic Relay Studio Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v05",
+      "name": "Quiet Harbor Network Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v06",
+      "name": "Velvet Compass Supply Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v07",
+      "name": "Northstar Parcel Lab Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v08",
+      "name": "Paper Lantern Systems Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v09",
+      "name": "Orbit Finch Analytics Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v10",
+      "name": "Cobalt Meadow Consulting Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v12",
+      "name": "Larkspur Transit Demo",
+      "allowed": false,
+      "externalRef": null
+    },
+    {
+      "key": "v13",
+      "name": "Maple Circuit Works Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v14",
+      "name": "Amber Current Studio Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v15",
+      "name": "Silver Poppy Operations Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v16",
+      "name": "Banyan Thread Logistics Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v17",
+      "name": "Cloudberry Dispatch Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v18",
+      "name": "Saffron Bridge Tools Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "v19",
+      "name": "Blue Acorn Office Demo",
+      "allowed": true,
+      "externalRef": null
+    }
+  ],
+  "agreements": [
+    {
+      "key": "agr_001",
+      "vendorKey": "v01",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Regional route mapping",
+      "active": true
+    },
+    {
+      "key": "agr_002",
+      "vendorKey": "v02",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Parcel sorting support",
+      "active": true
+    },
+    {
+      "key": "agr_003",
+      "vendorKey": "v03",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Monthly ledger export",
+      "active": true
+    },
+    {
+      "key": "agr_004",
+      "vendorKey": "v04",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Warehouse signage design",
+      "active": true
+    },
+    {
+      "key": "agr_005",
+      "vendorKey": "v05",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Network health snapshot",
+      "active": true
+    },
+    {
+      "key": "agr_006",
+      "vendorKey": "v06",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Reusable crate labels",
+      "active": true
+    },
+    {
+      "key": "agr_007",
+      "vendorKey": "v07",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Dispatch map maintenance",
+      "active": true
+    },
+    {
+      "key": "agr_008",
+      "vendorKey": "v08",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Document archive indexing",
+      "active": true
+    },
+    {
+      "key": "agr_009",
+      "vendorKey": "v09",
+      "currency": "USD",
+      "amountMinor": 60000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Cross-border lane review",
+      "active": true
+    },
+    {
+      "key": "agr_010",
+      "vendorKey": "v10",
+      "currency": "USD",
+      "amountMinor": 70000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Fleet capacity planning",
+      "active": true
+    },
+    {
+      "key": "agr_014",
+      "vendorKey": "v13",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Catalog record cleanup",
+      "active": true
+    },
+    {
+      "key": "agr_015",
+      "vendorKey": "v14",
+      "currency": "USD",
+      "amountMinor": 160000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Map tile refresh",
+      "active": true
+    },
+    {
+      "key": "agr_016",
+      "vendorKey": "v15",
+      "currency": "USD",
+      "amountMinor": 90000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Fleet telemetry reconciliation",
+      "active": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "5dec3d3151663005ef577c84d9ef27ada1f40d1b6d8630cdc63dc66026c8d4c5",
+        "sizeBytes": 1125
+      },
+      "expectedExtraction": {
+        "vendorName": "Alder Route Systems Demo",
+        "invoiceNumber": "V01-001",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Regional route mapping"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "002",
+      "file": {
+        "path": "documents/002.png",
+        "mimeType": "image/png",
+        "sha256": "ce06ae64121b502baad743e71f52ba2b032d0571ed2ca122c9edc06a6a03a096",
+        "sizeBytes": 59597
+      },
+      "expectedExtraction": {
+        "vendorName": "Copper Kite Freight Demo",
+        "invoiceNumber": "V02-002",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Parcel sorting support"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "6ef038ba827ee0a176ec95de0f1321208cf047e5039cc82b8c98362784351e61",
+        "sizeBytes": 1090
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Ledger Services Demo",
+        "invoiceNumber": "V03-003",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Monthly ledger export"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "004",
+      "file": {
+        "path": "documents/004.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "a6466db41b4f3c00a456f4520a84f2859bc196afe5e984306e249e47df24eff7",
+        "sizeBytes": 104415
+      },
+      "expectedExtraction": {
+        "vendorName": "Mosaic Relay Studio Demo",
+        "invoiceNumber": "V04-004",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Warehouse signage design"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "70fdbfe91f59e75d8308cecfa4326e6b6e1bbcf37efefaf83b935fc8ac743565",
+        "sizeBytes": 1077
+      },
+      "expectedExtraction": {
+        "vendorName": "Quiet Harbor Network Demo",
+        "invoiceNumber": "V05-005",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Network health snapshot"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "006",
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sha256": "cd0c0a1f97257e4c9532e522d14986c011bc836867bb9582e17440f71ccb9ef9",
+        "sizeBytes": 60679
+      },
+      "expectedExtraction": {
+        "vendorName": "Velvet Compass Supply Demo",
+        "invoiceNumber": "V06-006",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Reusable crate labels"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "007",
+      "file": {
+        "path": "documents/007.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "78fa7443f7352e0cb460a82bafe7a25239923d2ace7e6a7ffd2b3b892ffd35e7",
+        "sizeBytes": 1129
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Parcel Lab Demo",
+        "invoiceNumber": "V07-007",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Dispatch map maintenance"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "008",
+      "file": {
+        "path": "documents/008.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "e5da5e431b9417662801e2a80df447c567a09ecab5fc694bb92cc695278e5f81",
+        "sizeBytes": 1092
+      },
+      "expectedExtraction": {
+        "vendorName": "Paper Lantern Systems Demo",
+        "invoiceNumber": "V08-008",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Document archive indexing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Unique concept and one-time agreement; within automatic limits."
+    },
+    {
+      "id": "009",
+      "file": {
+        "path": "documents/009.png",
+        "mimeType": "image/png",
+        "sha256": "8690fd6dba1099c743993dc131dc606d25184d3a07d17ba762843523b8501e96",
+        "sizeBytes": 62462
+      },
+      "expectedExtraction": {
+        "vendorName": "Orbit Finch Analytics Demo",
+        "invoiceNumber": "V09-009",
+        "amountMinor": 60000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Cross-border lane review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "APPROVE",
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 60000,
+      "notes": "Agreement and policy permit human exception; simulated human action only."
+    },
+    {
+      "id": "010",
+      "file": {
+        "path": "documents/010.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "2d19c758c37d7d8ac68aac3b2e8b0cbd80ee64a8b9f1cc41859cf15833e25c88",
+        "sizeBytes": 1093
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Meadow Consulting Demo",
+        "invoiceNumber": "V10-010",
+        "amountMinor": 70000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Fleet capacity planning"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "REJECT",
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Agreement and policy permit human exception; simulated human action only."
+    },
+    {
+      "id": "011",
+      "file": {
+        "path": "documents/011.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "5dec3d3151663005ef577c84d9ef27ada1f40d1b6d8630cdc63dc66026c8d4c5",
+        "sizeBytes": 1125
+      },
+      "expectedExtraction": {
+        "vendorName": "Alder Route Systems Demo",
+        "invoiceNumber": "V01-001",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Regional route mapping"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Byte-identical copy of 001; server hash must identify it."
+    },
+    {
+      "id": "012",
+      "file": {
+        "path": "documents/012.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "83780ff7b62d2fc7843d7de1f0dd2dff050345b3f6b26cf235ba8f4f393bac52",
+        "sizeBytes": 1075
+      },
+      "expectedExtraction": {
+        "vendorName": "Alder Route Systems Demo",
+        "invoiceNumber": "V01-001",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Regional route mapping"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Same vendor and invoice number as 001; content and hash differ."
+    },
+    {
+      "id": "013",
+      "file": {
+        "path": "documents/013.png",
+        "mimeType": "image/png",
+        "sha256": "3ab6ddb5f483dae6c890aa68828e984b01f82c166e6f388f35f96171d795fd46",
+        "sizeBytes": 60124
+      },
+      "expectedExtraction": {
+        "vendorName": "Larkspur Transit Demo",
+        "invoiceNumber": "V12-013",
+        "amountMinor": 12000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Unlisted seasonal courier"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "UNKNOWN_VENDOR"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Explicitly disallowed supplier; matching amount cannot grant permission."
+    },
+    {
+      "id": "014",
+      "file": {
+        "path": "documents/014.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "6db121f92f4924a79f1c23bcea61e650416358c7be98b3a0f142039c3c2f56c0",
+        "sizeBytes": 1087
+      },
+      "expectedExtraction": {
+        "vendorName": "Maple Circuit Works Demo",
+        "invoiceNumber": "V13-014",
+        "amountMinor": 14000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Catalog record cleanup"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AGREEMENT_MISMATCH"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Allowed supplier and unique concept; only amount conflicts with its agreement."
+    },
+    {
+      "id": "015",
+      "file": {
+        "path": "documents/015.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "3b84a7bab1ca7ed3c05254e4a2b448bde4bff76f010ca77b86588e293f215f26",
+        "sizeBytes": 1071
+      },
+      "expectedExtraction": {
+        "vendorName": "Amber Current Studio Demo",
+        "invoiceNumber": "V14-015",
+        "amountMinor": 160000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Map tile refresh"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_HARD_LIMIT"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "USD 1,600 exceeds the hard ceiling of USD 1,500."
+    },
+    {
+      "id": "016",
+      "file": {
+        "path": "documents/016.png",
+        "mimeType": "image/png",
+        "sha256": "2164fcd4411acb30241e69f62b567777df4a4a455d137ea2bcc760207e171e42",
+        "sizeBytes": 62067
+      },
+      "expectedExtraction": {
+        "vendorName": "Silver Poppy Operations Demo",
+        "invoiceNumber": "V15-016",
+        "amountMinor": 90000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Fleet telemetry reconciliation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "After 001-010 and simulated 009 approval, only USD 800 remains; this USD 900 obligation is below hard limit."
+    },
+    {
+      "id": "017",
+      "file": {
+        "path": "documents/017.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "e868f58cceaf11dcd946d3ae9fddf45a23a98b085ece2a57f1e4339b1e374d52",
+        "sizeBytes": 1017
+      },
+      "expectedExtraction": {
+        "vendorName": "Banyan Thread Logistics Demo",
+        "invoiceNumber": "V16-017",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Pallet tracking review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Visible amount has no currency code; expected amountMinor and currency stay null."
+    },
+    {
+      "id": "018",
+      "file": {
+        "path": "documents/018.png",
+        "mimeType": "image/png",
+        "sha256": "7ab9660786ff14a77ef8716c777ff7a049321f9d4447aff188171bdd734e1e85",
+        "sizeBytes": 73418
+      },
+      "expectedExtraction": {
+        "vendorName": "Cloudberry Dispatch Demo",
+        "invoiceNumber": "V17-018",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Dock schedule audit"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Contradictory final totals are both visible; amountMinor remains null."
+    },
+    {
+      "id": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "ea2373c4a84315727fc0e5521ed3a7c632534b9bfbd102eb1115893dd420fd4f",
+        "sizeBytes": 950
+      },
+      "expectedExtraction": {
+        "vendorName": "Saffron Bridge Tools Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": null
+      },
+      "expectedDocumentType": "PAYMENT_RECEIPT",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Clearly labeled fictional payment receipt; no invoice obligation."
+    },
+    {
+      "id": "020",
+      "file": {
+        "path": "documents/020.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "0b9ef5f4851d1a60f91b408966fc363de93367b224990d5855b0cb5b72a91e02",
+        "sizeBytes": 119389
+      },
+      "expectedExtraction": {
+        "vendorName": "Blue Acorn Office Demo",
+        "invoiceNumber": null,
+        "amountMinor": 42500,
+        "currency": "USD",
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Optional archive migration"
+      },
+      "expectedDocumentType": "QUOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Clearly labeled fictional quote, not a bill or obligation."
+    }
+  ]
+}

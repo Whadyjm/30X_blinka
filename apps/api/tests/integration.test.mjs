@@ -164,6 +164,23 @@ test('sin corroboración o con discrepancia no autoriza ni crea botón humano', 
   assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 1 });
 });
 
+test('antecedente con proveedor sin resolver impide aprobar otro archivo del mismo número', async t => {
+  const { env, DB, upload, read, ledger } = await setup(t);
+  const first = await upload();
+  const uncertain = (await processInvoice(env, 'org_demo', first.id, read(extraction({ amountMinor: 19000 }), { corroboration: null }))).data;
+  assert.equal(uncertain.latestDecision.action, 'ESCALATE');
+  assert.equal(uncertain.vendorId, null);
+  const second = await upload({ file: { bytes: new TextEncoder().encode('%PDF-1.4\ncorrected representation of prior invoice') } });
+  const result = (await processInvoice(env, 'org_demo', second.id, read())).data;
+  assert.equal(result.latestDecision.action, 'ESCALATE');
+  assert.ok(result.latestDecision.reasons.includes('POSSIBLE_DUPLICATE'));
+  assert.equal(result.approvalRequest, null);
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+  assert.equal((await DB.prepare('SELECT vendor_id FROM invoices WHERE id=?').bind(first.id).first()).vendor_id, null);
+  await processInvoice(env, 'org_demo', second.id, async () => assert.fail('El replay no relee ni elimina el antecedente'));
+  assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+});
+
 test('revisión humana agrega decisión y reserva; replay y dos revisores no duplican', async t => {
   const { env, api, upload, read, ledger } = await setup(t);
   const invoice = await upload(); const ex = extraction({ vendorName: 'Acme Accounting (ficticio)', amountMinor: 45000, description: 'Contabilidad mensual ficticia' });

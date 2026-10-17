@@ -1,0 +1,831 @@
+{
+  "datasetVersion": "company-journey-v1",
+  "synthetic": true,
+  "company": {
+    "slug": "lumen",
+    "name": "Lumen Studio Demo LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "rules": {
+    "currency": "USD",
+    "automaticLimitMinor": 30000,
+    "hardLimitMinor": 100000,
+    "monthlyBudgetMinor": 150000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 30000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  },
+  "vendors": [
+    {
+      "key": "northstar",
+      "name": "Northstar Type Foundry Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "paperkite",
+      "name": "Paper Kite Studio Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "cobalt",
+      "name": "Cobalt Audio Lab Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "juniper",
+      "name": "Juniper Motion Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "maproom",
+      "name": "Maproom Research Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "redwood",
+      "name": "Redwood Vendor Demo",
+      "allowed": false,
+      "externalRef": null
+    }
+  ],
+  "agreements": [
+    {
+      "key": "lumen_agreement_001",
+      "vendorKey": "northstar",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Typeface family renewal",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_002",
+      "vendorKey": "paperkite",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Editorial layout package",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_003",
+      "vendorKey": "cobalt",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Studio sound mix",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_004",
+      "vendorKey": "juniper",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Motion title sequence",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_005",
+      "vendorKey": "maproom",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archive map research",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_006",
+      "vendorKey": "northstar",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Variable font specimen",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_007",
+      "vendorKey": "paperkite",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Cover grid adaptation",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_008",
+      "vendorKey": "cobalt",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Audio signature edit",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_009",
+      "vendorKey": "northstar",
+      "currency": "USD",
+      "amountMinor": 35000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Type atlas research",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_010",
+      "vendorKey": "northstar",
+      "currency": "USD",
+      "amountMinor": 34000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Type specimen licensing",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_013",
+      "vendorKey": "redwood",
+      "currency": "USD",
+      "amountMinor": 5000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Sample palette printing",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_014",
+      "vendorKey": "paperkite",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Editorial title layout",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_015",
+      "vendorKey": "cobalt",
+      "currency": "USD",
+      "amountMinor": 100100,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Studio mix mastering",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_016",
+      "vendorKey": "juniper",
+      "currency": "USD",
+      "amountMinor": 40000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Short animation export",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_017",
+      "vendorKey": "maproom",
+      "currency": "USD",
+      "amountMinor": 8000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archive index review",
+      "active": true
+    },
+    {
+      "key": "lumen_agreement_018",
+      "vendorKey": "northstar",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Specimen family review",
+      "active": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "ee6b77db2ce58c828be435bcddc0c25cb0c51387a607183e91ec1dbf52a3890e",
+        "sizeBytes": 1180
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0001-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Typeface family renewal"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "002",
+      "file": {
+        "path": "documents/002.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "285cf033af30c6164fa0d8505a4af5fe6d2e1e24ff051027327fe76694d6c43c",
+        "sizeBytes": 1160
+      },
+      "expectedExtraction": {
+        "vendorName": "Paper Kite Studio Demo",
+        "invoiceNumber": "LM-0002-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Editorial layout package"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+        "sizeBytes": 1144
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Audio Lab Demo",
+        "invoiceNumber": "LM-0003-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Studio sound mix"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "004",
+      "file": {
+        "path": "documents/004.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "f043af95cad926188814ac49a2932a8caaaf90994630ad097042e36cf195b714",
+        "sizeBytes": 1157
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Motion Demo",
+        "invoiceNumber": "LM-0004-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Motion title sequence"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "1b7f1d1f69785267534af5708c7f089adbeb1abdeb52a65250d5f6e64c099914",
+        "sizeBytes": 1171
+      },
+      "expectedExtraction": {
+        "vendorName": "Maproom Research Demo",
+        "invoiceNumber": "LM-0005-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Archive map research"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "006",
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+        "sizeBytes": 31021
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0006-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Variable font specimen"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "007",
+      "file": {
+        "path": "documents/007.png",
+        "mimeType": "image/png",
+        "sha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+        "sizeBytes": 29320
+      },
+      "expectedExtraction": {
+        "vendorName": "Paper Kite Studio Demo",
+        "invoiceNumber": "LM-0007-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Cover grid adaptation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "008",
+      "file": {
+        "path": "documents/008.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "5c3e4c1899cb95c892dd7fabaace4a504529c9f7e1000a5b3a5b72254f957d2c",
+        "sizeBytes": 93568
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Audio Lab Demo",
+        "invoiceNumber": "LM-0008-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Audio signature edit"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Exact unique ONE_TIME agreement; within automatic and budget limits."
+    },
+    {
+      "id": "009",
+      "file": {
+        "path": "documents/009.png",
+        "mimeType": "image/png",
+        "sha256": "ba7129d13f7c779288d8decbeae69b55a7834a9fa1df25c7ccf5dc4c6deac4eb",
+        "sizeBytes": 30130
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0009-26",
+        "amountMinor": 35000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Type atlas research"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "APPROVE",
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 35000,
+      "notes": "Amount is above the automatic threshold and below the hard ceiling; simulated approval reserves 35,000."
+    },
+    {
+      "id": "010",
+      "file": {
+        "path": "documents/010.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "8b3ac59f6d3da94cbba3e53a5ed7b6c7ff9a0f0352152731e5f9ac61e7ec22bb",
+        "sizeBytes": 93619
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0010-26",
+        "amountMinor": 34000,
+        "currency": "USD",
+        "issuedAt": "2026-10-07",
+        "dueDate": "2026-10-29",
+        "servicePeriod": "2026-10",
+        "description": "Type specimen licensing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "REJECT",
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Human rejection is simulated; no budget reservation is created."
+    },
+    {
+      "id": "011",
+      "file": {
+        "path": "documents/011.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "ee6b77db2ce58c828be435bcddc0c25cb0c51387a607183e91ec1dbf52a3890e",
+        "sizeBytes": 1180
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0001-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Typeface family renewal"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Byte-for-byte duplicate of case 001; same-company history must block by hash."
+    },
+    {
+      "id": "012",
+      "file": {
+        "path": "documents/012.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "3474c48474ee6bd53ca8051cd31758711cf6559f09d6302a66af8a8a1cf5c8e0",
+        "sizeBytes": 1134
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "LM-0001-26",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Typeface family renewal"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Same supplier and invoice number as 001, with different bytes."
+    },
+    {
+      "id": "013",
+      "file": {
+        "path": "documents/013.png",
+        "mimeType": "image/png",
+        "sha256": "932e806223f569aa76ea35fa6975b14dac865908b359883f16d91a069de0c631",
+        "sizeBytes": 29185
+      },
+      "expectedExtraction": {
+        "vendorName": "Redwood Vendor Demo",
+        "invoiceNumber": "RW-1401",
+        "amountMinor": 5000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Sample palette printing"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "UNKNOWN_VENDOR"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Vendor is explicitly listed as disallowed; matching agreement cannot authorize it."
+    },
+    {
+      "id": "014",
+      "file": {
+        "path": "documents/014.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "17020b22ff8249b53684d6bede70f65f6e36d26240b434a9259b4d11bf7a677b",
+        "sizeBytes": 1101
+      },
+      "expectedExtraction": {
+        "vendorName": "Paper Kite Studio Demo",
+        "invoiceNumber": "PK-1414",
+        "amountMinor": 12000,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Editorial title layout"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AGREEMENT_MISMATCH"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Known vendor and exact concept, but amount differs from its only active agreement."
+    },
+    {
+      "id": "015",
+      "file": {
+        "path": "documents/015.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "da30e3f3b62c1d6ce7615dd585b6dff6a2eb76b58a4cde5a217ff4789a7111dc",
+        "sizeBytes": 1091
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Audio Lab Demo",
+        "invoiceNumber": "CA-1515",
+        "amountMinor": 100100,
+        "currency": "USD",
+        "issuedAt": "2026-10-08",
+        "dueDate": "2026-10-26",
+        "servicePeriod": "2026-10",
+        "description": "Studio mix mastering"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_HARD_LIMIT",
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Above the hard ceiling; also exceeds remaining ledger after cases 001-009. Both reasons are expected."
+    },
+    {
+      "id": "016",
+      "file": {
+        "path": "documents/016.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "da4e5f37364d14af971303adba0e86ee2bc6e69708c7c11aaf54d2e39f8a10de",
+        "sizeBytes": 1094
+      },
+      "expectedExtraction": {
+        "vendorName": "Juniper Motion Demo",
+        "invoiceNumber": "JM-1616",
+        "amountMinor": 40000,
+        "currency": "USD",
+        "issuedAt": "2026-10-09",
+        "dueDate": "2026-10-29",
+        "servicePeriod": "2026-10",
+        "description": "Short animation export"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Exact agreement and amount below hard ceiling; prior reservations leave only 35,000 minor units."
+    },
+    {
+      "id": "017",
+      "file": {
+        "path": "documents/017.png",
+        "mimeType": "image/png",
+        "sha256": "c1e911b87ff94ab712f83217773a0400e80a547bf06bd722aad2f1ff28a3588c",
+        "sizeBytes": 29327
+      },
+      "expectedExtraction": {
+        "vendorName": "Maproom Research Demo",
+        "invoiceNumber": "MR-1717",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-06",
+        "dueDate": "2026-10-27",
+        "servicePeriod": "2026-10",
+        "description": "Archive index review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Visible amount uses $ only; currency is unknown, amountMinor stays null, no reservation."
+    },
+    {
+      "id": "018",
+      "file": {
+        "path": "documents/018.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "722fa58ac8ba6f6cee18241ed1b3d7927e0ccb1301ac8015c020e35140cbf093",
+        "sizeBytes": 100139
+      },
+      "expectedExtraction": {
+        "vendorName": "Northstar Type Foundry Demo",
+        "invoiceNumber": "NS-1818",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-10",
+        "dueDate": "2026-10-28",
+        "servicePeriod": "2026-10",
+        "description": "Specimen family review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Two contradictory final totals are visible; expected amount is null despite an exact agreement."
+    },
+    {
+      "id": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "93815960524163c335cbd481b1393758f21dc3d46a1fd3b7cde577afe650c43b",
+        "sizeBytes": 1017
+      },
+      "expectedExtraction": {
+        "vendorName": "Cobalt Audio Lab Demo",
+        "invoiceNumber": null,
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Payment received for mix session"
+      },
+      "expectedDocumentType": "PAYMENT_RECEIPT",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Payment receipt is explicitly not an invoice."
+    },
+    {
+      "id": "020",
+      "file": {
+        "path": "documents/020.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "bbab29ea61908e5c71e2d1f994fb1be4cb649a4dce0f94a4e08c07364f4cd8cf",
+        "sizeBytes": 1129
+      },
+      "expectedExtraction": {
+        "vendorName": "Paper Kite Studio Demo",
+        "invoiceNumber": null,
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": null,
+        "dueDate": null,
+        "servicePeriod": null,
+        "description": "Proposed editorial layout package"
+      },
+      "expectedDocumentType": "QUOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Quotation is explicitly not an invoice."
+    }
+  ]
+}

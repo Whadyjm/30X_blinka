@@ -43,6 +43,28 @@ function priorFor(invoice: PolicyInvoice, context: PolicyContext): PolicyContext
   };
 }
 
+test('un número previo con identidad sin resolver requiere aclaración aunque cambien importe y concepto', () => {
+  const { invoice, context } = example();
+  const prior = priorFor(invoice, context);
+  prior.vendorId = null;
+  prior.agreementId = null;
+  prior.extraction.amountMinor = 123;
+  prior.extraction.description = 'Otro servicio anterior';
+  prior.extraction.invoiceNumber = (prior.extraction.invoiceNumber ?? '').toLowerCase().replaceAll('-', ' ');
+  context.priorInvoices = [prior];
+  let result = evaluateInvoice(invoice, context);
+  assert.equal(result.candidate.action, 'ESCALATE');
+  assert.ok(result.candidate.reasons.includes('POSSIBLE_DUPLICATE'));
+  assert.equal(result.candidate.needsHumanApproval, false);
+  assert.equal(result.requiresBudgetReservation, false);
+  prior.extraction.vendorName = null;
+  assert.equal(evaluateInvoice(invoice, context).candidate.action, 'ESCALATE', 'un proveedor desconocido no descarta el antecedente');
+  prior.extraction.vendorName = 'Otro proveedor distinto';
+  assert.equal(evaluateInvoice(invoice, context).candidate.action, 'APPROVE', 'un nombre distinto no se asigna al proveedor actual');
+  prior.extraction.invoiceNumber = null;
+  assert.equal(evaluateInvoice(invoice, context).candidate.action, 'APPROVE', 'un número ausente no fabrica una coincidencia');
+});
+
 test('50 escenarios etiquetados antes de construir el motor coinciden en acción, motivos y necesidad humana', async (t) => {
   const report = evaluatePolicyCorpus();
   for (const item of report.cases) {

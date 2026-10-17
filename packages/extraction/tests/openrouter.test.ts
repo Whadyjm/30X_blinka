@@ -343,6 +343,42 @@ test('clasifica errores anidados del proveedor y no reintenta un 400 con prose a
   }
 });
 
+test('HTTP 400 con error transitorio tipado activa respaldo acotado; prose de rate limit no autoriza reintento', async () => {
+  for (const error of [
+    { code: 400, metadata: { error_type: 'rate_limit_exceeded' } },
+    { code: 400, metadata: { error_type: 'provider_overloaded' } },
+    { code: 429 },
+  ]) {
+    let calls = 0;
+    const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => ++calls === 1
+      ? Response.json({ error }, { status: 400 }) : success(modelOf(init)) });
+    assert.equal(calls, 2);
+    assert.equal(result.model, EXTRACTION_MODELS[1]);
+    assert.ok(result.attempts[0]!.issueCodes?.includes('TRANSIENT_PROVIDER_ERROR'));
+  }
+  for (const error of [
+    { code: 400, message: 'rate limit exceeded; quota unavailable' },
+    { code: 429, metadata: { error_type: 'invalid_request' } },
+    { code: 400, metadata: { error_type: 'context_length_exceeded' } },
+  ]) {
+    let calls = 0;
+    await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+      calls++; return Response.json({ error }, { status: 400 });
+    } }), /OPENROUTER_REQUEST_REJECTED/);
+    assert.equal(calls, 1);
+  }
+  let calls = 0;
+  await assert.rejects(extractInvoiceWithOpenRouter(input, { fetch: async () => {
+    calls++; return Response.json({ error: { code: 400, metadata: { error_type: 'rate_limit_exceeded' } } }, { status: 400 });
+  } }), (error: unknown) => {
+    assert.ok(error instanceof ExtractionError);
+    assert.equal(error.code, 'ALL_MODELS_UNAVAILABLE');
+    assert.equal(error.attempts.length, 3);
+    return true;
+  });
+  assert.equal(calls, 3);
+});
+
 test('clasificación tipada separa comprobante, factura ambigua y factura; nunca autoriza', async () => {
   for (const documentType of ['PAYMENT_RECEIPT', 'DELIVERY_NOTE', 'INVOICE', 'UNKNOWN'] as const) {
     const result = await extractInvoiceWithOpenRouter(input, { fetch: async (_url, init) => {

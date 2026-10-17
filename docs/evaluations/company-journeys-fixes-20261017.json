@@ -1,0 +1,570 @@
+{
+  "measuredAt": "2026-10-17T22:42:47.092Z",
+  "scope": "OFFLINE_REGRESSION_FROZEN_PRIMARY_AND_QWEN_NEW_PDF_CAPTURES_CURRENT_DOMAIN_API_D1",
+  "baseline": {
+    "source": "docs/evaluations/company-journeys-audit-20261017.json",
+    "sha256": "0a9d110729c4a0161ba5e288ab1a2fbe30bcc16b1ef58fcab5bed860e995640a",
+    "fullyCorrect": 27,
+    "unsafeApprovals": 1,
+    "correctAutonomous": 17
+  },
+  "totals": {
+    "attempted": 60,
+    "decided": 56,
+    "fullyCorrect": 50,
+    "unsafeApprovals": 0,
+    "unexpectedApprovals": 0,
+    "correctAutonomous": 36,
+    "readerFailures": 4,
+    "harnessErrors": 0,
+    "approved": 21,
+    "blocked": 20,
+    "escalated": 15,
+    "explicitHumanReviews": 5,
+    "uploadReplays": 60,
+    "processingReplays": 60,
+    "privateDocumentsVerified": 60,
+    "remoteProbeCalls": 0
+  },
+  "companies": [
+    {
+      "company": "brisa",
+      "source": "docs/evaluations/company-journey-brisa-reparse-2026-10-17T22-39-32-996Z.json",
+      "sourceSha256": "34429c93194328dc41f7b9c10e16338da5f6274a6541bdfec83e1d4f01a4c215",
+      "sourceHashes": {
+        "apps/api/scripts/evaluate-company-journey.mjs": "0edb9f19781b059b5f8a33232b3b51aa920f9b3731b288cd74717a496bcce407",
+        "apps/api/worker/api.js": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+        "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+        "apps/api/worker/configuration.js": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+        "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+        "apps/api/worker/processing.js": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+        "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+        "apps/api/worker/repository.js": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+        "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+        "apps/api/worker/document.js": "51a6a7bc5e22d9480245cc8cfa1924a5a803633cd5aef8e567ff8ebb99122699",
+        "packages/extraction/src/openrouter.ts": "e4ecdfb4cc97377dcec1b3a4d1f391f64f516dd817a0a3a590a3ec75171cd149",
+        "packages/domain/src/index.ts": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+        "packages/contracts/src/index.ts": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc"
+      },
+      "summary": {
+        "attempted": 20,
+        "decided": 18,
+        "fullyCorrect": 17,
+        "unsafeApprovals": 0,
+        "unexpectedApprovals": 0,
+        "contextDivergences": 17,
+        "harnessErrors": 0,
+        "readerFailures": 2,
+        "allEightFieldsExact": 17,
+        "correctAutonomous": 12,
+        "explainedDecisions": 18,
+        "approved": 7,
+        "blocked": 7,
+        "escalated": 4,
+        "explicitHumanReviews": 2,
+        "uploadReplays": 20,
+        "processingReplays": 20,
+        "privateDocumentsVerified": 20,
+        "remoteProbeCalls": 0,
+        "readerCacheHits": 1,
+        "medianDurationMs": 840,
+        "maxDurationMs": 1548,
+        "readerVersions": [
+          "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+        ],
+        "successfulPrimaryReportedCostUsd": 0,
+        "successfulSecondaryReportedCostUsd": 0,
+        "selfTest": false,
+        "frozenReaderReplay": true,
+        "reparsedSecondaryText": true,
+        "newModelCalls": 0
+      },
+      "independentlyAuditedApprovals": 7,
+      "duplicate012": {
+        "action": "BLOCK",
+        "reasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "reservations": 0
+      },
+      "remaining": [
+        {
+          "caseId": "003",
+          "action": null,
+          "reasons": [],
+          "readerError": "OPENROUTER_REQUEST_REJECTED",
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Cobalt Design Demo Ltd",
+              "actual": null
+            },
+            {
+              "field": "invoiceNumber",
+              "expected": "CD-2603",
+              "actual": null
+            },
+            {
+              "field": "amountMinor",
+              "expected": 5000,
+              "actual": null
+            },
+            {
+              "field": "currency",
+              "expected": "EUR",
+              "actual": null
+            },
+            {
+              "field": "issuedAt",
+              "expected": "2026-10-06",
+              "actual": null
+            },
+            {
+              "field": "dueDate",
+              "expected": "2026-10-28",
+              "actual": null
+            },
+            {
+              "field": "servicePeriod",
+              "expected": "2026-10",
+              "actual": null
+            },
+            {
+              "field": "description",
+              "expected": "Catalog layout services",
+              "actual": null
+            }
+          ],
+          "referenceContextDiverged": false
+        },
+        {
+          "caseId": "008",
+          "action": null,
+          "reasons": [],
+          "readerError": "OPENROUTER_REQUEST_REJECTED",
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Silverline Support Demo Oy",
+              "actual": null
+            },
+            {
+              "field": "invoiceNumber",
+              "expected": "SS-2608",
+              "actual": null
+            },
+            {
+              "field": "amountMinor",
+              "expected": 6000,
+              "actual": null
+            },
+            {
+              "field": "currency",
+              "expected": "EUR",
+              "actual": null
+            },
+            {
+              "field": "issuedAt",
+              "expected": "2026-10-06",
+              "actual": null
+            },
+            {
+              "field": "dueDate",
+              "expected": "2026-10-28",
+              "actual": null
+            },
+            {
+              "field": "servicePeriod",
+              "expected": "2026-10",
+              "actual": null
+            },
+            {
+              "field": "description",
+              "expected": "Support desk coverage",
+              "actual": null
+            }
+          ],
+          "referenceContextDiverged": true
+        },
+        {
+          "caseId": "016",
+          "action": "ESCALATE",
+          "reasons": [
+            "AMOUNT_ABOVE_AUTO_LIMIT",
+            "HUMAN_APPROVAL_REQUIRED"
+          ],
+          "readerError": null,
+          "fieldDifferences": [],
+          "referenceContextDiverged": true
+        }
+      ]
+    },
+    {
+      "company": "cedro",
+      "source": "docs/evaluations/company-journey-cedro-reparse-2026-10-17T22-39-53-208Z.json",
+      "sourceSha256": "7d3b9565dcd93ea91336d6dd5d934d9550c09ba63d73724729737668f61f8c0c",
+      "sourceHashes": {
+        "apps/api/scripts/evaluate-company-journey.mjs": "0edb9f19781b059b5f8a33232b3b51aa920f9b3731b288cd74717a496bcce407",
+        "apps/api/worker/api.js": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+        "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+        "apps/api/worker/configuration.js": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+        "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+        "apps/api/worker/processing.js": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+        "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+        "apps/api/worker/repository.js": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+        "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+        "apps/api/worker/document.js": "51a6a7bc5e22d9480245cc8cfa1924a5a803633cd5aef8e567ff8ebb99122699",
+        "packages/extraction/src/openrouter.ts": "e4ecdfb4cc97377dcec1b3a4d1f391f64f516dd817a0a3a590a3ec75171cd149",
+        "packages/domain/src/index.ts": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+        "packages/contracts/src/index.ts": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc"
+      },
+      "summary": {
+        "attempted": 20,
+        "decided": 18,
+        "fullyCorrect": 17,
+        "unsafeApprovals": 0,
+        "unexpectedApprovals": 0,
+        "contextDivergences": 15,
+        "harnessErrors": 0,
+        "readerFailures": 2,
+        "allEightFieldsExact": 15,
+        "correctAutonomous": 13,
+        "explainedDecisions": 18,
+        "approved": 8,
+        "blocked": 6,
+        "escalated": 4,
+        "explicitHumanReviews": 1,
+        "uploadReplays": 20,
+        "processingReplays": 20,
+        "privateDocumentsVerified": 20,
+        "remoteProbeCalls": 0,
+        "readerCacheHits": 1,
+        "medianDurationMs": 905,
+        "maxDurationMs": 1626,
+        "readerVersions": [
+          "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+        ],
+        "successfulPrimaryReportedCostUsd": 0,
+        "successfulSecondaryReportedCostUsd": 0,
+        "selfTest": false,
+        "frozenReaderReplay": true,
+        "reparsedSecondaryText": true,
+        "newModelCalls": 0
+      },
+      "independentlyAuditedApprovals": 8,
+      "duplicate012": {
+        "action": "BLOCK",
+        "reasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "reservations": 0
+      },
+      "remaining": [
+        {
+          "caseId": "005",
+          "action": null,
+          "reasons": [],
+          "readerError": "OPENROUTER_REQUEST_REJECTED",
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Quiet Harbor Network Demo",
+              "actual": null
+            },
+            {
+              "field": "invoiceNumber",
+              "expected": "V05-005",
+              "actual": null
+            },
+            {
+              "field": "amountMinor",
+              "expected": 10000,
+              "actual": null
+            },
+            {
+              "field": "currency",
+              "expected": "USD",
+              "actual": null
+            },
+            {
+              "field": "issuedAt",
+              "expected": "2026-10-06",
+              "actual": null
+            },
+            {
+              "field": "dueDate",
+              "expected": "2026-10-26",
+              "actual": null
+            },
+            {
+              "field": "servicePeriod",
+              "expected": "2026-10",
+              "actual": null
+            },
+            {
+              "field": "description",
+              "expected": "Network health snapshot",
+              "actual": null
+            }
+          ],
+          "referenceContextDiverged": false
+        },
+        {
+          "caseId": "010",
+          "action": null,
+          "reasons": [],
+          "readerError": "OPENROUTER_REQUEST_REJECTED",
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Cobalt Meadow Consulting Demo",
+              "actual": null
+            },
+            {
+              "field": "invoiceNumber",
+              "expected": "V10-010",
+              "actual": null
+            },
+            {
+              "field": "amountMinor",
+              "expected": 70000,
+              "actual": null
+            },
+            {
+              "field": "currency",
+              "expected": "USD",
+              "actual": null
+            },
+            {
+              "field": "issuedAt",
+              "expected": "2026-10-06",
+              "actual": null
+            },
+            {
+              "field": "dueDate",
+              "expected": "2026-10-26",
+              "actual": null
+            },
+            {
+              "field": "servicePeriod",
+              "expected": "2026-10",
+              "actual": null
+            },
+            {
+              "field": "description",
+              "expected": "Fleet capacity planning",
+              "actual": null
+            }
+          ],
+          "referenceContextDiverged": true
+        },
+        {
+          "caseId": "016",
+          "action": "ESCALATE",
+          "reasons": [
+            "AMOUNT_ABOVE_AUTO_LIMIT",
+            "HUMAN_APPROVAL_REQUIRED"
+          ],
+          "readerError": null,
+          "fieldDifferences": [],
+          "referenceContextDiverged": true
+        }
+      ]
+    },
+    {
+      "company": "lumen",
+      "source": "docs/evaluations/company-journey-lumen-reparse-2026-10-17T22-40-14-993Z.json",
+      "sourceSha256": "873ca403948cb332f1ffb12db3cdfc18e2978e53c0ec568c477e16fed2694024",
+      "sourceHashes": {
+        "apps/api/scripts/evaluate-company-journey.mjs": "0edb9f19781b059b5f8a33232b3b51aa920f9b3731b288cd74717a496bcce407",
+        "apps/api/worker/api.js": "d6e99a26817708443a3f4a380d72f4d94cbc455b82a4b6111afa315d9fc56326",
+        "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+        "apps/api/worker/configuration.js": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+        "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+        "apps/api/worker/processing.js": "b60d36d2d1b90a52fe36080f8e60c5684b4a11e68df0e82c9d3dd76cf3bc1b39",
+        "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+        "apps/api/worker/repository.js": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+        "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+        "apps/api/worker/document.js": "51a6a7bc5e22d9480245cc8cfa1924a5a803633cd5aef8e567ff8ebb99122699",
+        "packages/extraction/src/openrouter.ts": "e4ecdfb4cc97377dcec1b3a4d1f391f64f516dd817a0a3a590a3ec75171cd149",
+        "packages/domain/src/index.ts": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+        "packages/contracts/src/index.ts": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc"
+      },
+      "summary": {
+        "attempted": 20,
+        "decided": 20,
+        "fullyCorrect": 16,
+        "unsafeApprovals": 0,
+        "unexpectedApprovals": 0,
+        "contextDivergences": 17,
+        "harnessErrors": 0,
+        "readerFailures": 0,
+        "allEightFieldsExact": 14,
+        "correctAutonomous": 11,
+        "explainedDecisions": 20,
+        "approved": 6,
+        "blocked": 7,
+        "escalated": 7,
+        "explicitHumanReviews": 2,
+        "uploadReplays": 20,
+        "processingReplays": 20,
+        "privateDocumentsVerified": 20,
+        "remoteProbeCalls": 0,
+        "readerCacheHits": 1,
+        "medianDurationMs": 862.5,
+        "maxDurationMs": 1474,
+        "readerVersions": [
+          "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017"
+        ],
+        "successfulPrimaryReportedCostUsd": 0,
+        "successfulSecondaryReportedCostUsd": 0,
+        "selfTest": false,
+        "frozenReaderReplay": true,
+        "reparsedSecondaryText": true,
+        "newModelCalls": 0
+      },
+      "independentlyAuditedApprovals": 6,
+      "duplicate012": {
+        "action": "BLOCK",
+        "reasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "reservations": 0
+      },
+      "remaining": [
+        {
+          "caseId": "003",
+          "action": "ESCALATE",
+          "reasons": [
+            "INVALID_OR_MISSING_DATA"
+          ],
+          "readerError": null,
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Cobalt Audio Lab Demo",
+              "actual": "Juniper Motion Finance"
+            }
+          ],
+          "referenceContextDiverged": false
+        },
+        {
+          "caseId": "006",
+          "action": "ESCALATE",
+          "reasons": [
+            "INVALID_OR_MISSING_DATA"
+          ],
+          "readerError": null,
+          "fieldDifferences": [
+            {
+              "field": "vendorName",
+              "expected": "Northstar Type Foundry Demo",
+              "actual": "COBALT AUDIO LAB"
+            }
+          ],
+          "referenceContextDiverged": true
+        },
+        {
+          "caseId": "007",
+          "action": "ESCALATE",
+          "reasons": [
+            "INVALID_OR_MISSING_DATA",
+            "MISSING_AGREEMENT"
+          ],
+          "readerError": null,
+          "fieldDifferences": [
+            {
+              "field": "description",
+              "expected": "Cover grid adaptation",
+              "actual": "Paper grid adaptation"
+            }
+          ],
+          "referenceContextDiverged": true
+        },
+        {
+          "caseId": "016",
+          "action": "ESCALATE",
+          "reasons": [
+            "AMOUNT_ABOVE_AUTO_LIMIT",
+            "HUMAN_APPROVAL_REQUIRED"
+          ],
+          "readerError": null,
+          "fieldDifferences": [],
+          "referenceContextDiverged": true
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "suites": [
+      {
+        "suite": "api",
+        "passed": 128,
+        "failed": 0,
+        "logSha256": "d36d062afafcd7d6494ee6d805b58888ae06971c562dd70314c011827c96070c"
+      },
+      {
+        "suite": "domain",
+        "passed": 79,
+        "failed": 0,
+        "logSha256": "b73554573d18f1ffd17611b287769a64462e3dc70edd14f8d34edbf3a8ddd421"
+      },
+      {
+        "suite": "extraction",
+        "passed": 28,
+        "failed": 0,
+        "logSha256": "3c236d4c6b89ea7c4311216f84aa0c1c5129037b1e5948622b95f82465134197"
+      },
+      {
+        "suite": "contracts",
+        "passed": 28,
+        "failed": 0,
+        "logSha256": "6431ddeadf6ea1c50914ab980a77c6a22efffb08fac8a410abbef52572598635"
+      },
+      {
+        "suite": "d1",
+        "passed": 14,
+        "failed": 0,
+        "logSha256": "29e0c016efaf10f1e31654d9f3735f5ea5b28d88d39f198c74f719d752cc8560"
+      },
+      {
+        "suite": "workerd",
+        "passed": 1,
+        "failed": 0,
+        "logSha256": "ff3fb8898583e98436937ec957fb65e4b4e9feb785c0ebb64ae933edbdbe6212"
+      }
+    ],
+    "totalTests": 278,
+    "typecheck": [
+      "domain",
+      "extraction"
+    ],
+    "diffCheck": "PASS",
+    "workerBundle": "wrangler deploy --dry-run passed; no deployment",
+    "workerBundleSha256": "9ef59af570011a93be84291f418b513c175cb8f38152042bb571dc134856308b"
+  },
+  "limits": [
+    "This is regression on documents used for fixes, not a new live or unseen evaluation.",
+    "Primary model results and Qwen text are historical. PDF text was captured again; original PDF conversions were not retained.",
+    "Four historical HTTP400 reader errors are preserved; their typed upstream metadata was not retained, so recovery is not measured here.",
+    "Three primary extraction discrepancies remain safely escalated in Lumen003/006/007.",
+    "Three budget-script differences follow from earlier unapproved invoices and actual cumulative reservations.",
+    "Lumen017 has incorrect original reference dates; original reports, manifest and bytes are preserved.",
+    "Financial writes use fresh local D1/R2 with simulated human reviews; no real payments, production financial writes or browser testing.",
+    "The primary prompt now clarifies explicit supplier identity and literal description, but frozen replay does not measure its efficacy."
+  ],
+  "corrections": {
+    "unresolvedVendorDuplicateGuard": "IMPLEMENTED_AND_REPLAY_VERIFIED",
+    "secondaryParser": "labelled-v7",
+    "primaryConfiguration": "invoice-json-v4-supplier-role-20261017",
+    "primaryPromptEffectiveness": "PENDING_NEW_LIVE_MEASUREMENT",
+    "typedTransientHttp400": "INTEGRATION_VERIFIED_REAL_UPSTREAM_RECOVERY_NOT_YET_MEASURED",
+    "harness": "QUEUE_IDENTITY_GUARD_AND_ABORT_ON_HARNESS_ERROR"
+  },
+  "additionalCheck": {
+    "source": "docs/evaluations/priority-fixes-parallel-instability-20261017.json",
+    "sha256": "5355d0709a76c0a0c1440bc747cf8d73263eaa417a89576e1aa683c6e3e25f54",
+    "note": "Additional parallel attempt failed on local Miniflare transport; reports preserved. Final checks above run sequentially."
+  },
+  "originalReportsUnchanged": true
+}

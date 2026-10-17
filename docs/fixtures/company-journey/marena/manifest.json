@@ -1,0 +1,912 @@
+{
+  "datasetVersion": "marena-holdout-v1-predeclared",
+  "synthetic": true,
+  "company": {
+    "slug": "marena",
+    "name": "Marena Demo Operations LLC",
+    "currency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "rules": {
+    "currency": "USD",
+    "automaticLimitMinor": 20000,
+    "hardLimitMinor": 100000,
+    "monthlyBudgetMinor": 180000,
+    "requireAllowedVendor": true,
+    "requireAgreement": true,
+    "humanApprovalEnabled": true,
+    "reviewAboveMinor": 20000,
+    "processDaysBeforeDue": 0,
+    "scopedDelegations": []
+  },
+  "vendors": [
+    {
+      "key": "vendor_001",
+      "name": "Granite Data Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_002",
+      "name": "Sierra Forms Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_003",
+      "name": "Copper Lake Design Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_004",
+      "name": "Blue Fern Hosting Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_005",
+      "name": "Amber Field Support Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_006",
+      "name": "Meadow Grid Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_007",
+      "name": "Tamarind Audio Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_008",
+      "name": "Indigo Map Demo Ltd",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_009",
+      "name": "Birch Ledger Demo LLC",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_010",
+      "name": "Coral Ridge Research Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_013",
+      "name": "Unlisted Harbor Demo",
+      "allowed": false,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_014",
+      "name": "Cedar Frame Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_015",
+      "name": "Violet Relay Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_016",
+      "name": "Canyon Survey Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_017",
+      "name": "Moss Archive Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_018",
+      "name": "Cloudberry Metrics Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_019",
+      "name": "Elm Package Demo",
+      "allowed": true,
+      "externalRef": null
+    },
+    {
+      "key": "vendor_020",
+      "name": "Dune Creative Demo",
+      "allowed": true,
+      "externalRef": null
+    }
+  ],
+  "agreements": [
+    {
+      "key": "agreement_001",
+      "vendorKey": "vendor_001",
+      "currency": "USD",
+      "amountMinor": 15000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Secure archive capacity",
+      "active": true
+    },
+    {
+      "key": "agreement_002",
+      "vendorKey": "vendor_002",
+      "currency": "USD",
+      "amountMinor": 6000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Document layout review",
+      "active": true
+    },
+    {
+      "key": "agreement_003",
+      "vendorKey": "vendor_003",
+      "currency": "USD",
+      "amountMinor": 7000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Catalogue cover proof",
+      "active": true
+    },
+    {
+      "key": "agreement_004",
+      "vendorKey": "vendor_004",
+      "currency": "USD",
+      "amountMinor": 8000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Application uptime monitoring",
+      "active": true
+    },
+    {
+      "key": "agreement_005",
+      "vendorKey": "vendor_005",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Support inbox coverage",
+      "active": true
+    },
+    {
+      "key": "agreement_006",
+      "vendorKey": "vendor_006",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Search index maintenance",
+      "active": true
+    },
+    {
+      "key": "agreement_007",
+      "vendorKey": "vendor_007",
+      "currency": "USD",
+      "amountMinor": 11000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Interview sound cleanup",
+      "active": true
+    },
+    {
+      "key": "agreement_008",
+      "vendorKey": "vendor_008",
+      "currency": "USD",
+      "amountMinor": 12000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Dispatch route annotation",
+      "active": true
+    },
+    {
+      "key": "agreement_009",
+      "vendorKey": "vendor_009",
+      "currency": "USD",
+      "amountMinor": 30000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "One time operations review",
+      "active": true
+    },
+    {
+      "key": "agreement_010",
+      "vendorKey": "vendor_010",
+      "currency": "USD",
+      "amountMinor": 35000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "One time operations review",
+      "active": true
+    },
+    {
+      "key": "agreement_012",
+      "vendorKey": "vendor_001",
+      "currency": "USD",
+      "amountMinor": 6500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archive transfer consultation",
+      "active": true
+    },
+    {
+      "key": "agreement_013",
+      "vendorKey": "vendor_013",
+      "currency": "USD",
+      "amountMinor": 7500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Unrequested export service",
+      "active": true
+    },
+    {
+      "key": "agreement_014",
+      "vendorKey": "vendor_014",
+      "currency": "USD",
+      "amountMinor": 10000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Annual visual review",
+      "active": true
+    },
+    {
+      "key": "agreement_015",
+      "vendorKey": "vendor_015",
+      "currency": "USD",
+      "amountMinor": 110000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Relay infrastructure setup",
+      "active": true
+    },
+    {
+      "key": "agreement_016",
+      "vendorKey": "vendor_016",
+      "currency": "USD",
+      "amountMinor": 80000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Regional capacity survey",
+      "active": true
+    },
+    {
+      "key": "agreement_017",
+      "vendorKey": "vendor_017",
+      "currency": "USD",
+      "amountMinor": 8500,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archive classification",
+      "active": true
+    },
+    {
+      "key": "agreement_018",
+      "vendorKey": "vendor_018",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Monthly metrics summary",
+      "active": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "001",
+      "file": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Granite Data Demo LLC",
+        "invoiceNumber": "MN-001-2026",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Secure archive capacity"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 15000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "002",
+      "file": {
+        "path": "documents/002.png",
+        "mimeType": "image/png",
+        "sha256": "ca5d28b05edf4193ab2407ddb9d64a3917c2ebc3f8e467286a4214d054f2fc57",
+        "sizeBytes": 54967
+      },
+      "expectedExtraction": {
+        "vendorName": "Sierra Forms Demo Ltd",
+        "invoiceNumber": "MN-002-2026",
+        "amountMinor": 6000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Document layout review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 6000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "1fda770e6fb99500ca24183499b66165b2317448d0b46e783890a644ad027f1e",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Copper Lake Design Demo",
+        "invoiceNumber": "MN-003-2026",
+        "amountMinor": 7000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Catalogue cover proof"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 7000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "004",
+      "file": {
+        "path": "documents/004.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "dffda0a41dc4ae1d08da4d4cb0c548937b94bef37c9185343da2829028117cbc",
+        "sizeBytes": 103141
+      },
+      "expectedExtraction": {
+        "vendorName": "Blue Fern Hosting Demo",
+        "invoiceNumber": "MN-004-2026",
+        "amountMinor": 8000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Application uptime monitoring"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 8000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "4cde391a6817c55d39fde221c79876abf449a9b8bf9583cfa3fbb7edfc2f3e07",
+        "sizeBytes": 1199
+      },
+      "expectedExtraction": {
+        "vendorName": "Amber Field Support Demo",
+        "invoiceNumber": "MN-005-2026",
+        "amountMinor": 9000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Support inbox coverage"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 9000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "006",
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sha256": "60a26719e8a3eff43cee78894fc567246c679c51079fe16ee7345be03ad4ea50",
+        "sizeBytes": 54565
+      },
+      "expectedExtraction": {
+        "vendorName": "Meadow Grid Demo LLC",
+        "invoiceNumber": "MN-006-2026",
+        "amountMinor": 10000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Search index maintenance"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 10000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "007",
+      "file": {
+        "path": "documents/007.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "35cdc4205e2ec68d48aefa09104934a21ed0cfc7934eee4dac274c8f454fca4d",
+        "sizeBytes": 1160
+      },
+      "expectedExtraction": {
+        "vendorName": "Tamarind Audio Demo",
+        "invoiceNumber": "MN-007-2026",
+        "amountMinor": 11000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Interview sound cleanup"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 11000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "008",
+      "file": {
+        "path": "documents/008.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "06950d6e2f46823cfef0f2e6b276d350fce7eb5281a82e06cff3e7cef359bc30",
+        "sizeBytes": 110987
+      },
+      "expectedExtraction": {
+        "vendorName": "Indigo Map Demo Ltd",
+        "invoiceNumber": "MN-008-2026",
+        "amountMinor": 12000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Dispatch route annotation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "APPROVE",
+        "requiredReasons": [],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 12000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "009",
+      "file": {
+        "path": "documents/009.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "c8fd407209a6234fbb99a8b23787f86450a9e5dac6a25cd54c876a9b846022e3",
+        "sizeBytes": 1166
+      },
+      "expectedExtraction": {
+        "vendorName": "Birch Ledger Demo LLC",
+        "invoiceNumber": "MN-009-2026",
+        "amountMinor": 30000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "One time operations review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "APPROVE",
+      "expectedFinalAction": "APPROVE",
+      "expectedReservationDeltaMinor": 30000,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "010",
+      "file": {
+        "path": "documents/010.png",
+        "mimeType": "image/png",
+        "sha256": "9ff9cc739f2980d200794cc40d388f488a10eda6eb1750dbbe5ce7e939fecb14",
+        "sizeBytes": 56473
+      },
+      "expectedExtraction": {
+        "vendorName": "Coral Ridge Research Demo",
+        "invoiceNumber": "MN-010-2026",
+        "amountMinor": 35000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "One time operations review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_AUTO_LIMIT",
+          "HUMAN_APPROVAL_REQUIRED"
+        ],
+        "needsHumanApproval": true
+      },
+      "humanAction": "REJECT",
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "011",
+      "file": {
+        "path": "documents/011.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "379e6f3772ec4c9eccbccd5c89bf4f08bb946a4869950fe6fa0030a6321ae8b8",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Granite Data Demo LLC",
+        "invoiceNumber": "MN-001-2026",
+        "amountMinor": 15000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Secure archive capacity"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "012",
+      "file": {
+        "path": "documents/012.png",
+        "mimeType": "image/png",
+        "sha256": "79ef83d4a9b390d7948d950cee4755d78ecdda8aa4b698548457c4ece10f4a30",
+        "sizeBytes": 54622
+      },
+      "expectedExtraction": {
+        "vendorName": "Granite Data Demo LLC",
+        "invoiceNumber": "MN-001-2026",
+        "amountMinor": 6500,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Archive transfer consultation"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "DUPLICATE_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "013",
+      "file": {
+        "path": "documents/013.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "74830b9d95f4bd27b462da255c2dda9025a5ac678a01281d03639777a7284ce7",
+        "sizeBytes": 1164
+      },
+      "expectedExtraction": {
+        "vendorName": "Unlisted Harbor Demo",
+        "invoiceNumber": "MN-013-2026",
+        "amountMinor": 7500,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Unrequested export service"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "UNKNOWN_VENDOR"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "014",
+      "file": {
+        "path": "documents/014.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "0806974e1589e3260a2024d5e403ed871fd16c656236cc464a7127bcd1c9478f",
+        "sizeBytes": 99783
+      },
+      "expectedExtraction": {
+        "vendorName": "Cedar Frame Demo",
+        "invoiceNumber": "MN-014-2026",
+        "amountMinor": 12500,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Annual visual review"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "AGREEMENT_MISMATCH"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "015",
+      "file": {
+        "path": "documents/015.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "566db3aba7b3dd6f9a3a6969507de9bdd9e3ef890f1a57bce90291b36a9a3d61",
+        "sizeBytes": 1160
+      },
+      "expectedExtraction": {
+        "vendorName": "Violet Relay Demo",
+        "invoiceNumber": "MN-015-2026",
+        "amountMinor": 110000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Relay infrastructure setup"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "AMOUNT_ABOVE_HARD_LIMIT"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "016",
+      "file": {
+        "path": "documents/016.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "a8c0a05f350e408d202b5eb72a47812ac852f5fb65c3ee76c0e124b872195f07",
+        "sizeBytes": 1166
+      },
+      "expectedExtraction": {
+        "vendorName": "Canyon Survey Demo",
+        "invoiceNumber": "MN-016-2026",
+        "amountMinor": 80000,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Regional capacity survey"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "BUDGET_EXCEEDED"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "017",
+      "file": {
+        "path": "documents/017.png",
+        "mimeType": "image/png",
+        "sha256": "84fbfdef9e90b712b539fd40342ceeb084394faafd0f1dc8f741b970d856c9da",
+        "sizeBytes": 53048
+      },
+      "expectedExtraction": {
+        "vendorName": "Moss Archive Demo",
+        "invoiceNumber": "MN-017-2026",
+        "amountMinor": null,
+        "currency": null,
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Archive classification"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "018",
+      "file": {
+        "path": "documents/018.jpg",
+        "mimeType": "image/jpeg",
+        "sha256": "8e3163226e1358a15cafccda3b8d9b97865f3afe1e99389856995db65e05f8ea",
+        "sizeBytes": 109571
+      },
+      "expectedExtraction": {
+        "vendorName": "Cloudberry Metrics Demo",
+        "invoiceNumber": "MN-018-2026",
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Monthly metrics summary"
+      },
+      "expectedDocumentType": "INVOICE",
+      "expected": {
+        "action": "ESCALATE",
+        "requiredReasons": [
+          "INVALID_OR_MISSING_DATA"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "ESCALATE",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "8833108986440a6c7472236e6642c42110c67456aedbb71631d9d494510a5d96",
+        "sizeBytes": 1145
+      },
+      "expectedExtraction": {
+        "vendorName": "Elm Package Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Draft artwork package"
+      },
+      "expectedDocumentType": "DELIVERY_NOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    },
+    {
+      "id": "020",
+      "file": {
+        "path": "documents/020.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "1b49f5c6792ce6e94630dc741ccb89e6146cc248bfd9f7a794209e13e7a9c2de",
+        "sizeBytes": 1143
+      },
+      "expectedExtraction": {
+        "vendorName": "Dune Creative Demo",
+        "invoiceNumber": null,
+        "amountMinor": null,
+        "currency": "USD",
+        "issuedAt": "2026-10-12",
+        "dueDate": "2026-10-30",
+        "servicePeriod": "2026-10",
+        "description": "Draft artwork package"
+      },
+      "expectedDocumentType": "QUOTE",
+      "expected": {
+        "action": "BLOCK",
+        "requiredReasons": [
+          "NOT_AN_INVOICE"
+        ],
+        "needsHumanApproval": false
+      },
+      "humanAction": null,
+      "expectedFinalAction": "BLOCK",
+      "expectedReservationDeltaMinor": 0,
+      "notes": "Predeclared synthetic case; no real payment."
+    }
+  ]
+}
