@@ -42,8 +42,8 @@ como ejemplo en el onboarding, identificados como demo y sujetos a confirmación
 ## Qué está conectado
 
 Los contratos, datos ficticios y [motor puro](../packages/domain/README.md) existen.
-La pantalla de Whady y los endpoints de guardar/activar mandato todavía deben conectarse
-siguiendo [docs/API.md](API.md). El motor no depende de que esa pantalla esté terminada
+Los endpoints de guardar/activar mandato ya están conectados a D1 en `apps/api`.
+La pantalla de Whady debe consumirlos siguiendo [docs/API.md](API.md). El motor no depende de que esa pantalla esté terminada
 para poder probar su comportamiento con snapshots sintéticos.
 
 Una respuesta `candidate.action=APPROVE` requiere un commit seguro en D1 antes de aparecer

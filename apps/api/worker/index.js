@@ -1,7 +1,9 @@
 import { handleExtractionProbe } from "./extraction-probe.js";
+import { handleApi } from "./api.js";
 
 export default {
   async fetch(request, env) {
+    if (new URL(request.url).pathname.startsWith('/api/v1/')) return handleApi(request, env);
     if (new URL(request.url).pathname === "/api/internal/extraction-probe") {
       return handleExtractionProbe(request, env);
     }

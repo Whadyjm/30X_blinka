@@ -16,6 +16,22 @@
   ],
   "observability": {
     "enabled": true,
-    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 0.01
+    }
+  },
+  "r2_buckets": [
+    {
+      "binding": "INVOICES",
+      "bucket_name": "oli-invoice-tests"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "DEMO_ORG_ID": "org_demo",
+    "DEMO_USER_ID": "user_demo_owner"
   }
 }

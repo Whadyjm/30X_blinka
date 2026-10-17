@@ -1,15 +1,30 @@
 # Oli API
 
-Worker inicial del backend en la cuenta Cloudflare de Tiamat
-(`fbaa64f96579f93b2db32a1eb12ff6c9`). Implementa `GET /api/health`, que consulta
-D1 antes de devolver éxito (503 si D1 falla), y una prueba privada de extracción
-visual con OpenRouter. El pipeline público de facturas y decisiones aún falta.
+Backend P0 del reto en la cuenta **Tiamat** (`fbaa64f96579f93b2db32a1eb12ff6c9`).
+Worker: **https://oli-api.tiamat-agency.workers.dev**. Contrato: [docs/API.md](../../docs/API.md).
+
+Implementa sesión demo con cookie HttpOnly/CSRF, reglas y activación OWNER, proveedores,
+acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamiento,
+revisión humana, dashboard y evaluación vacía. La UI de Whady debe conectarse a estas rutas.
+
+PDF se extrae mediante OpenRouter con Mistral OCR y se contrasta con una lectura separada
+PDF_TEXT de Cloudflare. El parser de texto acepta etiquetas explícitas conocidas; documentos
+escaneados/layouts no reconocidos y cualquier discrepancia se escalan. PNG/JPEG se extraen,
+pero **no se autoaprueban sin OCR independiente**, que sigue pendiente. Un segundo mensaje
+al mismo modelo no cuenta como corroboración.
+
+El motor recibe únicamente datos de la empresa de la sesión. Antes de guardar se comprueba
+la revisión del snapshot en el mismo batch D1. Los triggers existentes crean reserva y contador
+atómicamente; no hay un segundo incremento en JS. Procesar otra vez devuelve el resultado;
+una petición concurrente devuelve 202. Una ejecución interrumpida admite recuperar el trabajo
+tras 120 segundos sin aceptar escrituras del ejecutor antiguo. Las decisiones son append-only.
 
 Primero instalar los paquetes enlazados desde la raíz del repo:
 
 ```sh
 pnpm --dir packages/contracts install --frozen-lockfile
 pnpm --dir packages/extraction install --frozen-lockfile
+pnpm --dir packages/domain install --frozen-lockfile
 ```
 
 Después, desde esta carpeta:
@@ -25,9 +40,11 @@ pnpm deploy
 Base remota **`oli-demo`**, ID `349afff1-8b3b-4673-929b-ce6936c68d3a`, vinculada
 como `env.DB` en `wrangler.jsonc`, dentro de la cuenta de Tiamat. Migración
 `0001_initial.sql` y seed demo aplicados el 16 de octubre de 2026 (UTC−4).
-Contiene 14 tablas de aplicación, empresa ficticia, dos usuarios sin credenciales,
+La migración `0002_processing_sessions.sql` agrega sesiones, control de intentos y revisión
+de snapshot (17 tablas de aplicación en total). Contiene empresa ficticia, dos usuarios demo,
 tres proveedores, dos acuerdos, mandato v1 y presupuesto de USD 2000 del periodo
-`2026-10`, sin reservas. No contiene facturas ni decisiones inventadas.
+`2026-10`. Los smoke tests de integración agregan facturas, decisiones y reservas simuladas
+reales; no se reinicia la base después de medirlas. El seed no fabrica decisiones.
 
 Las migraciones se mantienen en `../../packages/database/migrations`, sin copiarlas.
 Desarrollo local usa una base independiente; no activa acceso remoto a D1 por defecto.
@@ -36,6 +53,7 @@ Desarrollo local usa una base independiente; no activa acceso remoto a D1 por de
 pnpm db:migrate:local
 pnpm db:seed:local
 pnpm test
+pnpm test:runtime
 pnpm types
 ```
 
@@ -108,3 +126,53 @@ Se crea un informe nuevo; no reemplaza el resultado original ni demuestra mejora
 por sí solo. Los valores `null` conservadores se distinguen de importes inventados.
 
 La cadena y sus límites están en [packages/extraction](../../packages/extraction/README.md).
+
+## Entrega para Whady
+
+1. Usar `/api/v1/session`, después `/api/v1/me`. Credenciales por canal privado: el archivo
+   **local ignorado** `apps/api/.env.api-demo.json` contiene URL, email y password. No subirlo a
+   GitHub ni copiar su contenido a variables públicas del frontend. `DEMO_PASSWORD` vive como
+   secreto del Worker; `DEMO_USER_ID` y `DEMO_ORG_ID` se configuran en Wrangler.
+2. Todas las mutaciones autenticadas llevan `X-CSRF-Token`; login y mutaciones validan `Origin`.
+   La cookie expira en ocho horas y logout la revoca. El login limita diez intentos por IP/15 min.
+3. Servir UI y API en el mismo origen. Para desarrollo, proxy de `/api` al Worker o un Worker
+   local con bindings locales; conservar `Origin`, host y cookie coherentes. No abrir CORS ni
+   guardar tokens OWNER en localStorage. Un proxy debe cambiar el origen al destino y no cachear.
+4. Guardar borrador y activar es un comando explícito con revisión/versión e `Idempotency-Key`.
+   Subida y revisión también llevan una clave UUID por acción. Los listados respetan el contrato.
+5. Subir → `POST /invoices/:id/process` → polling del detalle. Solo `latestDecision` persistido
+   determina el resultado. HTTP 200 puede contener BLOCK/ESCALATE o FAILED técnico.
+6. Probar [examples/invoices](../../examples/invoices/README.md), que coincide con el seed mínimo.
+   El corpus Aurora de 50 documentos tiene otros proveedores y sigue separado: configurar su
+   empresa de prueba antes de evaluar, sin copiar etiquetas esperadas al motor.
+
+Un cambio de política invalida solicitudes humanas antiguas. Cambios de proveedor/acuerdo,
+reserva o presupuesto se revalidan al decidir; una excepción humana no anula prohibiciones,
+duplicados, discrepancias ni saldo insuficiente. El servicio abre el nuevo periodo mensual
+con el límite del mandato y la zona empresarial; conserva los periodos y reservas anteriores.
+
+El demo usa un usuario provisionado por Worker; no hay registro público ni selector multiempresa.
+Los listados/cálculos recorren los datos de la empresa demo antes de paginar; cambiar a consultas
+SQL paginadas antes de operar con un volumen de producción. No hay transferencias ni Polygon.
+
+## Validación y smoke tests
+
+`pnpm test` cubre HTTP, CSRF/roles, D1/R2 locales, idempotencia, motor y concurrencia;
+`pnpm test:runtime` empaqueta con Wrangler y ejecuta el Worker real en workerd. Los proveedores
+se simulan en ambos; no son métricas OCR. `packages/domain` mantiene sus 50 escenarios aislados.
+
+Para una comprobación viva **con consumo de OpenRouter y escrituras demo**, desde `apps/api`:
+
+```sh
+node scripts/smoke-invoice-flow.mjs --run --file ../../examples/invoices/hosting.pdf
+node scripts/smoke-invoice-flow.mjs --run --file ../../examples/invoices/accounting.pdf --approve
+```
+
+`--approve` simula un OWNER revisando exclusivamente una excepción autorizable. La clave de
+subida y revisión se conserva localmente en `.wrangler/demo/` por hash; repetir el script
+reutiliza la factura y la decisión, sin nuevas reservas. Los informes quedan en
+`docs/evaluations/integration-*.json` y son comprobaciones puntuales, no una métrica del corpus.
+
+Fuentes: [PDF en OpenRouter](https://openrouter.ai/docs/guides/overview/multimodal/pdfs),
+[lectura PDF de Cloudflare](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/how-it-works/),
+[binding toMarkdown](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/usage/binding/).

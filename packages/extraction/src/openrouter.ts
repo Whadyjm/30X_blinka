@@ -42,6 +42,7 @@ type Options = {
   apiKey: string;
   documentSha256: string;
   images: Image[];
+  pdf?: { bytes: Uint8Array };
   signal?: AbortSignal;
 };
 type Dependencies = {
@@ -89,6 +90,13 @@ Do not invent missing subtotal/tax issues when the explicitly labelled total is 
 For evidence, use source 'page:1' (or the actual page number) and a short literal document quote in quote.
 Never claim that you verified the document.`;
 
+function dataUrl(bytes: Uint8Array, mimeType: string): string {
+  let binary = '';
+  for (let offset = 0; offset < bytes.length; offset += 32768) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + 32768));
+  }
+  return `data:${mimeType};base64,${btoa(binary)}`;
+}
 function imageDataUrl(image: Image): string {
   const bytes = image.bytes;
   const png = bytes.length >= 8 && [137, 80, 78, 71, 13, 10, 26, 10].every((value, index) => bytes[index] === value);
@@ -96,11 +104,7 @@ function imageDataUrl(image: Image): string {
   if (!(image.mimeType === 'image/png' && png) && !(image.mimeType === 'image/jpeg' && jpeg)) {
     throw new ExtractionError('INVALID_IMAGE');
   }
-  let binary = '';
-  for (let offset = 0; offset < bytes.length; offset += 32768) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + 32768));
-  }
-  return `data:${image.mimeType};base64,${btoa(binary)}`;
+  return dataUrl(bytes, image.mimeType);
 }
 
 async function boundedJson(response: Response): Promise<unknown> {
@@ -127,14 +131,19 @@ async function boundedJson(response: Response): Promise<unknown> {
 export async function extractInvoiceWithOpenRouter(options: Options, dependencies: Dependencies = {}): Promise<ExtractionResult> {
   if (!options.apiKey?.trim()) throw new ExtractionError('MISSING_API_KEY');
   if (!z.hash('sha256').safeParse(options.documentSha256).success) throw new ExtractionError('INVALID_DOCUMENT_HASH');
-  if (options.images.length < 1 || options.images.length > 4
+  if (options.pdf && (options.images.length !== 0 || options.pdf.bytes.length === 0
+    || options.pdf.bytes.length > MAX_INVOICE_BYTES || new TextDecoder().decode(options.pdf.bytes.subarray(0, 5)) !== '%PDF-')) {
+    throw new ExtractionError('INVALID_PDF');
+  }
+  if (!options.pdf && (options.images.length < 1 || options.images.length > 4
     || options.images.some((image) => image.bytes.length === 0)
-    || options.images.reduce((total, image) => total + image.bytes.length, 0) > MAX_INVOICE_BYTES) {
+    || options.images.reduce((total, image) => total + image.bytes.length, 0) > MAX_INVOICE_BYTES)) {
     throw new ExtractionError('INVALID_IMAGE_SIZE_OR_COUNT');
   }
   const content = [
     { type: 'text', text: 'Extract this synthetic invoice. Return data and warnings, never payment authorization.' },
     ...options.images.map((image) => ({ type: 'image_url', image_url: { url: imageDataUrl(image) } })),
+    ...(options.pdf ? [{ type: 'file', file: { filename: 'invoice.pdf', file_data: dataUrl(options.pdf.bytes, 'application/pdf') } }] : []),
   ];
   const fetchImpl = dependencies.fetch ?? fetch;
   const deadline = Date.now() + (dependencies.totalTimeoutMs ?? 40000);
@@ -153,6 +162,8 @@ export async function extractInvoiceWithOpenRouter(options: Options, dependencie
         headers: { Authorization: `Bearer ${options.apiKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model,
+          // A different PDF engine from the separate Cloudflare text read.
+          ...(options.pdf ? { plugins: [{ id: 'file-parser', pdf: { engine: 'mistral-ocr' } }] } : {}),
           messages: [{ role: 'system', content: SYSTEM_PROMPT }, { role: 'user', content }],
           temperature: 0,
           max_tokens: 2048,

@@ -20,7 +20,7 @@ test("D1 no disponible devuelve 503 sin exponer el error interno", async (t) => 
   assert.equal(console.error.mock.calls.length, 1);
 });
 
-test("rutas no implementadas no consultan D1", async () => {
+test("facturas requieren sesión antes de consultar D1", async () => {
   const response = await worker.fetch(new Request("https://oli.invalid/api/v1/invoices"), {});
-  assert.equal(response.status, 404);
+  assert.equal(response.status, 401);
 });

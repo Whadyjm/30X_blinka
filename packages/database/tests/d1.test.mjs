@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import test from 'node:test';
 import { Miniflare } from 'miniflare';
 
-const migration = readFileSync(new URL('../migrations/0001_initial.sql', import.meta.url), 'utf8');
+const migrations = readdirSync(new URL('../migrations/', import.meta.url)).filter(f => f.endsWith('.sql')).sort()
+  .map(file => readFileSync(new URL(`../migrations/${file}`, import.meta.url), 'utf8'));
 const seed = readFileSync(new URL('../seed/demo.sql', import.meta.url), 'utf8');
 const statements = (sql) => sql.split('\n-- statement-breakpoint\n').map((part) => part.trim()).filter(Boolean);
 
@@ -19,7 +20,7 @@ async function database(t) {
   });
   t.after(() => runtime.dispose());
   const db = await runtime.getD1Database('DB');
-  await db.batch(statements(migration).map((sql) => db.prepare(sql)));
+  for (const migration of migrations) await db.batch(statements(migration).map((sql) => db.prepare(sql)));
   await db.batch(statements(seed).map((sql) => db.prepare(sql)));
   return db;
 }

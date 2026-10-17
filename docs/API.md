@@ -1,11 +1,13 @@
 # Contrato API v1 — Oscar ↔ Whady
 
-Estado: **contrato de backend v1 definido por Oscar; validaciones P0 en `packages/contracts`; todavía sin endpoints implementados**.
+Estado: **endpoints P0 implementados en `apps/api`; contratos y motor en `packages/contracts` y `packages/domain`**.
+La UI de Whady consume estas rutas; todavía debe conectarse y verificarse desde el navegador.
 
 El [motor puro](../packages/domain/README.md) ya evalúa las reglas del onboarding;
 ver [datos y activación](ONBOARDING_POLICY.md). Su resultado es un candidato interno:
 solo la decisión confirmada junto con la reserva atómica de D1 se expone como aprobación.
-La integración HTTP y el servicio que construye ese contexto siguen pendientes.
+El Worker construye el contexto desde la empresa de la sesión y confirma decisión, reserva,
+auditoría y revisión en un batch D1 con control de concurrencia.
 
 Oscar implementa backend, persistencia y reglas. Whady implementa todo el frontend.
 Este documento permite que ambos trabajen con los mismos payloads desde ahora.
@@ -279,7 +281,7 @@ excepto health. Se devuelve `404` tanto para recurso inexistente como para recur
 
 | Método | Ruta | Entrada | Respuesta de éxito |
 |---|---|---|---|
-| GET | `/api/health` | — | `200 { data: { ok: true, service: "oli-api" } }` |
+| GET | `/api/health` | — | `200 { ok: true, service: "oli-api" }` |
 | GET | `/mandate` | — | `200 Envelope<{ active: PolicyVersion \| null; draft: MandateDraft \| null }>` |
 | PUT | `/mandate/draft` | Ver abajo | `200 Envelope<MandateDraft>` |
 | POST | `/mandate/activate` | Ver abajo | `200 Envelope<PolicyVersion>` |
@@ -583,7 +585,8 @@ Las reservas no son transferencias ni importes bancarios pagados.
 
 Sin mandato: `/mandate` devuelve `active=null`; el front muestra configuración inicial.
 Procesar sin mandato activo devuelve `409 MANDATE_REQUIRED`, sin aprobar.
-Sin ejecución de pruebas: `/evaluation/summary` devuelve `{ data: null }` y la UI dice «Sin evaluación».
+`/evaluation/summary` devuelve `{ data: null }`: todavía no hay una evaluación end-to-end del corpus
+publicada como métrica del producto. La UI dice «Sin evaluación».
 No mostrar porcentajes o resultados inventados como si fueran mediciones.
 
 ## 8. Errores y estados de UI
@@ -698,8 +701,14 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 - [ ] Se integra el contrato a `main`; cada uno continúa su implementación en su rama.
 - [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
 
-Estado actual: los tipos y validaciones P0 sí tienen código y pruebas de contrato.
-La migración y el seed están en [`packages/database`](../packages/database/README.md), probados
-en D1 local; todavía no hay una base remota configurada para la app.
-Este documento no demuestra que login, endpoints, extracción ni el motor financiero estén
-implementados o probados. Los tipos P1 de delegaciones siguen reservados en esta especificación.
+Estado actual: P0 tiene endpoints, sesión demo, R2 privado, extracción, motor y persistencia.
+D1 remoto `oli-demo` y Worker `oli-api` pertenecen a Tiamat; ver [operación y comprobaciones](../apps/api/README.md).
+Los tests de integración usan D1/R2 locales reales y proveedores simulados; los smoke tests vivos
+se registran por separado. PDF usa Mistral OCR y una lectura PDF_TEXT separada de Cloudflare;
+el parser conservador acepta etiquetas conocidas y escala layouts desconocidos. PNG/JPEG
+se extraen pero escalan mientras no haya OCR independiente. No confundir estos límites con
+una evaluación OCR de los 50 documentos. Los tipos P1 de delegaciones siguen reservados.
+
+El API es del mismo origen. En desarrollo, Whady debe usar un proxy `/api` hacia el Worker
+o servir el frontend junto al API; no copiar la contraseña ni secretos al bundle. No hay CORS abierto.
+`CONFIGURATION_CONFLICT` (409) indica que un proveedor/acuerdo cambió o su identidad está en uso.

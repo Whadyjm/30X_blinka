@@ -16,6 +16,19 @@ const success = (model: string, extraction: unknown = candidate) => Response.jso
 });
 const modelOf = (init?: RequestInit) => (JSON.parse(String(init?.body)) as { model: string }).model;
 
+test('PDF privado usa file base64 y Mistral OCR, sin reutilizar lectura Cloudflare como evidencia independiente', async () => {
+  const bytes = new Uint8Array(readFileSync(new URL('../../../fixtures/invoices/001.pdf', import.meta.url)));
+  const result = await extractInvoiceWithOpenRouter({ ...input, images: [], pdf: { bytes } }, { fetch: async (_url, init) => {
+    const body = JSON.parse(String(init?.body));
+    assert.equal(body.plugins[0].pdf.engine, 'mistral-ocr');
+    assert.equal(body.messages[1].content[1].file.file_data.startsWith('data:application/pdf;base64,'), true);
+    return success(body.model);
+  } });
+  assert.equal(result.extraction.amountMinor, 20000);
+  await assert.rejects(extractInvoiceWithOpenRouter({ ...input, images: [], pdf: { bytes: image } }), /INVALID_PDF/);
+  await assert.rejects(extractInvoiceWithOpenRouter({ ...input, pdf: { bytes } }), /INVALID_PDF/);
+});
+
 test('A lee imagen con schema estricto y sin políticas ni etiquetas de evaluación', async () => {
   const result = await extractInvoiceWithOpenRouter(input, { fetch: async (url, init) => {
     assert.equal(url, 'https://openrouter.ai/api/v1/chat/completions');

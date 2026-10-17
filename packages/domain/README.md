@@ -80,5 +80,5 @@ Las 17 aprobaciones son candidatos, no escrituras ni pagos ejecutados.
 Estas métricas prueban la lógica sobre ese corpus, **no precisión OCR, seguridad end-to-end
 ni transferencias**. Los casos históricos se evalúan contra sus snapshots presupuestarios
 de prueba; no eligen un periodo de gasto desde la fecha del documento en producción.
-Faltan el servicio de procesamiento con repositorios y commit atómico, autorización humana
-por sesión/rol, los adapters independientes y la integración HTTP/UI.
+El Worker ya conecta repositorios, commit atómico, sesión/rol y endpoints P0; ver
+[apps/api](../../apps/api/README.md). La UI y el OCR independiente de imágenes siguen pendientes.

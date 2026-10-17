@@ -4,13 +4,13 @@
 datos ficticios, decisiones dentro de las reglas, registro explicable y cero pagos reales.
 Los DTOs HTTP están en [docs/API.md](../../docs/API.md) y `packages/contracts`.
 
-Este paquete contiene una migración SQL, un seed y pruebas sobre **D1 local con Miniflare/workerd**.
+Este paquete contiene migraciones SQL, un seed y pruebas sobre **D1 local con Miniflare/workerd**.
 La base remota **`oli-demo`** (`349afff1-8b3b-4673-929b-ce6936c68d3a`) ya existe en
 **tiamat.agency** (`fbaa64f96579f93b2db32a1eb12ff6c9`), con migración y seed aplicados.
 El Worker `oli-api` la usa mediante el binding `DB`; la configuración y los comandos
 locales/remotos viven en [apps/api](../../apps/api/README.md).
-El motor de decisiones está en [packages/domain](../domain/README.md); su integración
-con la persistencia y los endpoints públicos sigue pendiente.
+El motor de decisiones está en [packages/domain](../domain/README.md) y el servicio que lo
+conecta con D1, sesión y endpoints vive en `apps/api/worker`.
 
 ## Ejecutar las comprobaciones
 
@@ -45,19 +45,22 @@ Al unificar el workspace con Whady, centralizar lockfile/configuración y conser
 | `budget_reservations` | Reserva inmutable vinculada a una decisión APPROVE |
 | `audit_events` | Historial append-only de operaciones administrativas |
 | `idempotency_keys` | Estado/respuesta por empresa, actor, ruta y clave HTTP |
+| `sessions` | Hash del token opaco, CSRF, pertenencia y expiración |
+| `login_attempts` | Contador por IP para limitar acceso demo |
+| `commit_guards` | Guard transitorio dentro de cada batch; un snapshot obsoleto aborta todo |
 
 Las claves foráneas compuestas incluyen `org_id`: una factura no puede apuntar a un proveedor,
 acuerdo, política o presupuesto de otra empresa. También impiden vincular un acuerdo al proveedor
 equivocado. Esto complementa la autorización HTTP; **no sustituye** filtrar lecturas por la empresa autenticada.
 
-SQL usa snake_case; repositorios futuros convertirán a camelCase y booleans del contrato.
+SQL usa snake_case; `apps/api/worker/repository.js` convierte a camelCase y booleans del contrato.
 No existe una cuarta decisión financiera: procesamiento, decisión y aprobación humana son estados separados.
 `availableMinor` se calcula como `limit_minor - reserved_minor`, no se guarda ni lo edita el cliente.
 Para P1 se añadirá una migración de propuestas; no hay tablas de agentes, clearance ni transferencias.
 
 ## Decisión y presupuesto atómicos
 
-El servicio futuro primero evalúa con el motor y después intenta insertar la decisión.
+El servicio primero evalúa con el motor y después intenta insertar la decisión.
 Para `APPROVE` debe enviar el `budget_period_id` y una política todavía activa.
 
 Un trigger de esa misma sentencia inserta la reserva desde los hechos actuales de la factura.
@@ -69,7 +72,7 @@ No insertar reservas desde JS ni hacer `SELECT saldo → UPDATE saldo` en solici
 No duplicar en el repositorio la inserción de reserva que ya hace el trigger.
 Operaciones adicionales de un mismo comando (aprobación humana, auditoría, respuesta de
 idempotencia) deben agruparse con `DB.batch()` y comprobar sus precondiciones en la escritura.
-La tabla de claves prepara la persistencia; el protocolo de reintentos HTTP todavía requiere implementación.
+Las respuestas de activación, subida y revisión se guardan con la clave de idempotencia en ese mismo batch.
 
 Una segunda petición de aprobar la misma factura falla sin otra reserva. El repositorio debe
 consultar/devolver el resultado existente para un reintento legítimo y traducir conflictos al contrato HTTP.
@@ -82,7 +85,7 @@ Se protege hash, número por proveedor y obligación mensual/acuerdo de una sola
 En P0 las reservas aprobadas no se liberan: no existe cancelación de autorizaciones ni pagos ejecutados.
 
 Estos guards protegen integridad, presupuesto y duplicados; **no constituyen todo el motor de reglas**.
-Falta implementar y probar acuerdos, límites, permisos y revalidación completa antes de exponer escritura de decisiones.
+El servicio aplica el motor completo y revalida el snapshot antes de exponer la decisión persistida.
 Las pruebas de almacenamiento insertan decisiones de fixture, no resultados medidos del agente.
 
 ## Seed ficticio
@@ -125,3 +128,12 @@ solo todo el contenido financiero de ese JSON.
 - [Batch transaccional](https://developers.cloudflare.com/d1/worker-api/d1-database/)
 - [Pruebas de D1 con Miniflare](https://developers.cloudflare.com/workers/testing/miniflare/storage/d1/)
 - [Migraciones D1](https://developers.cloudflare.com/d1/reference/migrations/)
+
+## Integración del Worker
+
+`0002_processing_sessions.sql` agrega sesiones, bloqueo temporal de procesamiento y una
+revisión monotónica por empresa. Triggers incrementan esa revisión al cambiar configuración,
+facturas, decisiones o presupuestos. El servicio lee el contexto en un batch y exige la misma
+revisión al confirmar. Una carrera vuelve a evaluar con datos actuales; nunca publica el candidato
+antes del commit. El seed continúa separado de las credenciales, que se provisionan como secretos.
+Las pruebas del servicio están en `apps/api/tests/integration.test.mjs` y `tests/runtime.mjs`.
