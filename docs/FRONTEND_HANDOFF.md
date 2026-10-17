@@ -55,6 +55,10 @@ recorrido completo en escritorio/inglés y entrada móvil/español, reemplazo de
 reservas e historial preservados, salida sin activar y reentrada con los valores actualizados.
 Incluye una prueba con borrador previo para verificar su revisión; no cambia datos productivos.
 
+[Comprobación de la entrada publicada](evaluations/settings-onboarding-production-20261017.json):
+Settings → reinicio → reglas actuales precargadas → volver a Settings, conservando mandato,
+borrador y presupuesto productivos. La activación completa se probó en la base aislada anterior.
+
 ## Desarrollo y acceso
 
 El proxy Vite ya apunta a `http://localhost:8787`; arrancar `apps/api` con Wrangler,
