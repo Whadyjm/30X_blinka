@@ -74,7 +74,7 @@ export function BillDetail() {
 
       <div className="grid gap-6 lg:grid-cols-5">
         {/* left: document + extraction */}
-        <div className="space-y-6 lg:col-span-2">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <Card>
             <CardHeader title={t('Original document')} subtitle={inv.fileName ?? undefined} />
             <div className="p-4">
@@ -88,7 +88,7 @@ export function BillDetail() {
         </div>
 
         {/* right: decision */}
-        <div className="space-y-6 lg:col-span-3">
+        <div className="min-w-0 space-y-6 lg:col-span-3">
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline px-5 py-4">
               <h2 className="text-base text-ink">{t('Decision')}</h2>
@@ -216,8 +216,8 @@ function ApprovalResult({ approval }: { approval: NonNullable<InvoiceDetail['app
 // English source hints (i18n keys) — translated at render time.
 const UNBLOCK: Record<string, string> = {
   INVALID_OR_MISSING_DATA: 'Upload a clearer copy so the missing fields can be read.',
-  POSSIBLE_DUPLICATE: 'Confirm it is not a repeat of an earlier invoice, then enable human review for possible duplicates in Rules.',
-  AGREEMENT_MISMATCH: 'Correct the agreement, or enable human review for agreement differences in Rules.',
+  POSSIBLE_DUPLICATE: 'Clarify the possible duplicate and upload a corrected document. This cannot be approved with an exception.',
+  AGREEMENT_MISMATCH: 'Correct the document or agreement before processing a corrected invoice.',
   MISSING_AGREEMENT: 'Add an agreement for this vendor in Rules.',
   AMOUNT_ABOVE_AUTO_LIMIT: 'Enable human approval for amounts above the automatic limit in Rules.',
 };

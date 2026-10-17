@@ -27,8 +27,8 @@ export function ExtractionPanel({ extracted, pending }: { extracted: ExtractedIn
           const missing = value == null || value === '';
           return (
             <div key={label} className="flex items-start justify-between gap-4 px-5 py-2.5 text-sm">
-              <dt className="text-slate-500">{t(label)}</dt>
-              <dd className={cn('text-right', missing ? (required ? 'text-ink underline decoration-dotted underline-offset-4' : 'text-slate-400') : 'text-ink')}>
+              <dt className="shrink-0 text-slate-500">{t(label)}</dt>
+              <dd className={cn('min-w-0 break-words text-right', missing ? (required ? 'text-ink underline decoration-dotted underline-offset-4' : 'text-slate-400') : 'text-ink')}>
                 {missing ? (
                   required ? (
                     <span className="inline-flex items-center gap-1">

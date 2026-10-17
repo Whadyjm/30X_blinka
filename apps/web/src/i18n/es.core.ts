@@ -119,6 +119,11 @@ export const esCore: Record<string, string> = {
   'Needs review': 'Requiere revisión',
   'Needs correction or clarification': 'Requiere corrección o aclaración',
   'Refresh': 'Actualizar',
+  'Loading original document…': 'Cargando documento original…',
   'Retry upload': 'Reintentar carga',
   'Retry processing': 'Reintentar procesamiento',
+  'Clarify the possible duplicate and upload a corrected document. This cannot be approved with an exception.': 'Aclara el posible duplicado y sube un documento corregido. No se puede aprobar mediante una excepción.',
+  'Correct the document or agreement before processing a corrected invoice.': 'Corrige el documento o el acuerdo antes de procesar una factura corregida.',
+  'A permitted exception was authorized after revalidation': 'Se autorizó una excepción permitida tras revalidar las reglas',
+  'A reviewer rejected this request': 'Una persona rechazó esta solicitud',
 };
