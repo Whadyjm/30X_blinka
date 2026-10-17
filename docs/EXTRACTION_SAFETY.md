@@ -32,6 +32,13 @@ Un segundo mensaje al mismo modelo no demuestra independencia. Dos canales tambi
 coincidir en un error: la comparación reduce riesgos detectables, no garantiza verdad absoluta.
 La implementación final de adapters y su rendimiento deben comprobarse antes de la demo.
 
+Modelo inicial elegido por Oscar: **`deepseek/deepseek-v4.1-flash` vía OpenRouter**.
+El catálogo consultado declara entrada de imagen/texto y salida estructurada. El adapter debe
+usar esa variante visual concreta; otros modelos de la familia no necesariamente leen imágenes.
+Para PDF, renderizar páginas a imágenes y conservar el texto extraído como canal de corroboración.
+La elección no demuestra precisión OCR: todavía faltan adapter, ejecución real y evaluación.
+La clave del Worker es `OPENROUTER_API_KEY`; no se incluye su valor en código, documentos o frontend.
+
 ## 2. Responsabilidad de cada capa
 
 | Capa | Qué debe hacer | Qué no concede |
@@ -169,7 +176,7 @@ Las pruebas de contrato/persistencia no pueden presentarse como precisión OCR n
 
 1. **Ahora:** regla de corroboración compartida y este plan, sin cambiar el contrato público P0.
 2. **Siguiente:** motor determinista y pruebas del reto, incluyendo el bloqueo por extracción no corroborada.
-3. **Después:** elegir/probar los adapters visual + texto/OCR con PDF/PNG reales del corpus ficticio.
+3. **Después:** conectar/probar los adapters visual + texto/OCR con PDF/PNG reales del corpus ficticio y el modelo elegido.
 4. Construir parsing seguro y evidencia por campo; conectar ambos canales al guard y al motor.
 5. Integrar API/D1/frontend y correr evaluación end-to-end antes de publicar métricas.
 6. Ensayar la demo completa y comprobar en el entorno desplegado las mismas reglas y fallos.
@@ -181,7 +188,8 @@ No falsificar una respuesta de respaldo ni sustituir el archivo enviado por una 
 
 La promesa de demo es: **las dudas se hacen visibles y no conceden autoridad automática**.
 La demostración debe incluir aprobaciones seguras y revisión útil; escalar todo tampoco cumple
-el objetivo de autonomía del reto. Se decidirá el proveedor con resultados medidos, no por un porcentaje supuesto.
+el objetivo de autonomía del reto. La configuración final del proveedor/ruta se verificará con
+resultados medidos, no por un porcentaje supuesto.
 
 ## Referencias técnicas
 
