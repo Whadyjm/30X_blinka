@@ -10,13 +10,16 @@ import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { ChatReply } from './ChatReply';
 import { useConversation } from './useConversation';
+import { useTelegramHistoryPreference } from './useTelegramHistoryPreference';
 
 const suggestions = ['¿Qué facturas necesitan mi revisión?', '¿Cómo va el presupuesto de este mes?'];
 export function ChatWorkspace() {
   const me = useMe();
   const scope = me.data?.org ? `${me.data.org.id}:${me.data.user.id}` : '';
-  const web = useConversation(scope, 'WEB'), telegram = useConversation(scope, 'TELEGRAM');
-  const [channel, setChannel] = useState<ChatChannel>('WEB');
+  const telegramPreference = useTelegramHistoryPreference(scope);
+  const web = useConversation(scope, 'WEB'), telegram = useConversation(telegramPreference.visible ? scope : '', 'TELEGRAM');
+  const [selectedChannel, setChannel] = useState<ChatChannel>('WEB');
+  const channel = telegramPreference.visible ? selectedChannel : 'WEB';
   const conversation = channel === 'WEB' ? web : telegram;
   const [draft, setDraft] = useState(''), [files, setFiles] = useState<File[]>([]);
   const drafts = useRef(new Map<string | null, { text: string; files: File[] }>());
@@ -134,7 +137,7 @@ export function ChatWorkspace() {
             className="grid size-11 place-items-center rounded-md text-ink hover:bg-bone disabled:opacity-40" aria-label={t('New conversation')} title={t('New conversation')}><Plus className="size-5" aria-hidden /></button>}
         </div>
       </div>
-      <div className="flex gap-5" role="tablist" aria-label={t('Conversation channels')}>
+      {telegramPreference.visible && <div className="flex gap-5" role="tablist" aria-label={t('Conversation channels')}>
         {(['WEB', 'TELEGRAM'] as const).map(value => <button key={value} id={`chat-tab-${value}`} type="button" role="tab" aria-selected={channel === value} aria-controls="chat-panel" tabIndex={channel === value ? 0 : -1}
           onClick={() => setChannel(value)} onKeyDown={e => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) {
             e.preventDefault(); const next = e.key === 'Home' ? 'WEB' : e.key === 'End' ? 'TELEGRAM' : channel === 'WEB' ? 'TELEGRAM' : 'WEB';
@@ -142,9 +145,9 @@ export function ChatWorkspace() {
           } }} className={cn('flex min-h-11 items-center gap-2 border-b-2 px-1 text-sm', channel === value ? 'border-ink text-ink' : 'border-transparent text-slate-600 hover:text-ink')}>
           {value === 'WEB' ? <MessageSquare className="size-4" aria-hidden /> : <Send className="size-4" aria-hidden />}{value === 'WEB' ? 'Web' : 'Telegram'}
         </button>)}
-      </div>
+      </div>}
     </header>
-    <div id="chat-panel" role="tabpanel" aria-labelledby={`chat-tab-${channel}`} className="flex min-h-0 flex-1 flex-col">
+    <div id="chat-panel" role={telegramPreference.visible ? 'tabpanel' : undefined} aria-labelledby={telegramPreference.visible ? `chat-tab-${channel}` : undefined} className="flex min-h-0 flex-1 flex-col">
       {channel === 'WEB' && <div role="tablist" aria-label={t('Conversation history')} className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline px-4 pt-2 md:px-6">
         {webTabs.map((thread, index) => <div key={thread.id ?? 'new'} role="presentation" className={cn('flex min-h-11 shrink-0 items-center rounded-t-md border border-b-0',
           web.id === thread.id ? 'border-hairline bg-bone text-ink' : 'border-transparent text-slate-600 hover:bg-bone')}>

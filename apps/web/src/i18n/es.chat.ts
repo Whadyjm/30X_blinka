@@ -1,4 +1,8 @@
 export const esChat: Record<string, string> = {
+  'Conversations': 'Conversaciones',
+  'Show Telegram conversation on Home': 'Ver conversación de Telegram en Home',
+  'Only changes this browser’s view. Your Telegram bot stays connected.': 'Solo cambia la vista en este navegador. Tu bot de Telegram sigue conectado.',
+  'Manage your preferences and the rules Oli follows.': 'Administra tus preferencias y las reglas que sigue Oli.',
   'Ask Oli': 'Ask Oli',
   'Dashboard': 'Dashboard',
   'Close conversation': 'Cerrar conversación',
