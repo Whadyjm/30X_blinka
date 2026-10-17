@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141515">
+  <meta name="description" content="Conoce a Oli. Una esfera de pequeñas partículas que respira, escucha y sonríe contigo.">
+  <title>Oli v0.2 — una pequeña presencia</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link rel="preload" href="./assets/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="experience">
+    <header class="header">
+      <a class="wordmark" href="./" aria-label="Oli, inicio">oli<span class="wordmark-dot">.</span></a>
+      <div class="header-actions">
+        <button class="quiet-button" id="theme" aria-label="Usar fondo claro" title="Cambiar de fondo">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+        </button>
+        <button class="quiet-button pause" id="pause" aria-pressed="false" aria-label="Pausar animación">
+          <svg viewBox="0 0 24 24" aria-hidden="true" id="pause-icon"><path d="M9 6v12M15 6v12"/></svg>
+          <span id="pause-label">Pausar</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="stage-wrap">
+        <button class="stage" id="greet" aria-label="Saludar a Oli">
+          <canvas id="oli" aria-hidden="true"></canvas>
+          <span class="halo" aria-hidden="true"></span>
+        </button>
+        <span class="touch-hint" id="touch-hint">Tócame para saludar</span>
+      </div>
+
+      <div class="voice" aria-live="polite" aria-atomic="true">
+        <h1 id="voice-title">Estoy aquí.</h1>
+        <p id="voice-description">Sin prisa. Solo una pequeña presencia.</p>
+      </div>
+
+      <nav class="expressions" aria-label="Expresiones de Oli">
+        <button data-state="idle" aria-pressed="true"><span class="state-mark" aria-hidden="true"></span>En reposo</button>
+        <button data-state="listening" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Escuchando</button>
+        <button data-state="thinking" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Pensando</button>
+        <button data-state="focused" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Concentrado</button>
+        <button data-state="understanding" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Entendiendo</button>
+        <button data-state="happy" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Contento</button>
+        <button data-state="celebrating" aria-pressed="false"><span class="state-mark" aria-hidden="true"></span>Celebrando</button>
+      </nav>
+
+      <div class="playback">
+        <button id="sequence" class="sequence-button" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 10 7-10 7Z"/></svg>
+          <span>Ver su historia</span>
+        </button>
+        <span class="sequence-caption" id="sequence-caption">Una emoción lleva a otra.</span>
+      </div>
+      <p id="error" class="error" role="alert" hidden></p>
+      <noscript><p class="error">Activa JavaScript para conocer a Oli en movimiento.</p></noscript>
+    </main>
+
+    <footer>
+      <p>Oli v0.2. <span>Miles de puntos, más emoción.</span></p>
+      <button id="portrait" class="text-button">Guardar un retrato <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg></button>
+    </footer>
+  </div>
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>
