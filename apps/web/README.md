@@ -23,6 +23,9 @@ El desarrollo normal y el build de producción usan modo live.
 
 ## Build y publicación
 
+La app compartida está en **https://oli30x.ultramare.dev/app**, con el API bajo `/api`
+en el mismo origen. El dominio está declarado en `apps/api/wrangler.jsonc`.
+
 ```sh
 npm test
 npm run build

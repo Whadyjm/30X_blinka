@@ -1,6 +1,8 @@
 # Integración del frontend de Whady
 
-Backend desplegado: `https://oli-api.tiamat-agency.workers.dev`.
+Dirección compartida: **https://oli30x.ultramare.dev/app**.
+La UI y el API `/api/*` comparten el origen `https://oli30x.ultramare.dev`.
+El acceso `https://oli-api.tiamat-agency.workers.dev` también sigue disponible.
 Contrato canónico: [API.md](API.md), esquemas en `packages/contracts`.
 El cliente de `apps/web` ya implementa este contrato. Valida DTOs compartidos y los
 proyecta a los componentes existentes mediante `src/api/view-model.ts`; esa proyección

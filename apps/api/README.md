@@ -1,7 +1,8 @@
 # Oli API
 
 Backend P0 del reto en la cuenta **Tiamat** (`fbaa64f96579f93b2db32a1eb12ff6c9`).
-Worker: **https://oli-api.tiamat-agency.workers.dev**. Contrato: [docs/API.md](../../docs/API.md).
+App compartida: **https://oli30x.ultramare.dev/app**; API en ese mismo origen, bajo `/api`.
+Worker alternativo: https://oli-api.tiamat-agency.workers.dev. Contrato: [docs/API.md](../../docs/API.md).
 
 Implementa sesión demo con cookie HttpOnly/CSRF, reglas y activación OWNER, proveedores,
 acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamiento,
