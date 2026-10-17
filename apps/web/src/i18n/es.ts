@@ -8,6 +8,7 @@ import { esShell } from './es.shell';
 import { esBills } from './es.bills';
 import { esRules } from './es.rules';
 import { esIntegrations } from './es.integrations';
+import { esEmail } from './es.email';
 
 export const es: Record<string, string> = {
   ...esCore,
@@ -15,4 +16,5 @@ export const es: Record<string, string> = {
   ...esBills,
   ...esRules,
   ...esIntegrations,
+  ...esEmail,
 };

@@ -11,6 +11,7 @@ import { enqueueInvoice } from './jobs.js';
 import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
 import { configureTelegram, createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
+import { disableEmail, emailStatus, enableEmail, inbox, readInboxMessage } from './email.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -30,6 +31,12 @@ export async function handleApi(request, env) {
     const session = await authenticate(request, env); const orgId = session.organization.id;
     if (path === '/me' && method === 'GET') { const { tokenHash, ...data } = session; return json({ data }); }
     if (path === '/session' && method === 'DELETE') return await logout(request, env, session);
+    if (path === '/integrations/email' && method === 'GET') return await emailStatus(env, session);
+    if (path === '/integrations/email' && method === 'POST') return await enableEmail(env, session);
+    if (path === '/integrations/email' && method === 'DELETE') return await disableEmail(env, session);
+    if (path === '/inbox' && method === 'GET') return await inbox(env, session);
+    const inboxItem = path.match(/^\/inbox\/([^/]+)\/read$/);
+    if (inboxItem && method === 'POST') return await readInboxMessage(env, session, inboxItem[1]);
     if (path === '/integrations/telegram' && method === 'GET') return await telegramStatus(env, session);
     if (path === '/integrations/telegram/setup' && method === 'POST') {
       owner(session); await configureTelegram(env); return new Response(null, { status: 204 });

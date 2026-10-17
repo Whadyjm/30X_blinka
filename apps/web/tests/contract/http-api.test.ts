@@ -19,6 +19,26 @@ const response = (data: unknown) => Response.json({ data });
 afterEach(() => vi.restoreAllMocks());
 
 describe('HTTP shared contract boundary', () => {
+  it('shares email/inbox schemas, preserves EMAIL invoice source and authenticates read/pause commands', async () => {
+    const integration = { available: true, mailbox: { address: 'oli+company@example.invalid', enabled: true, createdAt: '2026-10-17T12:00:00.000Z' } };
+    const message = { id: 'mail-test', sender: 'supplier@example.invalid', subject: 'Factura', receivedAt: '2026-10-17T12:00:00.000Z',
+      state: 'COMPLETED', readAt: null, summary: 'Oli revisó los documentos.', attachments: [{ id: 'att-test', name: 'invoice.pdf', invoiceId: detail.id,
+        status: detail.status, decision: detail.latestDecision.action, explanation: detail.latestDecision.humanExplanation }] };
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
+      const path = String(url);
+      if (path.endsWith('/me')) return response(session);
+      if (init?.method !== 'GET') expect(new Headers(init?.headers).get('X-CSRF-Token')).toBe('csrf-test');
+      if (path.endsWith('/integrations/email')) return init?.method === 'DELETE' ? new Response(null, { status: 204 }) : response(integration);
+      if (path.endsWith('/inbox')) return response({ messages: [message], unreadCount: 1 });
+      if (path.endsWith('/inbox/mail-test/read')) return new Response(null, { status: 204 });
+      return response({ ...detail, source: 'EMAIL' });
+    } });
+    expect((await api.getEmailIntegration()).mailbox?.address).toBe(integration.mailbox.address);
+    expect((await api.enableEmail()).mailbox?.enabled).toBe(true);
+    expect((await api.getInbox()).messages[0]?.id).toBe('mail-test');
+    expect((await api.getInvoice(detail.id)).source).toBe('EMAIL');
+    await api.readInboxMessage('mail-test'); await api.disableEmail();
+  });
   it('reanalyzes with current policy/decision guards and retains its key after a lost response', async () => {
     const keys: string[] = []; let attempts = 0;
     const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {

@@ -6,6 +6,7 @@ import { isInFlight } from '@/lib/outcome';
 import type { AgreementInput, VendorInput } from '@/contracts';
 
 export const qk = {
+  inbox: ['inbox'] as const,
   me: ['me'] as const,
   mandate: ['mandate'] as const,
   vendors: ['vendors'] as const,
@@ -19,6 +20,16 @@ export const qk = {
 
 const POLL_MS = 2000;
 const POLL_WINDOW_MS = 60000;
+
+export function useInbox() {
+  return useQuery({ queryKey: qk.inbox, queryFn: () => api.getInbox(), refetchInterval: 5000, retry: false });
+}
+
+export function useReadInboxMessage() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (id: string) => api.readInboxMessage(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.inbox }) });
+}
 
 export function useMe() {
   return useQuery({ queryKey: qk.me, queryFn: () => api.me(), staleTime: 60_000, retry: false });

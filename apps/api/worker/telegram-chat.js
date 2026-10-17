@@ -39,7 +39,7 @@ export function telegramParts(text) {
 const labels = { name: 'Nombre', allowed: 'Autorizado', externalRef: 'Referencia', vendorId: 'Proveedor',
   currency: 'Moneda', amountMinor: 'Importe', toleranceMinor: 'Tolerancia',
   frequency: 'Frecuencia', concept: 'Concepto', active: 'Activo' };
-function money(value, currency) {
+export function money(value, currency) {
   const exp = new Intl.NumberFormat('es', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
   const base = 10n ** BigInt(exp), n = BigInt(value);
   return `${n / base}${exp ? `.${String(n % base).padStart(exp, '0')}` : ''} ${currency}`;

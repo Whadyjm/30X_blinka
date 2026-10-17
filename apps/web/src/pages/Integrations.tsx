@@ -9,6 +9,7 @@ import { Card, ErrorState, InlineAlert, PageHeader, Skeleton } from '@/component
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { formatDateTime } from '@/lib/dates';
+import { EmailIntegration } from '@/features/integrations/EmailIntegration';
 
 export function Integrations() {
   const me = useMe();
@@ -43,6 +44,7 @@ export function Integrations() {
 
   return <>
     <PageHeader title={t('Integrations')} subtitle={t('Connect the places where your invoices arrive.')} />
+    <EmailIntegration />
     {status.isLoading ? <Skeleton className="h-72" />
       : status.isError ? <Card><ErrorState error={status.error} onRetry={() => void status.refetch()} /></Card>
       : <Card>

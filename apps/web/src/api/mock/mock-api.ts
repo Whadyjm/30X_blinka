@@ -348,6 +348,11 @@ function meOf(d: Db): Me {
 }
 
 export const mockApi: OliApi = {
+  async getEmailIntegration() { return { available: false, mailbox: null }; },
+  async enableEmail() { throw new ApiError({ status: 503, code: 'EMAIL_NOT_CONFIGURED', message: 'Email is temporarily unavailable.' }); },
+  async disableEmail() {},
+  async getInbox() { return { messages: [], unreadCount: 0 }; },
+  async readInboxMessage() {},
   async getTelegramIntegration() { return { available: false, connection: null }; },
   async createTelegramLink() { throw new ApiError({ status: 503, code: 'TELEGRAM_NOT_CONFIGURED', message: 'Telegram requires a connection to the Oli server.' }); },
   async disconnectTelegram() {},

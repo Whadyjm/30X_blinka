@@ -19,6 +19,7 @@ export async function uploadInvoice(request, env, session) {
 
 // sourceEventId is server-owned metadata, never a multipart or JSON field.
 export async function receiveInvoice(request, env, session, file, sourceEventId = null) {
+  const emailSource = sourceEventId?.kind === 'EMAIL' ? sourceEventId : null;
   if (!file.size || file.size > MAX_INVOICE_BYTES) throw new HttpError(413, 'FILE_TOO_LARGE');
   const content = new Uint8Array(await file.arrayBuffer()); validateDocument(content, file.type);
   const name = file.name.normalize('NFC').replace(/[\x00-\x1f\x7f/\\]/g, '_').trim().slice(0, 200) || 'invoice';
@@ -30,22 +31,31 @@ export async function receiveInvoice(request, env, session, file, sourceEventId 
   const invoiceId = id('inv'); const orgId = session.organization.id;
   const key = `uploads/${orgId}/${invoiceId}/original`;
   const time = now();
-  const data = { id: invoiceId, status: 'RECEIVED', source: sourceEventId === null ? 'HUMAN_UPLOAD' : 'TELEGRAM',
+  const data = { id: invoiceId, status: 'RECEIVED', source: emailSource ? 'EMAIL' : sourceEventId === null ? 'HUMAN_UPLOAD' : 'TELEGRAM',
     file: { name, mimeType: file.type, sizeBytes: file.size, url: `/api/v1/invoices/${invoiceId}/file` },
     vendorId: null, vendorName: null, agreementId: null, invoiceNumber: null, amountMinor: null, currency: null,
     issuedAt: null, dueDate: null, servicePeriod: null, description: null, extractionWarnings: [], latestDecision: null,
     approvalRequest: null, processingError: null, createdAt: time, updatedAt: time };
   const response = { data };
   await env.INVOICES.put(key, content, { httpMetadata: { contentType: file.type }, customMetadata: { sha256: hash } });
+  const emailGuard = emailSource ? id('guard') : null;
   try {
     await env.DB.batch([
+      ...(emailSource ? [stmt(env.DB, `INSERT INTO commit_guards(id,valid) VALUES (?, EXISTS(
+        SELECT 1 FROM email_attachments a JOIN email_messages e ON e.org_id = a.org_id AND e.id = a.message_id
+        JOIN email_mailboxes m ON m.org_id = e.org_id AND m.id = e.mailbox_id
+        WHERE a.id = ? AND a.org_id = ? AND a.sha256 = ? AND a.mime_type = ? AND a.size_bytes = ?
+        AND m.user_id = ? AND m.enabled = 1))`, emailGuard, emailSource.attachmentId, orgId, hash, file.type, file.size, session.user.id)] : []),
       stmt(env.DB, `INSERT INTO invoices(id, org_id, file_key, file_name, file_mime_type, file_size_bytes, file_sha256, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, invoiceId, orgId, key, name, file.type, file.size, hash, time, time),
-      ...(sourceEventId === null ? [] : [stmt(env.DB,
-        "INSERT INTO invoice_sources(org_id, invoice_id, kind, telegram_update_id) VALUES (?, ?, 'TELEGRAM', ?)", orgId, invoiceId, sourceEventId)]),
-      audit(env.DB, orgId, session.user.id, 'INVOICE_RECEIVED', invoiceId,
-        { documentSha256: hash, sizeBytes: file.size, source: data.source, ...(sourceEventId === null ? {} : { telegramUpdateId: sourceEventId }) }, time),
+      ...(emailSource ? [stmt(env.DB, 'INSERT INTO email_invoice_sources(org_id,invoice_id,attachment_id) VALUES (?,?,?)', orgId, invoiceId, emailSource.attachmentId)]
+        : sourceEventId === null ? [] : [stmt(env.DB,
+          "INSERT INTO invoice_sources(org_id, invoice_id, kind, telegram_update_id) VALUES (?, ?, 'TELEGRAM', ?)", orgId, invoiceId, sourceEventId)]),
+      audit(env.DB, orgId, emailSource ? null : session.user.id, 'INVOICE_RECEIVED', invoiceId,
+        { documentSha256: hash, sizeBytes: file.size, source: data.source,
+          ...(emailSource ? { emailAttachmentId: emailSource.attachmentId } : sourceEventId === null ? {} : { telegramUpdateId: sourceEventId }) }, time),
       idem.save(response, 201),
+      ...(emailGuard ? [clearGuard(env.DB, emailGuard)] : []),
     ]);
   } catch (error) {
     await env.INVOICES.delete(key);

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import test from 'node:test';
 import { Miniflare, createFetchMock } from 'miniflare';
 
@@ -17,13 +17,28 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
     description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [] };
   fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
     .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction, documentType: 'INVOICE' }) } }] });
-  const runtime = new Miniflare({ modules: true, scriptPath: new URL('../.wrangler/runtime/index.js', import.meta.url).pathname,
+  // This harness exists only in the ignored test output; production exposes no HTTP email-ingest bypass.
+  const harness = new URL('../.wrangler/runtime/email-harness.js', import.meta.url);
+  writeFileSync(harness, `import app from './index.js';
+    export default { ...app, async fetch(request, env, ctx) {
+      if (new URL(request.url).pathname === '/__test_email') {
+        let rejected = null;
+        await app.email({ from: request.headers.get('X-Email-From'), to: request.headers.get('X-Email-To'),
+          raw: request.body, rawSize: Number(request.headers.get('Content-Length')),
+          setReject(reason) { rejected = reason; } }, env, ctx);
+        return Response.json({ rejected });
+      }
+      return app.fetch(request, env, ctx);
+    } };`);
+  const runtime = new Miniflare({ modules: true, scriptPath: harness.pathname,
+    modulesRules: [{ type: 'ESModule', include: ['**/*.js'] }],
     compatibilityDate: '2026-07-30', d1Databases: { DB: 'runtime' }, r2Buckets: ['INVOICES'], fetchMock,
-    queueProducers: { TELEGRAM_QUEUE: 'oli-telegram', INVOICE_QUEUE: 'oli-invoices' },
+    queueProducers: { TELEGRAM_QUEUE: 'oli-telegram', INVOICE_QUEUE: 'oli-invoices', EMAIL_QUEUE: 'oli-email' },
     queueConsumers: { 'oli-invoices': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 3 },
-      'oli-telegram': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 5 } },
+      'oli-telegram': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 5 },
+      'oli-email': { maxBatchSize: 1, maxBatchTimeout: 0.1, maxRetries: 5 } },
     bindings: { DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner', DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only',
-      PUBLIC_APP_URL: 'https://oli.invalid', TELEGRAM_BOT_TOKEN: '123456:runtime-test-token', TELEGRAM_WEBHOOK_SECRET: 'runtime-webhook-secret' } });
+      PUBLIC_APP_URL: 'https://oli.invalid', EMAIL_BASE_ADDRESS: 'oli@example.invalid', TELEGRAM_BOT_TOKEN: '123456:runtime-test-token', TELEGRAM_WEBHOOK_SECRET: 'runtime-webhook-secret' } });
   t.after(() => runtime.dispose());
   const db = await runtime.getD1Database('DB');
   const root = new URL('../../../packages/database/', import.meta.url);
@@ -78,7 +93,7 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   assert.equal(await db.prepare('SELECT count(*) AS n FROM decisions WHERE invoice_id = ?').bind(invoice.id).first('n'), 1);
   const sent = [];
   fetchMock.get('https://api.telegram.org').intercept({ path: '/bot123456:runtime-test-token/sendMessage', method: 'POST' })
-    .reply(200, async options => { sent.push(await mockBody(options.body)); return { ok: true, result: { message_id: sent.length } }; }).times(2);
+    .reply(200, async options => { sent.push(await mockBody(options.body)); return { ok: true, result: { message_id: sent.length } }; }).times(3);
   const webhook = text => runtime.dispatchFetch(`${origin}/api/channels/telegram/webhook`, { method: 'POST',
     headers: { 'X-Telegram-Bot-Api-Secret-Token': 'runtime-webhook-secret' },
     body: JSON.stringify({ update_id: sent.length + 100, message: { text, from: { id: 101, is_bot: false, first_name: 'Oscar' }, chat: { id: 101, type: 'private' } } }) });
@@ -111,6 +126,30 @@ test('Worker empaquetado en workerd: sesión, R2, OpenRouter simulado, motor y D
   assert.ok(Number(limited.headers.get('Retry-After')) > 0 && Number(limited.headers.get('Retry-After')) <= 60);
   assert.deepEqual((await (await reevaluate(detail, reanalysisKey)).json()).data, result.data);
   assert.equal(await db.prepare('SELECT count(*) n FROM decisions WHERE invoice_id=?').bind(invoice.id).first('n'), 2);
+  assert.equal(await db.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+  const mailbox = await runtime.dispatchFetch(`${origin}/api/v1/integrations/email`, { method: 'POST', headers });
+  assert.equal(mailbox.status, 200); const address = (await mailbox.json()).data.mailbox.address;
+  fetchMock.get('https://openrouter.ai').intercept({ path: '/api/v1/chat/completions', method: 'POST' })
+    .reply(200, { model: 'test-vision', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...extraction, invoiceNumber: 'RUNTIME-EMAIL', documentType: 'INVOICE' }) } }] });
+  const raw = `From: supplier@example.invalid\r\nTo: ${address}\r\nSubject: Factura runtime email\r\nMessage-ID: <runtime-email@example.invalid>\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=oli\r\n\r\n--oli\r\nContent-Type: application/pdf\r\nContent-Disposition: attachment; filename=factura.pdf\r\nContent-Transfer-Encoding: base64\r\n\r\n${Buffer.from('%PDF-1.4 synthetic runtime email').toString('base64')}\r\n--oli--\r\n`;
+  const incoming = await runtime.dispatchFetch(`${origin}/__test_email`, { method: 'POST', body: raw,
+    headers: { 'X-Email-From': 'supplier@example.invalid', 'X-Email-To': address } });
+  assert.equal((await incoming.json()).rejected, null);
+  let received;
+  for (let poll = 0; poll < 100; poll++) {
+    const current = (await (await runtime.dispatchFetch(`${origin}/api/v1/inbox`, { headers })).json()).data;
+    received = current.messages[0];
+    if (received?.attachments[0]?.status === 'DECIDED') break;
+    await new Promise(resolve => setTimeout(resolve, 50));
+  }
+  assert.equal(received?.attachments[0]?.status, 'DECIDED');
+  assert.equal((await (await runtime.dispatchFetch(`${origin}/api/v1/invoices/${received.attachments[0].invoiceId}`, { headers })).json()).data.source, 'EMAIL');
+  // Force a duplicate delivery to also cover the scheduler's fallback when jobs finish inside the receipt lease.
+  await (await runtime.getQueueProducer('EMAIL_QUEUE')).send({ kind: 'EMAIL_MESSAGE', messageId: received.id });
+  await waitForReply(3);
+  assert.match(sent.at(-1).text, /Factura runtime email/);
+  const inbox = (await (await runtime.dispatchFetch(`${origin}/api/v1/inbox`, { headers })).json()).data;
+  assert.equal(inbox.unreadCount, 1);
   assert.equal(await db.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
   fetchMock.assertNoPendingInterceptors();
 });

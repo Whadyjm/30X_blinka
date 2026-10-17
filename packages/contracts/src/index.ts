@@ -241,7 +241,7 @@ export const UploadFileMetadataSchema = z.strictObject({
 export const InvoiceSchema = z.strictObject({
   id: IdSchema,
   status: InvoiceStatusSchema,
-  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM']),
+  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM', 'EMAIL']),
   file: UploadFileMetadataSchema.extend({
     url: z.string().regex(/^\/api\/v1\/invoices\/[^/?#]+\/file$/),
   }),
@@ -480,3 +480,19 @@ export type ChatAction = z.infer<typeof ChatActionSchema>;
 export type ChatActionInput = z.infer<typeof ChatActionInputSchema>;
 export type ChatCard = z.infer<typeof ChatCardSchema>;
 export type ChatActionResult = z.infer<typeof ChatActionResultSchema>;
+
+export const EmailIntegrationSchema = z.strictObject({
+  available: z.boolean(),
+  mailbox: z.strictObject({ address: z.email(), enabled: z.boolean(), createdAt: TimestampSchema }).nullable(),
+});
+export const InboxMessageSchema = z.strictObject({
+  id: IdSchema, sender: z.string().max(254), subject: z.string().max(200), receivedAt: TimestampSchema,
+  state: z.enum(['RECEIVED','WAITING','COMPLETED','NO_DOCUMENT','FAILED']),
+  readAt: TimestampSchema.nullable(), summary: z.string(),
+  attachments: z.array(z.strictObject({ id: IdSchema, name: z.string(), invoiceId: IdSchema.nullable(),
+    status: InvoiceStatusSchema.nullable(), decision: DecisionActionSchema.nullable(), explanation: z.string().nullable() })).max(4),
+});
+export const InboxSchema = z.strictObject({ messages: z.array(InboxMessageSchema).max(50), unreadCount: MinorUnitsSchema });
+export type EmailIntegration = z.infer<typeof EmailIntegrationSchema>;
+export type InboxMessage = z.infer<typeof InboxMessageSchema>;
+export type Inbox = z.infer<typeof InboxSchema>;
