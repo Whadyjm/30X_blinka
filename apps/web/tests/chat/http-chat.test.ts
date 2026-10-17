@@ -45,8 +45,8 @@ describe('real conversation HTTP contract', () => {
     const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
       const path = String(url); paths.push(path);
       if (path.endsWith('/me')) return response(session);
-      if (path.endsWith('/chat/conversations')) return response([{ id: reply.conversationId, createdAt: stamp, updatedAt: stamp }]);
-      if (path.includes('/chat/conversations/')) return response({ id: reply.conversationId, turns: [] });
+      if (path.includes('/chat/conversations?')) return response([{ id: reply.conversationId, channel: path.endsWith('TELEGRAM') ? 'TELEGRAM' : 'WEB', title: 'hola', createdAt: stamp, updatedAt: stamp }]);
+      if (path.includes('/chat/conversations/')) return response({ id: reply.conversationId, channel: 'WEB', turns: [] });
       if (path.endsWith('/confirm')) {
         const headers = new Headers(init?.headers); expect(headers.get('X-CSRF-Token')).toBe('csrf-test');
         confirmations.push({ key: headers.get('Idempotency-Key'), body: JSON.parse(String(init?.body)) });
@@ -57,6 +57,8 @@ describe('real conversation HTTP contract', () => {
       return response(action);
     } });
     await api.listChatConversations(); await api.getChatHistory('id/with slash'); await api.getChatAction(action.id);
+    await api.listChatConversations('TELEGRAM');
+    expect(paths).toContain('/api/v1/chat/conversations?channel=WEB'); expect(paths).toContain('/api/v1/chat/conversations?channel=TELEGRAM');
     expect(confirmations).toHaveLength(0); expect(paths).toContain('/api/v1/chat/conversations/id%2Fwith%20slash');
     await expect(api.confirmChatAction(action.id)).rejects.toMatchObject({ code: 'NETWORK' });
     expect((await api.confirmChatAction(action.id)).action.status).toBe('CONFIRMED');

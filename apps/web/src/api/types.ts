@@ -48,7 +48,7 @@ export interface OliApi {
 
   // Server-owned conversation and changes; sending a message never confirms a proposal.
   sendChatMessage(input: z.infer<typeof ChatMessageInputSchema>, operationKey: string): Promise<ChatReply>;
-  listChatConversations(): Promise<z.infer<typeof ChatConversationsSchema>>;
+  listChatConversations(channel?: 'WEB' | 'TELEGRAM'): Promise<z.infer<typeof ChatConversationsSchema>>;
   getChatHistory(id: string): Promise<z.infer<typeof ChatHistorySchema>>;
   getInvoiceIntake(id: string): Promise<Extract<ChatCard, { type: 'INVOICE' }>>;
   getChatAction(id: string): Promise<ChatAction>;

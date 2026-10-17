@@ -7,6 +7,7 @@ import worker from '../worker/index.js';
 import { processInvoice } from '../worker/processing.js';
 import { corroboratePdfText } from '../worker/document.js';
 import { runTool } from '../worker/chat-tools.js';
+import { chatMessage } from '../worker/chat.js';
 
 const origin = 'https://oli.invalid';
 const vendor = { name: 'Faro Telecom Demo', allowed: true, externalRef: null };
@@ -79,6 +80,38 @@ test('chat usa herramientas reales, persiste historial y replay no vuelve a gast
   const history = await h.api('/chat/conversations/' + r.data.conversationId);
   assert.equal(history.data.turns.length, 1); assert.equal(history.data.turns[0].state, 'COMPLETED');
   assert.equal(JSON.stringify(r).includes('test-provider-key'), false);
+});
+
+test('Web y Telegram filtran historial y contexto, y rechazan cruce de canal incluso con replay cacheado', async t => {
+  const h = await setup(t), tgKey = crypto.randomUUID();
+  const tgInput = { conversationId: null, text: 'TG_ONLY', invoiceIds: [] };
+  const internal = (input, key) => new Request(origin + '/api/v1/chat/messages', { method: 'POST',
+    headers: { 'Idempotency-Key': key, 'Content-Type': 'application/json' }, body: JSON.stringify(input) });
+  h.model(h.text('Respuesta de Telegram'));
+  const tg = (await (await chatMessage(internal(tgInput, tgKey), h.env, h.session, 'telegram')).json()).data;
+  h.model(payload => {
+    assert.equal(payload.messages.some(m => m.content?.includes('TG_ONLY')), false);
+    return Response.json({ choices: [h.text('Respuesta web')] });
+  });
+  const web = await h.chat('WEB_ONLY'); assert.equal(web.status, 200);
+  const webList = await h.api('/chat/conversations'), tgList = await h.api('/chat/conversations?channel=TELEGRAM');
+  assert.deepEqual(webList.data.map(c => [c.id,c.channel]), [[web.data.conversationId,'WEB']]);
+  assert.deepEqual(tgList.data.map(c => [c.id,c.channel]), [[tg.conversationId,'TELEGRAM']]);
+  assert.equal((await h.api('/chat/conversations?channel=INVALID')).status, 400);
+  assert.equal((await h.api('/chat/conversations/' + tg.conversationId)).data.channel, 'TELEGRAM');
+  const calls = h.calls.length;
+  assert.equal((await h.chat('cruce', crypto.randomUUID(), tg.conversationId)).status, 409);
+  assert.equal((await h.chat('TG_ONLY', tgKey)).status, 409, 'un replay sin conversationId tampoco cruza canales');
+  await assert.rejects(chatMessage(internal({ conversationId: web.data.conversationId, text: 'cruce', invoiceIds: [] }, crypto.randomUUID()), h.env, h.session, 'telegram'), e => e.code === 'CHAT_CHANNEL_MISMATCH');
+  assert.equal(h.calls.length, calls);
+  h.model(payload => {
+    assert.equal(payload.messages.some(m => m.content?.includes('WEB_ONLY')), false);
+    assert.ok(payload.messages.some(m => m.content === 'TG_ONLY'));
+    return Response.json({ choices: [h.text('Seguimos en Telegram')] });
+  });
+  await chatMessage(internal({ ...tgInput, conversationId: tg.conversationId, text: 'sigue TG' }, crypto.randomUUID()), h.env, h.session, 'telegram');
+  assert.equal((await h.api('/chat/conversations/' + web.data.conversationId)).data.turns.length, 1);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
 });
 
 test('el modelo solo propone: alta/modificación requieren confirmación, payload fijo e idempotencia', async t => {

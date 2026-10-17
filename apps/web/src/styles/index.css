@@ -156,6 +156,25 @@
 }
 
 @layer components {
+  .oli-chat {
+    height: var(--chat-height, calc(100dvh - 100px));
+  }
+  .chat-composer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .chat-prose > * + * {
+    margin-top: 0.8em;
+  }
+  .chat-prose :is(ul, ol) {
+    padding-left: 1.4em;
+  }
+  .chat-prose ul { list-style: disc; }
+  .chat-prose ol { list-style: decimal; }
+  .chat-prose li + li { margin-top: 0.35em; }
+  .chat-prose strong { font-weight: 600; }
+  .chat-prose :is(h1, h2, h3) { font-size: 1.125rem; line-height: 1.5; }
+  .chat-prose pre { max-width: 100%; overflow-x: auto; padding: 12px; background: var(--color-bone); border-radius: 6px; }
+  .chat-prose blockquote { padding-left: 12px; border-left: 1px solid var(--color-hairline); color: var(--color-ash); }
   /* Elevation = 1px hairline, never a blur. Class names kept so components don't churn. */
   .shadow-card {
     box-shadow: 0 0 0 1px var(--color-hairline);
@@ -183,6 +202,10 @@
     text-transform: uppercase;
     color: var(--color-ash);
   }
+}
+
+@media (min-width: 1024px) {
+  .oli-chat { height: min(840px, calc(100dvh - 64px)); min-height: 560px; }
 }
 
 /* Moderate, utility-focused motion: color/background/border only. */

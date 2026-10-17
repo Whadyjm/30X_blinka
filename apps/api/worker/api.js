@@ -44,7 +44,7 @@ export async function handleApi(request, env) {
     if (path === '/integrations/telegram/link' && method === 'POST') return await createTelegramLink(env, session);
     if (path === '/integrations/telegram' && method === 'DELETE') return await disconnectTelegram(env, session);
     if (path === '/chat/messages' && method === 'POST') return await chatMessage(request, env, session);
-    if (path === '/chat/conversations' && method === 'GET') return await listConversations(env, session);
+    if (path === '/chat/conversations' && method === 'GET') return await listConversations(env, session, request);
     const chat = path.match(/^\/chat\/conversations\/([^/]+)$/);
     if (chat && method === 'GET') return await chatHistory(env, session, chat[1]);
     if (path === '/chat/actions' && method === 'POST') return await prepareActionRequest(request, env, session);

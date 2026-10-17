@@ -93,13 +93,13 @@ export function AppLayout() {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between border-b border-hairline bg-white px-4 py-3 lg:hidden">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-hairline bg-white px-4 lg:hidden">
             <Link to="/app">
               <Logo />
             </Link>
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
-              <button type="button" aria-label={open ? t('Close menu') : t('Open menu')} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="rounded-md p-2 hover:bg-bone">
+              <button type="button" aria-label={open ? t('Close menu') : t('Open menu')} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="grid size-11 place-items-center rounded-md hover:bg-bone">
                 {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
               </button>
             </div>

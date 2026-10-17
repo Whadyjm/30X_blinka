@@ -6,16 +6,17 @@ import { api, errorMessage } from '@/api';
 import { invoiceView } from '@/api/view-model';
 import { Button } from '@/components/ui/Button';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
-import { invalidateMoney, qk, useMe } from '@/hooks/queries';
+import { invalidateMoney, qk, useMe, useVendors } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { formatDateTime } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
+import { ChatText } from './ChatText';
 
-export function ChatReply({ reply }: { reply: Reply }) {
+export function ChatReply({ reply, readOnly = false }: { reply: Reply; readOnly?: boolean }) {
   return <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-    <p className="whitespace-pre-wrap">{reply.text}</p>
+    <ChatText text={reply.text} />
     {reply.cards.map((card, i) => <ChatCardView key={i} card={card} />)}
-    {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} />)}
+    {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} readOnly={readOnly} />)}
   </div>;
 }
 
@@ -82,12 +83,14 @@ function Fact({ label, value }: { label: string; value: string }) {
 }
 
 const fieldLabels: Record<string, string> = {
-  name: 'Vendor name', allowed: 'Authorized', externalRef: 'External reference', vendorId: 'Vendor ID',
+  name: 'Vendor name', allowed: 'Authorized', externalRef: 'External reference',
   concept: 'Concept', currency: 'Currency', amountMinor: 'Amount', toleranceMinor: 'Tolerance',
-  frequency: 'Frequency', active: 'Active', invoiceId: 'Invoice', expectedDecisionId: 'Decision',
+  frequency: 'Frequency', active: 'Active',
 };
-function ProposalFields({ fields }: { fields: Record<string, unknown> }) {
-  return <dl className="space-y-1 text-sm">{Object.entries(fields).filter(([key]) => key in fieldLabels).map(([key, value]) =>
+export function ProposalFields({ fields, vendorName }: { fields: Record<string, unknown>; vendorName?: string }) {
+  return <dl className="space-y-1 text-sm">
+    {typeof fields.vendorId === 'string' && <div className="flex flex-wrap justify-between gap-x-4 gap-y-1"><dt>{t('Vendor name')}</dt><dd>{vendorName ?? <Link to="/app/rules" className="underline">{t('View rules and limits')}</Link>}</dd></div>}
+    {Object.entries(fields).filter(([key]) => key in fieldLabels).map(([key, value]) =>
     <Fact key={key} label={t(fieldLabels[key]!)} value={typeof value === 'boolean' ? t(value ? 'Yes' : 'No')
       : key.endsWith('Minor') && typeof value === 'number' ? formatMoney(value, typeof fields.currency === 'string' ? fields.currency : undefined)
       : value == null ? '—' : key === 'frequency' ? t(String(value)) : String(value)} />)}</dl>;
@@ -96,7 +99,7 @@ const actionLabels = {
   CREATE_VENDOR: 'Register vendor', UPDATE_VENDOR: 'Update vendor', CREATE_AGREEMENT: 'Create agreement',
   UPDATE_AGREEMENT: 'Update agreement', ONBOARD_INVOICE_VENDOR: 'Register vendor and review invoice', RESUME_INVOICE: 'Review invoice again',
 };
-function ActionReview({ snapshot }: { snapshot: ChatAction }) {
+function ActionReview({ snapshot, readOnly }: { snapshot: ChatAction; readOnly: boolean }) {
   const me = useMe();
   const qc = useQueryClient();
   const current = useQuery({ queryKey: ['chat-action', snapshot.id], queryFn: () => api.getChatAction(snapshot.id), retry: false,
@@ -106,10 +109,14 @@ function ActionReview({ snapshot }: { snapshot: ChatAction }) {
   const [result, setResult] = useState<ChatActionResult | null>(null);
   const action = current.data ?? snapshot;
   const p = action.proposal;
-  const actionable = me.data?.role === 'owner' && !!current.data && !current.isError && !current.isFetching && !busy
+  const vendors = useVendors(p.kind === 'CREATE_AGREEMENT' || p.kind === 'UPDATE_AGREEMENT');
+  const vendorName = (fields: Record<string, unknown>) => vendors.data?.find(v => v.id === fields.vendorId)?.name;
+  const proposedFields: Record<string, unknown> = 'data' in p ? { ...action.before, ...p.data } : {};
+  const vendorIdentified = typeof proposedFields.vendorId !== 'string' || !!vendorName(proposedFields);
+  const actionable = !readOnly && me.data?.role === 'owner' && !!current.data && !current.isError && !current.isFetching && !busy
     && action.status === 'PENDING' && Date.parse(action.expiresAt) > Date.now();
   const mutate = async (confirm: boolean) => {
-    if (!actionable) return;
+    if (!actionable || (confirm && !vendorIdentified)) return;
     setBusy(true); setError(null);
     try {
       if (confirm) { const saved = await api.confirmChatAction(action.id); setResult(saved); qc.setQueryData(['chat-action', action.id], saved.action); }
@@ -122,16 +129,17 @@ function ActionReview({ snapshot }: { snapshot: ChatAction }) {
   };
   return <section className="space-y-3 border-t border-hairline pt-3" aria-label={t('Proposed change')}>
     <h3 className="font-medium">{t(actionLabels[p.kind])}</h3>
-    {action.before && <div><p className="mb-1 text-xs">{t('Before')}</p><ProposalFields fields={action.before} /></div>}
+    {action.before && <div><p className="mb-1 text-xs">{t('Before')}</p><ProposalFields fields={action.before} vendorName={vendorName(action.before)} /></div>}
     <div><p className="mb-1 text-xs">{t('Proposed')}</p>
-      {'data' in p && <ProposalFields fields={{ ...action.before, ...p.data }} />}
+      {'data' in p && <ProposalFields fields={proposedFields} vendorName={vendorName(proposedFields)} />}
       {p.kind === 'ONBOARD_INVOICE_VENDOR' && <><ProposalFields fields={p.vendor} />{p.agreement && <ProposalFields fields={p.agreement} />}</>}
       {'invoiceId' in p && <Link to={`/app/bills/${encodeURIComponent(p.invoiceId)}`} className="underline">{t('View invoice')}</Link>}
     </div>
     <p className="text-xs">{t(action.status)} · {t('Expires')}: {formatDateTime(action.expiresAt)}</p>
     {action.status === 'PENDING' && <p className="text-xs">{t('Review the proposed values. Nothing changes until you confirm.')}</p>}
-    {me.data?.role === 'owner' && action.status === 'PENDING' && <div className="flex flex-wrap gap-2">
-      <Button size="sm" disabled={!actionable} loading={busy} onClick={() => void mutate(true)}>{t('Confirm change')}</Button>
+    {readOnly && action.status === 'PENDING' && <p className="text-sm">{t('Review and confirm this proposal in Telegram.')}</p>}
+    {!readOnly && me.data?.role === 'owner' && action.status === 'PENDING' && <div className="flex flex-wrap gap-2">
+      <Button size="sm" disabled={!actionable || !vendorIdentified} loading={busy} onClick={() => void mutate(true)}>{t('Confirm change')}</Button>
       <Button size="sm" variant="secondary" disabled={!actionable} onClick={() => void mutate(false)}>{t('Cancel')}</Button>
     </div>}
     {(error || current.isError) && <div role="alert" className="space-y-2"><p>{error ?? errorMessage(current.error)}</p><Button size="sm" variant="secondary" onClick={() => void current.refetch()}>{t('Refresh')}</Button></div>}

@@ -18,8 +18,8 @@ const sessionFor = c => ({ user: { id: c.user_id, name: c.user_name, email: c.em
 export async function telegramContext(env, connection) {
   const conversationId = `chat_${connection.id}`;
   await env.DB.batch([
-    stmt(env.DB, `INSERT INTO chat_conversations(id, org_id, user_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING`, conversationId, connection.org_id, connection.user_id, now(), now()),
+    stmt(env.DB, `INSERT INTO chat_conversations(id, org_id, user_id, created_at, updated_at, channel)
+      VALUES (?, ?, ?, ?, ?, 'TELEGRAM') ON CONFLICT(id) DO NOTHING`, conversationId, connection.org_id, connection.user_id, now(), now()),
     stmt(env.DB, `INSERT INTO telegram_conversations(connection_id, org_id, user_id, conversation_id)
       VALUES (?, ?, ?, ?) ON CONFLICT(connection_id) DO NOTHING`, connection.id, connection.org_id, connection.user_id, conversationId),
   ]);

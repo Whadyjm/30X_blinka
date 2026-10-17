@@ -740,8 +740,9 @@ Propuesta de versión anterior: `409 POLICY_CHANGED`, estado `STALE`.
 Activar no aprueba facturas ni las reevalúa automáticamente; el owner pide reevaluación explícita.
 Reevaluar solo casos pendientes sin aprobación/reserva previa; si ya están resueltos,
 `409 APPROVAL_NOT_ALLOWED`. Cada resultado nuevo se agrega al historial.
-Chat queda fuera del MVP, sin endpoint que integrar actualmente. Si se incorpora después,
-consultará hechos registrados; no modificará políticas ni sustituirá la autorización formal.
+La extensión conversacional autorizada consulta hechos registrados y prepara propuestas con
+confirmación humana; no sustituye la autorización formal. Su contrato está en
+[CONVERSATION_FRONTEND_HANDOFF.md](CONVERSATION_FRONTEND_HANDOFF.md).
 
 ## 10. Cómo trabajar juntos y compartir este contrato
 
@@ -790,6 +791,13 @@ o servir el frontend junto al API; no copiar la contraseña ni secretos al bundl
 `CONFIGURATION_CONFLICT` (409) indica que un proveedor/acuerdo cambió o su identidad está en uso.
 
 ## Integración con Telegram
+
+Home separa Web y Telegram en pestañas con historiales y contexto independientes. El listado
+`GET /chat/conversations?channel=WEB|TELEGRAM` devuelve solo ese canal (por defecto `WEB`),
+con `channel` y `title` por conversación. El detalle incluye `channel`. El canal de escritura
+lo fija el servidor: el navegador solo escribe Web; intentar enviar o repetir una clave de
+Telegram desde Web devuelve `409 CHAT_CHANNEL_MISMATCH` antes de llamar al modelo.
+La pestaña Telegram permite leer su historial y continuar en el bot.
 
 La sección `/app/integrations` permite vincular y desconectar la cuenta de Telegram del usuario.
 `GET /integrations/telegram` devuelve `TelegramIntegration`; `POST /integrations/telegram/link`

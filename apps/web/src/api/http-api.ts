@@ -104,7 +104,7 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
       z.uuid().parse(operationKey);
       return parse('/chat/messages', envelope(ChatReplySchema), await raw('POST', '/chat/messages', { data, key: operationKey, timeoutMs: 60000 })).data;
     },
-    listChatConversations: () => get('/chat/conversations', ChatConversationsSchema),
+    listChatConversations: (channel = 'WEB') => get(`/chat/conversations?channel=${channel}`, ChatConversationsSchema),
     getChatHistory: id => get(`/chat/conversations/${encodeURIComponent(id)}`, ChatHistorySchema),
     async getInvoiceIntake(id) {
       const path = `/invoices/${encodeURIComponent(id)}/intake`;
