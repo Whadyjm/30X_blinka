@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f2f0">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Propuesta interactiva de inicio conversacional para Oli. Datos de ejemplo, sin operaciones reales.">
+  <title>Oli · Propuesta conversacional</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+    <symbol id="i-attach" viewBox="0 0 24 24"><path d="m8 12 6-6a3 3 0 0 1 4 4l-8 8a5 5 0 0 1-7-7l9-9m-2 13 7-7"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 15v5h16v-5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H5v18h14V8l-5-5Zm0 0v5h5M8 13h8m-8 4h5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-block" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6l8-3Z"/><path d="m8 12 3 3 5-6"/></symbol>
+  </defs></svg>
+
+  <div class="proposal-strip"><span><strong>Propuesta</strong><span class="strip-detail"> Una nueva forma de trabajar con Oli</span></span><span>Datos de ejemplo</span></div>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Oli, inicio de la propuesta"><span class="brand-mark" aria-hidden="true">O</span>Oli</a>
+    <nav aria-label="Navegación principal"><a class="nav-active" href="#inicio" aria-current="page">Tu espacio</a><a href="#facturas">Facturas</a><a href="/app/rules">Reglas</a></nav>
+    <a class="back-app" href="/app">Ver app actual <svg class="icon"><use href="#i-external"/></svg></a>
+  </header>
+
+  <main id="inicio">
+    <section class="workspace" aria-labelledby="welcome-title">
+      <div class="oli-presence">
+        <canvas id="oli" width="480" height="480" role="img" aria-label="Oli, tu asistente de finanzas"></canvas>
+      </div>
+      <div class="welcome"><h1 id="welcome-title">¿Qué resolvemos hoy?</h1><p>Cuéntame qué necesitas. Yo te ayudo con las cuentas.</p></div>
+
+      <section id="conversation" class="conversation" aria-label="Conversación de ejemplo" hidden>
+        <div class="conversation-top"><span>Conversación de ejemplo</span><button class="text-button" id="reset-chat">Empezar de nuevo <svg class="icon"><use href="#i-plus"/></svg></button></div>
+        <div id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+      </section>
+
+      <form id="composer" class="composer" novalidate>
+        <label class="sr-only" for="prompt">Escríbele a Oli o adjunta facturas de ejemplo</label>
+        <textarea id="prompt" rows="2" maxlength="1000" placeholder="Quiero agregar un proveedor…" aria-describedby="composer-help"></textarea>
+        <div id="attachments" class="attachments" aria-label="Archivos adjuntos"></div>
+        <div class="composer-actions"><button class="attach-button" id="attach" type="button"><svg class="icon"><use href="#i-attach"/></svg><span>Adjuntar factura</span></button><span class="drop-hint">o arrástrala aquí</span><button id="send" class="send-button" type="submit" aria-label="Enviar mensaje a Oli" disabled><svg class="icon"><use href="#i-arrow"/></svg></button></div>
+        <div class="drop-overlay" aria-hidden="true"><svg class="icon"><use href="#i-upload"/></svg><strong>Suelta tus facturas aquí.</strong><span>PDF, PNG o JPG · hasta 5 MB por archivo</span></div>
+      </form>
+      <input id="file-picker" class="sr-only" type="file" accept="application/pdf,image/png,image/jpeg" multiple tabindex="-1" aria-label="Seleccionar facturas de ejemplo">
+      <p id="composer-help" class="composer-help">Prueba la conversación. Los archivos se quedan en tu navegador.</p>
+      <p id="input-error" class="input-error" role="alert" hidden></p>
+      <div class="suggestions" aria-label="Ideas para empezar"><button data-prompt="Quiero agregar un proveedor"><svg class="icon"><use href="#i-plus"/></svg>Agregar un proveedor</button><button data-prompt="¿Cuánto gasté en internet el mes pasado?">Ver mis gastos de internet <svg class="icon"><use href="#i-next"/></svg></button><button data-prompt="¿Qué facturas necesitan mi revisión?">¿Qué necesita mi atención? <svg class="icon"><use href="#i-next"/></svg></button></div>
+      <button class="attention-note" data-prompt="¿Por qué está pendiente la factura de Acme Accounting Demo?"><span class="attention-dot" aria-hidden="true"></span><span>Hay una factura que necesita tu visto bueno.</span><svg class="icon"><use href="#i-next"/></svg></button>
+    </section>
+
+    <section class="overview" id="facturas" aria-labelledby="overview-title">
+      <div class="section-heading"><div><h2 id="overview-title">Tus cuentas, a la vista.</h2><p>Octubre de 2026 · Lumen Atlas, empresa de ejemplo</p></div><button class="outline-button" id="classic-upload"><svg class="icon"><use href="#i-upload"/></svg>Subir factura</button></div>
+      <div class="overview-grid">
+        <section class="invoice-panel" aria-label="Facturas de ejemplo">
+          <div class="filters" role="group" aria-label="Filtrar facturas"><button class="selected" data-filter="all" aria-pressed="true">Todas <span>5</span></button><button data-filter="approved" aria-pressed="false">Aprobadas <span>3</span></button><button data-filter="review" aria-pressed="false">Por revisar <span>1</span></button><button data-filter="blocked" aria-pressed="false">Bloqueadas <span>1</span></button></div>
+          <div id="invoice-list" class="invoice-list"></div>
+          <div class="invoice-footer"><span><svg class="icon"><use href="#i-shield"/></svg>Las reglas siguen al mando.</span><a href="/app/bills">Abrir vista clásica <svg class="icon"><use href="#i-external"/></svg></a></div>
+        </section>
+        <aside class="month-panel" aria-labelledby="month-title">
+          <div class="month-heading"><h3 id="month-title">Aprobado este mes</h3><span>USD</span></div><p class="month-total">449<span>.00</span></p><p class="month-note">Autorizaciones simuladas. Sin mover dinero.</p>
+          <figure class="chart"><figcaption class="sr-only">Facturas aprobadas de ejemplo: mayo USD310, junio350, julio330, agosto410, septiembre389 y octubre449.</figcaption><div class="bars" aria-hidden="true"><div><span>310</span><i style="--bar:62%"></i><small>May</small></div><div><span>350</span><i style="--bar:70%"></i><small>Jun</small></div><div><span>330</span><i style="--bar:66%"></i><small>Jul</small></div><div><span>410</span><i style="--bar:82%"></i><small>Ago</small></div><div><span>389</span><i style="--bar:78%"></i><small>Sep</small></div><div class="current"><span>449</span><i style="--bar:90%"></i><small>Oct</small></div></div></figure>
+          <div class="budget-label"><span>Presupuesto disponible</span><strong>USD 1,551</strong></div><meter min="0" max="2000" value="449" aria-label="USD449 reservados de USD2000 de presupuesto">449 de 2000</meter><p class="budget-caption">USD 449 reservados de USD 2,000</p>
+          <button class="text-button month-question" data-prompt="Explícame cómo va mi presupuesto este mes">Oli, explícame mi mes <svg class="icon"><use href="#i-next"/></svg></button>
+        </aside>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><span>Propuesta para conversar con Whady.</span><span>Interacciones demostrativas · Sin cambios en tu cuenta</span></footer>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
