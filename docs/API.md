@@ -471,6 +471,11 @@ Un trigger D1 aplica ambos límites dentro de la misma transacción: un exceso c
 la decisión, las solicitudes humanas, cualquier reserva y los eventos asociados. Esto limita
 los reanálisis efectivos; no reemplaza un límite general de tráfico HTTP ni de nuevas cargas.
 
+[Comprobación en producción](evaluations/invoices-reanalysis-limits-production-20261017.json):
+un reanálisis de documento sintético devolvió 200, el siguiente inmediato 429 con `Retry-After: 60`
+y el replay 200 sin otra decisión ni cambios en presupuesto. El agotamiento de cuota y las
+carreras entre copias se verifican contra D1 local, sin agotar la cuota de documentos productivos.
+
 Filtros de `GET /invoices`: `status?`, `action?`, `vendorId?`, `needsHumanApproval?` y paginación.
 Los filtros se combinan con AND; `action` consulta la última decisión.
 `needsHumanApproval=true` selecciona solicitudes `PENDING` autorizables, no todos los `ESCALATE`.

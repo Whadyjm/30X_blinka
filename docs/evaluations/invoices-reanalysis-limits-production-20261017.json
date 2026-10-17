@@ -1,0 +1,20 @@
+{
+  "testedAt": "2026-10-17T16:36:55.724Z",
+  "scope": "LIVE_PRODUCTION_SYNTHETIC_DOCUMENT_REANALYSIS_COOLDOWN_AND_REPLAY",
+  "workerVersion": "c9c3b639-ad79-4729-be36-a313b5f5e4b7",
+  "sourceCommit": "825e0f4923a03bccb0d731bffd6fb6a99bce9d1d",
+  "target": "https://oli30x.ultramare.dev",
+  "successfulReanalysisStatus": 200,
+  "repeatedNewRequestStatus": 429,
+  "repeatedNewRequestCode": "REANALYSIS_COOLDOWN",
+  "retryAfterSeconds": 60,
+  "idempotentReplayStatus": 200,
+  "sameReplayResponse": true,
+  "decisionsAdded": 1,
+  "earlierDecisionsPreserved": true,
+  "extractionUnchanged": true,
+  "fileUnchanged": true,
+  "budgetUnchanged": true,
+  "latestAction": "BLOCK",
+  "limits": "One synthetic existing document; lifetime exhaustion and concurrent rollback tested locally against D1, not by exhausting production data"
+}
