@@ -29,5 +29,26 @@
     "disposition": "ship",
     "materialFixes": [],
     "scope": "Subpestañas Web y contexto único Telegram"
-  }
+  },
+  "production": {
+    "date": "2026-10-17T20:27:55.873Z",
+    "host": "https://oli30x.ultramare.dev",
+    "webThreads": 4,
+    "telegramThreads": 1,
+    "historyTurnsRead": 10,
+    "channelOverlap": false,
+    "crossChannelWrite": "409 CHAT_CHANNEL_MISMATCH before model or turn creation",
+    "mobileViewport": {
+      "width": 390,
+      "height": 844
+    },
+    "composerInsideViewport": true,
+    "draftPreserved": true,
+    "webSubtabs": 4,
+    "telegramSubtabs": 0,
+    "mutations": "Only login/logout and rejected wrong-channel request. No conversation sent, no proposal confirmed, no Telegram/email notifications sent.",
+    "deploymentVersion": "05ddabcb-dc64-40cc-bd9b-96621dfc85ac",
+    "mergedPR": 8
+  },
+  "documentationReview": "Extensión ordinaria; sistema visual existente conservado; sin cambios de archivos de diseño"
 }
