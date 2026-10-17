@@ -27,7 +27,10 @@ documentos no conceden permisos. El remitente es dato, no prueba de identidad. E
 y HTML no se almacenan ni ejecutan; solo se conserva su hash para deduplicación, remitente
 SMTP, asunto, fecha y metadatos. MIME se parsea con `postal-mime` y límites de profundidad,
 partes y cabeceras. Se admiten cuatro PDF/JPEG/PNG de 5 MiB cada uno, 8 MiB en total y
-correo de 12 MiB. El tipo se verifica con los bytes y se ignoran logos inline.
+correo de 12 MiB. El tipo se verifica con los bytes. Las imágenes pegadas en el cuerpo
+también se reciben cuando viajan como partes MIME inline, aunque lleven Content-ID.
+Pasan por la misma clasificación que los adjuntos: una firma o un logo no se presume
+factura, y una lectura incierta no permite autoaprobar. Los límites incluyen estas imágenes.
 
 Hay un límite atómico de veinte correos nuevos por empresa por hora. R2 privado y recibo
 D1 se confirman antes de encolar. La reentrega combina hashes del servidor y contenido:
@@ -40,8 +43,9 @@ autoriza aprobación. La procedencia EMAIL es append-only en `email_invoice_sour
 `invoice_channel_sources` combina procedencia sin reconstruir tablas financieras.
 
 El inbox distingue RECEIVED, WAITING, COMPLETED, NO_DOCUMENT y FAILED. Sin adjuntos
-compatibles no hay extracción ni aprobación. Esta versión requiere adjuntar el documento:
-no sigue enlaces, abre ZIP/Office ni convierte facturas del cuerpo del correo.
+compatibles no hay extracción ni aprobación. El documento debe viajar dentro del correo,
+como adjunto o imagen incrustada: no se siguen enlaces, se abren ZIP/Office ni se convierte
+el texto/HTML del cuerpo en un documento. Las imágenes remotas no se descargan.
 Los avisos usan decisiones registradas. Cursor por partes evita reenviar lo ya registrado
 al reintentar Telegram, sin repetir extracción ni efectos financieros. Una caída entre
 aceptación remota y registro local puede repetir una notificación. Los adjuntos temporales
@@ -82,9 +86,15 @@ de Inbox, Integraciones y Home en 1440 y 390 px, con copia, lectura de mensajes,
 enlaces privados y recuperación de pausa verificados en navegador. Sin cambios
 al sistema visual existente. No son métricas de precisión del extractor.
 
-Desplegado como `09c2447f-04d8-4dd9-829b-eba9f9b1c0ae`, preservando el parser
+Despliegue inicial `09c2447f-04d8-4dd9-829b-eba9f9b1c0ae`, preservando el parser
 `labelled-v5` que ya estaba en producción por trabajo concurrente. Migración, cola,
 regla de correo y subaddressing activos; reglas previas y catch-all conservados.
 Health, sesión, dirección, Inbox y Telegram existente comprobados en producción;
 Integraciones y Bandeja abren sin errores de navegador. La entrega de un correo
 SMTP externo todavía requiere la prueba desde el proveedor.
+
+La recepción SMTP real, Inbox y aviso Telegram se comprobaron con el primer correo
+de Oscar. Ese mensaje reveló el filtro incorrecto de imágenes inline y quedó sin documentos.
+La corrección pasa nueve pruebas de correo y el Worker empaquetado con una imagen
+incrustada; los lectores de esas pruebas son simulados. El caso anterior requiere reenvío,
+porque el contenido descartado no se conserva. Falta validar ese nuevo envío real.
