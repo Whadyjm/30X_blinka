@@ -1,0 +1,96 @@
+{
+  "startedAt": "2026-10-17T15:06:54.636Z",
+  "finishedAt": "2026-10-17T15:07:06.857Z",
+  "scope": "SEPARATE_ERROR_DIAGNOSTIC_NOT_A_CORPUS_REPLACEMENT",
+  "caseId": "case_019",
+  "workerVersion": "f058fad7-d55b-4a36-8f4d-54ff8c12381f",
+  "status": 200,
+  "payload": {
+    "data": {
+      "extraction": {
+        "vendorName": "Acme Accounting Demo",
+        "invoiceNumber": "INV-0019",
+        "amountMinor": 45000,
+        "currency": "USD",
+        "issuedAt": "2026-09-01",
+        "dueDate": "2026-09-15",
+        "servicePeriod": "2026-09",
+        "description": "Contabilidad mensual de demostración",
+        "extractionWarnings": [],
+        "evidence": [
+          {
+            "field": "vendorName",
+            "source": "page:1",
+            "quote": "Acme Accounting Demo"
+          },
+          {
+            "field": "invoiceNumber",
+            "source": "page:1",
+            "quote": "Número / Number | INV-0019"
+          },
+          {
+            "field": "amountMinor",
+            "source": "page:1",
+            "quote": "TOTAL A COBRAR\nUSD 450.00"
+          },
+          {
+            "field": "currency",
+            "source": "page:1",
+            "quote": "Moneda / Currency | USD"
+          },
+          {
+            "field": "issueDate",
+            "source": "page:1",
+            "quote": "Emisión / Issued | 2026-09-01"
+          },
+          {
+            "field": "dueDate",
+            "source": "page:1",
+            "quote": "Vencimiento / Due | 2026-09-15"
+          },
+          {
+            "field": "servicePeriod",
+            "source": "page:1",
+            "quote": "Periodo de servicio | 2026-09"
+          },
+          {
+            "field": "description",
+            "source": "page:1",
+            "quote": "Contabilidad mensual de demostración"
+          }
+        ]
+      },
+      "primaryReadId": "28677877-adc4-44a5-8df1-2c4c7eefdf62",
+      "documentSha256": "6997c1b97e8087166f25936a88669d0780c4b682702a5f4b8a2f761b1bf4ecca",
+      "corroboration": {
+        "documentSha256": "6997c1b97e8087166f25936a88669d0780c4b682702a5f4b8a2f761b1bf4ecca",
+        "readId": "pdftext_4bfbd2ab-a50c-47c9-8f30-908b8ff3114f",
+        "method": "PDF_TEXT",
+        "fields": {
+          "vendorName": "Acme Accounting Demo",
+          "amountMinor": 45000,
+          "currency": "USD",
+          "dueDate": "2026-09-15"
+        }
+      },
+      "provenance": {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "provider": "Wafer",
+        "pdfTextParser": "labelled-v1",
+        "attempts": [
+          {
+            "model": "deepseek/deepseek-v4.1-flash",
+            "outcome": "SUCCESS",
+            "durationMs": 11800
+          }
+        ],
+        "usage": {
+          "inputTokens": 533,
+          "outputTokens": 1533,
+          "costUsd": 0.00302927
+        },
+        "corroborationError": null
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "scope": "PRODUCTION_PUBLIC_HTTP_UPLOAD_QUEUE_PROCESS_DETAIL_REPLAY",
+  "workerVersion": "9061818e-cfbf-4851-89ff-02e77dfa09a9",
+  "testedAt": "2026-10-17T15:50:29.873Z",
+  "invoiceId": "inv_8e61da7f-83d3-4067-9fe3-a865e407d41a",
+  "document": "holdout_007 delivery note; deliberately non-authorizable",
+  "receiptStatus": 201,
+  "receiptMs": 1328,
+  "processStatus": 202,
+  "finalStatus": "DECIDED",
+  "action": "ESCALATE",
+  "reasons": [
+    "INVALID_OR_MISSING_DATA"
+  ],
+  "decisionCount": 1,
+  "elapsedMs": 9971,
+  "budgetUnchanged": true,
+  "replayIdempotent": true,
+  "remoteD1Verification": {
+    "date": "2026-10-17",
+    "method": "Wrangler authenticated Tiamat remote read-only query",
+    "jobState": "DONE",
+    "jobAttempts": 1,
+    "invoiceReservations": 0,
+    "cachedReadArtifactsDatabaseTotal": 2
+  }
+}

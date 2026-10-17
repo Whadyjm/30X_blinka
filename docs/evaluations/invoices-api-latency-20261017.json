@@ -1,0 +1,45 @@
+{
+  "scope": "PRODUCTION_AUTHENTICATED_READ_ONLY_LATENCY",
+  "workerVersion": "9061818e-cfbf-4851-89ff-02e77dfa09a9",
+  "measuredAt": "2026-10-17T15:49:48.627Z",
+  "samplesPerEndpoint": 5,
+  "includes": "Client network + HTTP + D1 + serialization; not a load test or before-after comparison",
+  "results": [
+    {
+      "path": "/dashboard",
+      "records": 8,
+      "samplesMs": [
+        188,
+        189,
+        190,
+        192,
+        211
+      ],
+      "medianMs": 190
+    },
+    {
+      "path": "/invoices?page=1&pageSize=10",
+      "records": 8,
+      "samplesMs": [
+        131,
+        137,
+        147,
+        156,
+        174
+      ],
+      "medianMs": 147
+    },
+    {
+      "path": "/approvals?page=1&pageSize=10",
+      "records": 0,
+      "samplesMs": [
+        121,
+        123,
+        124,
+        131,
+        143
+      ],
+      "medianMs": 124
+    }
+  ]
+}

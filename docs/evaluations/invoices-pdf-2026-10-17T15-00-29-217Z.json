@@ -1,0 +1,42 @@
+{
+  "runId": "2026-10-17T15-00-29-217Z",
+  "startedAt": "2026-10-17T15:00:29.217Z",
+  "finishedAt": "2026-10-17T15:03:18.467497+00:00",
+  "scope": "REAL_PDF_READERS_LOCAL_API_PROCESSING_D1_R2",
+  "datasetVersion": "oli-invoices-v1",
+  "manifestSha256": "17495bd32b89ee17c2552b3c2d494a9dbbb5f2ec4d6e0caa00e38cd7f55d079a",
+  "target": "https://oli-api.tiamat-agency.workers.dev",
+  "remoteWorkerVersion": "8012df9a-e353-41f2-a09c-61034b272aa9",
+  "code": {
+    "apps/api/worker/document.js": "eaab84edcc6bedbcc599f43fd02d94817d0d786c007746e486b90b5e531fac41",
+    "apps/api/worker/processing.js": "ab08a0e7b9436309cacf0e3b3eb135d3c1444bf9a5d9f37e8737bca34a8c6ee7",
+    "packages/extraction/src/openrouter.ts": "790600d7cdd189d8618a72c18c3e7f8360a8de8344c4f50ae4599d809d122084",
+    "packages/domain/src/index.ts": "887303f2cd23b2f1bc2abe2a5d0302e042b976fad7b367729a3a68bee5ca9bfd"
+  },
+  "limits": {
+    "documents": 50,
+    "concurrency": 2,
+    "maximumModelCalls": 150,
+    "retriesPerDocument": 0
+  },
+  "context": {
+    "perCaseIsolatedD1": true,
+    "productionDatabaseWrites": false,
+    "persistedLocalState": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/corpus/2026-10-17T15-00-29-217Z",
+    "priorInvoices": "Labelled synthetic historical context, not newly measured OCR",
+    "openingReservedBudget": "Established with explicit synthetic fixture decisions and the original D1 reservation triggers; no counter edits",
+    "clock": "Current API clock; corpus evaluationTime belongs to the same budget month",
+    "processingEntry": "Original processInvoice service with a server-only adapter to the authenticated remote readDocument probe; upload/detail/document APIs unchanged",
+    "browser": "Not run for all 50; API details and private document bytes verified",
+    "cost": "Reported successful responses only; excludes failed/interrupted calls and possibly separately billed PDF conversion"
+  },
+  "results": [],
+  "summary": {
+    "attempted": 0,
+    "paidRequestsStarted": 0
+  },
+  "initializationError": {
+    "code": "ERR_RUNTIME_FAILURE",
+    "message": "Installed workerd supports at most 2026-08-06; requested local compatibility date was 2026-10-17. No document/model requests were started."
+  }
+}

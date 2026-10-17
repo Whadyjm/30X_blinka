@@ -15,7 +15,7 @@ const ex = { vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'TELEGR
   currency: 'USD', issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10',
   description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [] };
 const processing = (env, org, invoice) => processInvoice(env, org, invoice, async (_env, _file, _bytes, hash) => ({
-  extraction: ex, primaryReadId: 'synthetic-primary', documentSha256: hash,
+  extraction: ex, documentType: 'INVOICE', primaryReadId: 'synthetic-primary', documentSha256: hash,
   corroboration: corroboratePdfText(`EMISOR / SUPPLIER\n${ex.vendorName}\nMoneda / Currency\nUSD\nVencimiento / Due\n${ex.dueDate}\nTOTAL A COBRAR\nUSD 200.00`, hash),
 }));
 

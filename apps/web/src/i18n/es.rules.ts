@@ -107,5 +107,5 @@ export const esRules: Record<string, string> = {
   'e.g. Cloud hosting': 'p. ej. Alojamiento en la nube',
   'Save agreement': 'Guardar acuerdo',
   'Sample vendors and agreements loaded.': 'Proveedores y acuerdos de ejemplo cargados.',
-  'Load fictitious sample set': 'Cargar conjunto de ejemplo ficticio',
+  'Load sample set': 'Cargar conjunto de ejemplo',
 };

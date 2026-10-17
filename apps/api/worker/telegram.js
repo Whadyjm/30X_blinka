@@ -8,7 +8,7 @@ const activeConnection = (db, orgId, userId) => stmt(db, `SELECT * FROM telegram
   WHERE org_id = ? AND user_id = ? AND revoked_at IS NULL`, orgId, userId).first();
 const available = env => !!(env.TELEGRAM_BOT_TOKEN && env.TELEGRAM_WEBHOOK_SECRET && env.TELEGRAM_QUEUE && env.PUBLIC_APP_URL);
 
-async function telegram(env, method, data) {
+export async function telegram(env, method, data) {
   const botToken = env.TELEGRAM_BOT_TOKEN?.trim();
   if (!/^\d+:[A-Za-z0-9_-]+$/.test(botToken ?? '')) {
     throw new HttpError(503, 'TELEGRAM_BOT_TOKEN_INVALID', 'El token del bot no es válido. Revisa TELEGRAM_BOT_TOKEN en el Worker.');

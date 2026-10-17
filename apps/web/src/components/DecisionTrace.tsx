@@ -70,11 +70,15 @@ function TraceRow({ step, index, fallbackVersion, fallbackAt }: { step: TraceSte
             )}
           </dl>
         )}
-        {step.evidence && <p className="mt-1 break-words text-sm italic text-slate-600 [overflow-wrap:anywhere]">“{step.evidence}”</p>}
+        {step.evidence && step.rule !== 'DOCUMENT_TYPE' && (
+          <p className="mt-1 break-words text-sm italic text-slate-600 [overflow-wrap:anywhere]">“{step.evidence}”</p>
+        )}
         <p className="caption mt-1.5 normal-case tracking-normal">
           {version != null && version !== '' ? t('Policy v{n}', { n: String(version) }) : t('Policy version n/a')}
           {at ? ` · ${formatDateTime(at)}` : ''}
-          <span className="text-data ml-1 text-xs text-slate-400">· {step.rule}</span>
+          {!['DOCUMENT_TYPE', 'NOT_AN_INVOICE', 'DOCUMENT_TYPE_UNCERTAIN'].includes(step.rule) && (
+            <span className="text-data ml-1 text-xs text-slate-400">· {step.rule}</span>
+          )}
         </p>
       </div>
     </li>

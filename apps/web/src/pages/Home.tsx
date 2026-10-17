@@ -13,6 +13,7 @@ import { dueLabel, isOverdue } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
 import { getOutcome } from '@/lib/outcome';
 import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
+import { InboxPreview } from '@/features/integrations/InboxPreview';
 
 export function Home() {
   const me = useMe();
@@ -43,7 +44,7 @@ export function Home() {
       </div>
 
       <section aria-label={t('Summary')} className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Stat loading={invoices.isLoading} label={t('Approved (simulated)')} value={stats.approvedCount} icon={<CheckCircle2 className="size-5" />} tone="emerald" to="/app/bills?outcome=APPROVED" />
+        <Stat loading={invoices.isLoading} label={t('Approved invoices')} value={stats.approvedCount} icon={<CheckCircle2 className="size-5" />} tone="emerald" to="/app/bills?outcome=APPROVED" />
         <Stat loading={invoices.isLoading} label={t('Blocked')} value={stats.blockedCount} icon={<Ban className="size-5" />} tone="rose" to="/app/bills?outcome=BLOCKED" />
         <Stat loading={invoices.isLoading} label={t('Needs you')} value={stats.needsYouCount} icon={<Hand className="size-5" />} tone="amber" to="/app/approvals" />
         <Stat loading={invoices.isLoading} label={t('Due in 14 days')} value={stats.upcoming.length} icon={<CalendarClock className="size-5" />} tone="indigo" to="/app/bills" />
@@ -51,6 +52,7 @@ export function Home() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
+          <InboxPreview />
           <Card>
             <CardHeader title={t('Recent activity')} action={<Link to="/app/bills" className="text-sm text-ink underline underline-offset-2">{t('View all')}</Link>} />
             {invoices.isLoading ? (
@@ -119,7 +121,6 @@ export function Home() {
           </Card>
         </div>
       </div>
-      <p className="mt-8 text-center text-xs text-slate-400">{t('{label}: no transfer is made. Demo data is fictitious.', { label: brand.approveLabel })}</p>
     </>
   );
 }

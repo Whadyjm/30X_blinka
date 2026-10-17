@@ -1,5 +1,5 @@
 import { AlertCircle, Ban, CheckCircle2, Hand, XCircle, type LucideIcon } from 'lucide-react';
-import { Bot, Send, User } from 'lucide-react';
+import { Bot, Mail, Send, User } from 'lucide-react';
 import { Orb } from '@/components/ui/Orb';
 import type { InvoiceSource } from '@/contracts';
 import { reasonInfo, type ReasonTone } from '@/contracts/reasons';
@@ -19,7 +19,7 @@ import { outcomeLabel, type Outcome } from '@/lib/outcome';
  * `title` values are English i18n keys, translated at render time.
  */
 const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> = {
-  APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved for simulated payment' },
+  APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved' },
   BLOCKED: { cls: 'bg-ink text-white', Icon: Ban, title: 'Blocked by your rules' },
   NEEDS_APPROVAL: { cls: 'bg-white text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
   NEEDS_REVIEW: { cls: 'bg-bone text-ink ring-1 ring-inset ring-smoke', Icon: AlertCircle, title: 'Needs correction or clarification' },
@@ -66,8 +66,8 @@ export function SourceBadge({ source, agentName }: { source: InvoiceSource; agen
   const agent = source === 'AGENT_REQUEST';
   return (
     <span className="inline-flex items-center gap-1 text-xs text-slate-600">
-      {agent ? <Bot className="size-3.5" aria-hidden /> : source === 'TELEGRAM' ? <Send className="size-3.5" aria-hidden /> : <User className="size-3.5" aria-hidden />}
-      {agent ? (agentName ?? t('Agent')) : source === 'TELEGRAM' ? 'Telegram' : t('Upload')}
+      {agent ? <Bot className="size-3.5" aria-hidden /> : source === 'TELEGRAM' ? <Send className="size-3.5" aria-hidden /> : source === 'EMAIL' ? <Mail className="size-3.5" aria-hidden /> : <User className="size-3.5" aria-hidden />}
+      {agent ? (agentName ?? t('Agent')) : source === 'TELEGRAM' ? 'Telegram' : source === 'EMAIL' ? t('Email') : t('Upload')}
     </span>
   );
 }

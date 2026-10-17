@@ -14,9 +14,15 @@ export function draftView(d: MandateDraft, active: PolicyVersion | null): Financ
   return { ...d.rules, id: d.id, version: (active?.version ?? 0) + 1, status: 'DRAFT', createdAt: d.updatedAt,
     revision: d.revision, basedOnPolicyVersionId: d.basedOnPolicyVersionId };
 }
+// Presentation copy only; persisted explanations, evidence and identities stay intact.
+const explanationView = (text: string): string => text
+  .replaceAll('Bloqueada para pago simulado.', 'Bloqueada.')
+  .replaceAll('aprobación simulada', 'aprobación')
+  .replaceAll('Aprobación simulada', 'Aprobación');
+
 export function decisionView(d: ApiDecision): PolicyDecision {
   return { id: d.id, invoiceId: d.invoiceId, decision: d.action, status: undefined, policyVersion: d.policyVersion,
-    policyVersionId: d.policyVersionId, reasons: d.reasons, explanation: d.humanExplanation,
+    policyVersionId: d.policyVersionId, reasons: d.reasons, explanation: explanationView(d.humanExplanation),
     needsHumanApproval: d.needsHumanApproval, checkedAt: d.checkedAt, simulated: d.simulated,
     facts: { amountMinor: d.facts.amountMinor ?? undefined, currency: d.facts.currency ?? undefined,
       autoLimitMinor: d.facts.automaticLimitMinor, hardLimitMinor: d.facts.hardLimitMinor,
@@ -24,7 +30,7 @@ export function decisionView(d: ApiDecision): PolicyDecision {
     trace: d.trace.map(step => ({ rule: step.rule, result: step.outcome === 'PASS' ? 'PASS' : step.outcome === 'BLOCK' ? 'FAIL' : 'WARN',
       observed: step.explanation, evidence: JSON.stringify(step.evidence), checkedAt: d.checkedAt, policyVersion: d.policyVersion })) };
 }
-export const approvalView = (a: ApiApproval): ApprovalSummary => ({ id: a.id, state: a.state, reason: a.reason,
+export const approvalView = (a: ApiApproval): ApprovalSummary => ({ id: a.id, state: a.state, reason: explanationView(a.reason),
   decisionId: a.decisionId, policyVersionId: a.policyVersionId, canDecide: a.canApprove,
   reviewerId: a.reviewerId, decidedAt: a.decidedAt, justification: a.reviewComment });
 export const invoiceView = (i: Invoice): InvoiceSummary => ({ id: i.id, status: i.status, source: i.source,

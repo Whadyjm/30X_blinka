@@ -2,7 +2,6 @@ import { useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '@/api';
-import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
@@ -47,7 +46,6 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
       <div className="flex justify-end px-4 pt-4 sm:px-6">
         <LanguageSwitcher />
       </div>
@@ -60,14 +58,13 @@ export function Login() {
           <Card className="p-6">
             {env.apiMode === 'mock' ? <>
             <Button size="lg" beam className="w-full" loading={busy === 'demo'} disabled={busy !== null} onClick={() => void run('demo')}>
-              {t('Enter the demo organization')}
+              {t('Try Oli')}
             </Button>
-            <p className="mt-2 text-xs text-slate-500">{t('A fictitious company with sample invoices. No sign-up needed.')}</p>
 
             <div className="my-5 flex items-center gap-3 text-xs text-slate-400">
               <span className="h-px flex-1 bg-hairline" /> {t('or sign in')} <span className="h-px flex-1 bg-hairline" />
             </div>
-            </> : <p className="mb-5 text-sm text-ash">{t('Sign in with your demo credentials. No real money is moved.')}</p>}
+            </> : <p className="mb-5 text-sm text-ash">{t('Sign in to manage your invoices.')}</p>}
 
             <form onSubmit={submit} className="space-y-4" noValidate>
               <TextField label={t('Email or username')} type="text" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -80,7 +77,7 @@ export function Login() {
 
             {env.apiMode === 'mock' && (
               <p className="mt-4 rounded-md bg-bone p-2.5 text-xs text-slate-500">
-                {t('Mock mode credentials:')} <code>demo@oli.test</code> / <code>oli-demo-2026</code>
+                {t('Access credentials:')} <code>demo@oli.test</code> / <code>oli-demo-2026</code>
               </p>
             )}
           </Card>

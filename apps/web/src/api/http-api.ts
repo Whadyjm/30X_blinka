@@ -2,8 +2,9 @@ import { z } from 'zod';
 import {
   ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
-  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema,
+  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema,
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
+  EmailIntegrationSchema, InboxSchema,
 } from '@oli/contracts';
 import { HealthSchema } from '@/contracts';
 import { ApiError, ContractError } from './errors';
@@ -102,6 +103,11 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
       return parse('/integrations/telegram/link', envelope(TelegramLinkSchema), await raw('POST', '/integrations/telegram/link')).data;
     },
     async disconnectTelegram() { await raw('DELETE', '/integrations/telegram'); },
+    getEmailIntegration: () => get('/integrations/email', EmailIntegrationSchema),
+    async enableEmail() { return parse('/integrations/email', envelope(EmailIntegrationSchema), await raw('POST', '/integrations/email')).data; },
+    async disableEmail() { await raw('DELETE', '/integrations/email'); },
+    getInbox: () => get('/inbox', InboxSchema),
+    async readInboxMessage(id) { await raw('POST', `/inbox/${encodeURIComponent(id)}/read`); },
     async getMandate() {
       const state = await get('/mandate', mandateSchema);
       const budgets = await get('/budgets', z.array(BudgetPeriodSchema));
@@ -154,6 +160,10 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     async processInvoice(id) {
       // A timeout is ambiguous: the server may still be working. Callers keep polling this same invoice.
       parse('/process', envelope(z.union([InvoiceDetailSchema, InvoiceSchema])), await raw('POST', `/invoices/${encodeURIComponent(id)}/process`, { timeoutMs: 90000 }));
+    },
+    async reevaluateInvoice(id, input) {
+      const path = `/invoices/${encodeURIComponent(id)}/reevaluate`;
+      return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ReevaluateInvoiceSchema.parse(input))).data);
     },
     invoiceFileUrl: invoice => invoice.fileUrl ?? `${opts.base}/invoices/${encodeURIComponent(invoice.id)}/file`,
     async listApprovals() {

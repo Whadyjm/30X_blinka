@@ -47,6 +47,7 @@ No se requiere una pantalla de registro.
 - Monedas ISO 4217 en mayúsculas. No se convierten monedas ni se suman presupuestos de monedas diferentes.
 - P0 configura un presupuesto mensual en la moneda del mandato. Una factura en otra moneda
   se extrae, pero sin presupuesto compatible no se aprueba. No mostrar un selector que sugiera conversión automática.
+- La activación inicializa el presupuesto. Si no existe un presupuesto inicial, procesar no inventa uno: bloquea con `MISSING_BUDGET`. Solo se abre un mes nuevo automáticamente cuando hay un periodo anterior de esa misma moneda; conserva las reservas históricas.
 - `null` significa dato desconocido/no disponible. No sustituir por cero o cadena vacía.
 - `orgId`, roles, versiones, reservas y decisiones se determinan en el servidor; no se aceptan como autoridad del navegador.
 - Los ejemplos y sus resultados son **datos ficticios para mocks**, no métricas de una implementación real.
@@ -249,7 +250,7 @@ type ApprovalRequest = {
 type Invoice = {
   id: string;
   status: InvoiceStatus;
-  source: 'HUMAN_UPLOAD' | 'TELEGRAM';
+  source: 'HUMAN_UPLOAD' | 'TELEGRAM' | 'EMAIL';
   file: { name: string; mimeType: string; sizeBytes: number; url: string };
   vendorId: string | null;
   vendorName: string | null;
@@ -392,24 +393,88 @@ Referencias a proveedor/acuerdo deben pertenecer a la empresa de la sesión.
 1. `POST /invoices`: `FormData` con un PDF/PNG/JPEG ficticio, máximo **5 MiB (5 242 880 bytes)**.
    No fijar `Content-Type` manualmente; el navegador incluye el boundary.
 2. Devuelve factura `RECEIVED`, campos desconocidos en `null` y `latestDecision=null`.
-3. El front llama `POST /invoices/:id/process`.
-4. Si termina durante la solicitud: `200` con detalle. Si continúa: `202` con la factura actual.
-5. Mientras esté `PARSING`, `READY` o `PROCESSING`, consultar `GET /invoices/:id`
+3. El servidor guarda un trabajo durable junto con la factura y lo publica en la cola. El front puede llamar `POST /invoices/:id/process` para consultar/solicitar el mismo trabajo.
+4. En producción devuelve `202` con el detalle actual; una factura ya terminada devuelve `200`. El procesamiento continúa aunque se cierre la página. Sin binding de cola, el entorno local conserva ejecución síncrona para desarrollo.
+5. Mientras esté `RECEIVED`, `PARSING`, `READY` o `PROCESSING`, consultar `GET /invoices/:id`
    cada 2 segundos. Parar en `DECIDED`/`FAILED`, al salir de la pantalla o después de
    60 segundos; al agotar ese tiempo mostrar «Sigue procesando» con actualización manual,
    sin inventar un fallo o repetir automáticamente la subida.
 
 Repetir `process` devuelve el trabajo/resultado existente y nunca reserva dos veces.
-Si está `FAILED` y `processingError.retryable=true`, el usuario puede reintentar con el mismo endpoint.
-Una factura ya decidida no se reevalúa por llamar `process`; P1 usa `/reevaluate` explícito.
+Los fallos técnicos transitorios vuelven a `RECEIVED` con `processingError.retryable=true` mientras esperan el siguiente intento automático. Hay como máximo tres intentos por factura, con espera de 30/120 segundos; repetir el endpoint no reinicia ese límite. Al agotarlo o ante un error permanente, queda `FAILED` con `retryable=false`.
+Una factura ya decidida no se reevalúa por llamar `process`; el endpoint explícito `/reevaluate` descrito abajo vuelve a comprobar las reglas.
 
 Un documento ilegible puede terminar `DECIDED` con `ESCALATE` y explicación de datos faltantes.
-Una caída técnica del proveedor/BD deja `FAILED`, sin una aprobación nueva. Ante fallo de polling,
+Una caída técnica nunca crea una aprobación nueva: el trabajo se recupera o termina `FAILED`. Ante fallo de polling,
 mantener la última información conocida y mostrar el error de conexión.
 
 Subir el mismo documento como factura nueva debe producir un registro auditable bloqueado como
 duplicado cuando se confirme. Repetir la misma solicitud HTTP con la misma clave de idempotencia
 devuelve el mismo registro original; son dos situaciones distintas.
+
+### Tipo de documento y documentos que no son factura
+
+El lector clasifica el original como `INVOICE`, `PAYMENT_RECEIPT`, `DELIVERY_NOTE`, `QUOTE`,
+`CREDIT_NOTE`, `OTHER` o `UNKNOWN`. El tipo se guarda como metadata de la lectura del servidor,
+no como una entrada editable por el navegador ni como un permiso para aprobar.
+
+- Un documento identificado como comprobante, nota de entrega, cotización, nota de crédito u
+  otro tipo ajeno a una factura produce `BLOCK / NOT_AN_INVOICE`, sin solicitud humana ni reserva.
+- Un tipo `UNKNOWN` produce `ESCALATE / DOCUMENT_TYPE_UNCERTAIN`. Que falten datos, por sí solo, no
+  prueba que el documento no sea una factura. Una factura ilegible sigue en revisión.
+- `INVOICE` no sustituye la corroboración independiente ni las comprobaciones financieras.
+
+La traza registra `DOCUMENT_TYPE` y su explicación antes del control de extracción. No ejecutar
+las reglas de proveedor/acuerdo/presupuesto sobre un documento que no se identificó como factura.
+El hash duplicado puede bloquear independientemente del tipo. El texto del archivo no concede
+instrucciones ni autoridad para aprobar o cambiar su clasificación.
+
+El reanálisis explícito admite una compatibilidad negativa acotada para lecturas históricas sin
+campo de tipo: una advertencia categórica exacta conocida de comprobante de pago móvil, cuatro
+campos críticos desconocidos, hash/identidad de lectura del servidor y modelo permitido. Solo
+puede agregar un bloqueo, nunca acreditar una factura ni habilitar aprobación. La nueva evidencia
+registra `LEGACY_NEGATIVE_WARNING`; no se modifica la extracción ni la decisión histórica ni se
+pretende haber ejecutado OCR nuevo.
+
+### Reanalizar con las reglas actuales
+
+`POST /invoices/:id/reevaluate` requiere OWNER, sesión/CSRF, `Idempotency-Key` y body
+`{ expectedDecisionId, expectedPolicyVersionId }` (ambos obligatorios). Devuelve
+`200 Envelope<InvoiceDetail>`. Reutiliza la lectura guardada y ejecuta el motor con el
+proveedor, acuerdo, política y presupuesto actuales; no invoca OCR ni al modelo.
+Agrega una decisión y un evento `INVOICE_REEVALUATED`; mantiene el documento, la extracción
+y todas las decisiones anteriores. Invalida cualquier solicitud humana pendiente anterior
+y crea una nueva solo si el resultado actual la permite. Una nueva aprobación reserva
+atómicamente mediante los triggers originales; el replay devuelve la misma respuesta.
+
+No reabre facturas ya reservadas ni aprobadas/rechazadas por una persona (`409 APPROVAL_NOT_ALLOWED`).
+Exige una factura decidida con lectura completa; no reinicia trabajos FAILED ni su límite de intentos.
+Lecturas de una versión antigua permanecen en revisión por seguridad. Un cambio de identidad de
+proveedor/acuerdo requiere el flujo de alta/confirmación (`409 INVOICE_IDENTITY_CHANGED`),
+y cambios concurrentes devuelven `409 DECISION_CHANGED`/`POLICY_CHANGED` para actualizar la pantalla.
+El botón del detalle explica que reanaliza reglas y deshabilita los casos protegidos.
+
+El backend permite **tres reanálisis exitosos en total por empresa y SHA-256 del documento**,
+con **60 segundos entre ellos**. El primer procesamiento no consume esta cuota; los reintentos
+técnicos del trabajo conservan su límite independiente de tres intentos y su backoff.
+Se cuenta el historial `INVOICE_REEVALUATED` existente: ni otro usuario, otra sesión, otra clave,
+un cambio de política ni subir los mismos bytes con otro nombre reinician la cuota de reanálisis.
+Un replay con la misma clave devuelve la respuesta original y no consume otro intento.
+
+- `429 REANALYSIS_COOLDOWN`: incluye `Retry-After` con los segundos que faltan. Whady puede
+  deshabilitar temporalmente el botón y mostrar el mensaje del servidor.
+- `409 REANALYSIS_LIMIT_REACHED`: se agotó la cuota de este documento; no se debe reintentar
+  automáticamente ni presentar una cuenta regresiva. No hay reinicio automático de la cuota.
+
+Las validaciones rechazadas y las transacciones fallidas no consumen cuota ni generan una decisión.
+Un trigger D1 aplica ambos límites dentro de la misma transacción: un exceso concurrente revierte
+la decisión, las solicitudes humanas, cualquier reserva y los eventos asociados. Esto limita
+los reanálisis efectivos; no reemplaza un límite general de tráfico HTTP ni de nuevas cargas.
+
+[Comprobación en producción](evaluations/invoices-reanalysis-limits-production-20261017.json):
+un reanálisis de documento sintético devolvió 200, el siguiente inmediato 429 con `Retry-After: 60`
+y el replay 200 sin otra decisión ni cambios en presupuesto. El agotamiento de cuota y las
+carreras entre copias se verifican contra D1 local, sin agotar la cuota de documentos productivos.
 
 Filtros de `GET /invoices`: `status?`, `action?`, `vendorId?`, `needsHumanApproval?` y paginación.
 Los filtros se combinan con AND; `action` consulta la última decisión.
@@ -548,7 +613,7 @@ Mocks mínimos para Whady (no modificar solo el badge: mantener coherentes todos
 | USD 200 sin presupuesto suficiente | `DECIDED` | `BLOCK / BUDGET_EXCEEDED` | `null` |
 | Acuerdo 400 y factura 475 fuera de tolerancia | `DECIDED` | `ESCALATE / AGREEMENT_MISMATCH` | `null`, requiere corregir/aclarar |
 | Monto ilegible | `DECIDED` | `ESCALATE / INVALID_OR_MISSING_DATA` | `null` |
-| Proveedor de extracción caído | `FAILED` | `null` | `null`; `processingError.retryable=true` |
+| Proveedor de extracción caído | `RECEIVED` durante reintentos; `FAILED` al agotarlos | `null` | `null`; error técnico seguro |
 
 La política demo escala discrepancias comerciales para aclaración, pero no permite aprobarlas
 con un botón genérico. No se trata de una excepción autorizable como superar el automático.
@@ -662,7 +727,7 @@ type DelegationProposal = {
 | POST | `/delegations/proposals/detect` | Sin body | `200 Envelope<DelegationProposal[]>` |
 | POST | `/delegations/proposals/:id/reject` | `{ comment }` | `200 Envelope<DelegationProposal>` |
 | POST | `/delegations/proposals/:id/activate` | `{ expectedActivePolicyVersionId, confirmed: true }` | `200 Envelope<{ proposal: DelegationProposal; policy: PolicyVersion }>` |
-| POST | `/invoices/:id/reevaluate` | `{ expectedPolicyVersionId }` | Misma forma 200/202 de `process` |
+
 
 Mutaciones de propuestas requieren OWNER. Activación y reevaluación llevan `Idempotency-Key`;
 la detección no duplica propuestas equivalentes. Sin evidencia suficiente devuelve `data=[]`.
@@ -706,7 +771,7 @@ Mensaje para enviarle a Whady (Oscar lo envía por su canal habitual):
 - [ ] Whady usa los DTOs para onboarding, Home, Bills, detalle, Rules y Approvals; reporta cualquier dato que falte.
 - [ ] Los mocks respetan los nombres, estados, filtros y errores P0 definidos por Oscar.
 - [ ] El frontend distingue decisión, estado técnico y revisión humana.
-- [ ] La UI identifica datos ficticios y pago simulado.
+- [ ] La UI conserva decisiones y motivos operativos; no muestra avisos de demo, datos ficticios o dinero simulado, por decisión de Oscar.
 - [ ] Se integra el contrato a `main`; cada uno continúa su implementación en su rama.
 - [ ] Al implementar, los JSON de ejemplo y los esquemas compartidos se validan juntos.
 
@@ -729,3 +794,13 @@ La sección `/app/integrations` permite vincular y desconectar la cuenta de Tele
 devuelve `201 TelegramLink` con un enlace temporal; `DELETE /integrations/telegram` responde `204`.
 Las rutas mantienen sesión y CSRF. El usuario no envía claves de BotFather ni IDs de empresa.
 El origen de factura también acepta `TELEGRAM`. Ver [flujo, configuración y garantías](TELEGRAM.md).
+
+## Correo de Oli y bandeja de entrada
+
+`GET /integrations/email` devuelve `EmailIntegration`; `POST` habilita una dirección estable
+por empresa y `DELETE` pausa recepción. Habilitar/pausar requiere OWNER, sesión y CSRF.
+`GET /inbox` devuelve `Inbox` con últimos 50 mensajes y `unreadCount`; `POST /inbox/:id/read`
+marca lectura personal con respuesta `204`. Mensajes de otra empresa devuelven `404`.
+Los tipos compartidos son `EmailIntegrationSchema`, `InboxSchema` e `InboxMessageSchema`.
+El origen de factura acepta `EMAIL`. Los documentos siguen usando detalle y procesamiento
+existentes. Ver [configuración, estados y garantías de correo](EMAIL.md).

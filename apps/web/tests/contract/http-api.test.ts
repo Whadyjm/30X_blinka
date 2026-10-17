@@ -19,6 +19,43 @@ const response = (data: unknown) => Response.json({ data });
 afterEach(() => vi.restoreAllMocks());
 
 describe('HTTP shared contract boundary', () => {
+  it('shares email/inbox schemas, preserves EMAIL invoice source and authenticates read/pause commands', async () => {
+    const integration = { available: true, mailbox: { address: 'oli+company@example.invalid', enabled: true, createdAt: '2026-10-17T12:00:00.000Z' } };
+    const message = { id: 'mail-test', sender: 'supplier@example.invalid', subject: 'Factura', receivedAt: '2026-10-17T12:00:00.000Z',
+      state: 'COMPLETED', readAt: null, summary: 'Oli revisó los documentos.', attachments: [{ id: 'att-test', name: 'invoice.pdf', invoiceId: detail.id,
+        status: detail.status, decision: detail.latestDecision.action, explanation: detail.latestDecision.humanExplanation }] };
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
+      const path = String(url);
+      if (path.endsWith('/me')) return response(session);
+      if (init?.method !== 'GET') expect(new Headers(init?.headers).get('X-CSRF-Token')).toBe('csrf-test');
+      if (path.endsWith('/integrations/email')) return init?.method === 'DELETE' ? new Response(null, { status: 204 }) : response(integration);
+      if (path.endsWith('/inbox')) return response({ messages: [message], unreadCount: 1 });
+      if (path.endsWith('/inbox/mail-test/read')) return new Response(null, { status: 204 });
+      return response({ ...detail, source: 'EMAIL' });
+    } });
+    expect((await api.getEmailIntegration()).mailbox?.address).toBe(integration.mailbox.address);
+    expect((await api.enableEmail()).mailbox?.enabled).toBe(true);
+    expect((await api.getInbox()).messages[0]?.id).toBe('mail-test');
+    expect((await api.getInvoice(detail.id)).source).toBe('EMAIL');
+    await api.readInboxMessage('mail-test'); await api.disableEmail();
+  });
+  it('reanalyzes with current policy/decision guards and retains its key after a lost response', async () => {
+    const keys: string[] = []; let attempts = 0;
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
+      if (String(url).endsWith('/me')) return response(session);
+      expect(String(url)).toBe('/api/v1/invoices/test-id/reevaluate');
+      const headers = new Headers(init?.headers);
+      expect(headers.get('X-CSRF-Token')).toBe('csrf-test');
+      expect(JSON.parse(String(init?.body))).toEqual({ expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId });
+      keys.push(headers.get('Idempotency-Key')!);
+      if (++attempts === 1) throw new TypeError('lost response');
+      return response(detail);
+    } });
+    const input = { expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId };
+    await expect(api.reevaluateInvoice('test-id', input)).rejects.toMatchObject({ code: 'NETWORK' });
+    expect((await api.reevaluateInvoice('test-id', input)).decision?.id).toBe(detail.latestDecision.id);
+    expect(keys[0]).toBeTruthy(); expect(keys[1]).toBe(keys[0]);
+  });
   it('uses /session, memory-only CSRF, private file URL, canonical decisions and DELETE logout', async () => {
     const calls: Array<{ path: string; method?: string; headers: Headers }> = [];
     const fetchImpl: typeof fetch = async (input, init) => {
@@ -89,10 +126,10 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
     let current = { vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'WEB-1', amountMinor: 20000, currency: 'USD',
       issuedAt: '2026-10-17', dueDate: '2026-10-31', servicePeriod: '2026-10', description: 'Hosting mensual ficticio', extractionWarnings: [], evidence: [] };
     vi.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => Response.json({ model: JSON.parse(String(init?.body)).model,
-      choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(current) } }] }));
+      choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ ...current, documentType: 'INVOICE' }) } }] }));
     const env = { DB, INVOICES: await runtime.getR2Bucket('INVOICES'), DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner',
       DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: async () => ({ format: 'markdown',
-        data: `EMISOR / SUPPLIER\n${current.vendorName}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };
+        data: `EMISOR / SUPPLIER\n${current.vendorName}\nNúmero / Number\n${current.invoiceNumber}\nEmisión / Issued\n${current.issuedAt}\nPeriodo de servicio\n${current.servicePeriod}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nCONCEPTO / DESCRIPTION\n${current.description}\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };
     let cookie = ''; let loseUpload = false;
     const fetchImpl: typeof fetch = async (input, init) => {
       const headers = new Headers(init?.headers); headers.set('Origin', 'https://oli.invalid'); if (cookie) headers.set('Cookie', cookie);

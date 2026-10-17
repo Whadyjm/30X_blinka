@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bot, CheckSquare, FileText, Home, LogOut, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { Bot, CheckSquare, FileText, Home, Inbox, LogOut, Menu, MessageCircle, Plug, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
-import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { env } from '@/config/env';
-import { useApprovals, useMe } from '@/hooks/queries';
+import { useApprovals, useInbox, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 
@@ -17,6 +16,7 @@ type NavItem = { to: string; label: string; icon: typeof Home; end?: boolean; ba
 export function AppLayout() {
   const { data: me } = useMe();
   const approvals = useApprovals();
+  const inbox = useInbox();
   const pending = approvals.data?.filter((a) => a.state === 'PENDING').length ?? 0;
   const [open, setOpen] = useState(false);
   const qc = useQueryClient();
@@ -24,6 +24,7 @@ export function AppLayout() {
 
   const items: NavItem[] = [
     { to: '/app', label: 'Home', icon: Home, end: true },
+    { to: '/app/inbox', label: 'Inbox', icon: Inbox, badge: inbox.data?.unreadCount ?? 0 },
     { to: '/app/bills', label: 'Bills', icon: FileText },
     { to: '/app/approvals', label: 'Approvals', icon: CheckSquare, badge: pending },
     { to: '/app/rules', label: 'Rules', icon: SlidersHorizontal },
@@ -68,7 +69,6 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
       <div className="flex flex-1">
         <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-white p-4 lg:flex">
           <Link to="/app" className="mb-6 px-1">

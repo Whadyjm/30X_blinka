@@ -8,7 +8,7 @@ import { z } from 'zod';
 export const DecisionActionSchema = z.enum(['APPROVE', 'BLOCK', 'ESCALATE']);
 export type Decision = z.infer<typeof DecisionActionSchema>;
 
-export const InvoiceSourceSchema = z.enum(['HUMAN_UPLOAD', 'AGENT_REQUEST', 'TELEGRAM']);
+export const InvoiceSourceSchema = z.enum(['HUMAN_UPLOAD', 'AGENT_REQUEST', 'TELEGRAM', 'EMAIL']);
 export type InvoiceSource = z.infer<typeof InvoiceSourceSchema>;
 
 export const RoleSchema = z.enum(['owner', 'approver']);
@@ -51,6 +51,8 @@ export const KNOWN_REASON_CODES = [
   'BUDGET_EXCEEDED',
   'MISSING_BUDGET',
   'INVALID_OR_MISSING_DATA',
+  'NOT_AN_INVOICE',
+  'DOCUMENT_TYPE_UNCERTAIN',
   'INVALID_CURRENCY',
   'AGENT_NOT_AUTHORIZED',
   'AGENT_REVOKED',

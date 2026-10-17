@@ -3,7 +3,6 @@ import { Navigate, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import { api, errorMessage } from '@/api';
-import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/Button';
@@ -110,7 +109,6 @@ export function Onboarding() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DemoBanner />
       <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10">
         <div className="mb-8 flex items-center justify-between">
           <Logo />
@@ -134,9 +132,9 @@ export function Onboarding() {
             <div className="space-y-5">
               <div>
                 <h1 className="text-[40px] leading-[1.05]">{t('Meet Oli')}</h1>
-                <p className="mt-2 text-base text-ash">{t('Tell Oli about your (fictitious) company. Use made-up names — this is a demo.')}</p>
+                <p className="mt-2 text-base text-ash">{t('Tell Oli about your company.')}</p>
               </div>
-              <TextField label={t('Company name')} value={company} onChange={(e) => setCompany(e.target.value)} disabled={!!org} placeholder={t('e.g. Northwind Demo Co.')} maxLength={80} />
+              <TextField label={t('Company name')} value={company} onChange={(e) => setCompany(e.target.value)} disabled={!!org} placeholder={t('e.g. Northwind')} maxLength={80} />
               <SelectField label={t('Default currency')} value={currency} onChange={(e) => setCurrency(e.target.value)} disabled={!!org} hint={t('Budgets are kept per currency; Oli never mixes them.')}>
                 {CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </SelectField>

@@ -6,6 +6,7 @@
   "compatibility_date": "2026-10-16",
   "workers_dev": true,
   "preview_urls": false,
+  "addresses": ["oli@ultramare.dev"],
   "routes": [
     {
       "pattern": "oli30x.ultramare.dev",
@@ -37,13 +38,42 @@
     "binding": "AI"
   },
   "vars": {
+    "EMAIL_BASE_ADDRESS": "oli@ultramare.dev",
     "PUBLIC_APP_URL": "https://oli30x.ultramare.dev",
     "DEMO_ORG_ID": "org_demo",
     "DEMO_USER_ID": "user_demo_owner"
   },
   "queues": {
-    "producers": [{ "binding": "TELEGRAM_QUEUE", "queue": "oli-telegram" }],
-    "consumers": [{ "queue": "oli-telegram", "max_batch_size": 1, "max_batch_timeout": 1, "max_retries": 5, "max_concurrency": 2 }]
+    "producers": [
+      { "binding": "EMAIL_QUEUE", "queue": "oli-email" },
+      {
+        "binding": "TELEGRAM_QUEUE",
+        "queue": "oli-telegram"
+      },
+      {
+        "binding": "INVOICE_QUEUE",
+        "queue": "oli-invoices"
+      }
+    ],
+    "consumers": [
+      { "queue": "oli-email", "max_batch_size": 1, "max_batch_timeout": 1, "max_retries": 5, "max_concurrency": 2 },
+      {
+        "queue": "oli-telegram",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 5,
+        "max_concurrency": 2
+      },
+      {
+        "queue": "oli-invoices",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 3,
+        "max_concurrency": 2,
+        "dead_letter_queue": "oli-invoices-dead",
+        "retry_delay": 30
+      }
+    ]
   },
   "assets": {
     "directory": "../web/dist",
@@ -51,6 +81,11 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": [
       "/api/*"
+    ]
+  },
+  "triggers": {
+    "crons": [
+      "* * * * *"
     ]
   }
 }

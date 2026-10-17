@@ -10,9 +10,16 @@ export const PositiveMinorUnitsSchema = MinorUnitsSchema.min(1);
 const NameSchema = z.string().trim().min(1);
 
 export const DecisionActionSchema = z.enum(['APPROVE', 'BLOCK', 'ESCALATE']);
+export const DocumentTypeSchema = z.enum([
+  'INVOICE', 'PAYMENT_RECEIPT', 'DELIVERY_NOTE', 'QUOTE', 'CREDIT_NOTE', 'OTHER', 'UNKNOWN',
+]);
 export const InvoiceStatusSchema = z.enum([
   'RECEIVED', 'PARSING', 'READY', 'PROCESSING', 'DECIDED', 'FAILED',
 ]);
+export const ReevaluateInvoiceSchema = z.strictObject({
+  expectedDecisionId: IdSchema,
+  expectedPolicyVersionId: IdSchema,
+});
 export const RoleSchema = z.enum(['OWNER', 'APPROVER']);
 export const ApprovalStateSchema = z.enum(['PENDING', 'APPROVED', 'REJECTED', 'INVALIDATED']);
 export const PaginationSchema = z.strictObject({
@@ -164,6 +171,7 @@ export const DecisionReasonCodeSchema = z.enum([
   'AMOUNT_ABOVE_HARD_LIMIT', 'BUDGET_EXCEEDED', 'MISSING_BUDGET',
   'INVALID_OR_MISSING_DATA', 'INVALID_CURRENCY', 'HUMAN_APPROVAL_REQUIRED',
   'POLICY_ALLOWED', 'HUMAN_APPROVED', 'HUMAN_REJECTED',
+  'NOT_AN_INVOICE', 'DOCUMENT_TYPE_UNCERTAIN',
 ]);
 export const PolicyDecisionSchema = z.strictObject({
   id: IdSchema,
@@ -233,7 +241,7 @@ export const UploadFileMetadataSchema = z.strictObject({
 export const InvoiceSchema = z.strictObject({
   id: IdSchema,
   status: InvoiceStatusSchema,
-  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM']),
+  source: z.enum(['HUMAN_UPLOAD', 'TELEGRAM', 'EMAIL']),
   file: UploadFileMetadataSchema.extend({
     url: z.string().regex(/^\/api\/v1\/invoices\/[^/?#]+\/file$/),
   }),
@@ -472,3 +480,19 @@ export type ChatAction = z.infer<typeof ChatActionSchema>;
 export type ChatActionInput = z.infer<typeof ChatActionInputSchema>;
 export type ChatCard = z.infer<typeof ChatCardSchema>;
 export type ChatActionResult = z.infer<typeof ChatActionResultSchema>;
+
+export const EmailIntegrationSchema = z.strictObject({
+  available: z.boolean(),
+  mailbox: z.strictObject({ address: z.email(), enabled: z.boolean(), createdAt: TimestampSchema }).nullable(),
+});
+export const InboxMessageSchema = z.strictObject({
+  id: IdSchema, sender: z.string().max(254), subject: z.string().max(200), receivedAt: TimestampSchema,
+  state: z.enum(['RECEIVED','WAITING','COMPLETED','NO_DOCUMENT','FAILED']),
+  readAt: TimestampSchema.nullable(), summary: z.string(),
+  attachments: z.array(z.strictObject({ id: IdSchema, name: z.string(), invoiceId: IdSchema.nullable(),
+    status: InvoiceStatusSchema.nullable(), decision: DecisionActionSchema.nullable(), explanation: z.string().nullable() })).max(4),
+});
+export const InboxSchema = z.strictObject({ messages: z.array(InboxMessageSchema).max(50), unreadCount: MinorUnitsSchema });
+export type EmailIntegration = z.infer<typeof EmailIntegrationSchema>;
+export type InboxMessage = z.infer<typeof InboxMessageSchema>;
+export type Inbox = z.infer<typeof InboxSchema>;
