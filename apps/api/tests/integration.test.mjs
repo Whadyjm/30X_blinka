@@ -7,6 +7,7 @@ import worker from '../worker/index.js';
 import { processInvoice, snapshot } from '../worker/processing.js';
 import { corroboratePdfText, READER_VERSION } from '../worker/document.js';
 import { audit, clearGuard, guard, id, now, originCheck, periodKey, stmt } from '../worker/http.js';
+import { evaluationReport, evaluationSummary } from '../worker/evaluation.js';
 
 const origin = 'https://oli.invalid';
 const pdf = new TextEncoder().encode('%PDF-1.4\nsynthetic integration fixture, provider is mocked');
@@ -72,6 +73,28 @@ async function setup(t) {
   });
   return { env, DB, api, upload, read, ledger, cookie: () => cookie };
 }
+
+test('evaluación publicada: métricas históricas consistentes, procedencia y sesión obligatoria', async t => {
+  const { api, env } = await setup(t);
+  const summary = evaluationSummary(), report = evaluationReport();
+  const source = readFileSync(new URL('../../../' + report.reportPath, import.meta.url));
+  const { createHash } = await import('node:crypto');
+  assert.equal(createHash('sha256').update(source).digest('hex'), report.reportSha256);
+  const run = JSON.parse(source);
+  assert.equal(summary.totalCases, 20);
+  assert.equal(summary.correctDecisions, run.results.filter(row => row.correct).length);
+  assert.equal(summary.unsafeApprovals, run.results.filter(row => row.unsafeApproval).length);
+  assert.equal(summary.correctAutonomy, summary.correctAutonomousCases / 20);
+  assert.equal(summary.explanationCoverage, summary.explainedDecisions / 20);
+  assert.equal(report.workerVersion, run.backendAtStart.version);
+  assert.deepEqual((await api('/evaluation/summary')).data, summary);
+  assert.deepEqual((await api('/evaluation/report')).data.summary, summary);
+  assert.equal(report.targetedP0IncludedInDenominator, false);
+  for (const path of ['/evaluation/summary', '/evaluation/report']) {
+    const denied = await worker.fetch(new Request(origin + '/api/v1' + path), env);
+    assert.equal(denied.status, 401);
+  }
+});
 
 test('sesión protegida, CSRF, origen y logout; no acepta autoridad del navegador', async t => {
   const { api, env } = await setup(t);

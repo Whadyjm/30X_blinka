@@ -311,6 +311,7 @@ excepto health. Se devuelve `404` tanto para recurso inexistente como para recur
 | POST | `/approvals/:id/decision` | Ver abajo | `200 Envelope<{ approval: ApprovalRequest; invoice: InvoiceDetail }>` |
 | GET | `/dashboard` | — | `200 Envelope<Dashboard>` |
 | GET | `/evaluation/summary` | — | `200 Envelope<EvaluationSummary \| null>` |
+| GET | `/evaluation/report` | — | `200 Envelope<PublishedEvaluationReport>` |
 
 `PATCH` de proveedores/acuerdos, `/session`, `/budgets`, `/dashboard` y `/invoices/:id/file`
 completan operaciones que las pantallas necesitan y el mapa del brief no detallaba.
@@ -659,9 +660,21 @@ Las reservas no son transferencias ni importes bancarios pagados.
 
 Sin mandato: `/mandate` devuelve `active=null`; el front muestra configuración inicial.
 Procesar sin mandato activo devuelve `409 MANDATE_REQUIRED`, sin aprobar.
-`/evaluation/summary` devuelve `{ data: null }`: todavía no hay una evaluación end-to-end del corpus
-publicada como métrica del producto. La UI dice «Sin evaluación».
-No mostrar porcentajes o resultados inventados como si fueran mediciones.
+`/evaluation/summary` publica una medición histórica sobre una empresa ficticia y documentos
+etiquetados antes de ejecutar. Los contadores y porcentajes se derivan de sus veinte resultados
+observados; los fallos técnicos permanecen en el denominador. `datasetVersion` identifica la
+muestra ficticia, el alcance real de los lectores/cola y el prefijo de la versión medida. La
+fecha es la del cierre de la corrida, no la hora de esta petición. No describe las facturas de
+la empresa que consulta ni garantiza resultados para todos los formatos.
+
+`/evaluation/report` requiere la misma sesión autenticada y devuelve los metadatos de esa
+medición: `datasetVersion`, `evaluatedAt`, `workerVersion`, `bundleSha256`, `readerVersion`,
+`reportPath`, `reportSha256`, `manifestSha256`, `scope`, `synthetic:true`, `limits`, `cases` y
+`summary`. Cada caso conserva acción esperada, acción inicial/final observada, motivos,
+corrección, autonomía, explicación y fallo técnico. El control adicional P0 queda fuera del
+denominador y se declara con `targetedP0IncludedInDenominator:false`. El detalle no expone
+sesiones, claves ni documentos privados de una organización. Una versión posterior puede
+servir este reporte histórico sin atribuírselo como una nueva corrida.
 
 ## 8. Errores y estados de UI
 

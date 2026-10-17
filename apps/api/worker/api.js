@@ -12,6 +12,7 @@ import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
 import { configureTelegram, createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
 import { disableEmail, emailStatus, enableEmail, inbox, readInboxMessage } from './email.js';
+import { evaluationReport, evaluationSummary } from './evaluation.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -102,7 +103,8 @@ export async function handleApi(request, env) {
       return json({ data: DashboardSchema.parse({ ...invoiceData,
         budgets: await budgets(env.DB, orgId, periodKey(session.organization.timezone)), generatedAt: now(), simulated: true }) });
     }
-    if (path === '/evaluation/summary' && method === 'GET') return json({ data: null });
+    if (path === '/evaluation/summary' && method === 'GET') return json({ data: evaluationSummary() });
+    if (path === '/evaluation/report' && method === 'GET') return json({ data: evaluationReport() });
     throw new HttpError(404, 'NOT_FOUND');
   } catch (error) {
     const known = error instanceof HttpError;
