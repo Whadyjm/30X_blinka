@@ -2,7 +2,47 @@
 
 Se conservan todas las corridas del 17 de octubre de 2026, incluidas las fallidas y la aprobación indebida original. La nueva ejecución completa se presenta por separado.
 
-## Nueva corrida completa después de las correcciones
+## Regresión con clasificación de documento
+
+[Corrida de 50 PDF con clasificación](evaluations/invoices-pdf-2026-10-17T16-24-08-411Z.json).
+Commit `97538b95dd41484e4aade13dedc49b2af424fb4b`, Worker
+`bd70834b-a089-48a7-9b93-d1e2484584a3`, lector
+`labelled-v4:invoice-json-v3-document-type-20261017`. La versión seguía activa al consultar
+los despliegues durante la corrida. Ahora `DOCUMENT_TYPE` precede al control de extracción:
+los tipos identificados como ajenos a una factura bloquean; `UNKNOWN` requiere revisión.
+
+- 50/50 lecturas válidas, todas clasificadas `INVOICE`; cero fallos técnicos.
+- 50/50 decisiones, motivos requeridos y necesidad de autorización humana correctos:
+  17 APPROVE, 14 BLOCK, 19 ESCALATE. Cero aprobaciones indebidas observadas entre las 17 aprobadas.
+- 49/50 documentos con ocho campos exactos: se conserva la abstención de importe en 038,
+  cuya moneda es desconocida. No se cambió la referencia para mejorar la métrica.
+- 50/50 replays y documentos privados verificados; 50 decisiones explicadas. Mediana de lectura
+  3,7535 s; procesamiento aislado completo 4,2425 s, máximo 5,780 s.
+- 50 llamadas exitosas a DeepSeek; coste exitoso reportado USD 0,10664686, con los límites
+  de facturación del reporte. No se usaron reintentos externos.
+
+Se mantienen D1/R2 aislados por escenario y lectores remotos reales. Esta regresión no equivale
+a 50 subidas de navegador ni a 50 recorridos remotos por Queues; tampoco mide precisión general
+de clasificación, pues los 50 documentos originales son facturas.
+
+[Regresión de los ocho documentos adicionales](evaluations/invoices-holdout-2026-10-17T16-24-34-506Z.json):
+8/8 lecturas con ocho campos exactos frente a la referencia v1.1, siete `INVOICE` y una
+`DELIVERY_NOTE` (007). Ninguna lectura tuvo corroboración independiente suficiente: las ocho
+quedaron en revisión del gate de extracción. Aquí no se ejecutó el motor financiero ni se midieron
+autorizaciones. La clasificación es un dato separado; el motor aplica el bloqueo a la nota de entrega.
+Mediana de lectura 3,3855 s y coste exitoso parcial reportado USD 0,017848852. Son resultados de
+regresión sobre documentos ya usados, no un nuevo conjunto reservado ni garantía universal.
+
+[Comprobación puntual en producción](evaluations/invoices-document-type-production-20261017.json):
+el comprobante señalado por Oscar pasó de ESCALATE a BLOCK/NOT_AN_INVOICE mediante una nueva
+decisión. Se conservaron la lectura original y la decisión anterior, con cero reservas del documento.
+El reanálisis decodificó únicamente su advertencia negativa histórica estricta; una lectura fresca
+independiente de esa reevaluación confirmó `PAYMENT_RECEIPT` con el lector nuevo en una llamada.
+La interfaz se comprobó en inglés/escritorio y español/móvil, sin errores ni desbordamiento.
+El reporte omite la imagen y sus datos personales. Esta prueba de un documento no acredita
+exactitud general del clasificador.
+
+## Corrida anterior después de las correcciones
 
 [Reporte de las 50 facturas](evaluations/invoices-pdf-2026-10-17T15-49-27-321Z.json).
 Código desplegado: commit `2b0cc02dccfd971e869e0d7b7f61bcc7f67662b2`, Worker

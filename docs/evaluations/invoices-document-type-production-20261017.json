@@ -1,0 +1,57 @@
+{
+  "testedAt": "2026-10-17T16:24:31.791Z",
+  "scope": "LIVE_PRODUCTION_REEVALUATION_AND_BROWSER_WITH_SEPARATE_FRESH_READER_CHECK",
+  "workerVersion": "bd70834b-a089-48a7-9b93-d1e2484584a3",
+  "sourceCommit": "97538b95dd41484e4aade13dedc49b2af424fb4b",
+  "target": "https://oli30x.ultramare.dev",
+  "case": "User-confirmed payment receipt previously escalated for missing invoice fields",
+  "reanalysis": {
+    "previousAction": "ESCALATE",
+    "latestAction": "BLOCK",
+    "reasons": [
+      "NOT_AN_INVOICE",
+      "INVALID_OR_MISSING_DATA"
+    ],
+    "decisionCountBefore": 1,
+    "decisionCountAfter": 2,
+    "originalReadUnchanged": true,
+    "originalReadSha256": "5222ec396abd755f0005a1e204c36ab4556712e4f6f0ee851655745dd6cfdfd5",
+    "classificationSource": "LEGACY_NEGATIVE_WARNING",
+    "documentType": "PAYMENT_RECEIPT",
+    "budgetReservationsForDocument": 0,
+    "originalDocumentReplaced": false
+  },
+  "browser": {
+    "desktopEnglish": {
+      "disabled": false,
+      "overflow": false
+    },
+    "mobileSpanish": {
+      "disabled": false,
+      "overflow": false
+    },
+    "protectedApprovedDocument": {
+      "disabled": true,
+      "overflow": false
+    },
+    "errors": [],
+    "reevaluationRequestsDuringReadOnlyVisualVerification": 0
+  },
+  "freshReader": {
+    "testedAt": "2026-10-17T16:25:24.859Z",
+    "scope": "FRESH_READER_CLASSIFICATION_ONLY_NO_INVOICE_MUTATION",
+    "documentType": "PAYMENT_RECEIPT",
+    "source": "PRIMARY_READER",
+    "readerVersion": "labelled-v4:invoice-json-v3-document-type-20261017",
+    "model": "deepseek/deepseek-v4.1-flash",
+    "attempts": 1,
+    "hashMatches": true,
+    "originalReadReplaced": false,
+    "financialDecisions": "NOT_EVALUATED"
+  },
+  "limits": [
+    "Single production document; not a general classification accuracy measurement",
+    "Reevaluation uses a strict decoder of the existing negative warning; fresh read was a separate validation and did not replace stored facts",
+    "No receipt contents, image, personal data or credentials included in this report"
+  ]
+}
