@@ -5,12 +5,14 @@ import { brand } from '@/config/brand';
 import { env } from '@/config/env';
 import { t } from '@/i18n';
 
-/** Always visible. Required by the brief: nobody should think real money is moving. */
+/** Development controls for explicitly selected mock mode. */
 export function DemoBanner() {
   const [controls, setControls] = useState<Awaited<ReturnType<typeof mockControls>>>(null);
   useEffect(() => {
     void mockControls().then(setControls);
   }, []);
+
+  if (env.apiMode !== 'mock') return null;
 
   return (
     <div className="flex flex-wrap items-center justify-start gap-x-5 gap-y-1 bg-obsidian px-4 py-2 text-[11px] uppercase tracking-[0.05em] text-white sm:justify-center" role="note">
