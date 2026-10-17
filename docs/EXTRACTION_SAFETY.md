@@ -36,7 +36,14 @@ Modelo inicial elegido por Oscar: **`deepseek/deepseek-v4.1-flash` vía OpenRout
 El catálogo consultado declara entrada de imagen/texto y salida estructurada. El adapter debe
 usar esa variante visual concreta; otros modelos de la familia no necesariamente leen imágenes.
 Para PDF, renderizar páginas a imágenes y conservar el texto extraído como canal de corroboración.
-La elección no demuestra precisión OCR: todavía faltan adapter, ejecución real y evaluación.
+`packages/extraction` implementa esa lectura con B `z-ai/glm-5.3-flash` y C
+`minimax/minimax-m3`. Máximo tres llamadas, 12 s por intento y 40 s de límite global
+para conservar una ventana completa para C después de dos timeouts.
+Solo red/timeout/HTTP 404/408/429/5xx activan respaldo. Incertidumbre válida,
+rechazo del modelo o salida inválida no se ocultan cambiando de modelo.
+Los tres comparten OpenRouter; no cubren una caída global del gateway.
+La elección y las pruebas simuladas no demuestran precisión OCR: falta evaluación
+del corpus y conectar corroboración independiente al motor.
 La clave del Worker es `OPENROUTER_API_KEY`; no se incluye su valor en código, documentos o frontend.
 
 ## 2. Responsabilidad de cada capa
@@ -151,7 +158,7 @@ El runner compara después con las respuestas etiquetadas y registra todas las e
 | Corroboración | Campos críticos discrepantes, fuente distinta, lectura repetida, warnings y datos incompletos | Implementado con datos simulados de adapters |
 | D1 | Presupuesto concurrente, doble reserva, rollback e integridad del historial | Implementado en D1 local |
 | Parsing | Formatos monetarios/fechas, totales múltiples, aritmética y PDF texto/vista | Pendiente |
-| Extractor real | PDF y PNG contra dataset etiquetado, fallos y prompt injection | Pendiente; proveedor sin integrar |
+| Extractor real | PDF y PNG contra dataset etiquetado, fallos y prompt injection | Diez PNG evaluados; discrepancia de importe y un timeout detectados. PDF y perturbaciones pendientes. Ver `EXTRACTION_EVALUATION.md` |
 | Motor | Cada caso normal/trampa y contexto independiente | Pendiente |
 | End-to-end | Archivo → corroboración → decisión → D1 → frontend | Pendiente |
 
@@ -174,9 +181,9 @@ Las pruebas de contrato/persistencia no pueden presentarse como precisión OCR n
 
 ## 8. Secuencia de implementación y demo en vivo
 
-1. **Ahora:** regla de corroboración compartida y este plan, sin cambiar el contrato público P0.
+1. **Implementado:** regla de corroboración, adapter visual A/B/C y prueba privada PNG/JPEG del Worker; sin cambiar el contrato público P0.
 2. **Siguiente:** motor determinista y pruebas del reto, incluyendo el bloqueo por extracción no corroborada.
-3. **Después:** conectar/probar los adapters visual + texto/OCR con PDF/PNG reales del corpus ficticio y el modelo elegido.
+3. Completar renderizado PDF y canal independiente de texto/OCR; evaluar el corpus ficticio con el modelo elegido.
 4. Construir parsing seguro y evidencia por campo; conectar ambos canales al guard y al motor.
 5. Integrar API/D1/frontend y correr evaluación end-to-end antes de publicar métricas.
 6. Ensayar la demo completa y comprobar en el entorno desplegado las mismas reglas y fallos.
