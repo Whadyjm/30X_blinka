@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-17",
+  "scope": "Pruebas locales de UI con datos ficticios y API mock; no evaluación del extractor ni del motor",
+  "changes": [
+    "Cola de atención con NEEDS_APPROVAL, NEEDS_REVIEW y FAILED; bloqueadas y resueltas fuera de la cola",
+    "Orden por vencimiento y luego antigüedad; sin fecha al final; urgencia hasta dos días",
+    "Presupuesto disponible/reservado del periodo y montos aprobados separados por moneda",
+    "Aprobadas y bloqueadas en resumen compacto; actividad e inbox secundarios",
+    "Estados vacíos y de procesamiento, expansión de pendientes y traducción ES/EN"
+  ],
+  "verification": {
+    "frontend_suite": {
+      "command": "npm --prefix apps/web test",
+      "files_passed": 8,
+      "tests_passed": 33
+    },
+    "dashboard_regressions": {
+      "command": "npm --prefix apps/web test -- tests/dashboard/briefing.test.ts",
+      "tests_passed": 7
+    },
+    "build": "npm --prefix apps/web run build: PASS (TypeScript + Vite)",
+    "i18n": "847 claves ES, literales cubiertos",
+    "design_detector": "Sin hallazgos en targets cambiados",
+    "browser": {
+      "scope": "Pruebas locales de UI con datos ficticios y API mock; no evaluación del extractor ni del motor",
+      "checks": [
+        "Aprobación, revisión y fallo visibles con motivo y acción; bloqueadas fuera de pendientes; urgencia y orden por fecha",
+        "Acción de error abre el detalle de la factura, sin ejecutar cambios",
+        "Estado empty verificado",
+        "Estado processing verificado",
+        "Estado settled verificado",
+        "Estado blocked-only verificado",
+        "Estado review-only verificado",
+        "Estado failed-only verificado",
+        "Inglés, expansión y colapso con teclado, sin fecha al final, texto largo y presupuesto cero"
+      ],
+      "errors": [],
+      "mutations": [],
+      "missingTranslations": []
+    },
+    "viewports": [
+      {
+        "width": 1440,
+        "height": 1000
+      },
+      {
+        "width": 768,
+        "height": 1000
+      },
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 320,
+        "height": 844
+      }
+    ]
+  },
+  "artifacts": ".impeccable/review/dashboard-attention/",
+  "limitations": [
+    "Navegador con API mock y datos ficticios; no validación del extractor ni decisiones del motor en producción",
+    "Sin despliegue ni cambios a políticas o autorizaciones",
+    "Se preservó trabajo concurrente; es.ts también contiene cambios ajenos previos"
+  ]
+}

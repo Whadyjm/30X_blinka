@@ -1,251 +1,149 @@
-import type { ReactNode } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { Ban, CalendarClock, CheckCircle2, Hand, Upload } from 'lucide-react';
+import { ArrowRight, Ban, CalendarClock, CheckCircle2, Clock3, Upload } from 'lucide-react';
 import { OutcomeBadge } from '@/components/Badges';
 import { buttonClass } from '@/components/ui/Button';
-import { Beam } from '@/components/ui/Beam';
-import { Card, CardHeader, EmptyState, ErrorState, Skeleton } from '@/components/ui/Card';
-import { brand } from '@/config/brand';
+import { Card, CardHeader, EmptyState, ErrorState, PageHeader, Skeleton } from '@/components/ui/Card';
+import type { InvoiceSummary } from '@/contracts';
+import { reasonInfo } from '@/contracts/reasons';
+import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
+import { InboxPreview } from '@/features/integrations/InboxPreview';
 import { useInvoices, useMandate } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { buildBriefing, computeStats } from '@/lib/briefing';
-import { dueLabel, isOverdue } from '@/lib/dates';
-import { formatMoney } from '@/lib/money';
+import { daysUntil, dueLabel } from '@/lib/dates';
+import { formatMoneyWithCode } from '@/lib/money';
 import { getOutcome } from '@/lib/outcome';
-import { InvoiceList, invoiceTitle } from '@/features/invoices/InvoiceList';
-import { InboxPreview } from '@/features/integrations/InboxPreview';
 
 export function Dashboard() {
   const invoices = useInvoices();
   const mandate = useMandate();
+  const [showAll, setShowAll] = useState(false);
   if (invoices.isError) return <ErrorState error={invoices.error} onRetry={() => void invoices.refetch()} />;
   const list = invoices.data ?? [];
   const stats = computeStats(list);
-  const briefing = buildBriefing(stats);
   const budget = mandate.data?.budget;
-  const used = budget && budget.limitMinor > 0 ? Math.min(100, Math.round((budget.reservedMinor / budget.limitMinor) * 100)) : null;
-  return (<div className="space-y-8">
-      <section id="organization-overview" aria-label={t('Overview')} className="space-y-6">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-normal text-ink">{t('Organization Overview')}</h2>
-            <p className="text-sm text-slate-500">
-              {t('Live activity evaluated against your finance mandate.')}
-            </p>
-          </div>
-          <Beam>
-            <Link to="/app/bills" className={buttonClass('primary', 'md')}>
-              <Upload className="size-4" aria-hidden /> {t('Upload invoices')}
-            </Link>
-          </Beam>
-        </div>
+  const used = budget && budget.limitMinor > 0
+    ? Math.min(100, Math.round((budget.reservedMinor / budget.limitMinor) * 100))
+    : budget && budget.reservedMinor > 0 ? 100 : 0;
+  const urgent = stats.attention.filter(inv => {
+    const days = daysUntil(inv.dueDate);
+    return days != null && days <= 2;
+  }).length;
 
-        {/* 4 Summary Stat Cards */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Stat
-            loading={invoices.isLoading}
-            label={t('Approved invoices')}
-            value={stats.approvedCount}
-            icon={<CheckCircle2 className="size-5" />}
-            tone="emerald"
-            to="/app/bills?outcome=APPROVED"
-          />
-          <Stat
-            loading={invoices.isLoading}
-            label={t('Blocked')}
-            value={stats.blockedCount}
-            icon={<Ban className="size-5" />}
-            tone="rose"
-            to="/app/bills?outcome=BLOCKED"
-          />
-          <Stat
-            loading={invoices.isLoading}
-            label={t('Needs you')}
-            value={stats.needsYouCount}
-            icon={<Hand className="size-5" />}
-            tone="amber"
-            to="/app/approvals"
-          />
-          <Stat
-            loading={invoices.isLoading}
-            label={t('Due in 14 days')}
-            value={stats.upcoming.length}
-            icon={<CalendarClock className="size-5" />}
-            tone="indigo"
-            to="/app/bills"
-          />
-        </div>
+  return (
+    <section id="organization-overview" aria-label={t('Dashboard')}>
+      <PageHeader
+        title={t('Dashboard')}
+        subtitle={invoices.isLoading ? t('Decisions, reviews and available budget.') : buildBriefing(stats)[0]}
+        actions={<Link to="/app/bills" className={buttonClass('secondary', 'md')}><Upload className="size-4" aria-hidden />{t('Upload invoices')}</Link>}
+      />
 
-        {/* 2 Column + 1 Column Layout */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Primary Column (2 cols) */}
-          <div className="space-y-6 lg:col-span-2">
-            <InboxPreview />
+      <div className="grid items-start gap-6 lg:grid-cols-3">
+        <Card className={`min-w-0 lg:col-span-2 ${stats.needsYouCount > 0 ? 'border-ink' : ''}`}>
+          <CardHeader
+            title={t('Needs your attention')}
+            subtitle={t('Earliest due dates first. Review the reason for each case.')}
+            action={!invoices.isLoading && stats.needsYouCount > 0 ? <span className="shrink-0 rounded-md bg-ink px-2.5 py-1 text-sm tabular-nums text-white">{stats.needsYouCount}</span> : undefined}
+          />
+          {invoices.isLoading ? <LoadingRows /> : list.length === 0 ? (
+            <EmptyState title={t('Start with your first invoice')} body={t('Upload your first invoice and Oli will review it against your rules.')} action={<Link to="/app/bills" className={buttonClass('primary')}>{t('Upload invoices')}</Link>} />
+          ) : stats.needsYouCount === 0 ? (
+            <EmptyState
+              icon={stats.processingCount > 0 ? <Clock3 className="size-6" aria-hidden /> : <CheckCircle2 className="size-6" aria-hidden />}
+              title={t('No pending interventions.')}
+              body={stats.processingCount > 0
+                ? t('Oli is still processing invoices. Their decisions will appear here.')
+                : t('Review recorded decisions below, including why each invoice was approved or blocked.')}
+              action={stats.processingCount > 0 ? <Link to="/app/bills?outcome=PROCESSING" className="text-sm underline underline-offset-4">{t('View processing invoices')}</Link> : undefined}
+            />
+          ) : (
+            <>
+              {urgent > 0 && <p className="flex items-center gap-2 border-b border-hairline bg-bone px-5 py-3 text-sm text-ink"><CalendarClock className="size-4 shrink-0" aria-hidden />{urgent === 1 ? t('1 pending invoice is overdue or due within 2 days.') : t('{n} pending invoices are overdue or due within 2 days.', { n: urgent })}</p>}
+              <ul className="divide-y divide-hairline">
+                {(showAll ? stats.attention : stats.attention.slice(0, 5)).map(inv => <AttentionRow key={inv.id} invoice={inv} />)}
+              </ul>
+              {stats.needsYouCount > 5 && <div className="border-t border-hairline px-5 py-3"><button type="button" aria-expanded={showAll} onClick={() => setShowAll(value => !value)} className="min-h-11 text-sm underline underline-offset-4">{showAll ? t('Show fewer') : t('Show all {n} pending invoices', { n: stats.needsYouCount })}</button></div>}
+            </>
+          )}
+        </Card>
 
-            <Card>
-              <CardHeader
-                title={t('Recent activity')}
-                action={
-                  <Link to="/app/bills" className="text-sm text-ink underline underline-offset-2">
-                    {t('View all')}
+        <aside className="min-w-0 space-y-6 lg:row-span-3" aria-label={t('Budget and decisions')}>
+          <Card className="p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-base text-ink">{t('Available budget')}</h2>
+              {budget && <span className="text-xs text-ash">{budget.periodKey}</span>}
+            </div>
+            {mandate.isLoading ? <Skeleton className="mt-4 h-20" /> : mandate.isError ? <ErrorState error={mandate.error} onRetry={() => void mandate.refetch()} /> : budget ? (
+              <>
+                <p className="mt-3 break-words text-2xl tabular-nums text-ink">{formatMoneyWithCode(Math.max(0, budget.limitMinor - budget.reservedMinor), budget.currency)}</p>
+                <p className="mt-1 text-sm text-ash">{t('of {total} for the period', { total: formatMoneyWithCode(budget.limitMinor, budget.currency) })}</p>
+                <div className="mt-4 h-2 overflow-hidden rounded-sm bg-bone" role="progressbar" aria-valuenow={used} aria-valuemin={0} aria-valuemax={100} aria-label={t('Budget reserved')}>
+                  <div className="h-full bg-ink" style={{ width: `${used}%` }} />
+                </div>
+                <p className="mt-2 text-xs text-ash">{t('{amount} reserved', { amount: formatMoneyWithCode(budget.reservedMinor, budget.currency) })}</p>
+              </>
+            ) : <p className="mt-3 text-sm text-ash">{t('No budget is configured for this period.')}</p>}
+            <Link to="/app/rules" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm underline underline-offset-4">{t('View rules')}<ArrowRight className="size-4" aria-hidden /></Link>
+          </Card>
+
+          <Card>
+            <CardHeader title={t('Recorded decisions')} subtitle={t('Counts across your invoices.')} />
+            {invoices.isLoading ? <LoadingRows /> : (
+              <>
+                <div className="divide-y divide-hairline">
+                  <Link to="/app/bills?outcome=APPROVED" className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 hover:bg-bone">
+                    <span className="flex items-center gap-2 text-sm"><CheckCircle2 className="size-4" aria-hidden />{t('Approved invoices')}</span><span className="text-xl tabular-nums">{stats.approvedCount}</span>
                   </Link>
-                }
-              />
-              {invoices.isLoading ? (
-                <div className="space-y-3 p-5">
-                  {[0, 1, 2].map((i) => (
-                    <Skeleton key={i} className="h-10" />
-                  ))}
+                  <Link to="/app/bills?outcome=BLOCKED" className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 hover:bg-bone">
+                    <span className="flex items-center gap-2 text-sm"><Ban className="size-4" aria-hidden />{t('Blocked invoices')}</span><span className="text-xl tabular-nums">{stats.blockedCount}</span>
+                  </Link>
+                  {stats.processingCount > 0 && <Link to="/app/bills?outcome=PROCESSING" className="flex min-h-14 items-center justify-between gap-3 px-5 py-3 hover:bg-bone"><span className="flex items-center gap-2 text-sm"><Clock3 className="size-4" aria-hidden />{t('Processing')}</span><span className="text-xl tabular-nums">{stats.processingCount}</span></Link>}
                 </div>
-              ) : list.length === 0 ? (
-                <EmptyState
-                  title={t('No invoices yet')}
-                  body={t('Upload your first invoice and Oli will review it against your rules.')}
-                  action={
-                    <Link to="/app/bills" className={buttonClass('primary')}>
-                      {t('Upload invoices')}
-                    </Link>
-                  }
-                />
-              ) : (
-                <InvoiceList invoices={list.slice(0, 6)} compact />
-              )}
-            </Card>
-          </div>
-
-          {/* Secondary Column (1 col) */}
-          <div className="space-y-6">
-            {/* Briefing Card */}
-            <Card className="border-obsidian bg-obsidian text-white">
-              <div className="p-5">
-                <h3 className="caption !text-slate-400">
-                  {t('{name}’s briefing', { name: brand.name })}
-                </h3>
-                {invoices.isLoading ? (
-                  <Skeleton className="mt-3 h-16 opacity-30" />
-                ) : (
-                  <ul className="mt-3 space-y-2 text-sm leading-relaxed text-white">
-                    {briefing.map((line, i) => (
-                      <li key={i}>{line}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </Card>
-
-            {/* Budget Progress Card */}
-            {budget && used != null && (
-              <Card className="p-5">
-                <div className="flex items-baseline justify-between">
-                  <h3 className="text-sm text-ink">
-                    {t('Budget · {period}', { period: budget.periodKey })}
-                  </h3>
-                  <span className="text-xs text-slate-500">{t('{n}% reserved', { n: used })}</span>
-                </div>
-                <div
-                  className="mt-3 h-2 overflow-hidden rounded-sm bg-bone ring-1 ring-inset ring-hairline"
-                  role="progressbar"
-                  aria-valuenow={used}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={t('Budget reserved')}
-                >
-                  <div
-                    className={used >= 70 ? 'h-full bg-ink' : 'h-full bg-highlighter'}
-                    style={{ width: `${used}%` }}
-                  />
-                </div>
-                <p className="mt-2 text-sm text-slate-600">
-                  {t('{left} left of {total}', {
-                    left: formatMoney(Math.max(0, budget.limitMinor - budget.reservedMinor), budget.currency),
-                    total: formatMoney(budget.limitMinor, budget.currency),
-                  })}
-                </p>
-              </Card>
+                {stats.approvedCount > 0 && <div className="space-y-1 border-t border-hairline px-5 py-4"><p className="text-xs text-ash">{t('Approved amounts by currency')}</p>{Object.entries(stats.approvedMinor).map(([currency, amount]) => <p key={currency} className="text-sm tabular-nums">{formatMoneyWithCode(amount, currency)}</p>)}</div>}
+              </>
             )}
+          </Card>
+        </aside>
 
-            {/* Coming Due Card */}
-            <Card>
-              <CardHeader title={t('Coming due')} />
-              {stats.upcoming.length === 0 && stats.overdue.length === 0 ? (
-                <p className="px-5 py-6 text-sm text-slate-500">
-                  {t('Nothing due in the next two weeks.')}
-                </p>
-              ) : (
-                <ul className="divide-y divide-hairline">
-                  {[...stats.overdue, ...stats.upcoming].slice(0, 5).map((inv) => (
-                    <li key={inv.id}>
-                      <Link
-                        to={`/app/bills/${inv.id}`}
-                        className="flex items-center justify-between gap-3 px-5 py-3 hover:bg-bone"
-                      >
-                        <div className="min-w-0">
-                          <p className="truncate text-sm text-ink">{invoiceTitle(inv)}</p>
-                          <p
-                            className={`text-xs ${
-                              isOverdue(inv.dueDate)
-                                ? 'text-ink underline decoration-dotted underline-offset-2'
-                                : 'text-slate-500'
-                            }`}
-                          >
-                            {dueLabel(inv.dueDate)}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm tabular-nums text-ink">
-                            {formatMoney(inv.amountMinor, inv.currency)}
-                          </p>
-                          <OutcomeBadge outcome={getOutcome(inv)} className="mt-1" />
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-          </div>
-        </div>
-      </section>
-    </div>
+        <Card className="min-w-0 lg:col-span-2">
+          <CardHeader title={t('Recent activity')} action={<Link to="/app/bills" className="shrink-0 text-sm underline underline-offset-4">{t('View all')}</Link>} />
+          {invoices.isLoading ? <LoadingRows /> : list.length === 0 ? <p className="px-5 py-6 text-sm text-ash">{t('Recorded decisions will appear here after you upload an invoice.')}</p> : <div className="overflow-x-auto"><InvoiceList invoices={list.slice(0, 5)} compact /></div>}
+        </Card>
+        <div className="min-w-0 lg:col-span-2"><InboxPreview /></div>
+      </div>
+    </section>
   );
 }
 
-const TONES = {
-  emerald: 'bg-highlighter text-ink',
-  rose: 'bg-ink text-white',
-  amber: 'bg-white text-ink ring-1 ring-inset ring-ink',
-  indigo: 'bg-bone text-ink',
-} as const;
-
-function Stat({
-  label,
-  value,
-  icon,
-  tone,
-  to,
-  loading,
-}: {
-  label: string;
-  value: number;
-  icon: ReactNode;
-  tone: keyof typeof TONES;
-  to: string;
-  loading?: boolean;
-}) {
+function AttentionRow({ invoice }: { invoice: InvoiceSummary }) {
+  const outcome = getOutcome(invoice);
+  const days = daysUntil(invoice.dueDate);
+  const urgent = days != null && days <= 2;
+  const reason = outcome === 'FAILED'
+    ? invoice.failureReason || t('Processing failed. Open the invoice to review the error.')
+    : invoice.decision?.explanation || invoice.approval?.reason || (invoice.decision?.reasons[0] ? reasonInfo(invoice.decision.reasons[0]).label : t('Open the invoice to review what needs attention.'));
+  const action = outcome === 'NEEDS_APPROVAL' ? t('Review request') : outcome === 'FAILED' ? t('View error') : t('Review details');
   return (
-    <Link
-      to={to}
-      className="rounded-2xl border border-hairline bg-white p-5 transition-colors hover:border-ink"
-    >
-      <div className={`grid size-9 place-items-center rounded-lg ${TONES[tone]}`} aria-hidden>
-        {icon}
-      </div>
-      {loading ? (
-        <Skeleton className="mt-3 h-8 w-12" />
-      ) : (
-        <p className="mt-3 text-[28px] leading-none tabular-nums text-ink">{value}</p>
-      )}
-      <p className="mt-1 text-sm text-slate-500">{label}</p>
-    </Link>
+    <li>
+      <Link to={`/app/bills/${invoice.id}`} className="group block px-5 py-4 hover:bg-bone">
+        <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0 flex-1 basis-48">
+            <h3 className="break-words text-base text-ink group-hover:underline group-hover:underline-offset-4">{invoiceTitle(invoice)}</h3>
+            {invoice.invoiceNumber && <p className="mt-0.5 break-all text-xs text-ash">{invoice.invoiceNumber}</p>}
+          </div>
+          <p className="text-base tabular-nums text-ink">{formatMoneyWithCode(invoice.amountMinor, invoice.currency)}</p>
+        </div>
+        <p className="mt-2 break-words text-sm leading-relaxed text-slate-600">{reason}</p>
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2"><OutcomeBadge outcome={outcome} /><span className={`text-xs ${urgent ? 'text-ink underline decoration-dotted underline-offset-4' : 'text-ash'}`}>{dueLabel(invoice.dueDate)}</span></div>
+          <span className="inline-flex items-center gap-1.5 text-sm text-ink">{action}<ArrowRight className="size-4" aria-hidden /></span>
+        </div>
+      </Link>
+    </li>
   );
+}
+
+function LoadingRows() {
+  return <div className="space-y-3 p-5" role="status" aria-label={t('Loading')}>{[0, 1, 2].map(i => <Skeleton key={i} className="h-12" />)}</div>;
 }

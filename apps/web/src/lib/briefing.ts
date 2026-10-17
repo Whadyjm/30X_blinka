@@ -1,7 +1,7 @@
 import type { InvoiceSummary } from '@/contracts';
 import { t } from '@/i18n';
 import { daysUntil } from './dates';
-import { formatMoney } from './money';
+import { formatMoneyWithCode } from './money';
 import { getOutcome } from './outcome';
 
 export type Stats = {
@@ -9,13 +9,15 @@ export type Stats = {
   approvedMinor: Record<string, number>;
   blockedCount: number;
   needsYouCount: number;
+  attention: InvoiceSummary[];
+  processingCount: number;
   upcoming: InvoiceSummary[];
   overdue: InvoiceSummary[];
 };
 
 /** Counts derived from the server's invoice list. The "briefing" below reads these — never invented text. */
 export function computeStats(invoices: InvoiceSummary[], today: Date = new Date()): Stats {
-  const stats: Stats = { approvedCount: 0, approvedMinor: {}, blockedCount: 0, needsYouCount: 0, upcoming: [], overdue: [] };
+  const stats: Stats = { approvedCount: 0, approvedMinor: {}, blockedCount: 0, needsYouCount: 0, attention: [], processingCount: 0, upcoming: [], overdue: [] };
   for (const inv of invoices) {
     const o = getOutcome(inv);
     if (o === 'APPROVED') {
@@ -24,14 +26,22 @@ export function computeStats(invoices: InvoiceSummary[], today: Date = new Date(
         stats.approvedMinor[inv.currency] = (stats.approvedMinor[inv.currency] ?? 0) + inv.amountMinor;
       }
     } else if (o === 'BLOCKED') stats.blockedCount++;
-    else if (o === 'NEEDS_APPROVAL') stats.needsYouCount++;
+    else if (o === 'PROCESSING') stats.processingCount++;
 
-    // Due-date calendar: only invoices that are not terminally rejected/blocked.
-    if (o === 'APPROVED' || o === 'NEEDS_APPROVAL') {
+    // Attention is distinct from a completed decision, including a correct block.
+    if (o === 'NEEDS_APPROVAL' || o === 'NEEDS_REVIEW' || o === 'FAILED') {
+      stats.attention.push(inv);
       const n = daysUntil(inv.dueDate, today);
       if (n != null) (n < 0 ? stats.overdue : n <= 14 ? stats.upcoming : []).push(inv);
     }
   }
+  stats.needsYouCount = stats.attention.length;
+  stats.attention.sort((a, b) => {
+    const dueA = daysUntil(a.dueDate, today) ?? Infinity;
+    const dueB = daysUntil(b.dueDate, today) ?? Infinity;
+    return dueA === dueB ? a.receivedAt.localeCompare(b.receivedAt) : dueA - dueB;
+  });
+  stats.overdue.sort((a, b) => (a.dueDate ?? '').localeCompare(b.dueDate ?? ''));
   stats.upcoming.sort((a, b) => (a.dueDate ?? '').localeCompare(b.dueDate ?? ''));
   return stats;
 }
@@ -41,15 +51,20 @@ export function buildBriefing(stats: Stats, today: Date = new Date()): string[] 
   if (stats.needsYouCount > 0) {
     lines.push(
       stats.needsYouCount === 1
-        ? t('1 invoice needs your decision — everything else is on track.')
-        : t('{n} invoices need your decision — everything else is on track.', { n: stats.needsYouCount }),
+        ? t('1 invoice needs your attention.')
+        : t('{n} invoices need your attention.', { n: stats.needsYouCount }),
     );
   } else {
-    lines.push(t('Nothing is waiting on you right now.'));
+    lines.push(t('No pending interventions.'));
+  }
+  if (stats.processingCount > 0) {
+    lines.push(stats.processingCount === 1
+      ? t('1 invoice is still processing.')
+      : t('{n} invoices are still processing.', { n: stats.processingCount }));
   }
   if (stats.approvedCount > 0) {
     const totals = Object.entries(stats.approvedMinor)
-      .map(([cur, minor]) => formatMoney(minor, cur))
+      .map(([cur, minor]) => formatMoneyWithCode(minor, cur))
       .join(' + ');
     lines.push(
       totals
