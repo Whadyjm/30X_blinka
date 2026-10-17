@@ -205,7 +205,7 @@
 }
 
 @media (min-width: 1024px) {
-  .oli-chat { height: min(840px, calc(100dvh - 64px)); min-height: 560px; }
+  .oli-chat { height: calc(100dvh - 48px); }
 }
 
 /* Moderate, utility-focused motion: color/background/border only. */

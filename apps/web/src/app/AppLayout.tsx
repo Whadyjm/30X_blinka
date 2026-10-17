@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Link, NavLink, Outlet, useNavigate } from 'react-router';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bot, CheckSquare, FileText, Home, Inbox, LogOut, Menu, MessageCircle, Plug, Settings, SlidersHorizontal, Trophy, X } from 'lucide-react';
+import { Bot, CheckSquare, FileText, Inbox, LayoutDashboard, LogOut, Menu, MessageCircle, Plug, Settings, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -12,10 +12,12 @@ import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 
 // `label` is an English i18n key, translated at render time.
-type NavItem = { to: string; label: string; icon: typeof Home; end?: boolean; badge?: number };
+type NavItem = { to: string; label: string; icon: typeof MessageCircle; end?: boolean; badge?: number };
 
 export function AppLayout() {
   const nav = useNavigate();
+  const location = useLocation();
+  const isChat = location.pathname === '/app' || location.pathname === '/app/';
   const qc = useQueryClient();
   const { data: me } = useMe();
   const approvals = useApprovals();
@@ -33,7 +35,8 @@ export function AppLayout() {
   };
 
   const items: NavItem[] = [
-    { to: '/app', label: 'Home', icon: Home, end: true },
+    { to: '/app', label: 'Ask Oli', icon: MessageCircle, end: true },
+    { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/app/inbox', label: 'Inbox', icon: Inbox, badge: inbox.data?.unreadCount ?? 0 },
     { to: '/app/bills', label: 'Bills', icon: FileText },
     { to: '/app/approvals', label: 'Approvals', icon: CheckSquare, badge: pending },
@@ -42,7 +45,6 @@ export function AppLayout() {
     { to: '/app/evaluation', label: 'Evaluation', icon: Trophy },
     { to: '/app/settings', label: 'Settings', icon: Settings },
     ...(env.features.agentAccess ? [{ to: '/app/agent-access', label: 'Agent access', icon: Bot }] : []),
-    ...(env.features.chat ? [{ to: '/app/chat', label: 'Chat', icon: MessageCircle }] : []),
   ];
 
   const links = (
@@ -112,7 +114,7 @@ export function AppLayout() {
               </button>
             </div>
           )}
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <main className={cn('mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8', isChat && 'pb-0 lg:pb-6')}>
             <Outlet />
           </main>
         </div>

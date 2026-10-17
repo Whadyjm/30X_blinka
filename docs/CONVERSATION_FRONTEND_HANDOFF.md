@@ -1,6 +1,6 @@
 # Whady: conectar el inicio conversacional de Oli
 
-Home ya consume el chat real con este contrato: historial privado, adjuntos recibidos antes del mensaje, tarjetas del servidor y propuestas que requieren confirmación explícita. El prototipo [/propuesta/](https://oli30x.ultramare.dev/propuesta/) sigue como referencia visual independiente. La versión unificada está publicada en `main` y desplegada en `oli30x.ultramare.dev`; la consulta real de presupuesto desde Home respondió con una tarjeta del servidor. [Comprobación de producción](evaluations/unified-release-production-20261017.json) y [regresiones locales y límites](evaluations/frontend-integration-fixes-20261017.json).
+Ask Oli consume el chat real con este contrato: historial privado, adjuntos recibidos antes del mensaje, tarjetas del servidor y propuestas que requieren confirmación explícita. El prototipo [/propuesta/](https://oli30x.ultramare.dev/propuesta/) sigue como referencia visual independiente. La versión unificada está publicada en `main` y desplegada en `oli30x.ultramare.dev`; la consulta real de presupuesto desde Home respondió con una tarjeta del servidor. [Comprobación de producción](evaluations/unified-release-production-20261017.json) y [regresiones locales y límites](evaluations/frontend-integration-fixes-20261017.json).
 
 Backend: `/api/v1`, misma sesión/cookie y `X-CSRF-Token` en memoria. Modelo fijo `deepseek/deepseek-v4.1-flash`, clave exclusivamente en el Worker. Las reglas, lecturas y cambios de D1 son responsabilidad del servidor.
 
@@ -38,21 +38,32 @@ reales y extracción simulada; no se presenta como medición OCR en producción.
 
 Todas las mutaciones requieren CSRF. Solo OWNER prepara/confirma/cancela cambios. APPROVER puede conversar y consultar, sin herramientas de escritura. Conversaciones y acciones son privadas para el mismo usuario y empresa; IDs de otro usuario devuelven404. Los listados de conversaciones y su historial tienen un límite fijo, sin envelope de paginación P0.
 
-Home mantiene dos pestañas con selección y queries independientes. `ChatHistorySchema`
+Ask Oli mantiene dos pestañas con selección y queries independientes. `ChatHistorySchema`
 incluye `channel`; Web conserva borrador y adjuntos al consultar Telegram. Telegram es
 una vista del historial con enlace al bot y sin botones de confirmar/cancelar. El servidor
 rechaza escribir o reutilizar una clave Telegram desde Web con `CHAT_CHANNEL_MISMATCH`409.
 Web presenta las conversaciones como subpestañas debajo de los canales; en móvil la fila
 se desplaza horizontalmente. El botón + abre una conversación nueva, persistida al enviar
 su primer mensaje. Cada hilo conserva su borrador y adjuntos en memoria mientras Home
-permanece abierto. Telegram abre su conversación más reciente sin subpestañas ni selector.
+permanece abierto. La × cierra la pestaña sin borrar historial: el icono de conversaciones
+cerradas permite recuperarla. Se recuerda el cierre por usuario/empresa en este navegador;
+el servidor conserva los mensajes. Cerrar el último hilo deja una conversación nueva.
+Durante un turno pendiente los controles de cierre quedan deshabilitados. Telegram abre
+su conversación más reciente sin subpestañas ni selector.
 La migración0009 separa el legado mezclado mediante una proyección append-only; conserva
 los snapshots originales y el contexto al modelo usa exclusivamente el canal del hilo.
+
+El menú separa **Ask Oli** (`/app`) de **Dashboard** (`/app/dashboard`). Dashboard conserva
+el resumen, métricas, bandeja, actividad, presupuesto y vencimientos antes mostrados debajo
+del chat. `/app/chat` redirige a Ask Oli. El chat ocupa su propia pantalla y no depende de
+que la consulta de facturas del dashboard termine correctamente.
 
 El chat móvil ocupa el espacio disponible sobre el teclado mediante `visualViewport`;
 el historial tiene scroll propio y el compositor permanece al pie. El texto del asistente
 usa Markdown acotado, sin HTML ni imágenes remotas. El prompt `chat-v3` pide respuestas
 breves y preguntas progresivas en lenguaje cotidiano, sin nombres de campos de programación.
+El compositor usa una sola fila de 54px con clip, texto y envío; crece con varias líneas
+hasta 144px de texto y mantiene los archivos en una fila aparte cuando hay adjuntos.
 
 ## Mensajes y adjuntos
 
