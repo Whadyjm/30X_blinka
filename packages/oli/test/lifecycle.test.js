@@ -19,12 +19,19 @@ test('animation lifecycle pauses, handles visibility/reduced motion, and cleans 
   const globals = { document: mockDocument, window: { devicePixelRatio: 3 }, matchMedia: () => media, ResizeObserver: Observer, IntersectionObserver: Observer,
     requestAnimationFrame: fn => { callbacks.set(++next, fn); return next; }, cancelAnimationFrame: id => callbacks.delete(id) };
   for (const [key, value] of Object.entries(globals)) { originals.set(key, Object.getOwnPropertyDescriptor(globalThis, key)); Object.defineProperty(globalThis, key, { configurable: true, writable: true, value }); }
-  const ctx = { setTransform() {}, clearRect() {}, beginPath() {}, arc(...args) { assert.ok(args.every(Number.isFinite)); }, fill() { draws++; } };
-  const canvas = { getContext: () => ctx, getBoundingClientRect: () => ({ width: 240, height: 240 }) };
+  const finite = (...args) => assert.ok(args.every(Number.isFinite));
+  const ctx = { setTransform() {}, clearRect() {}, beginPath() {}, arc: finite,
+    moveTo: finite, lineTo: finite, closePath() {}, fill() { draws++; } };
+  const canvas = { clientWidth: 240, clientHeight: 240, getContext: () => ctx,
+    getBoundingClientRect: () => ({ width: 72, height: 72 }) };
   try {
     const oli = new OliCanvas(canvas, { particles: 100 });
     assert.equal(callbacks.size, 1);
-    assert.equal(canvas.width, 480, 'pixel density is capped at 2');
+    assert.equal(canvas.width, 480, 'parent scale must not reduce the bitmap resolution; pixel density is capped at 2');
+    canvas.clientWidth = canvas.clientHeight = 760;
+    oli.resize();
+    assert.equal(canvas.width, 1520, 'the giant mascot renders at its full layout size on Retina displays');
+    assert.equal(canvas.height, 1520);
     oli.setOptions({ paused: true });
     assert.equal(callbacks.size, 0);
     const prior = draws;

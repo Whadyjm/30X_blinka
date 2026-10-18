@@ -1,0 +1,19 @@
+.ask-oli-board {
+  --beam-stroke-opacity: 0.15;
+}
+
+.ask-oli-board > .oli-chat {
+  margin: 0;
+}
+
+/* Keep the halo outside even when the board spans the full viewport height. */
+.ask-oli-board[data-beam]:is([data-active], [data-fading])::before,
+.ask-oli-board[data-beam]:is([data-active], [data-fading]) > [data-beam-bloom] {
+  transform: none;
+}
+
+@media (max-width: 767px) {
+  .ask-oli-board[data-beam] {
+    overflow-x: clip;
+  }
+}

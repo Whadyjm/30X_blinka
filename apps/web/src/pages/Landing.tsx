@@ -56,9 +56,9 @@ export function Landing() {
 
       <main className="flex-1">
         <section className="mx-auto w-full max-w-[1200px] px-4 pb-16 pt-16 sm:px-6 sm:pb-24 sm:pt-24">
-          <h1 className="max-w-3xl text-[44px] leading-none text-ink sm:text-[64px]">{brand.tagline}</h1>
+          <h1 className="max-w-3xl text-balance text-[clamp(2rem,10vw,2.75rem)] leading-none text-ink sm:text-[64px]">{brand.tagline}</h1>
           <p className="mt-6 max-w-xl text-xl leading-[1.3] text-ash sm:text-2xl">
-            {t('Give Oli your invoices and tell it what it may approve. It reviews each one against your rules and only interrupts you when it truly needs permission.')}
+            {t('You set the rules. Your agents submit invoices. Oli reviews each request, applies your limits, and asks for approval when needed.')}
           </p>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Beam>

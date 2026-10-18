@@ -46,7 +46,8 @@ export class OliCanvas {
   }
 
   resize() {
-    const { width, height } = this.canvas.getBoundingClientRect();
+    // Parent transforms must not shrink the bitmap while Oli grows or rotates.
+    const width = this.canvas.clientWidth, height = this.canvas.clientHeight;
     if (!width || !height) return;
     this.width = width;
     this.height = height;
@@ -167,7 +168,8 @@ export class OliCanvas {
     }
 
     this.sorted.sort((a, b) => a.z - b.z);
-    ctx.fillStyle = this.dark ? '#f5f1e8' : '#242725';
+    const bodyColor = this.dark ? '#f5f1e8' : '#242725';
+    ctx.fillStyle = bodyColor;
     for (const p of this.sorted) {
       if (p.role && pose.face < 0.001) continue;
       const perspective = 3.8 / (3.8 - p.z * 0.26);
@@ -183,6 +185,33 @@ export class OliCanvas {
       ctx.beginPath();
       ctx.arc(cx + p.x * r * perspective, cy + p.y * r * perspective, size, 0, Math.PI * 2);
       ctx.fill();
+
+      // Sparse, seeded glints share the body's motion and animation lifecycle.
+      if (!p.role && p.drift < 0.035 && depth > 0.4) {
+        const shimmer = Math.max(0, Math.sin(t * (0.65 + p.size * 0.18) + p.phase)) ** 18;
+        if (shimmer < 0.015) continue;
+        const x = cx + p.x * r * perspective, y = cy + p.y * r * perspective;
+        const ray = (2.4 + shimmer * 2) * dotScale;
+        const core = ray * 0.16;
+        ctx.fillStyle = this.dark ? '#fff4d6' : '#897451';
+        ctx.globalAlpha = shimmer * depth * 0.08;
+        ctx.beginPath();
+        ctx.arc(x, y, ray * 1.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = shimmer * depth * 0.72;
+        ctx.beginPath();
+        ctx.moveTo(x, y - ray);
+        ctx.lineTo(x + core, y - core);
+        ctx.lineTo(x + ray * 0.75, y);
+        ctx.lineTo(x + core, y + core);
+        ctx.lineTo(x, y + ray);
+        ctx.lineTo(x - core, y + core);
+        ctx.lineTo(x - ray * 0.75, y);
+        ctx.lineTo(x - core, y - core);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = bodyColor;
+      }
     }
     ctx.globalAlpha = 1;
   }

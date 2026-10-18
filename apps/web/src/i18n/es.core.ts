@@ -5,10 +5,10 @@ export const esCore: Record<string, string> = {
   'Email or username': 'Correo o usuario',
 
   // brand
-  'Your bills, handled.': 'Tus facturas, resueltas.',
+  'Payments infrastructure for agents': 'Infraestructura de pagos para agentes',
   'Meet Oli': 'Conoce a Oli',
-  'AI agents can do the work. Oli decides whether they’re allowed to spend.':
-    'Los agentes de IA pueden hacer el trabajo. Oli decide si tienen permiso para gastar.',
+  'Your agents request. Oli reviews. You set the limits.':
+    'Tus agentes solicitan. Oli revisa. Tú defines los límites.',
 
   // outcomes
   Processing: 'Procesando',

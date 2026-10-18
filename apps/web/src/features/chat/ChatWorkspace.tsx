@@ -166,7 +166,7 @@ export function ChatWorkspace() {
           {showCompanion && <ChatMascot compact state={thinking ? 'thinking' : draft.trim() ? 'listening' : undefined} />}
           <div className="min-w-0">
             <h1 className="text-lg leading-normal text-ink"><span className={showCompanion ? 'hidden sm:inline' : undefined}>{t('Chat with Oli')}</span>{showCompanion && <span className="sm:hidden">Oli</span>}</h1>
-            {showCompanion && <p role="status" className="mt-1 text-xs leading-relaxed text-slate-600">{t(conversation.loading ? 'Loading conversation...' : thinking ? 'Oli is thinking...' : 'I’m here with you')}</p>}
+            {showCompanion && <p role="status" className="mt-1 text-xs leading-relaxed text-slate-600">{t(conversation.loading ? 'Loading conversation...' : thinking ? 'Oli is thinking...' : 'Ask anything about your accounts payable')}</p>}
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-1">

@@ -35,3 +35,96 @@
 @media (prefers-reduced-motion: reduce) {
   .ask-oli-float { animation: none; }
 }
+
+.ask-oli-tickle {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.ask-oli-tickle::backdrop {
+  background: color-mix(in srgb, var(--color-canvas) 88%, transparent);
+  backdrop-filter: blur(4px);
+}
+
+.ask-oli-tickle-close {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(20px, env(safe-area-inset-right));
+  z-index: 1;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid var(--color-hairline);
+  border-radius: 50%;
+  background: var(--color-paper);
+  cursor: pointer;
+}
+
+.ask-oli-tickle-stage {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  pointer-events: none;
+}
+
+.ask-oli-tickle-character {
+  position: relative;
+  width: min(88vw, 74dvh, 760px);
+}
+
+.ask-oli-tickle-sway {
+  animation: ask-oli-tickle-sway 1.4s ease-in-out infinite;
+}
+
+.ask-oli-tickle-message {
+  position: absolute;
+  bottom: 88%;
+  left: 50%;
+  width: max-content;
+  max-width: calc(100vw - 40px);
+  margin: 0;
+  padding: 16px 24px;
+  transform: translateX(-50%);
+  border: 1px solid var(--color-hairline);
+  border-radius: 20px;
+  background: var(--color-paper);
+  font-size: clamp(20px, 4vw, 28px);
+  line-height: 1.3;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.ask-oli-tickle-message::after {
+  content: '';
+  position: absolute;
+  top: calc(100% - 6px);
+  left: calc(50% - 6px);
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  border-right: 1px solid var(--color-hairline);
+  border-bottom: 1px solid var(--color-hairline);
+  background: var(--color-paper);
+}
+
+@keyframes ask-oli-tickle-sway {
+  0%, 100% { transform: translateX(-5px) rotate(-2deg); }
+  50% { transform: translateX(5px) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-oli-tickle-sway { animation: none; }
+  .ask-oli-tickle::backdrop { backdrop-filter: none; }
+}

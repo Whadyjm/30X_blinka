@@ -58,8 +58,8 @@ export const esShell: Record<string, string> = {
 
   // landing
   'Open app': 'Abrir la app',
-  'Give Oli your invoices and tell it what it may approve. It reviews each one against your rules and only interrupts you when it truly needs permission.':
-    'Entrégale tus facturas a Oli y dile qué puede aprobar. Revisa cada una según tus reglas y solo te interrumpe cuando de verdad necesita permiso.',
+  'You set the rules. Your agents submit invoices. Oli reviews each request, applies your limits, and asks for approval when needed.':
+    'Tú defines las reglas. Tus agentes envían facturas. Oli revisa cada solicitud, aplica tus límites y pide aprobación cuando hace falta.',
   'See how it decides': 'Mira cómo decide',
   'Possible outcomes': 'Resultados posibles',
   'Authorized vendor, matches the agreement, inside your limits, budget available. Approved.':

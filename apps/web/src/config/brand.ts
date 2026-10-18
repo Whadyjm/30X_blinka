@@ -8,13 +8,13 @@ import { t } from '@/i18n';
 export const brand = {
   name: 'Oli',
   get tagline() {
-    return t('Your bills, handled.');
+    return t('Payments infrastructure for agents');
   },
   get cta() {
     return t('Meet Oli');
   },
   get pitch() {
-    return t('AI agents can do the work. Oli decides whether they’re allowed to spend.');
+    return t('Your agents request. Oli reviews. You set the limits.');
   },
   /** Label for the development-only mock controls. */
   get envLabel() {
