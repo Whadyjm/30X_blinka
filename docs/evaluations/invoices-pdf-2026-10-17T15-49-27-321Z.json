@@ -24,7 +24,7 @@
   "context": {
     "perCaseIsolatedD1": true,
     "productionDatabaseWrites": false,
-    "persistedLocalState": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/corpus/2026-10-17T15-49-27-321Z",
+    "persistedLocalState": "apps/api/.wrangler/corpus/2026-10-17T15-49-27-321Z",
     "priorInvoices": "Labelled synthetic historical context, not newly measured OCR",
     "openingReservedBudget": "Established with explicit synthetic fixture decisions and the original D1 reservation triggers; no counter edits",
     "clock": "Current API clock; corpus evaluationTime belongs to the same budget month",

@@ -39,7 +39,7 @@
     "id": "14a7fd00-21c4-4a63-b12a-f46aea13be42",
     "source": "wrangler",
     "strategy": "percentage",
-    "author_email": "tiamat.agency@gmail.com",
+    "author_email": "<correo-de-despliegue-omitido>",
     "annotations": {
       "workers/message": "Dashboard con desglose, historial de reglas, avisos de correo y calidad (cf60d70)",
       "workers/triggered_by": "deployment"

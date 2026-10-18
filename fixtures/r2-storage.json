@@ -1,6 +1,6 @@
 {
   "accountId": "fbaa64f96579f93b2db32a1eb12ff6c9",
-  "accountName": "Tiamat.agency@gmail.com's Account",
+  "accountName": "Cuenta de pruebas Oli",
   "bucket": "oli-invoice-tests",
   "datasetPrefix": "datasets/oli-invoices-v1",
   "resultsPrefix": "runs/oli-invoices-v1",

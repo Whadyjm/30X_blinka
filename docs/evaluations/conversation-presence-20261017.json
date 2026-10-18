@@ -65,7 +65,7 @@
       "id": "d6b8d13e-80a4-4870-bde3-b34555ab4362",
       "source": "wrangler",
       "strategy": "percentage",
-      "author_email": "tiamat.agency@gmail.com",
+      "author_email": "<correo-de-despliegue-omitido>",
       "annotations": {
         "workers/message": "Ask Oli: presencia continua durante la conversación (dbdfe85)",
         "workers/triggered_by": "deployment"

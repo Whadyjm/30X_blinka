@@ -45,7 +45,7 @@
     "cumulativeBudget": true,
     "resetBetweenCases": false,
     "localD1R2": true,
-    "localStatePath": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/company-journey/marena/2026-10-17T23-05-36-489Z",
+    "localStatePath": "apps/api/.wrangler/company-journey/marena/2026-10-17T23-05-36-489Z",
     "queueTransport": "Controlled in-memory transport; original durable D1 job creation, enqueue API and consumeInvoiceJobs processor.",
     "originalDomainAndReservationTriggers": true,
     "productionFinancialWrites": false,

@@ -17,11 +17,21 @@ Los documentos, acuerdos y expectativas están en [fixtures de empresas](docs/fi
 
 ## Desarrollo y comprobaciones
 
+Requiere Node.js 22.18 o posterior. Para explorar la interfaz con datos ficticios, desde la raíz:
+
+```sh
+npm --prefix apps/web ci
+npm --prefix apps/web run dev:mock
+```
+
+Para usar el backend local y los lectores, seguir la configuración de API y frontend enlazada abajo. Las claves se configuran en archivos locales ignorados; cualquier variable `VITE_*` es pública. El despliegue necesita recursos propios de Cloudflare y secretos propios.
+
 - [API, configuración local y despliegue](apps/api/README.md).
 - [Frontend y modos de ejecución](apps/web/README.md).
 - [Contrato HTTP](docs/API.md) y [schemas compartidos](packages/contracts/README.md).
 - [Motor de política](packages/domain/README.md), [lectores](packages/extraction/README.md) y [base de datos](packages/database/README.md).
 - [Garantías de lectura](docs/EXTRACTION_SAFETY.md) y [plan de cierre](docs/PLAN_95.md).
+- [Preparación del repositorio público](docs/PUBLICACION.md).
 
 Para ejecutar la suite de API con las dependencias instaladas:
 

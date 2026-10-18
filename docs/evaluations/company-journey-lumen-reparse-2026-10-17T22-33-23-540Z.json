@@ -54,7 +54,7 @@
     "cumulativeBudget": true,
     "resetBetweenCases": false,
     "localD1R2": true,
-    "localStatePath": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/apps/api/.wrangler/company-journey/lumen/2026-10-17T22-33-23-540Z",
+    "localStatePath": "apps/api/.wrangler/company-journey/lumen/2026-10-17T22-33-23-540Z",
     "queueTransport": "Controlled in-memory transport; original durable D1 job creation, enqueue API and consumeInvoiceJobs processor.",
     "originalDomainAndReservationTriggers": true,
     "productionFinancialWrites": false,

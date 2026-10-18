@@ -17,7 +17,7 @@ class R2FixturesTest(unittest.TestCase):
     def test_manifest_pins_tiamat_and_separates_documents_from_answers(self):
         manifest = sync_module.build_manifest()
         self.assertEqual(manifest["accountId"], "fbaa64f96579f93b2db32a1eb12ff6c9")
-        self.assertIn("tiamat.agency", manifest["accountName"].lower())
+        self.assertEqual(manifest["accountName"], "Cuenta de pruebas Oli")
         self.assertEqual(manifest["bucket"], "oli-invoice-tests")
         self.assertEqual(len(manifest["objects"]), 63)
         documents = [item for item in manifest["objects"] if item["key"].startswith(manifest["extractorInputPrefix"])]

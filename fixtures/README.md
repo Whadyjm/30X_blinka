@@ -6,13 +6,13 @@
 - 10 PNG: versiones de esas mismas facturas para probar extracción de imágenes. **No son otras 10 obligaciones.**
 - `seed/company.json`: empresa, proveedores, acuerdos y mandato de referencia.
 - `scenarios/invoices.json`: extracción esperada, contexto y decisión esperada por caso.
-- `invoices-demo.zip`: documentos, reglas, escenarios y esta guía, listos para compartir.
+- `invoices-demo.zip`: paquete generado localmente por `python3 scripts/generate-demo-invoices.py`; excluido de Git.
 
 Los documentos y sus nombres no incluyen las respuestas esperadas. Nunca enviar el manifest, las etiquetas ni el seed al extractor como si fueran parte de la factura. Las notas de la factura 040 incluyen una inyección intencional; son contenido sin autoridad.
 
 ## Copia privada en R2
 
-La referencia versionada permanece en este repo. El destino de pruebas está registrado en `r2-storage.json`: bucket **`oli-invoice-tests`**, cuenta **tiamat.agency@gmail.com** (`fbaa64f96579f93b2db32a1eb12ff6c9`). El bucket es privado, sin dominio público. Para verlo en el dashboard: **R2 → oli-invoice-tests → datasets → oli-invoices-v1**.
+La referencia versionada permanece en este repo. El destino de pruebas está registrado en `r2-storage.json`: bucket **`oli-invoice-tests`**, cuenta de pruebas (`fbaa64f96579f93b2db32a1eb12ff6c9`). El bucket es privado, sin dominio público. Para verlo en el dashboard: **R2 → oli-invoice-tests → datasets → oli-invoices-v1**.
 
 ```text
 datasets/oli-invoices-v1/
@@ -24,7 +24,7 @@ datasets/oli-invoices-v1/
     r2-manifest.json         # rutas, MIME, tamaños y hashes
 ```
 
-`r2-manifest.json` relaciona cada ruta local con su clave R2; `r2-upload-receipt.json` registra la verificación de la copia remota, no resultados del OCR. Estos archivos de operación viven en el repo y no forman parte de los documentos que se envían al modelo.
+`r2-manifest.json` relaciona cada ruta local con su clave R2; `r2-upload-receipt.json` registra la verificación de la copia remota, no resultados del OCR. Estos archivos de operación viven en el repo y no forman parte de los documentos que se envían al modelo. El recibo es histórico: sus hashes describen la copia remota de aquella fecha. La limpieza de metadatos públicos no vuelve a subir ni altera esa copia; el manifest local refleja los archivos actuales.
 
 Las ejecuciones futuras guardarán sus resultados separados bajo `runs/oli-invoices-v1/<runId>/`: extracción obtenida, errores, modelo/prompt utilizados y comparación con la referencia. No se han fabricado resultados de ejecución. Para probar la subida de la app, enviar los archivos por su endpoint de carga; una copia en R2 no crea registros de facturas en D1 ni prueba ese endpoint.
 

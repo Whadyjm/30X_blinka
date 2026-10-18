@@ -46,7 +46,7 @@
       "id": "fc7d03d6-d355-4e14-ac09-55a899594670",
       "source": "wrangler",
       "strategy": "percentage",
-      "author_email": "tiamat.agency@gmail.com",
+      "author_email": "<correo-de-despliegue-omitido>",
       "annotations": {
         "workers/message": "Dashboard: recuperar botón Beam y cuatro tiles (b0acdd6)",
         "workers/triggered_by": "deployment"

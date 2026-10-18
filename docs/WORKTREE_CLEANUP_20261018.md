@@ -27,7 +27,7 @@ El snapshot del video contiene sus tres fuentes/documentos al momento del respal
 Respaldo local protegido, con manifiesto, bundles, archivos completos y logs de validación:
 
 ```text
-/Users/oscarcrescente/Developer/archives/blinka-challenge/cleanup-20261018T021140Z
+<respaldo-local-fuera-del-repositorio>
 ```
 
 La carpeta duplicada de fixtures fue comparada por contenido y movida a `quarantine` en ese respaldo. Se versionó la carpeta canónica `fixtures/reto-manual-15-20261018` con sus quince documentos ficticios, controles y generador. Solo se normalizaron los saltos de línea del CSV, verificando que sus celdas no cambiaran.

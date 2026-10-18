@@ -49,7 +49,7 @@
       "id": "f08f0f54-2843-4b3c-93d0-3ac6ddfb2012",
       "source": "wrangler",
       "strategy": "percentage",
-      "author_email": "tiamat.agency@gmail.com",
+      "author_email": "<correo-de-despliegue-omitido>",
       "annotations": {
         "workers/message": "Logo: marca estática inspirada en Oli, sin mascota en navegación (9fbfab3)",
         "workers/triggered_by": "deployment"

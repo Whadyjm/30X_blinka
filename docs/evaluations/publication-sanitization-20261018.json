@@ -1,0 +1,1213 @@
+{
+  "date": "2026-10-18",
+  "sourceCommit": "6b13e456333317ed7dd44a3a31b46534f73e0e86",
+  "scope": "Repository metadata cleanup; original measurements and document bytes are not re-evaluated. Historical report hashes identify the original bytes at sourceCommit.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "originalSha256": "6e26738c957b8d978267284eb92c938e1f9f4b23795194b9e50acb733ac7e59d",
+      "publicSha256": "efee7068f816ef01e32bccc5f44aea2dbf56fe5a5bfa784af838181eb9b6b968",
+      "action": "updated"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-12-53-341Z/dashboard-1440.png",
+      "originalSha256": "4e28ca5b28005653f13a2dca89736e87bd73d5031dea885052e428c91705a289",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-16-24-811Z/001-desktop.png",
+      "originalSha256": "ef42c157c9f506e7944b32733ff1ede81c08a1a741ea3e59e8627809f341dee3",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-16-24-811Z/dashboard-1440.png",
+      "originalSha256": "1a1c60c4a875abe99560295f87a051f70a4e2761443b5eef82b818385551968d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-16-24-811Z/dashboard-390.png",
+      "originalSha256": "37d6e01f57365519729685790dbac40ad4a05a584da9f40047ad0acfa14c3384",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/001-desktop.png",
+      "originalSha256": "5ddacb72eb490f9144575ef4eb84a4465f3086d1583ac4a7f8b118dfd30e273f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/010-desktop.png",
+      "originalSha256": "42e4ded548db90b5482f1894f43a781f3bd2e9bce5814e91cbfd7cbfbcbe5913",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/011-desktop.png",
+      "originalSha256": "542c3a7a73d3f1925db99c860994f01820fad9906de07cf3392ff15ac23d40c0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/013-desktop.png",
+      "originalSha256": "32e6a83db25ca808300fb4581dd7c6c89cff16f445d45dc2464ffcfc0a4ac2a0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/014-desktop.png",
+      "originalSha256": "7875369803a49f7daf1cc4ec531f6526e8e80df3cba8cd3c93119b222c1271f8",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/016-desktop.png",
+      "originalSha256": "c01751b57bcf2a9ffd1b89758e3fa5b327f4aef72cd1b6fba9509a25586e809f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-19-18-180Z/018-desktop.png",
+      "originalSha256": "cf473a7c21311c369ba0eb57e67c95e8501ef8f437a6b87cf978be682de385b2",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-30-39-754Z/001-desktop.png",
+      "originalSha256": "1d8e7081815c6b130b5112bf76f1eafe43ee721750d75836fa0a88b8417b9ce5",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-30-39-754Z/010-desktop.png",
+      "originalSha256": "ccbbf3bda9c35b09a278995247328ba6ccb7686739414da5eabeca86868e860e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-2026-10-17T23-30-39-754Z/011-desktop.png",
+      "originalSha256": "c10288dfab7d440b45166de5f4c9b1e6a6ce1fd35cfe3f4874fdb6922b528add",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/candidate-mobile-overflow.png",
+      "originalSha256": "276d9e9b7d790250ad54b2f25a836bc792a4f5b2371e783ec9262202940305e2",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/checks.json",
+      "originalSha256": "4ae05c4314ac251c45499a846ae9c2b8db6d2086ee3973a1ffcc3a5aaa75848d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/closed-mobile.png",
+      "originalSha256": "4300293bd2f8bd685f95c31c8b4083437cb2dd4ad22ee4f97b7e78fbccabec7f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/dashboard-desktop.png",
+      "originalSha256": "0f4a38f0286d3e82a2378200305ee7bc47ba2c9dc8f8289f5400574556cd21c2",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/dashboard-mobile.png",
+      "originalSha256": "97db05f191e595688d60f4302923630a0666e52ed93f8bb21cfd67892b0c460a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/desktop.png",
+      "originalSha256": "193462b0d66b9fc67bba97fe0aa65542fafad98105bf680e50a2fc0bacdd3616",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/mobile.png",
+      "originalSha256": "4471bb30038a3dd5f1d034e7d6add1b2ca5abeabec102f63dcd4d5654e51854d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/multiline-mobile.png",
+      "originalSha256": "4e7802722d3e155f8c185b63692a9f20a8564231bf15a0669a75572991a52dd7",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/compact-dashboard/telegram-mobile.png",
+      "originalSha256": "46a2e347fee08776a994aaeed96cb4a8601b72fe2c943bd9823be19dd76cf1d3",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/ask-1440.png",
+      "originalSha256": "2105e52d92673d00ca34c0dbc1d3ee0ed5c61552e281a746c1aa71bf0fd4eee2",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/ask-390.png",
+      "originalSha256": "2fe5dcb0d86da6707e4ddef78cae704ba2e248e224f03fa18fcef760a58c573d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/dashboard-1440.png",
+      "originalSha256": "51d933de7152945eca56ff33d241172824da8fe9fffd7f1cd83b5ea0280f1cc7",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/dashboard-390.png",
+      "originalSha256": "99dbe93038767a056078619aac5535514a0814fc147f87c43940b725c959de6b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/desktop-idle.png",
+      "originalSha256": "b593636f9ed0c624427d22f5e7ade1a01b452d6cbcb0c050b59c4127913265a3",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/desktop-tap.png",
+      "originalSha256": "8afb6762b9d9f71a4a490a57f95ba1e478eb70eece100322bfd1332aa83da32d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/existing-1440.png",
+      "originalSha256": "29014642b63be3642608d92b3e1dc898ec5ce66c54781b67fd49eff36fbcc316",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/existing-320.png",
+      "originalSha256": "a4c1ccb535d9688bd84c936b35691cd56c96a201702d85aa7e102a333eb2a280",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/existing-390.png",
+      "originalSha256": "cc4fdf9532ce0c52eddbff69d6eae10d4d78ef6fd33ea930e4cf95ff69e103fe",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/mobile-320-568.png",
+      "originalSha256": "1f7421f771932261c2d39d97c184d78f4282cacdce8ebb9941d9a47d0e7fcdd0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence-production/mobile-390-844.png",
+      "originalSha256": "4b9a9f959ef9b710a7dee68239550ed3aa5cb020bc627ff10dab9c34e89d3683",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence/checks.json",
+      "originalSha256": "2ce1fb81ba55e1ed64e7e4fdf81b735a1d88d49d810487482a59a3c1bcf8660b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence/conversation-1440.png",
+      "originalSha256": "2736cd3f3fa9d1ed6ef1bc498a23c9b31e5f29043faf4bfadf66dbda786a2e99",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence/conversation-320.png",
+      "originalSha256": "2970c99ea7e6e6aef614a501d0f165dc2411d1f4cd0988391a914a0e9ea3bb4e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence/conversation-390.png",
+      "originalSha256": "1ac0767800a64cbd25469dce795bd876c1aa6817ccb4a8f1da14c7ea2ee63635",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/conversation-presence/desktop-thinking.png",
+      "originalSha256": "942f093717acde4e539b7e088ae4887ef3cbdce8fc124f3a7faf6a02a57504bb",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/blocked-only-desktop.png",
+      "originalSha256": "6c41e950c027c7d7ecb6b8af655ccf29ffb556499821375399183511d3dcf2d0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/checks.json",
+      "originalSha256": "b05d57a967ff363c8cb765938b538ce47e341a7635d2ba646c5e4f76e7ffd5e5",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/empty-desktop.png",
+      "originalSha256": "a0084f73c43fc8b075a3c4f20363323498d66041ab9f10aadcf06409fa7648ee",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/expanded-en-desktop.png",
+      "originalSha256": "1bd08f7e50b679424461135aea7cc057c7b39961738ca9d06ea7e5a2c4ead476",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/expanded-en-mobile.png",
+      "originalSha256": "a597d60c7695aaa4ce6c59206dd22c69814e85dc693f87a46c151f2fd28ffdd0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/expanded-en-tablet.png",
+      "originalSha256": "daae1be757ed9e3ea8cf52ba5817fad404a50e0f0f31ce7ab9c142c048fd00fe",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/failed-only-desktop.png",
+      "originalSha256": "3b2d5540e01e67296c7cc9defa153b9916a3fc9b5b7bf33c6bd87c704e6fa568",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/mixed-desktop.png",
+      "originalSha256": "f01f09c66d3b3d845a6a21bfcb205865a162ffb13a337706f0d97ce6246eb6bc",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/mixed-mobile.png",
+      "originalSha256": "c100adead30a39e734ec39a75f8d1cacf52e50c93a1ecbda82fab7b09961609d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/mixed-narrow.png",
+      "originalSha256": "ab0a005a17846c74329ed622dc0bfc7159322ad86c01ed06f1190a399acb1c35",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/review-only-desktop.png",
+      "originalSha256": "7a97d3bcecd3ed47f23cd1198c6393c9e238f10533553d45b6a08adb0a4faffb",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-attention/settled-desktop.png",
+      "originalSha256": "4b77a1c33ca76827e4ad1a5bf6b3d6119af7ad22987ea20d096d0c2198de1fc6",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality-production/dashboard-1440.png",
+      "originalSha256": "313978c4e6619063aefe59e453b4e1e7745eae43a2e11b24555d6513d74ae64e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality-production/dashboard-390.png",
+      "originalSha256": "222471e6f7da0b5ea0b8292a88ef638fd8ef7ed5f90bb4abd79f2d25c1e6e091",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality/checks.json",
+      "originalSha256": "05b7384a98e6510b696ae0094c8937ee40cf3c0a3767236231986cd7103bac55",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality/dashboard-1440.png",
+      "originalSha256": "9b682c0c74771bfa127de45faff0e81548c93547bc169145aba27dde956349f6",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality/dashboard-320.png",
+      "originalSha256": "a5cde18cf2f07681cb9397653f241cf55e2e250b6c0fb18c5a0a4eea3bb1e714",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-personality/dashboard-390.png",
+      "originalSha256": "a94030a035852eefd1815d01fa14676333115b87167c0b29c84e6a8bc8e868a9",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-production/dashboard-1440.png",
+      "originalSha256": "ad0e6339d2a82a63f63fd6d4e789b67d63171b78fe0ce9eabe747237d0bde378",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/dashboard-production/dashboard-390.png",
+      "originalSha256": "a8652dce0cc366167c0571843fdc2d22269259ee115c7b577de6dd990c5790d2",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/ask-1440.png",
+      "originalSha256": "b4a522b187c3cbf6df3306b15deb4e2b45bf6e96b5954abbe39a362c7b2d68b3",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/ask-390.png",
+      "originalSha256": "aefb188ba1f1cf6b4e48261ac73a1de9b6069e84c4921840300d237dfd29da83",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/dashboard-1440.png",
+      "originalSha256": "9d8a906fd239bd67da5e5d90381bd71272f8868c88610b5ce9f1cf817667cb4b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/dashboard-390.png",
+      "originalSha256": "066ab420a07794c9f427f0a05cbf64eac337b1d86964f35f3c9637dddb2623da",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/desktop-idle.png",
+      "originalSha256": "624e5f0ead8b529e84a3a5716d9a943bd6c6219be3a7cedf31a92797aa491f48",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/desktop-tap.png",
+      "originalSha256": "5325d72e04adbf5ea6307f247d7124a9a5a8e3cf536a8286e575e91fa951f45f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/mobile-320-568.png",
+      "originalSha256": "5767a562d6e1aee3bb340e4f2668abc01de595a0156aa62b08790a50bec051f0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat-production/mobile-390-844.png",
+      "originalSha256": "360e1db17175012f88e462baa591812a0a69257bc05f4af749a4ba432bf0208a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat/checks.json",
+      "originalSha256": "666d9172085b28123b6b017a3203774595704c2ddbf6fcd2425f2d0e7d3bc9e9",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat/desktop-idle.png",
+      "originalSha256": "e8651dfb684a8d5f73d97bfe1d56d76841f45eb2e975a29aeebaeaebd6c1d882",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat/desktop-tap.png",
+      "originalSha256": "378854b8648e682b7564ea4617907128cb892bd50837b6734e3945469cd6b2d8",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat/mobile-320-568.png",
+      "originalSha256": "b976bec358c30c2d551d0eefdc3f83d0e4a16b84b245565551885530d41bf283",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/interactive-chat/mobile-390-844.png",
+      "originalSha256": "48486dfed2aa85b9180616b8b2030e15c508379511ddf1f44878c135a7a944b8",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash-production/bills-1440.png",
+      "originalSha256": "526f48f9149d299c473d5f47c31a36ed4598cb1286189cf1a38195364b3fe7dd",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash-production/bills-320.png",
+      "originalSha256": "064e94696e258d705b0e6f3d2991f131d46da706055c7eaf758d2d0ecf9ebc62",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash-production/bills-390.png",
+      "originalSha256": "08c5573c5264dbd21b70e84d8378163866259f8e5df00407b9098ccc79e7005f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash-production/deleted-controlled-320.png",
+      "originalSha256": "79508a2784148cd9faf5bcba45315003f3d3053dc4b4a908d32bb3eca591eeb1",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/checks.json",
+      "originalSha256": "d349e7ef2afb0d0adde832037371b771d7fb269f9123aa1c1d922199f1afa6e6",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/deleted-1440.png",
+      "originalSha256": "36a657b7699095c602e1778abfecbff51c5fa6b77b979b4242aef6837bacf9e4",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/deleted-320.png",
+      "originalSha256": "b1780f75fa86be90e1b50c468731f4701043236443c4c69ca573f908362d3943",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/deleted-390.png",
+      "originalSha256": "3a48f00cfaf723e91857b7a5141a55faa4cbda97d9163dbcc410e516f7722e17",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/deleted-desktop.png",
+      "originalSha256": "8fff7b2ac84774c4b2d7d9bcb6ae36a385c05520fa531691fd5a416c3d771a7d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/invoice-trash/deleted-detail-320.png",
+      "originalSha256": "3809a104385f59df3a0850f918ed4551e3c6942fe62a7238db9c0902f9959545",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow-production/dashboard-1440.png",
+      "originalSha256": "38a3bfdc78d1314309a6497da8436198ef235542409be1406913c9f518658cc5",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow-production/dashboard-390.png",
+      "originalSha256": "3f7d94774aa1496d41a8bc1984ddd605468fcdd0cdcdb945cd017e3009213547",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/checks.json",
+      "originalSha256": "dc861cb6776782a11f7ed8107ac0ab4df02b1649c32b641c4ecfb191a88d4fe5",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/desktop-rest.png",
+      "originalSha256": "dc832af4be690755664132ecd8707a9642bac0e2b041ba1e8a083a4e53c69e0f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/mobile-header.png",
+      "originalSha256": "4d22becc4ad3e2e78a8016478b88748edc0b972ca31875ad745c6e50b95b01b4",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/mobile-rest.png",
+      "originalSha256": "f70eeaf211505e7bd47b73d23abc77d8cd1310b456f1831e175522aa04e4530a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/sidebar-greeting.png",
+      "originalSha256": "e4bdbace19f5b9695119c500c39a410e2edd269260adc1670f80d1bcfe95331e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/logo-glow/sidebar-rest.png",
+      "originalSha256": "31bc82d97e1b826cd07add02f162e1bcd771002997a779ef01a2dcf0c090bff3",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/oli-skill/checks.json",
+      "originalSha256": "b353c0127f7737b9b2cb88c79a9ebe219790c4f455bda1a3aa0e29f54a8a6a90",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/oli-skill/desktop-connections.png",
+      "originalSha256": "92ed91d870932b96795fdf46f31f58d84f70c40e502f35ac515973993c6b1bd9",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/oli-skill/desktop-install.png",
+      "originalSha256": "d2bb6ba142700eb5b79efda01f793962d0666c8d9c32ccca489476bba98c7916",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/oli-skill/mobile-connections.png",
+      "originalSha256": "0b494804f59438c163e44f3a4737df6cdb903426f29768a459059654f5073fc4",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/oli-skill/mobile-install.png",
+      "originalSha256": "648e8aa2667bfa760859331b153dcb690e872e221939f3839e350f6a4b19d902",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/dashboard-1440.png",
+      "originalSha256": "727fddb52ad2b2cddc3ade0523c98f223df8e8fdb227f788e09d4dcd0cc3fe55",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/dashboard-320.png",
+      "originalSha256": "c535f392a5ab4072412ec05b6bb5335d9b653d438f6aa01c748c014d681a3e20",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/dashboard-390.png",
+      "originalSha256": "fd062ad6995c8a661a8c7c8bcf52ea217b7d52793b396403a4cf6441cd84e478",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/history-1440.png",
+      "originalSha256": "f995923ce85eb28ce7574fe29badc8f091e81f0d6d9de8d05c31c350c545a619",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/history-320.png",
+      "originalSha256": "749fd43d4c9810d7bbedf37cdf19a3f6fa8b4678338bac31f48363b6c75dd78b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/history-390.png",
+      "originalSha256": "ebfff1bfc26c939173d806c1feb62b6f9ea7c63818b83e6f840850efb09d6f5b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/notification-controlled-320.png",
+      "originalSha256": "13934782d049eb17cd5d7d57a51ba1ae2e221d63892db32bda227be1c314ea28",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/quality-1440.png",
+      "originalSha256": "f256270e92a5bc5a7d0f4ac92d7a727d1582d64c7f31288c72c12cf56c71aa54",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity-production/quality-320.png",
+      "originalSha256": "b1ec528c1d5f26001dc28e7d05cfd15506a937db4302425fe8b12204c0c2e267",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/checks.json",
+      "originalSha256": "b3bf04e8f82578fdb3449c55c1b6b5e24b235c3b93121ae97b588677571102e6",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/dashboard-1440.png",
+      "originalSha256": "449c550852582d1beea6ac9dc64c60152a1c1f7b9d66938f2cc26291019b2c89",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/dashboard-320.png",
+      "originalSha256": "b1ff6adab5de5631579afaad65352d0febd7e8cf77a9596d5a417e91e053ac17",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/dashboard-390.png",
+      "originalSha256": "ab5d85aa66441c38f33f8a5378050de6a9dfe228f50dba702a03b6d3c930197b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/email-notification-320.png",
+      "originalSha256": "d879f385db4ac440cdac03574ac4effe2756100cce32da1105d3f02e811ded5f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/history-1440.png",
+      "originalSha256": "df77fa7f6dfe4cc0ed7bd5bcfcaa50f78c46b85a5ec4d86217532ee2e2ec4d4e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/history-320.png",
+      "originalSha256": "fec3d560baa505a025ff9d72f640908a9c401c4cabcb6bf17b7fe0beb3ca4d23",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/history-390.png",
+      "originalSha256": "e38a950aa49154530cb7587bb74aef197de72483f190fa71cc97f8b0cf013e41",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/inbox-320.png",
+      "originalSha256": "c4212a4c9f05cc65ae6a0769c444f81115db03e12f234af95783e7911777efff",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/quality-1440.png",
+      "originalSha256": "c50e23876564b9f57ed508bd4bbbd618d61cc1bd2318cbe5124d941953f32c06",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/quality-320.png",
+      "originalSha256": "8c866d491c8c611377d12bccd447afab81061c19112fe54a0f81a049c8bd2e48",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/product-clarity/quality-390.png",
+      "originalSha256": "82f8ceafc20eaa4179397a9d2752cd8619007d9cf9c9dffcbca87bba769eb90b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo-production/ask-1440.png",
+      "originalSha256": "6bf6e2f8b7a33e15209fe126235ed62c97ecda66a82a5febf805a9dca5477c09",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo-production/ask-390.png",
+      "originalSha256": "f7a847f83f7dfdb5584680e8f5a8cf0feacd96c48ef06be32a82fb7b6dd61efa",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo-production/dashboard-1440.png",
+      "originalSha256": "d4193a3b1530c6b4d2bf99e3201e4f06bd7387fd47b37540b1f6e52d343ffff0",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo-production/dashboard-390.png",
+      "originalSha256": "a7a3395d258be4e49d6fdc02be32dc6e713ddaa55ceab94ce6db4de039fac212",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/ask-320.png",
+      "originalSha256": "a0a9e46da4385f43d7cf8e399d692250bdd7786ad6d8d5176232dca80d4e098b",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/ask-390.png",
+      "originalSha256": "a0b366ee9b6babff0bab0ad16dc4c472f5e888b8039edfbc0c773b8e84b9c75d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/ask-desktop.png",
+      "originalSha256": "5127865dbb0d7dbac6d9656fea2bbd3386b844aa76e411a6e9c4408699ea5b87",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/checks.json",
+      "originalSha256": "07e06c5c81626d4db6c8a3e35aab71c86474c176749ed9009e9c13bad40fe14e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/dashboard-desktop.png",
+      "originalSha256": "e0e199bf7c64ddee1ad02e3e4d4a239175bb58fcbd22c2991692de08bb7059b1",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/header-320.png",
+      "originalSha256": "8c4ce067b485edb0b42fd03d5e73607894f7d380286aa2e52effe2020ca0bf3f",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/header-390.png",
+      "originalSha256": "d86e72a0acb3d0c6afb9d80612dd52dc5b6e85de2dc96e755380f6832bcfa4b1",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/static-logo/sidebar.png",
+      "originalSha256": "b26c28e7a385d04cc8727158d2426fb1350d14f48780e06c01e88cdd1ebdd885",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/subtabs/checks.json",
+      "originalSha256": "42a8df340c76da0541eeca63f717cb0e7ee1ce6471e3180daaf25e24ccb0a11a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/subtabs/desktop.png",
+      "originalSha256": "06199a79ccf45e229a894239ff6be450308a52296c71cb837719b02437e2e9e7",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/subtabs/mobile.png",
+      "originalSha256": "79a4112d99ff11a6d3a2f775f6c93add2733251e73652a26e5ce3af648b28eae",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/subtabs/telegram-desktop.png",
+      "originalSha256": "691769b8eb6ae0475f14cec78c946074d65dd23a4442b8c2550435090288c7d6",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/subtabs/telegram-mobile.png",
+      "originalSha256": "f5e56b5322814f502347de6c69b133d3e91a176bd1ade89d4d3af77c235ae117",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/checks.json",
+      "originalSha256": "b33370dc06ec7d22779f59102b8deac821df654a7b9b9b5e898ba6621c81615c",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/desktop.png",
+      "originalSha256": "6db8ea745e1dd22c3473735c2d13f2ed7ce63016a201da9a272bbda8bfa084fe",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/mobile.png",
+      "originalSha256": "f59dc90b22f0af010c7d11c892e3d40c5c7858e1fa7010442d659beea2d14c45",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/settings-desktop.png",
+      "originalSha256": "ff3c6636fe582848f12f09964e1b143c933d1bf367769ccfd0c8e30f6b2beb54",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/settings-mobile-off.png",
+      "originalSha256": "822610d44138cef7383264303c9f38092cc110d7d7bd2be232b13c5816343b08",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/settings-mobile-on.png",
+      "originalSha256": "0695f3a6aa103b3bf0ad8d924387e98d6251589b3e17bcf14a161f2cb945894a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": ".impeccable/review/telegram-visibility/telegram-mobile.png",
+      "originalSha256": "487c14b5a292c6f86368e9ad3deb114b73522e9464f4fc5843c24f4749fe558a",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": "README.md",
+      "originalSha256": "5575be82a641e9c2757ad90abb965fd3d0c35fd78753cfadbaea1d1fe777a1ff",
+      "publicSha256": "30326c3ea10b7532334d6c1c98fa9fb4c3dc10e1e8f0c66e49af22cbbff8de01",
+      "action": "updated"
+    },
+    {
+      "path": "apps/web/public/skills/oli-skill.tar.gz",
+      "originalSha256": "2ec655d87480e0ac94ff4c7537a69671e4b9b247915af093d07d9d61a9b73a44",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": "docs/WORKTREE_CLEANUP_20261018.md",
+      "originalSha256": "2ba150e2a508321179659c03ac72450806370bd5477629bc8fcc6b336f5b8cd5",
+      "publicSha256": "f80b891e26eb7058884835960b97cbe5faf1c611707eed961f105bd1490219f4",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-final-browser-20261017.json",
+      "originalSha256": "64eaa5d93dd50e88a306733098feb34cf446f13e25dd87d6c6010e3a3303925e",
+      "publicSha256": "e4da9964ea7af405b5ef0faef68bbbfc94adfb0a9f3f305bd0e31aa13db3b28a",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-marena-live-2026-10-17T23-12-53-341Z.json",
+      "originalSha256": "b098759c771b17c2268aaabc4fb090eec2ad05a538b6ec736fd6daa2ddef50d6",
+      "publicSha256": "66bb39aabf3735729a252c621fe679c304b5c0934e3e0569ed74185b05b83f1b",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-marena-live-2026-10-17T23-16-24-811Z.json",
+      "originalSha256": "e1a4415740cb992d9f4b9c72a7c2f571a8c82c293fc2dbb48cf876f78da3ea36",
+      "publicSha256": "8e49906d6454cfbe477f39925351b4d18f58c2209a5179774a13b8597bf55237",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-marena-live-2026-10-17T23-19-18-180Z.json",
+      "originalSha256": "79bfbb0ac7f30b69995d95c818b8651b0015f2d0abfd54971fc46c13897bdb8b",
+      "publicSha256": "62f871a5520915d97b91f84362883a94061f19b4438ce7f6eddb9303e735dc9c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-ronda-live-2026-10-17T23-57-09-830Z.json",
+      "originalSha256": "4351b8a9f884cacca4f556cb53c78ea8000d4a1da201f6655375734b9206307d",
+      "publicSha256": "9cd13df4760192a94271c5f2aee10708078005349b62e0105f49dda238d867b8",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/candidate-selva-live-2026-10-17T23-30-39-754Z.json",
+      "originalSha256": "13dbef3fb4b464dec51e1dc41605ec676d30286abfce305813e433bca2f9ee2e",
+      "publicSha256": "5b90aa2acdc5f435984cd3cb7f9e27cd229f461747fa15415d1e990f59f45f8c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-2026-10-17T22-01-40-441Z.json",
+      "originalSha256": "d02a38e88f4a27882acccb7bb9f13e461ddbe838e641b762f728eef36497bd94",
+      "publicSha256": "992e91597b1fed9fa3ae6977e092313db0d7c3b43799e13a4ff27f5b84712df0",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-reparse-2026-10-17T22-33-23-540Z.json",
+      "originalSha256": "04a2aa7791f3389b68bde9675944334e6981796dd5a79e939e3b0c213365e0c6",
+      "publicSha256": "5beac4cb2befba7373e2368f9c0c2406c3e8d16af8d1db597c2de8a292b084f9",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-reparse-2026-10-17T22-37-29-083Z.json",
+      "originalSha256": "33da9e3752ee7495b1fd0650b5464c0d9cdf3b84ebb8a02b00e4cdfe68bc2adf",
+      "publicSha256": "5eb6c68ccbcc19aa7ff62a95074777b1a30392406aac63c28ee4e44c035119d7",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-reparse-2026-10-17T22-39-32-996Z.json",
+      "originalSha256": "34429c93194328dc41f7b9c10e16338da5f6274a6541bdfec83e1d4f01a4c215",
+      "publicSha256": "0af5cbea41a12780eb77308e51e43110bae2f1842a6839408e056d5ec8709fc1",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-replay-2026-10-17T22-29-24-729Z.json",
+      "originalSha256": "192d1fd151f79c2fc1e71bbe9107abaf9ee64a9bc29d9f208b1d4c58e4f20896",
+      "publicSha256": "081707bdfdf4faba96edf39c16b6c129288e923af5a17f6c4cd8aff6bc148d07",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-selftest-2026-10-17T21-58-11-677Z.json",
+      "originalSha256": "824a2c7bf9998959f6a8f3f8c0fff402872b7e8a0175fcdc5c6110419caa0657",
+      "publicSha256": "316dc1e8ae13082bc6c542cf38da7a8b19767bb6682f4db14634d82160c6cfed",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-selftest-2026-10-17T22-00-00-521Z.json",
+      "originalSha256": "a4a41d01d87fc11337fa4f5b53bf27ebbf07182abcdcade00a917a8c39cd6b25",
+      "publicSha256": "fc11b77519147604aca0139564cc5bb1e410f09336f4135208a2997815b64f62",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-selftest-2026-10-17T22-01-02-578Z.json",
+      "originalSha256": "a7d6edceee5f6b08214729e1f72275895f92e1e3f5d545808755c67470bd2e41",
+      "publicSha256": "fe556fa9b72c6424925475d53732d2913df14b6426c4ec25db3cba1c0e5bc32c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-brisa-selftest-2026-10-17T22-07-01-270Z.json",
+      "originalSha256": "19f362f1c0adff8aef2d0befb155b9b0198ed779d94b8f3364559e2f1be08590",
+      "publicSha256": "26dc7512196ff06847223e1c0196a282e7a6a4227bd4bdbcec5156bbfbc2d0b0",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-2026-10-17T22-01-30-431Z.json",
+      "originalSha256": "cd7433ad5e58b347dda35ed9c1b09c4145be2e776bed8d30a086c1c069160868",
+      "publicSha256": "471678f5ef5643671a0545b87bd9f1d1e876ee4a8a1e74b35c2962af3deafc01",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-reparse-2026-10-17T22-33-23-540Z.json",
+      "originalSha256": "1184c99e7306e34a0cedea5f40088aa5f46347774aba283897bffcba76f6ef79",
+      "publicSha256": "31c2c5361e213afa7df743430b53eb59cfeeac4446b1ce5d839872c9c5684508",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-reparse-2026-10-17T22-37-29-085Z.json",
+      "originalSha256": "4e3307a99465d205cd6fc3c19fea0eabf568c1474119f30b58d492551e0f89b1",
+      "publicSha256": "b1f66127b10a07947f3eeebefdcb0bd1100eca293b682be7cca93395560db2c4",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-reparse-2026-10-17T22-39-53-208Z.json",
+      "originalSha256": "7d3b9565dcd93ea91336d6dd5d934d9550c09ba63d73724729737668f61f8c0c",
+      "publicSha256": "4eb5b97a3636f7848fa237dcc99e8db029ca35379b5ad759fb7c0ee506b2f0a7",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-selftest-2026-10-17T21-57-48-792Z.json",
+      "originalSha256": "3a8ebbcb3d5bc5899f5cbd0dfcb396797c3f4ee7359226d2f0842917826361bd",
+      "publicSha256": "3410d660e7f74002db34fc14d4e31bea887d1fc47e40d5b936c17d1148f161e2",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-selftest-2026-10-17T21-58-05-070Z.json",
+      "originalSha256": "fe3cb7e488762e327dd9c04669481d65e661815d1496a09487cabde5e58035b5",
+      "publicSha256": "e81b9fbe564f0d7a6f9c7a306511110450795b2cc580d07a73192db2bb71dca5",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-selftest-2026-10-17T21-59-06-596Z.json",
+      "originalSha256": "404e6c446ea9c6a78e786057fe69d2bda45f3d063d04c953d97330d2930404bb",
+      "publicSha256": "8bc32c602caf6bee4073cec90b27551254e178bc29d97145f0260ca937f6be61",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-selftest-2026-10-17T21-59-53-479Z.json",
+      "originalSha256": "8654ef8b43d03152cd860134d89a0409d54b39b0d7733bb3b8af612d64e6da22",
+      "publicSha256": "262370263c4b92bc1374d9892599165bf5dc5fb5c0ed05ba3ad7d0beb033ebcf",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-cedro-selftest-2026-10-17T22-00-42-221Z.json",
+      "originalSha256": "d9cb55bc6ce0a4bc9863b9aababe9592a283e709963e8575bb1c8aac2044dcaa",
+      "publicSha256": "ea6daf02e7f94a68a97011d4ca38d5aba6f9d14dca4f27a7a8e70f61bbe3651e",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-2026-10-17T22-01-57-433Z.json",
+      "originalSha256": "2a41045f4673f3ebc256aa7b22c93384cf2ea6d721163180362059b59bab75cd",
+      "publicSha256": "9ea4f2966488bcf32ebf0cf490aa7d886fa9b1279e857bf69b9b34a49bf9600c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-reparse-2026-10-17T22-33-23-540Z.json",
+      "originalSha256": "1d770fcafc511a2b97d6b6c2a41776e9604972fda0a18d1f6c65cba373ef2e92",
+      "publicSha256": "97fe35ced16a8f613fd2df612a17ad5ae967da3bd7b88fbc05c145e2e5ee4439",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-reparse-2026-10-17T22-37-29-083Z.json",
+      "originalSha256": "b6dafc7fd473b876e63d735dce239a7651d46ab917ac6a69e0bfa44560ce4640",
+      "publicSha256": "9c04ca38c04074786ce442be1de75ed012ba7f59fe1ed531971ea636d6c987eb",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-reparse-2026-10-17T22-40-14-993Z.json",
+      "originalSha256": "873ca403948cb332f1ffb12db3cdfc18e2978e53c0ec568c477e16fed2694024",
+      "publicSha256": "fc1375df0798c3c39c0d7af3cc4ac6a0278e2769bd88749e3197e605c6795f3c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-selftest-2026-10-17T21-59-21-465Z.json",
+      "originalSha256": "c1a7a0ac885279149d30fcdabd080056418c7e16b24478e0806f3652236ddf21",
+      "publicSha256": "2e1fad24fed34f19e10a4557b6bb9807ce773e2572ea1ede708466cc37d6e99d",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-lumen-selftest-2026-10-17T22-01-12-126Z.json",
+      "originalSha256": "50e770a6324ea1f84af1ab59ad40dc07213ea7006c6295ccf26620027a34b938",
+      "publicSha256": "6615a5c227551fb3b6978d24bf80864da270ab8890b370ee9cba134df0bd282e",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-marena-selftest-2026-10-17T23-04-54-520Z.json",
+      "originalSha256": "4781f7b4ca738de974410f6c6a31c7a9e4de61670fbd76a2ad616214e33946bd",
+      "publicSha256": "9caf5a484f03d3b116459268f5d90741f8c79120100c57c8ac938ee529c542d5",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-marena-selftest-2026-10-17T23-05-36-489Z.json",
+      "originalSha256": "257303b635bda40c7e05322fcead99ce105b583e3c2fe1ca8256f5912df3ed41",
+      "publicSha256": "08b189f261f562ac37a92ba2764fc37f50f95a4f5e2ab8a1181967abefb0a4b5",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-ronda-selftest-2026-10-17T23-39-14-709Z.json",
+      "originalSha256": "0e350473a3b14dfd8467f4c4fcd42c7d410df2ffb5d32a4eb848fecbf13424e9",
+      "publicSha256": "66b00f2770f2377709cdf9e06426fb53195e6687d6acbfb34f4ef625a78ce150",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-ronda-selftest-2026-10-17T23-56-20-585Z.json",
+      "originalSha256": "346e4838bc999328c26987bcd8faa40087190a1c231a22a010ae79ad5290c68e",
+      "publicSha256": "8a8964eda6f1161508edd25478d065384700e7e103a79d4568b99398e7d61ef8",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/company-journey-selva-selftest-2026-10-17T23-29-23-973Z.json",
+      "originalSha256": "b648ed9d4fb553c5d2417f7acb9f9ed00f3b8377ba4d252ce55409eaef14b937",
+      "publicSha256": "b389bd5a22193b1a26e6677ef8de348d963d8d097ac0018d9572fb577d6e51e5",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/conversation-presence-20261017.json",
+      "originalSha256": "0e758b6a1b52c2188f6f9c1f5023353c27a49f6f6bc44dfb4427fa17750855da",
+      "publicSha256": "e4cc6ddb34c4c9f671dce6e4f4073fe5a61f7cec7e9226284abd93034b1f0dc6",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/dashboard-personality-20261017.json",
+      "originalSha256": "beee5aecb5f3f4a039373c73e27a964d106b9e535363a3b161c582024bf63ffb",
+      "publicSha256": "4bc7b5b83d03619cdbe322cf2ec35210668e2c348b93f36d05563e51d7f986a2",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/interactive-chat-20261017.json",
+      "originalSha256": "deafdf4d01ceee143f0ba6a70459ec3fbb0d7cb15af634916ddaa9946b3385e0",
+      "publicSha256": "e814b9f8e5679ed8fe776078b787fca52bc6fa27aa615703f07ab10d504f2c7c",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoice-trash-20261017.json",
+      "originalSha256": "972eb2f13661cdfe680c75a8f9d9b1cadb4c7edef1d073c0df6511c8ea8653b7",
+      "publicSha256": "40962c82e1128928c9008c46dcde8454396cf1119c17ba8db7fc4a29a5f0a8d3",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-image-replay-2026-10-17T17-34-47-782Z.json",
+      "originalSha256": "688ce22f4eedf154fe9b041cf98b2c4b8c741850e164de8bd2f82fdac166065d",
+      "publicSha256": "f1ce484a777396b26e6eeeaa624c028dbf67b0f2a6392c4bd50b3dd55db32250",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T15-00-29-217Z.json",
+      "originalSha256": "7978a9a4d4844f204074e04234d105e529145a5580b436fc070eb9d473710ff9",
+      "publicSha256": "2665a2b79d849cd55598ef4494485ce8babe79710cc9fd730b74c31d473c30db",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T15-00-34-374Z.json",
+      "originalSha256": "8393669edba1a768d84307ddd2c1f6a4fbfe46fe74588c2aa58ecc1ebdadb82a",
+      "publicSha256": "f34f02650e0cc8955e3d9eb8ba59c036d9c6e1930177ade99c33a0541d5058f7",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T15-07-58-988Z.json",
+      "originalSha256": "61b25729c718eac5474aa5ec67b08b9c31e65fc3a5c5ecb2fb8dffb4f23e6c7d",
+      "publicSha256": "712d5af06f0f47343a90e067ecd03791469668beee351cbfa933913c22d94953",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T15-19-52-815Z.json",
+      "originalSha256": "cdf444f7d03bdf7175bc9e7732779387f85c3ecd5c2546ba947bd3a3e9b068ab",
+      "publicSha256": "f10772605d45eb85f72e9ec3bdd0406387e3f01bd2145f71027322f4c37e628f",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T15-49-27-321Z.json",
+      "originalSha256": "3ca91ca5662b6a13b545507d3490a58d5ddc19442ea2ba78fef95da1a42a9604",
+      "publicSha256": "a2326645c76385908a04307c50ad139b9572e285dee231af8c6045ce1cacff94",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T16-24-08-411Z.json",
+      "originalSha256": "e0d02d08cd09dc8f3b6bd28679a4ecccc7a5c11b4fa47826abcddc22fcf022f6",
+      "publicSha256": "2e3d2537d93e2619c8d86c63569be351ef2cf119a1e13e0ba793e615bbbe60a4",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/invoices-pdf-2026-10-17T16-48-33-680Z.json",
+      "originalSha256": "b5424c1baae81978d182ecfc4eae1cf362d51f546f160093157394d2036158b1",
+      "publicSha256": "c2507828cfa9664031da66b200c6dc2c455e20f5d7c47b74fa727f8a5e00d8c7",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/logo-glow-20261017.json",
+      "originalSha256": "7a68683dd07b737c36eb8c7fc4248bba020d5e3359ed822a5903a8d89f89b575",
+      "publicSha256": "8ebc4a90bb48b878de4d1ddebaf511233fde4d9b53a170b7269abbb694702cf5",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/product-clarity-20261017.json",
+      "originalSha256": "6f19a3b3b6f5f65292f9ca539c40e456c1f6b1fec12a0144bb224a6b57d4de6a",
+      "publicSha256": "f72cd53c9b072402690d7f0b3e87ea8ab4b5ef8a8cbc576d1aab5ec451f979b1",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/ronda-concurrent-deployment-audit-20261017.json",
+      "originalSha256": "880dd5e6da85c8945ef00031fa7f61cb5442bcf016b4e8629b0adc63b93e64cd",
+      "publicSha256": "190fa480fd77fa5be327159c1d80864901e979151099d35d2a77cbcfd32f7203",
+      "action": "updated"
+    },
+    {
+      "path": "docs/evaluations/static-logo-20261017.json",
+      "originalSha256": "4ab4d68f4571e06dca28e865be5ba19009444838f22b5c80fcccf79a5150e80c",
+      "publicSha256": "4478a52e2c66c91a18ff28f20284f62cc1f7099a9d91e3b14ff37c67b445ff5f",
+      "action": "updated"
+    },
+    {
+      "path": "fixtures/README.md",
+      "originalSha256": "63d7db0c5c039744e3e12c160e10e22f26a5eb3247c4fa196ff31aa4c02a1e9d",
+      "publicSha256": "b94ab91cbcf2d12b4df0f4401d1555f9dab6af1c9f131722d6ed647c183e091d",
+      "action": "updated"
+    },
+    {
+      "path": "fixtures/invoices-demo.zip",
+      "originalSha256": "5d9b07910a723e22278cc8d3ed63424dce7fdd7ee303346bf2b499e7a3131d0e",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": "fixtures/r2-manifest.json",
+      "originalSha256": "4d4b7f66c35ad3cd36a144f6c6b02bd4463f0d3aaf815ff225c7a89f7ea97f0d",
+      "publicSha256": "4f1b7e0d5bfcc3a9c14b83e55a672f605e7346d387d2a17667766aef6f5d2518",
+      "action": "updated"
+    },
+    {
+      "path": "fixtures/r2-storage.json",
+      "originalSha256": "23f92946b76fec83aee7ca87cf3ac8a04f7b9ef532153ea121c104d53731bfe2",
+      "publicSha256": "4f8ecc757f60d2420443c09b716da8f8483e268a5b7a97829422b6a286ad1959",
+      "action": "updated"
+    },
+    {
+      "path": "package-lock.json",
+      "originalSha256": "ee46bfc89d841ac4832443676c1ff408383d88bcb1416de62592fb23592b633d",
+      "publicSha256": null,
+      "action": "removed-generated-artifact"
+    },
+    {
+      "path": "scripts/tests/test_r2_fixtures.py",
+      "originalSha256": "51dd1417fce6503b15f42eed8ea6ed4d78821c5ea92f8b04e841605f849fcbec",
+      "publicSha256": "c8cb081ebb0aa63fccbedccd62d5254fc361689b00e6881e78ee2e055b5f5e2c",
+      "action": "updated"
+    }
+  ]
+}

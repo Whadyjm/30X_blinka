@@ -3,6 +3,10 @@ dist/
 .wrangler/
 .env*
 !.env.example
+# Public Vite mode defaults; never put credentials in these files.
+!/apps/web/.env.development
+!/apps/web/.env.production
+!/apps/web/.env.mock
 .dev.vars*
 !.dev.vars.example
 .DS_Store
@@ -18,3 +22,19 @@ shots/
 /artifacts/
 /assets/reveal-demo/
 /fixtures/*.zip
+/apps/web/public/skills/oli-skill.tar.gz
+
+# Local exports, state and credentials.
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+*.db-shm
+*.db-wal
+*.pem
+*.key
+*.p12
+*.pfx
+*.tsbuildinfo
+.venv/
+.pytest_cache/

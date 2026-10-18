@@ -72,7 +72,7 @@
     "sessionRevoked": true
   },
   "browser": {
-    "screenshots": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/.impeccable/review/candidate-2026-10-17T23-57-09-830Z/",
+    "screenshots": ".impeccable/review/candidate-2026-10-17T23-57-09-830Z/",
     "javascriptErrors": [],
     "checks": [
       {
