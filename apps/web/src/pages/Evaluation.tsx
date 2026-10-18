@@ -3,6 +3,7 @@ import { computeStats } from '@/lib/briefing';
 import { performanceRating } from '@/lib/performance';
 import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
+import { Oli } from '@/components/Oli';
 import { Card, CardHeader, EmptyState, ErrorState, InlineAlert, PageHeader, Skeleton } from '@/components/ui/Card';
 import type { Decision } from '@/contracts';
 import { useEvaluation, useInvoices } from '@/hooks/queries';
@@ -42,16 +43,21 @@ export function Evaluation() {
         title={t('Oli performance')}
         subtitle={t('Dataset {dataset} · run {when} · {n} labelled cases', { dataset: s.datasetVersion, when: formatDateTime(s.runAt), n: s.totalCases })}
       />
-      <section className="mb-8 grid gap-6 border-y border-hairline py-6 sm:grid-cols-[auto_1fr]" aria-label={t('Performance score')}>
-        <div className="sm:min-w-36">
-          <p className="text-sm text-ash">{t('Performance score')}</p>
-          <p className="mt-2 text-[64px] leading-none tabular-nums text-ink">{rating.score}<span className="text-xl text-ash">/100</span></p>
-          <div className="mt-3"><Badge tone={rating.status === 'Doing well' ? 'ok' : rating.status === 'Needs improvement' ? 'bad' : 'warn'}>{t(rating.status)}</Badge></div>
+      <section className="mb-8 grid items-center gap-6 border-y border-hairline py-6 md:grid-cols-[minmax(0,1fr)_minmax(16rem,24rem)]" aria-label={t('Performance score')}>
+        <div className="space-y-6">
+          <div>
+            <p className="text-sm text-ash">{t('Performance score')}</p>
+            <p className="mt-2 text-[64px] leading-none tabular-nums text-ink">{rating.score}<span className="text-xl text-ash">/100</span></p>
+            <div className="mt-3"><Badge tone={rating.status === 'Doing well' ? 'ok' : rating.status === 'Needs improvement' ? 'bad' : 'warn'}>{t(rating.status)}</Badge></div>
+          </div>
+          <div className="max-w-prose space-y-3">
+            <h2 className="text-xl text-ink">{t('Your finance teammate, with measurable results.')}</h2>
+            <p className="text-sm leading-relaxed text-slate-600">{t('The score is correct decisions divided by labelled test cases, multiplied by 100. An unsafe approval always means “Needs improvement”, regardless of the score.')}</p>
+            <p className="text-xs leading-relaxed text-ash">{t('Doing well: at least 95%. Needs attention: 80% to under 95%. Needs improvement: under 80% or any unsafe approval. This is a recorded test with fictitious invoices, not an accuracy score for your company.')}</p>
+          </div>
         </div>
-        <div className="max-w-prose space-y-3 self-center">
-          <h2 className="text-xl text-ink">{t('Your finance teammate, with measurable results.')}</h2>
-          <p className="text-sm leading-relaxed text-slate-600">{t('The score is correct decisions divided by labelled test cases, multiplied by 100. An unsafe approval always means “Needs improvement”, regardless of the score.')}</p>
-          <p className="text-xs leading-relaxed text-ash">{t('Doing well: at least 95%. Needs attention: 80% to under 95%. Needs improvement: under 80% or any unsafe approval. This is a recorded test with fictitious invoices, not an accuracy score for your company.')}</p>
+        <div className="order-first mx-auto w-full max-w-72 md:order-last md:max-w-none">
+          <Oli size={384} state="understanding" speed={0.7} followCursor />
         </div>
       </section>
       {isMock && <div className="mb-4"><InlineAlert tone="warn">{t('These numbers come from the mock API, not the real policy engine.')}</InlineAlert></div>}
