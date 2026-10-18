@@ -1,0 +1,73 @@
+{
+  "featureCommit": "59d1687",
+  "baseFrontendCommit": "9eb8120",
+  "published": {
+    "date": "2026-10-18T01:23:26.625Z",
+    "host": "https://oli30x.ultramare.dev",
+    "commit": "59d1687",
+    "version": "87f18740-a691-42d9-8fee-f92df5158efb",
+    "scope": "Lecturas autenticadas reales y preferencias locales. Sin aprobar, rechazar, reanalizar ni cambiar facturas en producción.",
+    "checks": [
+      "Puntuación publicada coincide con accuracy de la evaluación etiquetada; alcance y fórmula visibles; actividad de empresa separada",
+      "Idioma EN/ES y tema claro/oscuro funcionan desde Configuración; controles retirados del encabezado de la app",
+      "Aprobaciones incluye sección para revisiones que necesitan correcciones",
+      "JS/CSS servidos coinciden byte a byte con el build publicado"
+    ],
+    "counts": {
+      "invoices": 17,
+      "labelledCases": 20
+    },
+    "score": 100,
+    "actualInvoiceMutationsToServer": 0,
+    "errors": [],
+    "result": "PASS"
+  },
+  "localUi": {
+    "scope": "Mock fixtures in local browser; no production writes",
+    "staleReviewUpdated": true,
+    "approveAndRejectWithReason": true,
+    "uncertainNotApprovable": true,
+    "unknownVendorChatDraft": true,
+    "settingsThemeLanguage": true,
+    "performanceScoreAndCompanyActivity": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "errors": [],
+    "result": "PASS"
+  },
+  "validation": {
+    "frontend": {
+      "files": 11,
+      "testsPassed": 47
+    },
+    "apiIntegration": {
+      "testsPassed": 10,
+      "scope": "Proveedores de lectura simulados, D1/Miniflare local; aprobación, rechazo, concurrencia, política vigente, reanálisis e incertidumbre. No mide precisión del extractor real."
+    },
+    "i18nSpanishKeys": 928,
+    "typecheck": "PASS",
+    "productionBuild": "PASS",
+    "wranglerDryRun": "PASS"
+  },
+  "runtime": {
+    "preservedByteForByte": true,
+    "bindingsPreserved": true,
+    "sha256": "7619ffc58c479589528f499d10e5ec9e5d842ebe9a0de439a4c27c295700b061"
+  },
+  "liveReviewDiagnosis": {
+    "reviewsWithUncertainRead": 5,
+    "eligiblePendingApprovals": 0,
+    "reasons": [
+      "INVALID_OR_MISSING_DATA",
+      "DOCUMENT_TYPE_UNCERTAIN"
+    ],
+    "nextStep": "Obtener una lectura verificable con documento más claro; no se habilita una excepción que omita la seguridad del extractor."
+  },
+  "limitations": [
+    "Puntuación basada en 20 casos históricos etiquetados, no precisión de facturas de empresa ni de extracción end-to-end.",
+    "Aprobación registra autorización simulada y reserva presupuesto; no registra ni ejecuta pago.",
+    "Flujos de aprobar/rechazar y renovar solicitud probados localmente con fixtures; en producción solo lecturas y preferencias locales. No hay solicitudes elegibles al verificar."
+  ]
+}
