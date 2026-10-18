@@ -8,7 +8,7 @@ La limpieza no modifica API, dominio, contratos ni extracción respecto de `15c9
 
 ## Árboles y recuperación
 
-Se retiraron once worktrees obsoletos: diez temporales y el del logo terminado. Se conserva `main` y el worktree `oli-video`, que sigue en uso. El trabajo concurrente en el informe de robustez se conserva y no se mezcla con el código de producto.
+Se retiraron once worktrees obsoletos: diez temporales y el del logo terminado. Se conserva `main` y el worktree `oli-video`, que sigue en uso. El informe concurrente de robustez y su evidencia se incorporaron al terminar su autor, sin cambiar código de producto.
 
 Antes de retirar cada árbol se verificaron sus parches, archivos sin commit, un archivo completo sin dependencias y su hash. También se verificó el bundle Git. Las ramas locales obsoletas se retiraron solo cuando su commit ya era recuperable desde una referencia remota. No se borraron ramas remotas de otros trabajos.
 
