@@ -1,18 +1,34 @@
 // Generated from the immutable run identified below; never edit measured counters.
 export default {
-  "displayName": "marena ficticia · lectores y cola reales · 438f49f7 histórico",
-  "datasetVersion": "marena-holdout-v1-predeclared",
-  "evaluatedAt": "2026-10-17T23:21:56.378Z",
-  "workerVersion": "438f49f7-714c-455f-b840-064232fb46e2",
-  "bundleSha256": "ff174bfacb239f2860e313aecaf30ab97ff23172b30270983d9619d01fec26d5",
-  "reportPath": "docs/evaluations/candidate-marena-live-2026-10-17T23-19-18-180Z.json",
-  "reportSha256": "79bfbb0ac7f30b69995d95c818b8651b0015f2d0abfd54971fc46c13897bdb8b",
-  "manifestSha256": "29eee11d86e2f6c4fa500bbffe8f18e3d55fc06464c70507d2ecf1c109013971",
+  "displayName": "ronda ficticia · lectores y cola reales · c2ebd8b8 histórico",
+  "datasetVersion": "ronda-holdout-v1-final-predeclared",
+  "evaluatedAt": "2026-10-18T00:01:23.453Z",
+  "workerVersion": "c2ebd8b8-e2b7-4316-8904-df56ac40591d",
+  "bundleSha256": "dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9",
+  "reportPath": "docs/evaluations/candidate-ronda-live-2026-10-17T23-57-09-830Z.json",
+  "reportSha256": "4351b8a9f884cacca4f556cb53c78ea8000d4a1da201f6655375734b9206307d",
+  "manifestSha256": "d730dae5b668b0c000b6535ad061e120c527608b1a4ee795ef66b547bfffabb1",
   "scope": "PRODUCTION_HTTP_REAL_QUEUE_REAL_READERS_D1_R2_FRESH_FICTITIOUS_COMPANY_WITH_BROWSER",
   "synthetic": true,
   "targetedP0IncludedInDenominator": false,
   "limits": "One predeclared synthetic company using supported labelled PDF/PNG/JPEG layouts. Failed reads are included. Historical measurement, not a guarantee for all invoices.",
-  "readerVersion": "labelled-v7:invoice-json-v4-supplier-role-20261017:qwen-image-transcript-v2-20261017",
+  "readerVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+  "validation": {
+    "runnerGuard": {
+      "name": "AssertionError",
+      "message": "Published backend changed during validation\n+ actual - expected\n\n+ 'a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea'\n- 'dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9'\n"
+    },
+    "independentlyReviewedConcurrentRelease": {
+      "path": "docs/evaluations/ronda-concurrent-deployment-audit-20261017.json",
+      "sha256": "880dd5e6da85c8945ef00031fa7f61cb5442bcf016b4e8629b0adc63b93e64cd",
+      "onlyAddedEndpoint": "GET /api/v1/mandate/versions",
+      "readerFinancialAndAuthCodeUnchanged": true,
+      "versions": [
+        "c2ebd8b8-e2b7-4316-8904-df56ac40591d",
+        "049fcd19-54c4-41c2-8e81-e9dccbb76182"
+      ]
+    }
+  },
   "cases": [
     {
       "id": "001",
@@ -24,7 +40,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [],
@@ -64,7 +80,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [],
@@ -104,7 +120,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [],
@@ -144,7 +160,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [],
@@ -177,23 +193,26 @@ export default {
     {
       "id": "009",
       "expectedAction": "ESCALATE",
-      "actualAction": null,
-      "finalAction": null,
-      "correct": false,
+      "actualAction": "ESCALATE",
+      "finalAction": "APPROVE",
+      "correct": true,
       "unsafeApproval": false,
       "correctAutonomous": false,
-      "explained": false,
-      "technicalError": "OPENROUTER_REQUEST_REJECTED",
-      "readerModel": null,
+      "explained": true,
+      "technicalError": null,
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
         "AMOUNT_ABOVE_AUTO_LIMIT",
         "HUMAN_APPROVAL_REQUIRED"
       ],
-      "actualReasons": [],
-      "literalExactFields": 0,
-      "policyEquivalentFields": 0
+      "actualReasons": [
+        "AMOUNT_ABOVE_AUTO_LIMIT",
+        "HUMAN_APPROVAL_REQUIRED"
+      ],
+      "literalExactFields": 8,
+      "policyEquivalentFields": 8
     },
     {
       "id": "010",
@@ -229,7 +248,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
@@ -273,7 +292,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
@@ -317,7 +336,7 @@ export default {
       "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
@@ -335,20 +354,21 @@ export default {
     {
       "id": "016",
       "expectedAction": "BLOCK",
-      "actualAction": "ESCALATE",
-      "finalAction": "ESCALATE",
-      "correct": false,
+      "actualAction": "BLOCK",
+      "finalAction": "BLOCK",
+      "correct": true,
       "unsafeApproval": false,
-      "correctAutonomous": false,
+      "correctAutonomous": true,
       "explained": true,
       "technicalError": null,
-      "readerModel": "deepseek/deepseek-v4.1-flash",
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
         "BUDGET_EXCEEDED"
       ],
       "actualReasons": [
+        "BUDGET_EXCEEDED",
         "AMOUNT_ABOVE_AUTO_LIMIT",
         "HUMAN_APPROVAL_REQUIRED"
       ],
@@ -402,42 +422,48 @@ export default {
     {
       "id": "019",
       "expectedAction": "BLOCK",
-      "actualAction": null,
-      "finalAction": null,
-      "correct": false,
+      "actualAction": "BLOCK",
+      "finalAction": "BLOCK",
+      "correct": true,
       "unsafeApproval": false,
-      "correctAutonomous": false,
-      "explained": false,
-      "technicalError": "OPENROUTER_REQUEST_REJECTED",
-      "readerModel": null,
+      "correctAutonomous": true,
+      "explained": true,
+      "technicalError": null,
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
         "NOT_AN_INVOICE"
       ],
-      "actualReasons": [],
-      "literalExactFields": 0,
-      "policyEquivalentFields": 2
+      "actualReasons": [
+        "NOT_AN_INVOICE",
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "literalExactFields": 7,
+      "policyEquivalentFields": 7
     },
     {
       "id": "020",
       "expectedAction": "BLOCK",
-      "actualAction": null,
-      "finalAction": null,
-      "correct": false,
+      "actualAction": "BLOCK",
+      "finalAction": "BLOCK",
+      "correct": true,
       "unsafeApproval": false,
-      "correctAutonomous": false,
-      "explained": false,
-      "technicalError": "OPENROUTER_REQUEST_REJECTED",
-      "readerModel": null,
+      "correctAutonomous": true,
+      "explained": true,
+      "technicalError": null,
+      "readerModel": "google/gemini-3.8-flash",
       "durableJobAttempts": 1,
       "readerFallbackUsed": false,
       "requiredReasons": [
         "NOT_AN_INVOICE"
       ],
-      "actualReasons": [],
-      "literalExactFields": 0,
-      "policyEquivalentFields": 2
+      "actualReasons": [
+        "NOT_AN_INVOICE",
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "literalExactFields": 7,
+      "policyEquivalentFields": 7
     }
   ]
 };

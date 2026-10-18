@@ -15,8 +15,8 @@ acuerdos, presupuestos, subida privada R2, listado/detalle/preview, procesamient
 revisión humana, dashboard y evaluación histórica sobre documentos ficticios. El resumen
 mantiene el contrato de la UI; `/evaluation/report` conserva versión medida, hashes y casos.
 
-PDF se extrae mediante OpenRouter con Mistral OCR y se contrasta con una lectura separada
-PDF_TEXT de Cloudflare. El parser de texto acepta etiquetas explícitas conocidas; documentos
+PDF se envía como archivo original a Gemini mediante el motor nativo de OpenRouter y
+se contrasta con una lectura separada PDF_TEXT de Cloudflare. El parser de texto acepta etiquetas explícitas conocidas; documentos
 escaneados/layouts no reconocidos y cualquier discrepancia se escalan. PNG/JPEG se contrastan
 con la transcripción independiente de Qwen. La coincidencia entre lectores solo permite
 evaluar las reglas; cualquier advertencia bloqueante impide autoaprobar. Un segundo mensaje

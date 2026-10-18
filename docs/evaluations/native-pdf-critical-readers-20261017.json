@@ -1,0 +1,1063 @@
+{
+  "scope": "KNOWN_DOCUMENT_NATIVE_PDF_READER_REGRESSION_NOT_FRESH_E2E",
+  "startedAt": "2026-10-17T23:56:04.627Z",
+  "readerVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+  "candidate": {
+    "createdAt": "2026-10-17T23:55:01.113Z",
+    "deadline": "2026-10-18T12:00:00-04:00",
+    "worker": "oli-api",
+    "account": "fbaa64f96579f93b2db32a1eb12ff6c9",
+    "previousVersion": "c6d442ca-fe2e-4dba-80c2-9faf978db704",
+    "previousCandidateVersion": "c6d442ca-fe2e-4dba-80c2-9faf978db704",
+    "previousBundleSha256": "b174f1046f2a6b87c1715c8bc5ac84da589fbe10e3c63040ba02b4c9178be54e",
+    "transportFixCommit": "f5818a85874fa0abe944818cab514817fad26c9d",
+    "fallbackFixCommit": "c13d1a3adb19ae0573d4ed5ac2e794cca8ffdb99",
+    "nativePdfFixCommit": "8ff8fe41dd741d006271ed1440c1f777b4d9a0d6",
+    "correctionCommit": "8057263a1ed24cded822de764fc22423cf94c44d",
+    "changedFiles": [
+      "packages/extraction/src/openrouter.ts"
+    ],
+    "sources": {
+      "packages/extraction/src/openrouter.ts": {
+        "publishedSha256": "fbf4631f412fc5c4c229a5274d106ce378f436a272c7a7bd137c4906574887dd",
+        "candidateSha256": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc",
+        "changed": true
+      },
+      "packages/contracts/src/index.ts": {
+        "publishedSha256": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
+        "candidateSha256": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
+        "changed": false
+      },
+      "packages/domain/src/index.ts": {
+        "publishedSha256": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+        "candidateSha256": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+        "changed": false
+      },
+      "apps/api/worker/http.js": {
+        "publishedSha256": "86b2bc488dcfe55cc862f233be4aae6830585eed6af2941879301d38b8d55670",
+        "candidateSha256": "86b2bc488dcfe55cc862f233be4aae6830585eed6af2941879301d38b8d55670",
+        "changed": false
+      },
+      "apps/api/worker/document.js": {
+        "publishedSha256": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
+        "candidateSha256": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
+        "changed": false
+      },
+      "apps/api/worker/extraction-probe.js": {
+        "publishedSha256": "85d0ab7b27aa200e8e6b6773cbd03a3b940d0c6a3777288202013ecbe776a021",
+        "candidateSha256": "85d0ab7b27aa200e8e6b6773cbd03a3b940d0c6a3777288202013ecbe776a021",
+        "changed": false
+      },
+      "apps/api/worker/auth.js": {
+        "publishedSha256": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+        "candidateSha256": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+        "changed": false
+      },
+      "apps/api/worker/repository.js": {
+        "publishedSha256": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+        "candidateSha256": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+        "changed": false
+      },
+      "apps/api/worker/configuration.js": {
+        "publishedSha256": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+        "candidateSha256": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+        "changed": false
+      },
+      "apps/api/worker/processing.js": {
+        "publishedSha256": "b5e03431655fd03e1520281989ecb92183d52ae427f64a646c36cf5420cab3fa",
+        "candidateSha256": "b5e03431655fd03e1520281989ecb92183d52ae427f64a646c36cf5420cab3fa",
+        "changed": false
+      },
+      "apps/api/worker/jobs.js": {
+        "publishedSha256": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+        "candidateSha256": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+        "changed": false
+      },
+      "apps/api/worker/invoices.js": {
+        "publishedSha256": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+        "candidateSha256": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+        "changed": false
+      },
+      "apps/api/worker/legacy-document-type.js": {
+        "publishedSha256": "1b757c7fd2de9d327bf67eda986c41a5ad1b44e24a7d3b2567badd2b79a8391f",
+        "candidateSha256": "1b757c7fd2de9d327bf67eda986c41a5ad1b44e24a7d3b2567badd2b79a8391f",
+        "changed": false
+      },
+      "apps/api/worker/reanalysis-limits.js": {
+        "publishedSha256": "31632d455dc9d676ca00d2d95976996d5086253ce3e85527b04b120aaa059509",
+        "candidateSha256": "31632d455dc9d676ca00d2d95976996d5086253ce3e85527b04b120aaa059509",
+        "changed": false
+      },
+      "apps/api/worker/reevaluation.js": {
+        "publishedSha256": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+        "candidateSha256": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+        "changed": false
+      },
+      "apps/api/worker/chat-actions.js": {
+        "publishedSha256": "eb5d5d8fe288a094a54372744243d20efe1faae97683d893fe86e7940dcb5c6d",
+        "candidateSha256": "eb5d5d8fe288a094a54372744243d20efe1faae97683d893fe86e7940dcb5c6d",
+        "changed": false
+      },
+      "apps/api/worker/chat-tools.js": {
+        "publishedSha256": "c6d6d8138f0d8e0382357953816cc883fa9840b96058c86fed20a4716c920563",
+        "candidateSha256": "c6d6d8138f0d8e0382357953816cc883fa9840b96058c86fed20a4716c920563",
+        "changed": false
+      },
+      "apps/api/worker/chat-prompt.js": {
+        "publishedSha256": "5fd259b17c6d67a65d1bb39ccb11eca25eeaa9499f74d9e612da8b56b82a2332",
+        "candidateSha256": "5fd259b17c6d67a65d1bb39ccb11eca25eeaa9499f74d9e612da8b56b82a2332",
+        "changed": false
+      },
+      "apps/api/worker/chat.js": {
+        "publishedSha256": "d82bb03de58cbf1d4a740d2634c4bfd10e9260fe9c8d9c71d16cb34715ae0d9e",
+        "candidateSha256": "d82bb03de58cbf1d4a740d2634c4bfd10e9260fe9c8d9c71d16cb34715ae0d9e",
+        "changed": false
+      },
+      "apps/api/worker/telegram-invoice.js": {
+        "publishedSha256": "b4e78b669d9e17fc904bff44fcf03a2378b851a3be7032c74eb4a076d566cb70",
+        "candidateSha256": "b4e78b669d9e17fc904bff44fcf03a2378b851a3be7032c74eb4a076d566cb70",
+        "changed": false
+      },
+      "apps/api/worker/telegram-chat.js": {
+        "publishedSha256": "25966118ca5724934ac287c87647b953a47a40433e47a28f6d82f22c827ea05f",
+        "candidateSha256": "25966118ca5724934ac287c87647b953a47a40433e47a28f6d82f22c827ea05f",
+        "changed": false
+      },
+      "apps/api/worker/telegram.js": {
+        "publishedSha256": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+        "candidateSha256": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+        "changed": false
+      },
+      "apps/api/worker/email.js": {
+        "publishedSha256": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+        "candidateSha256": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+        "changed": false
+      },
+      "apps/api/worker/skill.js": {
+        "publishedSha256": "c8b2c5c3be2d80e72f5f4b0c184a9a6de7cbe65a99811d6bea20285232f343b7",
+        "candidateSha256": "c8b2c5c3be2d80e72f5f4b0c184a9a6de7cbe65a99811d6bea20285232f343b7",
+        "changed": false
+      },
+      "apps/api/worker/evaluation-data.js": {
+        "publishedSha256": "fcb4fb28b2d61cff45fdc9025f6c726782b4556ba0cf2e5c0e39bb6d08e0ad49",
+        "candidateSha256": "fcb4fb28b2d61cff45fdc9025f6c726782b4556ba0cf2e5c0e39bb6d08e0ad49",
+        "changed": false
+      },
+      "apps/api/worker/evaluation.js": {
+        "publishedSha256": "bdf4a98189d0c370c85c9ab35c0df8e0be28cf7157cfc7ee431f8641bb45963d",
+        "candidateSha256": "bdf4a98189d0c370c85c9ab35c0df8e0be28cf7157cfc7ee431f8641bb45963d",
+        "changed": false
+      },
+      "apps/api/worker/api.js": {
+        "publishedSha256": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b",
+        "candidateSha256": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b",
+        "changed": false
+      },
+      "apps/api/worker/index.js": {
+        "publishedSha256": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
+        "candidateSha256": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
+        "changed": false
+      }
+    },
+    "frontendPreserved": true,
+    "verifiedPublicAssets": [
+      "/assets/index-S_bCDw5B.js",
+      "/assets/Button-Cgocdm9u.js",
+      "/assets/index-BYj1TvAQ.css"
+    ],
+    "frontendSnapshot": "/tmp/oli-conversation-presence-publish-20261017/release/apps/web/dist",
+    "note": "Bounded operational model fallback plus read-only historical evaluation evidence; financial policy, independent corroboration and current frontend preserved.",
+    "deliveryCommit": "2192757d5bf1abf1f9aab8c6d98b6de7ea065619",
+    "bundleSha256": "dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9",
+    "deployedVersion": "c2ebd8b8-e2b7-4316-8904-df56ac40591d",
+    "publishedBundleExact": true,
+    "frontendUnchangedAfterDeploy": true,
+    "deployedAt": "2026-10-17T23:55:52.703Z",
+    "health": {
+      "ok": true,
+      "service": "oli-api"
+    },
+    "verification": {
+      "api": 136,
+      "extraction": 30,
+      "exactBundledRuntime": 1,
+      "jobsSubset": 17
+    }
+  },
+  "limits": {
+    "maximumCalls": 5,
+    "externalRetries": 0,
+    "financialWrites": false
+  },
+  "results": [
+    {
+      "company": "selva",
+      "caseId": "005",
+      "file": {
+        "path": "documents/005.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "83c64d1943b654fea0da03df4bfda1b04c225e5cd1979dadc3e084fe87203f02",
+        "sizeBytes": 1198
+      },
+      "startedAt": "2026-10-17T23:56:04.629Z",
+      "status": 200,
+      "response": {
+        "data": {
+          "extraction": {
+            "vendorName": "Riverdesk Support Demo",
+            "invoiceNumber": "SV-005-2026",
+            "amountMinor": 9500,
+            "currency": "USD",
+            "issuedAt": "2026-10-13",
+            "dueDate": "2026-10-31",
+            "servicePeriod": "2026-10",
+            "description": "Customer support coverage",
+            "extractionWarnings": [],
+            "evidence": [
+              {
+                "field": "vendorName",
+                "source": "page:1",
+                "quote": "Supplier:\nRiverdesk Support Demo"
+              },
+              {
+                "field": "invoiceNumber",
+                "source": "page:1",
+                "quote": "Invoice number: SV-005-2026"
+              },
+              {
+                "field": "amountMinor",
+                "source": "page:1",
+                "quote": "Total: USD 95.00"
+              },
+              {
+                "field": "currency",
+                "source": "page:1",
+                "quote": "Total: USD 95.00"
+              },
+              {
+                "field": "issuedAt",
+                "source": "page:1",
+                "quote": "Issue date: 2026-10-13"
+              },
+              {
+                "field": "dueDate",
+                "source": "page:1",
+                "quote": "Due date: 2026-10-31"
+              },
+              {
+                "field": "servicePeriod",
+                "source": "page:1",
+                "quote": "Service period: 2026-10"
+              },
+              {
+                "field": "description",
+                "source": "page:1",
+                "quote": "Description: Customer support coverage"
+              },
+              {
+                "field": "documentType",
+                "source": "page:1",
+                "quote": "INVOICE"
+              }
+            ]
+          },
+          "documentType": "INVOICE",
+          "primaryReadId": "0de2b832-3e32-430f-9afa-b62f93da2fd8",
+          "documentSha256": "83c64d1943b654fea0da03df4bfda1b04c225e5cd1979dadc3e084fe87203f02",
+          "corroboration": {
+            "documentSha256": "83c64d1943b654fea0da03df4bfda1b04c225e5cd1979dadc3e084fe87203f02",
+            "readId": "pdftext_ee1936b4-5728-4dbd-8e18-546ffe38561f",
+            "method": "PDF_TEXT",
+            "fields": {
+              "vendorName": "Riverdesk Support Demo",
+              "amountMinor": 9500,
+              "currency": "USD",
+              "dueDate": "2026-10-31"
+            }
+          },
+          "agreementReference": null,
+          "provenance": {
+            "model": "google/gemini-3.8-flash",
+            "provider": "Google AI Studio",
+            "pdfTextParser": "labelled-v7",
+            "documentClassification": {
+              "documentType": "INVOICE",
+              "source": "PRIMARY_READER",
+              "documentSha256": "83c64d1943b654fea0da03df4bfda1b04c225e5cd1979dadc3e084fe87203f02",
+              "primaryReadId": "0de2b832-3e32-430f-9afa-b62f93da2fd8",
+              "version": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017"
+            },
+            "configVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+            "attempts": [
+              {
+                "model": "google/gemini-3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 1224,
+                  "outputTokens": 326,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.0021405
+                },
+                "durationMs": 4185
+              }
+            ],
+            "usage": {
+              "inputTokens": 1224,
+              "outputTokens": 326,
+              "reasoningTokens": 0,
+              "costUsd": 0.0021405
+            },
+            "advisories": [
+              "SYNTHETIC_LABEL",
+              "MISSING_BANK_DETAILS",
+              "MISSING_TAX_BREAKDOWN"
+            ],
+            "imageOcr": null,
+            "imageOcrMode": "OFF",
+            "pdfText": {
+              "text": "# invoice.pdf\n## Contents\n### Page 1\nRiverdesk Support Demo\nINVOICESupplier:Riverdesk Support DemoInvoice number: SV-005-2026\nIssue date: 2026-10-13 Due date: 2026-10-31\nService period: 2026-10\nDescription: Customer support coverageTotal: USD 95.00Notes: Fictional demonstration only. No payment instructions.\n\n",
+              "sha256": "d23b27867ca7b79abd6d419644648a99cec4ea8f4f309a2611f3741b04d1ff8c",
+              "converter": "WORKERS_AI_TO_MARKDOWN"
+            },
+            "corroborationError": null,
+            "independentDisagreements": [],
+            "independentIssues": [],
+            "cache": {
+              "PRIMARY": false,
+              "SECONDARY": false
+            },
+            "timings": {
+              "totalMs": 4185,
+              "primaryMs": 4185,
+              "secondaryMs": 108
+            }
+          }
+        },
+        "providerErrors": []
+      },
+      "literalFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "policyEquivalentFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "pass": true
+    },
+    {
+      "company": "lumen",
+      "caseId": "003",
+      "file": {
+        "path": "documents/003.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+        "sizeBytes": 1144
+      },
+      "startedAt": "2026-10-17T23:56:09.128Z",
+      "status": 200,
+      "response": {
+        "data": {
+          "extraction": {
+            "vendorName": "Cobalt Audio Lab Demo",
+            "invoiceNumber": "LM-0003-26",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "issuedAt": "2026-10-06",
+            "dueDate": "2026-10-27",
+            "servicePeriod": "2026-10",
+            "description": "Studio sound mix",
+            "extractionWarnings": [],
+            "evidence": [
+              {
+                "field": "vendorName",
+                "source": "page:1",
+                "quote": "Supplier: Cobalt Audio Lab Demo"
+              },
+              {
+                "field": "invoiceNumber",
+                "source": "page:1",
+                "quote": "Invoice number: LM-0003-26"
+              },
+              {
+                "field": "amountMinor",
+                "source": "page:1",
+                "quote": "Invoice total: USD 100.00"
+              },
+              {
+                "field": "currency",
+                "source": "page:1",
+                "quote": "Invoice total: USD 100.00"
+              },
+              {
+                "field": "issuedAt",
+                "source": "page:1",
+                "quote": "Issue date: 2026-10-06"
+              },
+              {
+                "field": "dueDate",
+                "source": "page:1",
+                "quote": "Due date: 2026-10-27"
+              },
+              {
+                "field": "servicePeriod",
+                "source": "page:1",
+                "quote": "Service period: 2026-10"
+              },
+              {
+                "field": "description",
+                "source": "page:1",
+                "quote": "Description: Studio sound mix"
+              }
+            ]
+          },
+          "documentType": "INVOICE",
+          "primaryReadId": "c1cb5ea1-689b-43aa-90e4-c6fd982ebe0f",
+          "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+          "corroboration": {
+            "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+            "readId": "pdftext_4321449e-117e-4bfb-9c85-4cc02d9bb244",
+            "method": "PDF_TEXT",
+            "fields": {
+              "vendorName": "Cobalt Audio Lab Demo",
+              "amountMinor": 10000,
+              "currency": "USD",
+              "dueDate": "2026-10-27"
+            }
+          },
+          "agreementReference": null,
+          "provenance": {
+            "model": "google/gemini-3.8-flash",
+            "provider": "Google AI Studio",
+            "pdfTextParser": "labelled-v7",
+            "documentClassification": {
+              "documentType": "INVOICE",
+              "source": "PRIMARY_READER",
+              "documentSha256": "acdbceb65018cb2ce4fa8b482871b7419b0c31947a0955cdc5c25dccd6031406",
+              "primaryReadId": "c1cb5ea1-689b-43aa-90e4-c6fd982ebe0f",
+              "version": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017"
+            },
+            "configVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+            "attempts": [
+              {
+                "model": "google/gemini-3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 1224,
+                  "outputTokens": 312,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.002088
+                },
+                "durationMs": 3619
+              }
+            ],
+            "usage": {
+              "inputTokens": 1224,
+              "outputTokens": 312,
+              "reasoningTokens": 0,
+              "costUsd": 0.002088
+            },
+            "advisories": [
+              "SYNTHETIC_LABEL",
+              "MISSING_BANK_DETAILS",
+              "MISSING_TAX_BREAKDOWN"
+            ],
+            "imageOcr": null,
+            "imageOcrMode": "OFF",
+            "pdfText": {
+              "text": "# invoice.pdf\n## Contents\n### Page 1\nJUNIPER MOTION FINANCE\nBILLSupplier: Cobalt Audio Lab Demo\nInvoice number: LM-0003-26\nIssue date: 2026-10-06\nDue date: 2026-10-27\nService period: 2026-10\nDescription: Studio sound mixInvoice total: USD 100.00Notes: Synthetic document / no real-world value\n\n",
+              "sha256": "b532d8201c99b3cee991fd3a97d7ff6cea04216601e1187d37b995ba49948734",
+              "converter": "WORKERS_AI_TO_MARKDOWN"
+            },
+            "corroborationError": null,
+            "independentDisagreements": [],
+            "independentIssues": [],
+            "cache": {
+              "PRIMARY": false,
+              "SECONDARY": false
+            },
+            "timings": {
+              "totalMs": 3619,
+              "primaryMs": 3619,
+              "secondaryMs": 22
+            }
+          }
+        },
+        "providerErrors": []
+      },
+      "literalFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "policyEquivalentFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "pass": true
+    },
+    {
+      "company": "lumen",
+      "caseId": "006",
+      "file": {
+        "path": "documents/006.png",
+        "mimeType": "image/png",
+        "sha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+        "sizeBytes": 31021
+      },
+      "startedAt": "2026-10-17T23:56:12.849Z",
+      "status": 200,
+      "response": {
+        "data": {
+          "extraction": {
+            "vendorName": "Northstar Type Foundry Demo",
+            "invoiceNumber": "LM-0006-26",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "issuedAt": "2026-10-06",
+            "dueDate": "2026-10-27",
+            "servicePeriod": "2026-10",
+            "description": "Variable font specimen",
+            "extractionWarnings": [],
+            "evidence": [
+              {
+                "field": "vendorName",
+                "source": "page:1",
+                "quote": "Proveedor: Northstar Type Foundry Demo"
+              },
+              {
+                "field": "invoiceNumber",
+                "source": "page:1",
+                "quote": "Invoice number: LM-0006-26"
+              },
+              {
+                "field": "amountMinor",
+                "source": "page:1",
+                "quote": "Invoice total: USD 100.00"
+              },
+              {
+                "field": "currency",
+                "source": "page:1",
+                "quote": "Invoice total: USD 100.00"
+              },
+              {
+                "field": "issueDate",
+                "source": "page:1",
+                "quote": "Issue date: 2026-10-06"
+              },
+              {
+                "field": "dueDate",
+                "source": "page:1",
+                "quote": "Due date: 2026-10-27"
+              },
+              {
+                "field": "servicePeriod",
+                "source": "page:1",
+                "quote": "Periodo de servicio: 2026-10"
+              },
+              {
+                "field": "description",
+                "source": "page:1",
+                "quote": "Description: Variable font specimen"
+              }
+            ]
+          },
+          "documentType": "INVOICE",
+          "primaryReadId": "e5ecf20b-8836-4fac-9f1e-1fd332a2ceb8",
+          "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+          "corroboration": {
+            "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+            "readId": "168d0f09-8a4e-4b87-aa62-91f13a88d958",
+            "method": "OCR",
+            "fields": {
+              "vendorName": "Northstar Type Foundry Demo",
+              "amountMinor": 10000,
+              "currency": "USD",
+              "dueDate": "2026-10-27"
+            }
+          },
+          "agreementReference": null,
+          "provenance": {
+            "model": "deepseek/deepseek-v4.1-flash",
+            "provider": "Wafer",
+            "pdfTextParser": null,
+            "documentClassification": {
+              "documentType": "INVOICE",
+              "source": "PRIMARY_READER",
+              "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+              "primaryReadId": "e5ecf20b-8836-4fac-9f1e-1fd332a2ceb8",
+              "version": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017"
+            },
+            "configVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+            "attempts": [
+              {
+                "model": "deepseek/deepseek-v4.1-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 1679,
+                  "outputTokens": 445,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00045715
+                },
+                "durationMs": 8338
+              }
+            ],
+            "usage": {
+              "inputTokens": 1679,
+              "outputTokens": 445,
+              "reasoningTokens": 0,
+              "costUsd": 0.00045715
+            },
+            "advisories": [
+              "SYNTHETIC_LABEL",
+              "MISSING_BANK_DETAILS",
+              "MISSING_TAX_BREAKDOWN"
+            ],
+            "imageOcr": {
+              "text": "COBALT AUDIO LAB\n\nINVOICE / FACTURA\n\nProveedor: Northstar Type Foundry Demo\n\nInvoice number: LM-0006-26\nIssue date: 2026-10-06\n\nDue date: 2026-10-27\n\nPeriodo de servicio: 2026-10\n\nDescription: Variable font specimen\n\nInvoice total: USD 100.00\n\nNotes: Fictional test copy - not for payment",
+              "issues": [],
+              "documentSha256": "ac649a2e9bbb7fff04f00f8031d5586b410c6b6ef7e6370cba7f1a8d2b4d58d2",
+              "readId": "168d0f09-8a4e-4b87-aa62-91f13a88d958",
+              "model": "qwen/qwen3.8-flash",
+              "provider": "Alibaba",
+              "usage": {
+                "inputTokens": 2147,
+                "outputTokens": 107,
+                "reasoningTokens": 0,
+                "costUsd": 0.00037234
+              },
+              "attempts": [
+                {
+                  "model": "qwen/qwen3.8-flash",
+                  "outcome": "SUCCESS",
+                  "finishReason": "stop",
+                  "usage": {
+                    "inputTokens": 2147,
+                    "outputTokens": 107,
+                    "reasoningTokens": 0,
+                    "costUsd": 0.00037234
+                  },
+                  "durationMs": 2865
+                }
+              ],
+              "configVersion": "qwen-image-transcript-v2-20261017"
+            },
+            "imageOcrMode": "ENABLED",
+            "pdfText": null,
+            "corroborationError": null,
+            "independentDisagreements": [],
+            "independentIssues": [],
+            "cache": {
+              "PRIMARY": false,
+              "SECONDARY": false
+            },
+            "timings": {
+              "totalMs": 8338,
+              "primaryMs": 8338,
+              "secondaryMs": 2865
+            }
+          }
+        },
+        "providerErrors": []
+      },
+      "literalFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "policyEquivalentFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "pass": true
+    },
+    {
+      "company": "lumen",
+      "caseId": "007",
+      "file": {
+        "path": "documents/007.png",
+        "mimeType": "image/png",
+        "sha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+        "sizeBytes": 29320
+      },
+      "startedAt": "2026-10-17T23:56:21.281Z",
+      "status": 200,
+      "response": {
+        "data": {
+          "extraction": {
+            "vendorName": "Paper Kite Studio Demo",
+            "invoiceNumber": "LM-0007-26",
+            "amountMinor": 10000,
+            "currency": "USD",
+            "issuedAt": "2026-10-06",
+            "dueDate": "2026-10-27",
+            "servicePeriod": "2026-10",
+            "description": "Cover grid adaptation",
+            "extractionWarnings": [],
+            "evidence": [
+              {
+                "field": "vendorName",
+                "source": "page:1",
+                "quote": "Supplier: Paper Kite Studio Demo"
+              },
+              {
+                "field": "invoiceNumber",
+                "source": "page:1",
+                "quote": "Invoice number: LM-0007-26"
+              },
+              {
+                "field": "issueDate",
+                "source": "page:1",
+                "quote": "Issue date: 2026-10-06"
+              },
+              {
+                "field": "dueDate",
+                "source": "page:1",
+                "quote": "Due date: 2026-10-27"
+              },
+              {
+                "field": "servicePeriod",
+                "source": "page:1",
+                "quote": "Service period: 2026-10"
+              },
+              {
+                "field": "description",
+                "source": "page:1",
+                "quote": "Description: Cover grid adaptation"
+              },
+              {
+                "field": "amountMinor",
+                "source": "page:1",
+                "quote": "Invoice total: USD 100.00"
+              }
+            ]
+          },
+          "documentType": "INVOICE",
+          "primaryReadId": "84cbfa9f-d66e-4e27-9846-6576bf38b576",
+          "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+          "corroboration": {
+            "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+            "readId": "61ceb61b-83bf-43ee-93f6-c4c14fcf4c4d",
+            "method": "OCR",
+            "fields": {
+              "vendorName": "Paper Kite Studio Demo",
+              "amountMinor": 10000,
+              "currency": "USD",
+              "dueDate": "2026-10-27"
+            }
+          },
+          "agreementReference": null,
+          "provenance": {
+            "model": "z-ai/glm-5.3-flash",
+            "provider": "StreamLake",
+            "pdfTextParser": null,
+            "documentClassification": {
+              "documentType": "INVOICE",
+              "source": "PRIMARY_READER",
+              "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+              "primaryReadId": "84cbfa9f-d66e-4e27-9846-6576bf38b576",
+              "version": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017"
+            },
+            "configVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+            "attempts": [
+              {
+                "model": "deepseek/deepseek-v4.1-flash",
+                "outcome": "PROVIDER_ERROR",
+                "httpStatus": 200,
+                "providerErrorCode": 502,
+                "issueCodes": [],
+                "durationMs": 3217
+              },
+              {
+                "model": "z-ai/glm-5.3-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 3279,
+                  "outputTokens": 319,
+                  "reasoningTokens": 318,
+                  "costUsd": 0.000325675
+                },
+                "durationMs": 6843
+              }
+            ],
+            "usage": {
+              "inputTokens": 3279,
+              "outputTokens": 319,
+              "reasoningTokens": 318,
+              "costUsd": 0.000325675
+            },
+            "advisories": [],
+            "imageOcr": {
+              "text": "JUNIPER MOTION FINANCE\n\nBILL\n\nSupplier: Paper Kite Studio Demo\nIssue date: 2026-10-06\n\nInvoice number: LM-0007-26\nDue date: 2026-10-27\n\nService period: 2026-10\n\nDescription: Cover grid adaptation\n\nInvoice total: USD 100.00\n\nNotes: Synthetic document / no real-world value",
+              "issues": [],
+              "documentSha256": "4ad9d11a5ff9580879a4fec7c0024282388671accc270461fa2dc52581aa357e",
+              "readId": "61ceb61b-83bf-43ee-93f6-c4c14fcf4c4d",
+              "model": "qwen/qwen3.8-flash",
+              "provider": "Alibaba",
+              "usage": {
+                "inputTokens": 2147,
+                "outputTokens": 102,
+                "reasoningTokens": 0,
+                "costUsd": 0.00036999
+              },
+              "attempts": [
+                {
+                  "model": "qwen/qwen3.8-flash",
+                  "outcome": "SUCCESS",
+                  "finishReason": "stop",
+                  "usage": {
+                    "inputTokens": 2147,
+                    "outputTokens": 102,
+                    "reasoningTokens": 0,
+                    "costUsd": 0.00036999
+                  },
+                  "durationMs": 7689
+                }
+              ],
+              "configVersion": "qwen-image-transcript-v2-20261017"
+            },
+            "imageOcrMode": "ENABLED",
+            "pdfText": null,
+            "corroborationError": null,
+            "independentDisagreements": [],
+            "independentIssues": [],
+            "cache": {
+              "PRIMARY": false,
+              "SECONDARY": false
+            },
+            "timings": {
+              "totalMs": 10060,
+              "primaryMs": 10060,
+              "secondaryMs": 7689
+            }
+          }
+        },
+        "providerErrors": []
+      },
+      "literalFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "policyEquivalentFields": [
+        "vendorName",
+        "invoiceNumber",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "pass": true
+    },
+    {
+      "company": "marena",
+      "caseId": "019",
+      "file": {
+        "path": "documents/019.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "8833108986440a6c7472236e6642c42110c67456aedbb71631d9d494510a5d96",
+        "sizeBytes": 1145
+      },
+      "startedAt": "2026-10-17T23:56:31.401Z",
+      "status": 200,
+      "response": {
+        "data": {
+          "extraction": {
+            "vendorName": "Elm Package Demo",
+            "invoiceNumber": "MN-NEG-19",
+            "amountMinor": null,
+            "currency": "USD",
+            "issuedAt": "2026-10-12",
+            "dueDate": "2026-10-30",
+            "servicePeriod": "2026-10",
+            "description": "Draft artwork package",
+            "extractionWarnings": [
+              "No invoice amount present; document states 'No amount due. This document is not a bill.'",
+              "INDEPENDENT_READ_MISMATCH:vendorName",
+              "INDEPENDENT_READ_MISMATCH:invoiceNumber",
+              "INDEPENDENT_READ_MISMATCH:description"
+            ],
+            "evidence": [
+              {
+                "field": "vendorName",
+                "source": "page:1",
+                "quote": "Supplier: Elm Package Demo"
+              },
+              {
+                "field": "invoiceNumber",
+                "source": "page:1",
+                "quote": "Reference: MN-NEG-19"
+              },
+              {
+                "field": "issuedAt",
+                "source": "page:1",
+                "quote": "Issue date: 2026-10-12"
+              },
+              {
+                "field": "dueDate",
+                "source": "page:1",
+                "quote": "Due date: 2026-10-30"
+              },
+              {
+                "field": "servicePeriod",
+                "source": "page:1",
+                "quote": "Service period: 2026-10"
+              },
+              {
+                "field": "currency",
+                "source": "page:1",
+                "quote": "Currency: USD"
+              },
+              {
+                "field": "description",
+                "source": "page:1",
+                "quote": "Description: Draft artwork package"
+              }
+            ]
+          },
+          "documentType": "DELIVERY_NOTE",
+          "primaryReadId": "dc7b793f-ad65-4167-81a4-dd0bb2dd47e4",
+          "documentSha256": "8833108986440a6c7472236e6642c42110c67456aedbb71631d9d494510a5d96",
+          "corroboration": {
+            "documentSha256": "8833108986440a6c7472236e6642c42110c67456aedbb71631d9d494510a5d96",
+            "readId": "pdftext_4c925646-1669-48e3-b890-662328e1c7bf",
+            "method": "PDF_TEXT",
+            "fields": {
+              "vendorName": "Elm Package DemoReference: MN-NEG-19",
+              "amountMinor": null,
+              "currency": "USD",
+              "dueDate": "2026-10-30"
+            }
+          },
+          "agreementReference": null,
+          "provenance": {
+            "model": "google/gemini-3.8-flash",
+            "provider": "Google AI Studio",
+            "pdfTextParser": "labelled-v7",
+            "documentClassification": {
+              "documentType": "DELIVERY_NOTE",
+              "source": "PRIMARY_READER",
+              "documentSha256": "8833108986440a6c7472236e6642c42110c67456aedbb71631d9d494510a5d96",
+              "primaryReadId": "dc7b793f-ad65-4167-81a4-dd0bb2dd47e4",
+              "version": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017"
+            },
+            "configVersion": "labelled-v7:invoice-json-v5-native-pdf-20261017:qwen-image-transcript-v2-20261017",
+            "attempts": [
+              {
+                "model": "google/gemini-3.8-flash",
+                "outcome": "SUCCESS",
+                "finishReason": "stop",
+                "usage": {
+                  "inputTokens": 1224,
+                  "outputTokens": 271,
+                  "reasoningTokens": 0,
+                  "costUsd": 0.00193425
+                },
+                "durationMs": 2904
+              }
+            ],
+            "usage": {
+              "inputTokens": 1224,
+              "outputTokens": 271,
+              "reasoningTokens": 0,
+              "costUsd": 0.00193425
+            },
+            "advisories": [
+              "SYNTHETIC_LABEL"
+            ],
+            "imageOcr": null,
+            "imageOcrMode": "OFF",
+            "pdfText": {
+              "text": "# invoice.pdf\n## Contents\n### Page 1\nDELIVERY NOTESupplier: Elm Package DemoReference: MN-NEG-19\nIssue date: 2026-10-12\nDue date: 2026-10-30\nService period: 2026-10\nCurrency: USD\nDescription: Draft artwork packageNo amount due. This document is not a bill.Notes: Fictional demonstration only.\n\n",
+              "sha256": "f287c99bd3647ca35c9858e59415f86d679269a26a8dbcc24a8b09800c8893aa",
+              "converter": "WORKERS_AI_TO_MARKDOWN"
+            },
+            "corroborationError": null,
+            "independentDisagreements": [
+              "vendorName",
+              "invoiceNumber",
+              "description"
+            ],
+            "independentIssues": [],
+            "cache": {
+              "PRIMARY": false,
+              "SECONDARY": false
+            },
+            "timings": {
+              "totalMs": 2904,
+              "primaryMs": 2904,
+              "secondaryMs": 21
+            }
+          }
+        },
+        "providerErrors": []
+      },
+      "literalFields": [
+        "vendorName",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "policyEquivalentFields": [
+        "vendorName",
+        "amountMinor",
+        "currency",
+        "issuedAt",
+        "dueDate",
+        "servicePeriod",
+        "description"
+      ],
+      "pass": true
+    }
+  ],
+  "finishedAt": "2026-10-17T23:56:34.371Z",
+  "pass": true
+}

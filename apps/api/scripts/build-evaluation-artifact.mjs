@@ -27,6 +27,16 @@ const cases = run.results.map(row => {
     requiredReasons: row.expected.requiredReasons, actualReasons: row.initialDecision?.reasons ?? [],
     literalExactFields: row.matchingFields?.length ?? 0, policyEquivalentFields: row.policyEquivalentFields?.length ?? 0 };
 });
+let concurrentAudit = null;
+if (run.fatalError?.message.startsWith('Published backend changed during validation')) {
+  const path = 'docs/evaluations/ronda-concurrent-deployment-audit-20261017.json';
+  const auditBytes = readFileSync(new URL(path, root)), audit = JSON.parse(auditBytes);
+  assert.equal(audit.sourceReportSha256, createHash('sha256').update(bytes).digest('hex'));
+  assert.ok(audit.readerFinancialAndAuthCodeUnchanged && audit.allOtherBundleBytesIdentical && audit.addedRouteReadOnly);
+  concurrentAudit = { path, sha256: createHash('sha256').update(auditBytes).digest('hex'),
+    onlyAddedEndpoint: audit.onlyAddedEndpoint, readerFinancialAndAuthCodeUnchanged: true,
+    versions: [audit.previousVersion, audit.currentVersion] };
+}
 const evidence = {
   displayName: `${run.company.slug} ficticia · lectores y cola reales · ${run.backendAtStart.version.slice(0, 8)} histórico`,
   datasetVersion: JSON.parse(readFileSync(new URL(run.manifestPath, root))).datasetVersion,
@@ -35,6 +45,7 @@ const evidence = {
   scope: run.scope, synthetic: true, targetedP0IncludedInDenominator: false,
   limits: 'One predeclared synthetic company using supported labelled PDF/PNG/JPEG layouts. Failed reads are included. Historical measurement, not a guarantee for all invoices.',
   readerVersion: run.results.find(row => row.read)?.read.provenance.configVersion,
+  validation: { runnerGuard: run.fatalError ?? null, independentlyReviewedConcurrentRelease: concurrentAudit },
   cases,
 };
 writeFileSync(new URL('../worker/evaluation-data.js', import.meta.url),

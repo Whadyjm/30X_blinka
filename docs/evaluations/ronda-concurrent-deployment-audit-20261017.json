@@ -1,0 +1,74 @@
+{
+  "checkedAt": "2026-10-18T00:01:57.360Z",
+  "previousVersion": "c2ebd8b8-e2b7-4316-8904-df56ac40591d",
+  "previousBundleSha256": "dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9",
+  "currentVersion": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+  "currentBundleSha256": "a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea",
+  "changedSources": [],
+  "sourceHashes": {
+    "packages/extraction/src/openrouter.ts": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc",
+    "packages/contracts/src/index.ts": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
+    "packages/domain/src/index.ts": "8d33f95c265d6c18f460cb986e77ef7ba01d1a3ca0a562b6e2cc317ce942e36e",
+    "apps/api/worker/http.js": "86b2bc488dcfe55cc862f233be4aae6830585eed6af2941879301d38b8d55670",
+    "apps/api/worker/document.js": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
+    "apps/api/worker/extraction-probe.js": "85d0ab7b27aa200e8e6b6773cbd03a3b940d0c6a3777288202013ecbe776a021",
+    "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+    "apps/api/worker/repository.js": "bd7bfa1bbd7ef937a92aa4ca879e233d40648ad673daf72681a9686fca6d4e11",
+    "apps/api/worker/configuration.js": "8544ad0caab024d925657fee047e8f414e6bf85902dbf2e526d74fa56ce4128d",
+    "apps/api/worker/processing.js": "b5e03431655fd03e1520281989ecb92183d52ae427f64a646c36cf5420cab3fa",
+    "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+    "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+    "apps/api/worker/legacy-document-type.js": "1b757c7fd2de9d327bf67eda986c41a5ad1b44e24a7d3b2567badd2b79a8391f",
+    "apps/api/worker/reanalysis-limits.js": "31632d455dc9d676ca00d2d95976996d5086253ce3e85527b04b120aaa059509",
+    "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+    "apps/api/worker/chat-actions.js": "eb5d5d8fe288a094a54372744243d20efe1faae97683d893fe86e7940dcb5c6d",
+    "apps/api/worker/chat-tools.js": "c6d6d8138f0d8e0382357953816cc883fa9840b96058c86fed20a4716c920563",
+    "apps/api/worker/chat-prompt.js": "5fd259b17c6d67a65d1bb39ccb11eca25eeaa9499f74d9e612da8b56b82a2332",
+    "apps/api/worker/chat.js": "d82bb03de58cbf1d4a740d2634c4bfd10e9260fe9c8d9c71d16cb34715ae0d9e",
+    "apps/api/worker/telegram-invoice.js": "b4e78b669d9e17fc904bff44fcf03a2378b851a3be7032c74eb4a076d566cb70",
+    "apps/api/worker/telegram-chat.js": "25966118ca5724934ac287c87647b953a47a40433e47a28f6d82f22c827ea05f",
+    "apps/api/worker/telegram.js": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+    "apps/api/worker/email.js": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+    "apps/api/worker/skill.js": "c8b2c5c3be2d80e72f5f4b0c184a9a6de7cbe65a99811d6bea20285232f343b7",
+    "apps/api/worker/evaluation-data.js": "fcb4fb28b2d61cff45fdc9025f6c726782b4556ba0cf2e5c0e39bb6d08e0ad49",
+    "apps/api/worker/evaluation.js": "bdf4a98189d0c370c85c9ab35c0df8e0be28cf7157cfc7ee431f8641bb45963d",
+    "apps/api/worker/api.js": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b",
+    "apps/api/worker/index.js": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12"
+  },
+  "latestDeployment": {
+    "id": "14a7fd00-21c4-4a63-b12a-f46aea13be42",
+    "source": "wrangler",
+    "strategy": "percentage",
+    "author_email": "tiamat.agency@gmail.com",
+    "annotations": {
+      "workers/message": "Dashboard con desglose, historial de reglas, avisos de correo y calidad (cf60d70)",
+      "workers/triggered_by": "deployment"
+    },
+    "versions": [
+      {
+        "version_id": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+        "percentage": 100
+      }
+    ],
+    "created_on": "2026-10-17T23:59:33.056029Z"
+  },
+  "sourceReport": "docs/evaluations/candidate-ronda-live-2026-10-17T23-57-09-830Z.json",
+  "sourceReportSha256": "4351b8a9f884cacca4f556cb53c78ea8000d4a1da201f6655375734b9206307d",
+  "reviewedAt": "2026-10-18T00:03:27.710036+00:00",
+  "all134SourceMapContentsIdentical": true,
+  "sourceMapStaleForAddedReadOnlyRoute": true,
+  "actualBundleDiffLines": 1,
+  "onlyAddedEndpoint": "GET /api/v1/mandate/versions",
+  "addedRouteReadOnly": true,
+  "tenantScope": "WHERE org_id = ? uses authenticated organization",
+  "allOtherBundleBytesIdentical": true,
+  "readerFinancialAndAuthCodeUnchanged": true,
+  "exactAddedCompiledRoute": "if (path === \"/mandate/versions\" && method === \"GET\") { const q = query(url, PaginationQuerySchema); const rows = (await stmt(env.DB, \"SELECT * FROM policy_versions WHERE org_id = ? ORDER BY version DESC\", orgId).all()).results; return page(rows.map(policyDto), q); }",
+  "manifestStillMatchesPreliveFreeze": true,
+  "runnerGuardPreserved": {
+    "name": "AssertionError",
+    "message": "Published backend changed during validation\n+ actual - expected\n\n+ 'a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea'\n- 'dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9'\n"
+  },
+  "rawReportPreserved": true,
+  "acceptanceReadyAfterIndependentAudit": true
+}
