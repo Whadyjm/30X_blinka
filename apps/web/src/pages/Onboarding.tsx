@@ -226,6 +226,12 @@ export function Onboarding() {
   const cur = draft?.currency ?? currency;
   const vendorCount = vendors.data?.filter((v) => v.allowed).length ?? 0;
   const activeAgreements = agreements.data?.filter((a) => a.active).length ?? 0;
+  const missingVendors = draft?.requireAllowedVendor && vendors.isSuccess && vendorCount === 0;
+  const missingAgreements = draft?.requireAgreement && agreements.isSuccess && activeAgreements === 0;
+  const setupWarnings = <>
+    {missingVendors && <InlineAlert tone="warn">{t('No authorized vendors yet. You can upload an invoice, but an unregistered vendor will block it once checked. Add a vendor or load the sample set.')}</InlineAlert>}
+    {missingAgreements && <InlineAlert tone="warn">{t('No active agreements yet. With “Require an agreement” on, a missing agreement needs review unless another rule blocks it. Add one or load the sample set.')}</InlineAlert>}
+  </>;
 
   const titles = [
     restart ? 'Let’s revisit your workspace.' : 'A little about your team.',
@@ -247,7 +253,7 @@ export function Onboarding() {
   const continueLabel = step === 0 ? 'Let’s set my rules' : step === 1 ? section < 2 ? 'Continue' : 'Meet my vendors' : section === 0 ? 'Set up agreements' : 'Review my setup';
 
   return (
-    <div className="onboarding" data-compact={!!parts || undefined} data-leaving={leaving || undefined}>
+    <div className="onboarding" data-compact={step > 0 || undefined} data-leaving={leaving || undefined}>
       <DemoBanner />
       <div className="onboarding-shell">
         <header className="onboarding-header">
@@ -319,9 +325,14 @@ export function Onboarding() {
                     <SampleSetButton currency={cur} />
                   </div>
                   <section aria-label={t('Vendors')}><h2 className="mb-3 text-lg">{t('Vendors')}</h2><VendorsPanel compact /></section>
-                  {vendorCount === 0 && !vendors.isLoading && <InlineAlert tone="warn">{t('With no authorized vendors, Oli will block every invoice. Add at least one or load the sample set.')}</InlineAlert>}
+                  <p className="text-sm leading-relaxed text-ink">{t(draft?.requireAllowedVendor ? 'Your rule is on: invoices from vendors outside this authorized list are blocked, even for a small amount.' : 'Your rule is off: vendors do not have to be registered. Explicitly unauthorized vendors are still blocked, and other checks still apply.')}</p>
+                  {missingVendors && <InlineAlert tone="warn">{t('No authorized vendors yet. You can upload an invoice, but an unregistered vendor will block it once checked. Add a vendor or load the sample set.')}</InlineAlert>}
                   </div>
-                  <section hidden={section !== 1} aria-label={t('Agreements')}><AgreementsPanel currency={cur} compact /></section>
+                  <section hidden={section !== 1} aria-label={t('Agreements')} className="space-y-4">
+                    <p className="text-sm leading-relaxed text-ink">{t(draft?.requireAgreement ? 'Your rule is on: without an active matching agreement, the invoice needs review. A registered vendor alone is not enough.' : 'Your rule is off: an agreement is optional. Any matched or referenced agreement is still checked.')}</p>
+                    <AgreementsPanel currency={cur} compact />
+                    {missingAgreements && <InlineAlert tone="warn">{t('No active agreements yet. With “Require an agreement” on, a missing agreement needs review unless another rule blocks it. Add one or load the sample set.')}</InlineAlert>}
+                  </section>
                 </div>
               )}
 
@@ -329,6 +340,18 @@ export function Onboarding() {
                 <div className="space-y-6">
                   <MandateSummary mandate={draft} compareTo={restart ? mandate.data?.active : null} />
                   <p className="text-sm text-ash">{vendorCount === 1 ? t('1 authorized vendor · {a} active agreements', { a: activeAgreements }) : t('{v} authorized vendors · {a} active agreements', { v: vendorCount, a: activeAgreements })}</p>
+                  {setupWarnings}
+                  <Button variant="ghost" onClick={() => go(2)}>{t('Review vendors and agreements')}</Button>
+                  <section className="space-y-3" aria-labelledby="onboarding-outcomes">
+                    <h2 id="onboarding-outcomes" className="text-lg">{t('What each result means')}</h2>
+                    <dl className="space-y-3 text-sm leading-relaxed">
+                      <div><dt className="font-semibold text-ink">{t('Approved')}</dt><dd className="text-ash">{t('The applicable checks pass and budget is reserved. Any permitted amount exception has human authorization. No money moves.')}</dd></div>
+                      <div><dt className="font-semibold text-ink">{t('Needs approval')}</dt><dd className="text-ash">{t(draft.humanApprovalEnabled ? 'An amount needs a person and the other checks pass. An owner or approver must explicitly approve or reject.' : 'Human approval is off. Amounts that need a person will be blocked instead.')}</dd></div>
+                      <div><dt className="font-semibold text-ink">{t('Needs review')}</dt><dd className="text-ash">{t('There is something to verify or correct: an uncertain reading, ambiguous vendor or missing or mismatched agreement. Review does not mean approval.')}</dd></div>
+                      <div><dt className="font-semibold text-ink">{t('Blocked')}</dt><dd className="text-ash">{t('A rule prevents approval: for example, a duplicate, an amount above the ceiling or insufficient budget. A human “yes” cannot bypass the cause.')}</dd></div>
+                    </dl>
+                    <p className="text-sm leading-relaxed text-ink">{t('If several checks fail, a blocking rule prevents approval even when another issue also needs review.')}</p>
+                  </section>
                   <div className="onboarding-confirmation">
                     <Checkbox checked={confirmed} onChange={(value) => { setConfirmed(value); setOliState(value ? 'happy' : undefined); }} label={t('I confirm these rules.')} description={t(restart ? 'These rules will replace your current rules. Previous decisions keep their history.' : 'This creates policy version 1. You can change it later; old versions are kept for the audit trail.')} />
                   </div>
@@ -340,6 +363,14 @@ export function Onboarding() {
                   <p className="onboarding-activated"><CheckCircle2 className="size-4" aria-hidden="true" />{t('Mandate activated')}</p>
                   {!uploadedInvoice ? (
                     <>
+                      <div className="space-y-2 text-sm leading-relaxed text-ink">
+                        <h2 className="font-semibold">{t('Before your first invoice')}</h2>
+                        {setupWarnings}
+                        {!missingVendors && <p>{t(draft?.requireAllowedVendor ? 'With your rules, an unregistered vendor blocks the invoice once checked. Uploading does not add the vendor to your list.' : 'Your rules allow unregistered vendors. Explicitly unauthorized vendors remain blocked; all other checks still apply.')}</p>}
+                        {draft?.requireAgreement && !missingAgreements && <p>{t('The vendor also needs an active matching agreement. Without it, the invoice needs review; registering the vendor alone is not enough.')}</p>}
+                        <p className="text-ash">{t('If the document cannot be read reliably, it needs review before vendor, agreement and amount checks. Received does not mean approved.')}</p>
+                        <Link to="/app/rules" className="inline-flex min-h-11 items-center underline underline-offset-4">{t('Review vendors and agreements')}</Link>
+                      </div>
                       <div onDragOver={(e) => { e.preventDefault(); if (!uploading) setIsDragOver(true); }} onDragLeave={() => setIsDragOver(false)} onDrop={(e) => { e.preventDefault(); setIsDragOver(false); if (!uploading && e.dataTransfer.files?.[0]) void handleFileUpload(e.dataTransfer.files[0]); }}
                         className={cn('onboarding-dropzone', isDragOver && 'is-dragging', uploading && 'is-uploading')}>
                         <input ref={fileInputRef} type="file" accept=".pdf,.png,.jpg,.jpeg" className="sr-only" tabIndex={-1} aria-label={t('Upload invoice')} disabled={uploading} onChange={(e) => { if (e.target.files?.[0]) void handleFileUpload(e.target.files[0]); }} />
@@ -354,6 +385,7 @@ export function Onboarding() {
                         <Button variant="ghost" size="sm" loading={uploading} disabled={cur !== 'USD'} onClick={() => void handleLoadSample()}>{t('Try sample')}</Button>
                       </div>
                       {cur !== 'USD' && <p className="text-sm text-slate-600">{t('This sample uses USD. Upload an invoice in your rules’ currency instead.')}</p>}
+                      <p className="text-sm leading-relaxed text-ash">{t('The sample invoice follows your rules too. It may need review or be blocked if its vendor or agreement is missing; it is not guaranteed to be approved.')}</p>
                     </>
                   ) : (
                     <div className="onboarding-uploaded" role="status">

@@ -108,4 +108,12 @@ export const esRules: Record<string, string> = {
   'Save agreement': 'Guardar acuerdo',
   'Sample vendors and agreements loaded.': 'Proveedores y acuerdos de ejemplo cargados.',
   'Load sample set': 'Cargar conjunto de ejemplo',
+  'With these amounts, automatic approval is possible up to {amount}, only if every other rule passes. Above either threshold, human approval must be enabled.': 'Con estos montos, la aprobación automática es posible hasta {amount}, solo si se cumplen todas las demás reglas. Por encima de cualquiera de los dos umbrales, la aprobación humana debe estar habilitada.',
+  'Total for the month in {currency}. Each approval reserves part of it. If the remaining budget cannot cover an invoice, it is blocked.': 'Total del mes en {currency}. Cada aprobación reserva una parte. Si lo que queda no alcanza para una factura, se bloquea.',
+  'On: an unregistered vendor blocks the invoice. Add and authorize the vendor before trying it.': 'Activado: un proveedor sin registrar bloquea la factura. Registra y autoriza al proveedor antes de probarla.',
+  'Off: an unregistered vendor is allowed, but all other rules still apply. Explicitly unauthorized vendors remain blocked.': 'Desactivado: se permiten proveedores sin registrar, pero se mantienen las demás reglas. Los marcados como no autorizados siguen bloqueados.',
+  'On: a missing agreement or a mismatch needs review. It is not an amount exception you can simply approve.': 'Activado: si falta el acuerdo o la factura no coincide, requiere revisión. No es una excepción de monto que puedas aprobar directamente.',
+  'Off: an invoice can proceed without an agreement. If an agreement is matched or referenced, it is still checked.': 'Desactivado: la factura puede avanzar sin acuerdo. Si corresponde a uno o lo referencia, se comprueba igualmente.',
+  'On: amounts above the review threshold can request approval. The ceiling, available budget and all mandatory checks must still pass.': 'Activado: por encima del umbral de revisión se puede solicitar aprobación. Deben respetarse el techo, el presupuesto disponible y las comprobaciones obligatorias.',
+  'Off: an amount that requires human approval is blocked. Oli cannot approve it on its own.': 'Desactivado: un monto que requiera aprobación humana queda bloqueado. Oli no puede aprobarlo por su cuenta.',
 };
