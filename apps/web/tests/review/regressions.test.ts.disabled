@@ -1,0 +1,24 @@
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+import { expect, it } from 'vitest';
+import { buildTrace } from '../../src/lib/trace';
+
+it('preserves persisted budget failure explanation in the decision trace', () => {
+  const explanation = 'No existe presupuesto compatible para la moneda y periodo de evaluación.';
+  const steps = buildTrace({decision: 'BLOCK', facts: {amountMinor: 20000, currency: 'USD'}, reasons: ['MISSING_BUDGET'], trace: [
+    {rule: 'BUDGET', result: 'FAIL', observed: explanation, evidence: '{"invoiceCurrency":"USD","periodKey":"2026-10"}'},
+  ]});
+  expect(steps[0].observed).toBe(explanation);
+});
+
+const source = readFileSync(new URL('../../src/pages/Home.tsx', import.meta.url), 'utf8');
+const declaration = source.match(/function intentFor\(text: string\) \{[\s\S]*?\n\}/)![0].replace('text: string', 'text');
+const intentFor = vm.runInNewContext(`(${declaration})`) as (text: string) => string;
+it.each([
+  ['¿Qué facturas necesitan mi revisión?', 'review'],
+  ['¿Hay facturas bloqueadas o rechazadas?', 'blocked'],
+  ['¿Cómo va el presupuesto de este mes?', 'budget'],
+  ['¿Qué facturas vencen en los próximos 14 días?', 'due'],
+])('routes the Home suggestion %s to %s', (text, expected) => {
+  expect(intentFor(text)).toBe(expected);
+});
