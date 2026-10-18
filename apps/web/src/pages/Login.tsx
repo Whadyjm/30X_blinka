@@ -13,6 +13,11 @@ import { env } from '@/config/env';
 import { qk, useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
 
+const JUDGE_ACCOUNTS = [
+  { title: 'Set up a company', username: 'hackaton1', password: 'hackaton1' },
+  { title: 'Explore sample invoices', username: 'hackaton2', password: 'hackaton2' },
+];
+
 export function Login() {
   const nav = useNavigate();
   const loc = useLocation();
@@ -77,6 +82,25 @@ export function Login() {
                 {t('Sign in')}
               </Button>
             </form>
+
+            <details className="mt-5 border-t border-hairline">
+              <summary className="cursor-pointer rounded-md py-3 text-sm text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+                {t('Credentials')}
+              </summary>
+              <div className="space-y-4 pb-2">
+                {JUDGE_ACCOUNTS.map(account => (
+                  <section key={account.username} aria-label={t(account.title)}>
+                    <p className="text-sm text-ink">{t(account.title)}</p>
+                    <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+                      <dt className="text-ash">{t('Username')}</dt>
+                      <dd className="min-w-0 select-all text-ink">{account.username}</dd>
+                      <dt className="text-ash">{t('Password')}</dt>
+                      <dd className="min-w-0 select-all text-ink">{account.password}</dd>
+                    </dl>
+                  </section>
+                ))}
+              </div>
+            </details>
 
             {env.apiMode === 'mock' && (
               <p className="mt-4 rounded-md bg-bone p-2.5 text-xs text-slate-500">

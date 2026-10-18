@@ -55,6 +55,10 @@ export const esShell: Record<string, string> = {
   Password: 'Contraseña',
   'Sign in': 'Iniciar sesión',
   'Access credentials:': 'Credenciales de acceso:',
+  Credentials: 'Credenciales',
+  Username: 'Usuario',
+  'Set up a company': 'Configurar una empresa',
+  'Explore sample invoices': 'Explorar facturas de ejemplo',
 
   // landing
   'Open app': 'Abrir la app',
