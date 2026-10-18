@@ -214,6 +214,53 @@ test('el usuario demo solo entra por alias configurado y contraseña correcta', 
   assert.equal((await signIn(credentials)).status, 401, 'el alias no omite la pertenencia a la empresa');
 });
 
+test('demo accounts keep credentials, onboarding and invoice access isolated by organization', async t => {
+  const { api, env, DB, upload } = await setup(t);
+  const existing = await upload();
+  for (const suffix of ['one', 'two']) {
+    await DB.prepare('INSERT INTO organizations(id,name,default_currency,timezone) VALUES (?,?,?,?)')
+      .bind(`org_${suffix}`, `Fictional ${suffix}`, 'USD', 'UTC').run();
+    await DB.prepare('INSERT INTO users(id,name,email) VALUES (?,?,?)')
+      .bind(`user_${suffix}`, `Demo ${suffix}`, `${suffix}@oli-demo.invalid`).run();
+    await DB.prepare("INSERT INTO memberships(org_id,user_id,role) VALUES (?,?,'OWNER')")
+      .bind(`org_${suffix}`, `user_${suffix}`).run();
+  }
+  const accounts = { demo_one: { userId: 'user_one', orgId: 'org_one', password: 'test-one' },
+    demo_two: { userId: 'user_two', orgId: 'org_two', password: 'test-two' } };
+  env.DEMO_ACCOUNTS = JSON.stringify(accounts);
+  const signIn = (email, password) => api('/session', { method: 'POST', data: { email, password } });
+  for (const [username, account] of Object.entries(accounts)) {
+    const signed = await signIn(username.toUpperCase(), account.password);
+    assert.equal(signed.status, 200); assert.equal(signed.data.organization.id, account.orgId);
+    assert.equal(signed.data.user.id, account.userId);
+    const headers = { Cookie: signed.headers.get('Set-Cookie').split(';')[0] };
+    assert.equal((await api('/me', { headers })).data.organization.id, account.orgId);
+    assert.equal((await api('/mandate', { headers })).data.active, null);
+    assert.equal((await api('/mandate', { headers })).data.draft, null);
+    assert.deepEqual((await api('/invoices', { headers })).data, []);
+    assert.equal((await api(`/invoices/${existing.id}`, { headers })).status, 404);
+    assert.equal((await api(`/invoices/${existing.id}/file`, { headers })).status, 404);
+  }
+  assert.equal((await signIn('demo_one', 'test-two')).status, 401);
+  assert.equal((await signIn('demo_two', env.DEMO_PASSWORD)).status, 401);
+  assert.equal((await signIn('owner@oli-demo.invalid', env.DEMO_PASSWORD)).status, 200);
+  accounts.demo_one.orgId = 'org_two'; env.DEMO_ACCOUNTS = JSON.stringify(accounts);
+  assert.equal((await signIn('demo_one', 'test-one')).status, 401, 'the secret cannot bypass D1 membership');
+});
+
+test('demo account configuration fails closed and does not require the legacy account', async t => {
+  const { api, env } = await setup(t);
+  const data = { email: 'standalone', password: 'test-only' };
+  const account = { userId: env.DEMO_USER_ID, orgId: env.DEMO_ORG_ID, password: data.password };
+  delete env.DEMO_PASSWORD; delete env.DEMO_USER_ID; delete env.DEMO_ORG_ID;
+  env.DEMO_ACCOUNTS = JSON.stringify({ standalone: account });
+  assert.equal((await api('/session', { method: 'POST', data })).status, 200);
+  for (const value of ['{broken', 'null', '[]', '{"standalone":{}}', '{"standalone":{"password":"test-only","userId":"","orgId":"x"}}']) {
+    env.DEMO_ACCOUNTS = value;
+    assert.equal((await api('/session', { method: 'POST', data })).status, 503);
+  }
+});
+
 test('onboarding guarda borrador y activa versión/budget con idempotencia y sin mutar v1', async t => {
   const { api, DB } = await setup(t);
   const before = (await api('/mandate')).data.active;

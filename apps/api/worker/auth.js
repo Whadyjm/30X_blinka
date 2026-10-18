@@ -27,8 +27,17 @@ export async function authenticate(request, env) {
 
 export async function login(request, env) {
   originCheck(request, env);
-  // Fail closed until explicitly provisioned; seed users have no passwords.
-  if (!env.DEMO_PASSWORD || !env.DEMO_USER_ID || !env.DEMO_ORG_ID) throw new HttpError(503, 'SERVICE_UNAVAILABLE', 'Acceso demo no configurado.');
+  // Demo credentials stay in Worker secrets; each account is bound to one membership.
+  let accounts;
+  try {
+    accounts = JSON.parse(env.DEMO_ACCOUNTS ?? '{}');
+    if (!accounts || typeof accounts !== 'object' || Array.isArray(accounts) || Object.entries(accounts).some(([username, account]) =>
+      !LoginInputSchema.safeParse({ email: username, password: account?.password }).success ||
+      !['userId', 'orgId'].every(field => typeof account?.[field] === 'string' && account[field].trim()))) throw new Error('Invalid demo accounts');
+  } catch { throw new HttpError(503, 'SERVICE_UNAVAILABLE', 'Acceso demo no configurado.'); }
+  if (!Object.keys(accounts).length && (!env.DEMO_PASSWORD || !env.DEMO_USER_ID || !env.DEMO_ORG_ID)) {
+    throw new HttpError(503, 'SERVICE_UNAVAILABLE', 'Acceso demo no configurado.');
+  }
   const input = await body(request, LoginInputSchema);
   const key = await sha256(request.headers.get('CF-Connecting-IP') ?? 'local');
   const seconds = Math.floor(Date.now() / 1000);
@@ -38,15 +47,19 @@ export async function login(request, env) {
       window_start = CASE WHEN window_start < ? - 900 THEN ? ELSE window_start END
     RETURNING attempts`, key, seconds, seconds, seconds, seconds).first();
   if (attempt.attempts > 10) throw new HttpError(429, 'RATE_LIMITED', 'Espera 15 minutos antes de volver a intentar.');
-  const passwordMatches = await equalSecret(input.password, env.DEMO_PASSWORD);
-  const aliasMatches = !!env.DEMO_USERNAME && input.email.toLowerCase() === env.DEMO_USERNAME.toLowerCase();
+  const username = input.email.toLowerCase();
+  const account = Object.hasOwn(accounts, username) ? accounts[username] : null;
+  const orgId = account?.orgId ?? env.DEMO_ORG_ID;
+  const userId = account?.userId ?? env.DEMO_USER_ID;
+  const passwordMatches = await equalSecret(input.password, account?.password ?? env.DEMO_PASSWORD ?? '');
+  const aliasMatches = !!account || (!!env.DEMO_USERNAME && username === env.DEMO_USERNAME.toLowerCase());
   const user = await stmt(env.DB, `SELECT u.id FROM users u JOIN memberships m ON m.user_id = u.id
     WHERE u.id = ? AND m.org_id = ? AND (lower(u.email) = ? OR ? = 1)`,
-  env.DEMO_USER_ID, env.DEMO_ORG_ID, input.email.toLowerCase(), Number(aliasMatches)).first();
+  userId ?? '', orgId ?? '', username, Number(aliasMatches)).first();
   if (!passwordMatches || !user) throw new HttpError(401, 'INVALID_CREDENTIALS');
   const token = id('ses');
   await stmt(env.DB, `INSERT INTO sessions(token_hash, org_id, user_id, csrf_token, expires_at) VALUES (?, ?, ?, ?, ?)`,
-    await sha256(token), env.DEMO_ORG_ID, user.id, id('csrf'), new Date(Date.now() + 8 * 3600_000).toISOString()).run();
+    await sha256(token), orgId, user.id, id('csrf'), new Date(Date.now() + 8 * 3600_000).toISOString()).run();
   const authenticated = await authenticate(new Request(request.url, { headers: { Cookie: `${COOKIE}=${token}` } }), env);
   const { tokenHash, ...session } = authenticated;
   return json({ data: session }, 200, { 'Set-Cookie': cookie(request, token, 8 * 3600) });

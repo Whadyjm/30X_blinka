@@ -90,6 +90,14 @@ mediante `DEMO_USERNAME`. El alias no concede permisos por sí solo: sigue exigi
 la contraseña demo y resuelve únicamente el usuario/empresa provisionados.
 `Session.user.email` conserva el correo real del registro.
 
+Para varias empresas demo, el secreto del Worker `DEMO_ACCOUNTS` admite un objeto
+`{ "alias_en_minusculas": { "password": "…", "userId": "…", "orgId": "…" } }`.
+Cada alias exige su propia contraseña y una pertenencia existente en D1; la sesión
+solo accede a esa empresa. No acepta una empresa elegida desde el navegador.
+El acceso demo anterior se conserva para los demás identificadores. Una empresa
+sin política activa ni borrador comienza con el onboarding pendiente. Este secreto
+es exclusivo del backend: no incorporarlo al repositorio ni al frontend.
+
 ```ts
 type Role = 'OWNER' | 'APPROVER';
 type Session = {
