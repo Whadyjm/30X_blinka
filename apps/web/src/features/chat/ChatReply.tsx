@@ -97,7 +97,7 @@ export function ProposalFields({ fields, vendorName }: { fields: Record<string, 
       : value == null ? '—' : key === 'frequency' ? t(String(value)) : String(value)} />)}</dl>;
 }
 const actionLabels = {
-  CREATE_VENDOR: 'Register vendor', UPDATE_VENDOR: 'Update vendor', CREATE_AGREEMENT: 'Create agreement',
+  CREATE_VENDOR: 'Register vendor', CREATE_VENDORS: 'Register vendors', UPDATE_VENDOR: 'Update vendor', CREATE_AGREEMENT: 'Create agreement',
   UPDATE_AGREEMENT: 'Update agreement', ONBOARD_INVOICE_VENDOR: 'Register vendor and review invoice', RESUME_INVOICE: 'Review invoice again',
 };
 function ActionReview({ snapshot, readOnly }: { snapshot: ChatAction; readOnly: boolean }) {
@@ -132,6 +132,8 @@ function ActionReview({ snapshot, readOnly }: { snapshot: ChatAction; readOnly: 
     <h3 className="font-medium">{t(actionLabels[p.kind])}</h3>
     {action.before && <div><p className="mb-1 text-xs">{t('Before')}</p><ProposalFields fields={action.before} vendorName={vendorName(action.before)} /></div>}
     <div><p className="mb-1 text-xs">{t('Proposed')}</p>
+      {p.kind === 'CREATE_VENDORS' && <ol className="space-y-3">{p.vendors.map((vendor, index) =>
+        <li key={index} className="border-b border-hairline pb-2"><ProposalFields fields={vendor} /></li>)}</ol>}
       {'data' in p && <ProposalFields fields={proposedFields} vendorName={vendorName(proposedFields)} />}
       {p.kind === 'ONBOARD_INVOICE_VENDOR' && <><ProposalFields fields={p.vendor} />{p.agreement && <ProposalFields fields={p.agreement} />}</>}
       {'invoiceId' in p && <Link to={`/app/bills/${encodeURIComponent(p.invoiceId)}`} className="underline">{t('View invoice')}</Link>}

@@ -33,7 +33,7 @@ export async function completeChat(env, session, history, input, channel = 'web'
         method: 'POST', signal: AbortSignal.timeout(remaining),
         headers: { Authorization: `Bearer ${env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: MODEL, messages, tools: toolsFor(session), tool_choice: 'auto',
-          temperature: 0, max_tokens: 1500, stream: false, provider: { require_parameters: true } }),
+          temperature: 0, max_tokens: 3000, stream: false, provider: { require_parameters: true } }),
       });
       if (!response.ok) { await response.body?.cancel(); throw new HttpError(response.status === 429 ? 503 : 502, 'CHAT_PROVIDER_UNAVAILABLE'); }
       payload = JSON.parse(new TextDecoder().decode(await readBytes(response, 128 * 1024)));
@@ -48,7 +48,8 @@ export async function completeChat(env, session, history, input, channel = 'web'
       if (typeof msg.content !== 'string' || !msg.content.trim() || msg.content.length > 8000) throw new HttpError(502, 'CHAT_INVALID_OUTPUT');
       return { text: msg.content, cards, prepared, calls, rounds: round + 1 };
     }
-    if (!Array.isArray(msg.tool_calls) || (toolCount += msg.tool_calls.length) > 4) throw new HttpError(502, 'CHAT_TOOL_LIMIT');
+    if (!Array.isArray(msg.tool_calls) || (toolCount += msg.tool_calls.length) > 4) throw new HttpError(502, 'CHAT_TOOL_LIMIT',
+      'Esta solicitud superó el máximo de 4 consultas o propuestas por mensaje. Para registrar varios proveedores, pide un lote de hasta 20; para otras tareas, divide la solicitud en pasos más pequeños. No se ejecutó ningún cambio.');
     messages.push({ role: 'assistant', content: typeof msg.content === 'string' ? msg.content : null, tool_calls: msg.tool_calls });
     const usedIds = new Set();
     for (const call of msg.tool_calls) {
@@ -73,7 +74,8 @@ export async function completeChat(env, session, history, input, channel = 'web'
       messages.push({ role: 'tool', tool_call_id: call.id, content });
     }
   }
-  throw new HttpError(502, 'CHAT_TOOL_LIMIT');
+  throw new HttpError(502, 'CHAT_TOOL_LIMIT',
+    'Alcancé el máximo de 3 rondas de consultas para responder a este mensaje y no pude terminar. Divide la solicitud en pasos más pequeños; los proveedores pueden agruparse en lotes de hasta 20. No se ejecutó ningún cambio.');
 }
 
 async function conversation(env, session, conversationId, channel = null) {

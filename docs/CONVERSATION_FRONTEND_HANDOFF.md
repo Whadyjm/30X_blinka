@@ -83,7 +83,7 @@ Los archivos siguen el flujo existente: `POST /invoices` (multipart, un archivo 
 
 V1 responde JSON al finalizar; no hay streaming/SSE. Usar un timeout de60s para mensajes y el timeout de90s de procesamiento existente. Mientras espera, Oli puede mostrar `thinking`; escribir/enfocar usa `listening`, terminar `understanding` y reposo `idle`. Son estados visuales, no una fuente de decisiones financieras.
 
-Límites backend: tres rondas de modelo, cuatro herramientas por turno,35s de presupuesto de proveedor, respuestas de1500 tokens por llamada. Una conversación admite un turno activo. Se conservan claims de reintento: hasta tres intentos por turno y20 intentos por usuario/empresa cada15min. El contexto al modelo incluye los últimos seis turnos completos; la UI recibe hasta20.
+Límites backend: tres rondas de modelo, cuatro herramientas por turno,35s de presupuesto de proveedor, respuestas de3000 tokens por llamada. Una conversación admite un turno activo. Se conservan claims de reintento: hasta tres intentos por turno y20 intentos por usuario/empresa cada15min. El contexto al modelo incluye los últimos seis turnos completos; la UI recibe hasta20.
 
 ## Tarjetas del servidor
 
@@ -132,11 +132,22 @@ El modelo también puede preparar esa propuesta cuando ya cuenta con los datos q
 
 Botón: **Registrar proveedor y volver a revisar**. Envía exclusivamente `{confirmed:true}` al ID de acción. El servidor registra proveedor/acuerdo, resuelve IDs nulos de la misma factura y evalúa todas las reglas en un batch atómico. La decisión previa permanece. Si resulta `APPROVE`, D1 reserva una sola vez; si requiere una persona, devuelve una solicitud de revisión real. No mostrar un éxito financiero hasta recibir el resultado confirmado.
 
-Otros tipos: `CREATE_VENDOR`, `UPDATE_VENDOR`, `CREATE_AGREEMENT`, `UPDATE_AGREEMENT`, `RESUME_INVOICE`; sus formas exactas están en `ChatActionInputSchema`. No hay herramientas de borrar, pagar, activar mandato ni confirmar una propuesta desde el modelo. Los endpoints existentes de reglas y revisión humana se conservan.
+Otros tipos: `CREATE_VENDOR`, `CREATE_VENDORS`, `UPDATE_VENDOR`, `CREATE_AGREEMENT`, `UPDATE_AGREEMENT`, `RESUME_INVOICE`; sus formas exactas están en `ChatActionInputSchema`. No hay herramientas de borrar, pagar, activar mandato ni confirmar una propuesta desde el modelo. Los endpoints existentes de reglas y revisión humana se conservan.
+
+`CREATE_VENDORS` lleva `vendors: [{name, allowed, externalRef}]`, entre 1 y 20. Una sola tarjeta
+muestra cada nombre, permiso y referencia antes de confirmar el lote. No hay altas parciales:
+si un nombre existe o se repite, se rechaza todo el lote; no habilitar proveedores existentes
+desautorizados. El resultado confirmado añade `vendors: Vendor[]`, con los demás recursos null.
+Los tipos existentes conservan su respuesta. Confirmar sigue enviando solo `{confirmed:true}`.
 
 ## Confirmación, historial y errores
 
 `ChatActionResultSchema` devuelve `{ action, vendor, agreement, invoice }`; los campos que no participan son null. Confirmar dos veces la misma acción devuelve el resultado guardado, sin repetir efectos, incluso con otra clave. La UI sigue conservando una clave por intención. Antes de habilitar una acción recuperada del historial, refrescar su estado con GET: los replies/historial son snapshots históricos y pueden contener una acción que entonces estaba pendiente.
+
+`CHAT_TOOL_LIMIT` devuelve un mensaje humano que distingue exceso de cuatro herramientas de
+agotamiento de tres rondas, explica que no se ejecutó ningún cambio y ofrece continuar por
+lotes de hasta veinte proveedores o pasos más pequeños. Mostrar `error.message` en vivo;
+en historial, reconocer `errorCode=CHAT_TOOL_LIMIT` y mantener una explicación equivalente.
 
 Invalidar `qk.vendors`, `qk.agreements`, `qk.invoices`, `qk.invoice(id)`, `qk.approvals` y `qk.mandate` según el resultado. El presupuesto se obtiene dentro de `getMandate()`; refrescar además el dashboard si se muestra.
 

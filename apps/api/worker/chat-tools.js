@@ -11,7 +11,7 @@ const descriptions = {
   list_agreements: 'Read company agreements, optionally for one vendor.',
   get_budget: 'Read recorded budget and reservations for a company month.',
   summarize_invoices: 'Compute invoice totals by currency for a month. Optional query is a literal substring of vendor/description, not a verified spending category. Period uses servicePeriod, falling back to issue date. Totals are invoiced/approved/blocked, never money actually paid.',
-  prepare_change: 'Prepare a proposed directory change for a human review card. DOES NOT execute it. Use only after the user supplies required data. ONBOARD_INVOICE_VENDOR requires the inspected expectedDecisionId, exact vendor name, explicit allowed flag and confirmed commercial terms; never invent an agreement from a bill. RESUME_INVOICE resolves a previously unknown vendor now registered with the exact name. Only the user UI can confirm actions.',
+  prepare_change: 'Prepare a proposed directory change for a human review card. DOES NOT execute it. Use only after the user supplies required data. For multiple new vendors use ONE CREATE_VENDORS proposal with 1-20 vendors, never one tool call per vendor. Existing or repeated names reject the entire batch; never enable an existing disallowed vendor. ONBOARD_INVOICE_VENDOR requires the inspected expectedDecisionId, exact vendor name, explicit allowed flag and confirmed commercial terms; never invent an agreement from a bill. RESUME_INVOICE resolves a previously unknown vendor now registered with the exact name. Only the user UI can confirm actions.',
 };
 export function toolsFor(session) {
   return Object.entries(schemas).filter(([name]) => name !== 'prepare_change' || session.role === 'OWNER')

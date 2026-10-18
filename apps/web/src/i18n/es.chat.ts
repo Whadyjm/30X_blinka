@@ -1,4 +1,6 @@
 export const esChat: Record<string, string> = {
+  'Register vendors': 'Registrar proveedores por lote',
+  'Oli reached the limit of queries or proposals for this message. Ask for a batch of up to 20 vendors, or split other tasks into smaller steps. No changes were applied.': 'Oli alcanzó el límite de consultas o propuestas de este mensaje. Pide un lote de hasta 20 proveedores o divide las otras tareas en pasos más pequeños. No se ejecutó ningún cambio.',
   'Conversations': 'Conversaciones',
   'Show Telegram conversation on Home': 'Ver conversación de Telegram en Home',
   'Only changes this browser’s view. Your Telegram bot stays connected.': 'Solo cambia la vista en este navegador. Tu bot de Telegram sigue conectado.',

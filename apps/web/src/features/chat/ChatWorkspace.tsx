@@ -10,6 +10,7 @@ import { cn } from '@/lib/cn';
 import { ChatReply } from './ChatReply';
 import { ChatMascot } from './ChatMascot';
 import { useConversation } from './useConversation';
+import { chatFailureMessage } from './failure-message';
 import { useTelegramHistoryPreference } from './useTelegramHistoryPreference';
 
 const suggestions = ['¿Qué facturas necesitan mi revisión?', '¿Cómo va el presupuesto de este mes?'];
@@ -200,7 +201,7 @@ export function ChatWorkspace() {
             {turn.text && <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{turn.text}</p>}
             {turn.invoiceIds.length > 0 && <div className="flex flex-wrap gap-2">{turn.invoiceIds.map(id => <Link key={id} to={`/app/bills/${encodeURIComponent(id)}`} className="inline-flex min-h-11 items-center gap-2 text-sm underline underline-offset-4"><FileText className="size-4" aria-hidden />{t('View invoice')}</Link>)}</div>}
           </div></div>
-          <div className="text-base leading-7 text-ink">{turn.reply ? <ChatReply reply={turn.reply} readOnly={channel === 'TELEGRAM'} animate={channel === 'WEB' && turn.id === web.revealTurnId} onRevealProgress={followReply} onRevealDone={web.finishReveal} /> : <p role="status" className="text-slate-600">{t(turn.state === 'FAILED' ? 'This message failed. Please try again.' : 'Oli is thinking...')}</p>}</div>
+          <div className="text-base leading-7 text-ink">{turn.reply ? <ChatReply reply={turn.reply} readOnly={channel === 'TELEGRAM'} animate={channel === 'WEB' && turn.id === web.revealTurnId} onRevealProgress={followReply} onRevealDone={web.finishReveal} /> : <p role="status" className="text-slate-600">{turn.state === 'FAILED' ? chatFailureMessage(turn.errorCode) : t('Oli is thinking...')}</p>}</div>
         </div>)}
         {conversation.pending && <div className="mx-auto max-w-3xl space-y-5">
           <div className="flex justify-end"><div className="max-w-[90%] rounded-2xl bg-bone px-4 py-3 text-base leading-7">

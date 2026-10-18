@@ -27,3 +27,14 @@ test('las consultas acotan filtros y no aceptan SQL ni autoridad de confirmació
   assert.equal(ChatToolInputSchemas.list_invoices.safeParse({ orgId: 'other' }).success, false);
   assert.equal(Object.hasOwn(ChatToolInputSchemas, 'confirm_action'), false);
 });
+
+test('alta por lote admite hasta veinte proveedores con permiso explícito y sin autoridad extra', () => {
+  const vendor = { name: 'Proveedor ficticio', allowed: true, externalRef: null };
+  const proposal = { kind: 'CREATE_VENDORS', vendors: Array.from({ length: 20 }, (_, i) => ({ ...vendor, name: `Proveedor ${i}` })) };
+  assert.equal(ChatActionInputSchema.safeParse(proposal).success, true);
+  for (const invalid of [{ ...proposal, vendors: [] }, { ...proposal, vendors: [...proposal.vendors, vendor] },
+    { ...proposal, confirmed: true }, { ...proposal, vendors: [{ name: 'Demo', externalRef: null }] },
+    { ...proposal, vendors: [{ ...vendor, orgId: 'another' }] }]) {
+    assert.equal(ChatActionInputSchema.safeParse(invalid).success, false);
+  }
+});

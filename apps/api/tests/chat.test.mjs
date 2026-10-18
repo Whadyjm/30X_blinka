@@ -130,6 +130,97 @@ test('el modelo solo propone: alta/modificación requieren confirmación, payloa
   assert.equal((await h.confirm(changed.data)).data.vendor.allowed, false);
 });
 
+test('trece proveedores usan una propuesta, confirmación atómica y replay sin duplicados', async t => {
+  const h = await setup(t);
+  const vendors = Array.from({ length: 13 }, (_, i) => ({ name: `Proveedor lote ${i}`, allowed: i !== 12, externalRef: null }));
+  const proposal = { kind: 'CREATE_VENDORS', vendors };
+  const baseline = await h.DB.prepare('SELECT count(*) n FROM vendors').first('n');
+  h.model(h.tool('list_vendors', {}), h.tool('prepare_change', { proposal }), h.text('Revisa los trece proveedores y confirma el lote.'));
+  const reply = await h.chat('Agrega estos trece proveedores con los permisos indicados.');
+  assert.equal(reply.status, 200, JSON.stringify(reply));
+  assert.equal(reply.data.actions.length, 1);
+  assert.equal(reply.data.actions[0].proposal.vendors.length, 13);
+  assert.equal(h.calls.length, 3);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline);
+  const action = reply.data.actions[0], key = crypto.randomUUID();
+  const forged = await h.api(`/chat/actions/${action.id}/confirm`, { method: 'POST', key: crypto.randomUUID(), data: { confirmed: true, vendors: [] } });
+  assert.equal(forged.status, 400);
+  const result = await h.confirm(action, key);
+  assert.equal(result.status, 200, JSON.stringify(result));
+  ChatActionResultSchema.parse(result.data);
+  assert.deepEqual(result.data.vendors.map(({ name, allowed, externalRef }) => ({ name, allowed, externalRef })), vendors);
+  assert.equal(result.data.vendor, null);
+  assert.deepEqual((await h.confirm(action, key)).data, result.data);
+  assert.deepEqual((await h.confirm(action)).data, result.data);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline + 13);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+  assert.equal(await h.DB.prepare("SELECT count(*) n FROM audit_events WHERE type='CHAT_ACTION_CONFIRMED' AND entity_id=?").bind(action.id).first('n'), 1);
+});
+
+test('lotes rechazan nombres repetidos/existentes, datos inválidos y roles sin permiso', async t => {
+  const h = await setup(t);
+  const proposal = { kind: 'CREATE_VENDORS', vendors: [vendor] };
+  const baseline = await h.DB.prepare('SELECT count(*) n FROM vendors').first('n');
+  const duplicate = await h.prepare({ ...proposal, vendors: [vendor, { ...vendor, name: '  FARO   TELECOM DEMO ' }] });
+  assert.equal(duplicate.status, 409);
+  const blocked = await h.DB.prepare('SELECT name FROM vendors WHERE allowed=0 LIMIT 1').first('name');
+  assert.equal((await h.prepare({ ...proposal, vendors: [vendor, { ...vendor, name: blocked }] })).status, 409);
+  assert.equal(await h.DB.prepare('SELECT allowed FROM vendors WHERE name=?').bind(blocked).first('allowed'), 0);
+  for (const vendors of [[], Array(21).fill(vendor), [{ ...vendor, allowed: undefined }]]) {
+    assert.equal((await h.prepare({ ...proposal, vendors })).status, 400);
+  }
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline);
+  h.env.DEMO_USER_ID = 'user_demo_approver'; await h.login('approver@oli-demo.invalid');
+  assert.equal((await h.prepare(proposal)).status, 403);
+});
+
+test('cancelación y cambio concurrente impiden cualquier alta del lote', async t => {
+  const h = await setup(t), proposal = { kind: 'CREATE_VENDORS', vendors: [vendor, { ...vendor, name: 'Segundo lote Demo' }] };
+  const cancelled = await h.prepare(proposal);
+  await h.api(`/chat/actions/${cancelled.data.id}/cancel`, { method: 'POST' });
+  assert.equal((await h.confirm(cancelled.data)).status, 409);
+  const stale = await h.prepare(proposal);
+  await h.DB.prepare("UPDATE organizations SET state_revision=state_revision+1 WHERE id='org_demo'").run();
+  assert.equal((await h.confirm(stale.data)).error.code, 'ACTION_STALE');
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors WHERE name=?').bind(vendor.name).first('n'), 0);
+});
+
+test('un fallo al insertar el segundo proveedor revierte el lote y su confirmación', async t => {
+  const h = await setup(t), name = 'Fallo deliberado del lote';
+  const prepared = await h.prepare({ kind: 'CREATE_VENDORS', vendors: [vendor, { ...vendor, name }] });
+  await h.DB.prepare("CREATE TRIGGER reject_batch_test BEFORE INSERT ON vendors WHEN NEW.name='Fallo deliberado del lote' BEGIN SELECT RAISE(ABORT,'CHECK constraint failed: forced_batch_failure'); END").run();
+  const result = await h.confirm(prepared.data);
+  assert.equal(result.status, 409);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors WHERE name IN (?,?)').bind(vendor.name, name).first('n'), 0);
+  assert.equal((await h.api('/chat/actions/' + prepared.data.id)).data.status, 'PENDING');
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+});
+
+test('límite de herramientas explica causa y siguiente paso sin publicar propuestas parciales', async t => {
+  const h = await setup(t);
+  const proposal = { kind: 'CREATE_VENDOR', data: vendor };
+  const tooMany = h.tool('list_vendors', {});
+  tooMany.message.tool_calls = Array.from({ length: 4 }, () => h.tool('list_vendors', {}).message.tool_calls[0]);
+  h.model(h.tool('prepare_change', { proposal }), tooMany);
+  const result = await h.chat('Una solicitud con demasiadas acciones');
+  assert.equal(result.error.code, 'CHAT_TOOL_LIMIT');
+  assert.match(result.error.message, /máximo de 4/);
+  assert.match(result.error.message, /lote de hasta 20/);
+  assert.match(result.error.message, /No se ejecutó ningún cambio/);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM chat_actions').first('n'), 0);
+});
+
+test('límite de rondas explica que faltó terminar sin crear proveedores', async t => {
+  const h = await setup(t);
+  h.model(h.tool('prepare_change', { proposal: { kind: 'CREATE_VENDOR', data: vendor } }), h.tool('list_vendors', {}), h.tool('list_vendors', {}));
+  const result = await h.chat('Otra solicitud que no logra terminar');
+  assert.equal(result.error.code, 'CHAT_TOOL_LIMIT');
+  assert.match(result.error.message, /máximo de 3 rondas/);
+  assert.match(result.error.message, /Divide la solicitud/);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM chat_actions').first('n'), 0);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors WHERE name=?').bind(vendor.name).first('n'), 0);
+});
+
 test('proveedor desconocido: confirma proveedor/acuerdo, reevalúa misma factura y conserva decisión/reserva única', async t => {
   const h = await setup(t), i = await h.invoice();
   assert.equal(i.latestDecision.action, 'BLOCK'); assert.ok(i.latestDecision.reasons.includes('UNKNOWN_VENDOR'));

@@ -427,6 +427,7 @@ const ChatVendorInputSchema = CreateVendorSchema.extend({ name: NameSchema.max(2
 const ChatAgreementInputSchema = CreateAgreementSchema.extend({ concept: NameSchema.max(300) });
 export const ChatActionInputSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('CREATE_VENDOR'), data: ChatVendorInputSchema }),
+  z.strictObject({ kind: z.literal('CREATE_VENDORS'), vendors: z.array(ChatVendorInputSchema).min(1).max(20) }),
   z.strictObject({ kind: z.literal('UPDATE_VENDOR'), targetId: ChatIdSchema, data: ChatVendorInputSchema.partial().refine(v => Object.keys(v).length > 0) }),
   z.strictObject({ kind: z.literal('CREATE_AGREEMENT'), data: ChatAgreementInputSchema }),
   z.strictObject({ kind: z.literal('UPDATE_AGREEMENT'), targetId: ChatIdSchema, data: ChatAgreementInputSchema.partial().refine(v => Object.keys(v).length > 0) }),
@@ -482,7 +483,8 @@ export const ChatReplySchema = z.strictObject({
 });
 export const ConfirmChatActionSchema = z.strictObject({ confirmed: z.literal(true) });
 export const ChatActionResultSchema = z.strictObject({ action: ChatActionSchema,
-  vendor: VendorSchema.nullable(), agreement: AgreementSchema.nullable(), invoice: InvoiceDetailSchema.nullable() });
+  vendor: VendorSchema.nullable(), agreement: AgreementSchema.nullable(), invoice: InvoiceDetailSchema.nullable(),
+  vendors: z.array(VendorSchema).min(1).max(20).optional() });
 export const ChatChannelSchema = z.enum(['WEB', 'TELEGRAM']);
 export const ChatHistorySchema = z.strictObject({ id: ChatIdSchema, channel: ChatChannelSchema,
   turns: z.array(z.strictObject({ id: ChatIdSchema, text: z.string(), invoiceIds: z.array(ChatIdSchema),

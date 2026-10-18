@@ -45,7 +45,7 @@ const fields = (value, currency = value?.currency) => Object.entries(value ?? {}
   .map(([key, v]) => `${labels[key]}: ${v === null ? 'sin referencia' : v === true ? 'sí' : v === false ? 'no'
     : ['amountMinor', 'toleranceMinor'].includes(key) && currency ? money(v, currency)
       : v === 'MONTHLY' ? 'mensual' : v === 'ONE_TIME' ? 'una vez' : v}`).join('\n');
-const titles = { CREATE_VENDOR: 'Registrar proveedor', UPDATE_VENDOR: 'Actualizar proveedor',
+const titles = { CREATE_VENDOR: 'Registrar proveedor', CREATE_VENDORS: 'Registrar proveedores por lote', UPDATE_VENDOR: 'Actualizar proveedor',
   CREATE_AGREEMENT: 'Crear acuerdo', UPDATE_AGREEMENT: 'Actualizar acuerdo',
   ONBOARD_INVOICE_VENDOR: 'Registrar proveedor de la factura y reevaluarla', RESUME_INVOICE: 'Reevaluar factura con proveedor registrado' };
 
@@ -54,6 +54,7 @@ function proposalText(action, invoice) {
   return [`Propuesta: ${titles[p.kind]}.`, invoice ? `Factura: ${invoice.invoiceNumber ?? invoice.file.name}\n${invoice.vendorName ?? 'Proveedor desconocido'}${invoice.amountMinor !== null && invoice.currency ? `\n${money(invoice.amountMinor, invoice.currency)}` : ''}` : '',
     action.before ? `Registro actual:\n${fields(action.before)}` : '',
     p.data ? `Datos propuestos:\n${fields(p.data, p.data.currency ?? action.before?.currency)}` : '', p.vendor ? `Proveedor:\n${fields(p.vendor)}` : '',
+    p.kind === 'CREATE_VENDORS' ? `Proveedores (${p.vendors.length}):\n${p.vendors.map((v, i) => `${i + 1}. ${fields(v)}`).join('\n\n')}` : '',
     p.agreement ? `Acuerdo:\n${fields(p.agreement)}` : p.kind === 'ONBOARD_INVOICE_VENDOR' ? 'Sin acuerdo nuevo.' : '',
     'Revisa los datos. Solo se aplicará al pulsar Confirmar.', `Vence: ${action.expiresAt}.`].filter(Boolean).join('\n\n');
 }
@@ -75,6 +76,7 @@ export async function telegramChat(env, row, payload, connection) {
   } catch (error) {
     if (!(error instanceof HttpError)) throw error;
     if (error.code === 'CHAT_IN_PROGRESS') throw error;
+    if (error.code === 'CHAT_TOOL_LIMIT') return [{ text: error.message }];
     if (error.status === 429) return [{ text: 'Vamos a pausar unos minutos: alcanzaste el límite de conversación. Luego puedes seguir aquí.' }];
     if (error.status >= 500 || error.code === 'CHAT_RETRY_LIMIT') return [{ text: 'No pude completar la respuesta en este momento. Intenta enviarme tu mensaje de nuevo. No se ejecutó ninguna propuesta.' }];
     throw error;

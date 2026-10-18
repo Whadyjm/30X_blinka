@@ -239,6 +239,34 @@ test('Telegram: no reasigna un Telegram a otra empresa; vínculo del evento cons
 const tool = (name, args) => ({ content: null, tool_calls: [{ id: crypto.randomUUID(), type: 'function',
   function: { name, arguments: JSON.stringify(args) } }] });
 const vendor = { name: 'Proveedor creado desde Telegram', allowed: true, externalRef: null };
+
+test('Telegram muestra todos los proveedores del lote antes de confirmar una sola vez', async t => {
+  const s = await setup(t); await s.connect();
+  const vendors = Array.from({ length: 13 }, (_, i) => ({ ...vendor, name: `Proveedor Telegram lote ${i}` }));
+  s.modelSteps.push(tool('prepare_change', { proposal: { kind: 'CREATE_VENDORS', vendors } }), { content: 'Revisa y confirma el lote.' });
+  const baseline = await s.DB.prepare('SELECT count(*) n FROM vendors').first('n');
+  await s.webhook(s.update({ text: 'Agrega estos trece proveedores autorizados.' })); await s.drain();
+  const review = s.sent.filter(m => m.text.includes('Propuesta:') || m.text.includes('Nombre:')).map(m => m.text).join('\n');
+  for (const v of vendors) assert.ok(review.includes(v.name), v.name);
+  assert.equal(await s.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline);
+  const message = s.sent.at(-1), messageId = s.sent.length;
+  assert.ok(message.reply_markup);
+  await s.click(message.reply_markup.inline_keyboard[0][0], messageId); await s.drain();
+  assert.equal(await s.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline + 13);
+  await s.click(message.reply_markup.inline_keyboard[0][0], messageId); await s.drain();
+  assert.equal(await s.DB.prepare('SELECT count(*) n FROM vendors').first('n'), baseline + 13);
+});
+
+test('Telegram conserva la explicación específica de CHAT_TOOL_LIMIT', async t => {
+  const s = await setup(t); await s.connect();
+  const tooMany = tool('list_vendors', {});
+  tooMany.tool_calls = Array.from({ length: 5 }, () => tool('list_vendors', {}).tool_calls[0]);
+  s.modelSteps.push(tooMany);
+  await s.webhook(s.update({ text: 'Una petición con demasiadas acciones' })); await s.drain();
+  assert.match(s.sent.at(-1).text, /máximo de 4/);
+  assert.match(s.sent.at(-1).text, /lote de hasta 20/);
+  assert.match(s.sent.at(-1).text, /No se ejecutó ningún cambio/);
+});
 async function propose(s) {
   s.modelSteps.push(tool('prepare_change', { proposal: { kind: 'CREATE_VENDOR', data: vendor } }), { content: 'Revisa la propuesta y pulsa Confirmar.' });
   await s.webhook(s.update({ text: 'Registra este proveedor, autorizado, sin referencia externa.' }));

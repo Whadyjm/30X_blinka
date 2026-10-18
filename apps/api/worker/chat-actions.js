@@ -40,8 +40,20 @@ export async function inspectInvoice(env, session, invoiceId) {
 async function buildChange(env, session, proposal) {
   const db = env.DB, org = session.organization.id;
   const mutations = [];
-  let before = null, vendor = null, agreement = null, reevaluation = null;
-  if (proposal.kind === 'ONBOARD_INVOICE_VENDOR' || proposal.kind === 'RESUME_INVOICE') {
+  let before = null, vendor = null, vendors = null, agreement = null, reevaluation = null;
+  if (proposal.kind === 'CREATE_VENDORS') {
+    const existing = (await stmt(db, 'SELECT name FROM vendors WHERE org_id = ?', org).all()).results;
+    const names = new Set(existing.map(v => normalizeName(v.name)));
+    vendors = [];
+    for (const input of proposal.vendors) {
+      const name = normalizeName(input.name);
+      if (names.has(name)) throw new HttpError(409, 'CONFIGURATION_CONFLICT', `El proveedor «${input.name}» ya existe o está repetido en el lote. Retíralo y revisa la propuesta.`);
+      names.add(name);
+      const created = { ...input, id: id('vendor'), createdAt: now() };
+      vendors.push(created);
+      mutations.push(directoryMutation(db, org, 'vendors', created));
+    }
+  } else if (proposal.kind === 'ONBOARD_INVOICE_VENDOR' || proposal.kind === 'RESUME_INVOICE') {
     const card = await inspectInvoice(env, session, proposal.invoiceId);
     if (card.intake.expectedDecisionId !== proposal.expectedDecisionId) throw new HttpError(409, 'DECISION_CHANGED');
     if (!(proposal.kind === 'RESUME_INVOICE' ? card.intake.canResume : card.intake.canOnboard)) throw new HttpError(409, 'VENDOR_ONBOARDING_NOT_ALLOWED');
@@ -76,7 +88,7 @@ async function buildChange(env, session, proposal) {
     mutations.push(directoryMutation(db, org, table, data, proposal.targetId));
     if (isVendor) vendor = data; else agreement = data;
   }
-  return { before, vendor, agreement, mutations, reevaluation };
+  return { before, vendor, vendors, agreement, mutations, reevaluation };
 }
 
 export async function prepareAction(env, session, raw) {
@@ -153,7 +165,8 @@ export async function confirmAction(request, env, session, actionId, telegramCon
         canApprove: true, reviewerId: null, reviewComment: null, createdAt: evaluation.candidate.checkedAt, decidedAt: null };
     }
   }
-  const result = ChatActionResultSchema.parse({ action: { ...action, status: 'CONFIRMED' }, vendor: change.vendor, agreement: change.agreement, invoice });
+  const result = ChatActionResultSchema.parse({ action: { ...action, status: 'CONFIRMED' }, vendor: change.vendor, agreement: change.agreement, invoice,
+    ...(change.vendors ? { vendors: change.vendors } : {}) });
   const response = { data: result };
   // Confirmation and all effects commit together; D1 resolution triggers require this confirmed record.
   statements.splice(2, 0, stmt(env.DB, "UPDATE chat_actions SET state = 'CONFIRMED', result_json = ? WHERE id = ? AND org_id = ? AND state = 'PENDING'", JSON.stringify(response), actionId, org));

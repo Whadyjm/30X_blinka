@@ -759,6 +759,35 @@ La extensión conversacional autorizada consulta hechos registrados y prepara pr
 confirmación humana; no sustituye la autorización formal. Su contrato está en
 [CONVERSATION_FRONTEND_HANDOFF.md](CONVERSATION_FRONTEND_HANDOFF.md).
 
+El chat admite alta de proveedores por lote mediante una sola propuesta:
+
+```json
+{
+  "kind": "CREATE_VENDORS",
+  "vendors": [
+    { "name": "Sauce Infra Demo LLC", "allowed": true, "externalRef": null },
+    { "name": "Malva Studio Demo LLC", "allowed": true, "externalRef": null }
+  ]
+}
+```
+
+Se usa en `POST /chat/actions` o en `prepare_change.proposal`. Entre 1 y 20 proveedores,
+con permiso explícito por entrada. El modelo prepara una sola acción; la tarjeta web o
+Telegram muestra la lista completa antes de confirmar. `POST /chat/actions/:id/confirm`
+conserva `{ "confirmed": true }`, sesión OWNER, CSRF e idempotencia. La respuesta añade
+`vendors: Vendor[]` solo para esta acción; `vendor`, `agreement` e `invoice` son null.
+Los nombres repetidos, normalizados por NFC, espacios y caja, o existentes en la empresa
+rechazan el lote completo con `409 CONFIGURATION_CONFLICT`, sin cambiar permisos existentes.
+La confirmación revalida revisión, membresía y vencimiento, y guarda todas las altas con la
+acción y auditoría en un batch atómico. Repetir la confirmación devuelve el resultado guardado.
+No crea acuerdos, reevalúa facturas ni modifica reservas.
+
+El límite del chat sigue en cuatro herramientas acumuladas y tres rondas por turno.
+`502 CHAT_TOOL_LIMIT` incluye `error.message` legible: distingue exceso de cuatro consultas/
+propuestas de agotamiento de tres rondas, explica que no se ejecutó ningún cambio y propone
+un lote de hasta veinte proveedores o dividir otras tareas. Web muestra ese mensaje y
+Telegram lo conserva; el historial web reconoce el código y explica cómo continuar.
+
 ## 10. Cómo trabajar juntos y compartir este contrato
 
 1. Oscar publica este documento en `oscar/backend` y Whady usa sus DTOs/ejemplos para las pantallas.
