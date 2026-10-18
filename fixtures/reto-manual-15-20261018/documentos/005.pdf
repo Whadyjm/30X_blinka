@@ -1,0 +1,55 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1639 >>
+stream
+0.1373 0.3569 0.5412 rg 0 780 612 12 re f
+BT /F1 23 Tf 0.0902 0.1686 0.2275 rg 42 724 Td (FACTURA / INVOICE) Tj ET
+BT /F1 12 Tf 0.1373 0.3569 0.5412 rg 42 698 Td (Servicios profesionales) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 42 670 Td (Supplier: Sauce Infra Demo LLC) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 42 637 Td (Bill to: Albor Prueba LLC) Tj ET
+BT /F1 9 Tf 0.1373 0.3569 0.5412 rg 42 617 Td (DOCUMENTO FICTICIO - SIN VALOR FISCAL) Tj ET
+0.8118 0.8510 0.8706 rg 42 591 528 1 re f
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 552 Td (Invoice number:) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 240 550 Td (ALB-2026-001) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 523 Td (Issue date:) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 240 521 Td (2026-10-18) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 494 Td (Due date:) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 240 492 Td (2026-10-31) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 465 Td (Service period:) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 240 463 Td (2026-10) Tj ET
+BT /F1 10 Tf 0.3255 0.3961 0.4471 rg 42 436 Td (Currency:) Tj ET
+BT /F1 12 Tf 0.0902 0.1686 0.2275 rg 240 434 Td (USD) Tj ET
+0.9176 0.9451 0.9490 rg 42 352 528 35 re f
+BT /F1 11 Tf 0.0902 0.1686 0.2275 rg 54 365 Td (Description: Respaldo de servidores) Tj ET
+BT /F1 23 Tf 0.1373 0.3569 0.5412 rg 42 294 Td (Total: USD 120.00) Tj ET
+BT /F1 10 Tf 0.0902 0.1686 0.2275 rg 42 208 Td (Referencia de entrega: ALB-C05. Copia administrativa.) Tj ET
+0.8118 0.8510 0.8706 rg 42 66 528 1 re f
+BT /F1 9 Tf 0.3255 0.3961 0.4471 rg 42 38 Td (Empresas inventadas. No realizar pagos. Sin datos bancarios reales.) Tj ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000000344 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+2034
+%%EOF

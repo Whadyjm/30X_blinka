@@ -1,0 +1,275 @@
+{
+  "datasetVersion": "albor-manual-15-v1",
+  "synthetic": true,
+  "organization": {
+    "id": "org_albor_manual",
+    "name": "Albor Prueba LLC",
+    "defaultCurrency": "USD",
+    "timezone": "America/Caracas"
+  },
+  "policy": {
+    "id": "pol_albor_v1",
+    "version": 1,
+    "status": "ACTIVE",
+    "rules": {
+      "currency": "USD",
+      "automaticLimitMinor": 30000,
+      "hardLimitMinor": 100000,
+      "monthlyBudgetMinor": 110000,
+      "requireAllowedVendor": true,
+      "requireAgreement": true,
+      "humanApprovalEnabled": true,
+      "reviewAboveMinor": 30000,
+      "processDaysBeforeDue": 0,
+      "scopedDelegations": []
+    },
+    "activatedAt": "2026-10-18T12:00:00Z",
+    "activatedBy": "usr_albor_owner"
+  },
+  "vendors": [
+    {
+      "id": "ven_albor_001",
+      "name": "Sauce Infra Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_002",
+      "name": "Malva Studio Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_003",
+      "name": "Pino Soporte Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_004",
+      "name": "Rio Traduccion Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_007",
+      "name": "Marea Contenidos Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_008",
+      "name": "Cedron Asesoria Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_009",
+      "name": "Nardo Sistemas Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_010",
+      "name": "Brezo Reportes Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_011",
+      "name": "Junco Datos Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_012",
+      "name": "Aliso Archivo Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_013",
+      "name": "Verbena Servicios Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_014",
+      "name": "Olmo Documental Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "ven_albor_015",
+      "name": "Azahar Calidad Demo LLC",
+      "allowed": true,
+      "externalRef": null,
+      "createdAt": "2026-10-18T12:00:00Z"
+    }
+  ],
+  "agreements": [
+    {
+      "id": "agr_albor_001",
+      "vendorId": "ven_albor_001",
+      "currency": "USD",
+      "amountMinor": 12000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Respaldo de servidores",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_002",
+      "vendorId": "ven_albor_002",
+      "currency": "USD",
+      "amountMinor": 18000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Diseno de catalogo",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_003",
+      "vendorId": "ven_albor_003",
+      "currency": "USD",
+      "amountMinor": 30000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Soporte de plataforma",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_004",
+      "vendorId": "ven_albor_004",
+      "currency": "USD",
+      "amountMinor": 9000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Traduccion de manual",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_007",
+      "vendorId": "ven_albor_007",
+      "currency": "USD",
+      "amountMinor": 18000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Edicion de boletin",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_008",
+      "vendorId": "ven_albor_008",
+      "currency": "USD",
+      "amountMinor": 35000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Revision de procesos",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_009",
+      "vendorId": "ven_albor_009",
+      "currency": "USD",
+      "amountMinor": 100001,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Instalacion de conectividad",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_010",
+      "vendorId": "ven_albor_010",
+      "currency": "USD",
+      "amountMinor": 18000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Reporte operativo",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_011",
+      "vendorId": "ven_albor_011",
+      "currency": "USD",
+      "amountMinor": 14000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Limpieza de registros",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_012",
+      "vendorId": "ven_albor_012",
+      "currency": "USD",
+      "amountMinor": 11000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Archivo de contratos",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_013",
+      "vendorId": "ven_albor_013",
+      "currency": "USD",
+      "amountMinor": 15000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Mantenimiento de licencias",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_014",
+      "vendorId": "ven_albor_014",
+      "currency": "USD",
+      "amountMinor": 20000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Digitalizacion de archivos",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "agr_albor_015",
+      "vendorId": "ven_albor_015",
+      "currency": "USD",
+      "amountMinor": 25000,
+      "toleranceMinor": 0,
+      "frequency": "ONE_TIME",
+      "concept": "Control de calidad",
+      "active": true,
+      "createdAt": "2026-10-18T12:00:00Z"
+    }
+  ],
+  "defaultBudget": {
+    "id": "bud_albor_202610",
+    "currency": "USD",
+    "periodKey": "2026-10",
+    "limitMinor": 110000,
+    "reservedMinor": 0,
+    "availableMinor": 110000
+  }
+}
