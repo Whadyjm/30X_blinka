@@ -1,19 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router';
 import {
   ArrowDown, ArrowDownLeft, ArrowRight, ArrowUpRight, Bot, Check, CheckCheck,
   ChevronDown, CircleCheck, Code2, FileText, Fingerprint, Hand, History,
-  LoaderCircle, Mail, MessageCircle, Paperclip, Pause, Play, Send, ShieldCheck,
+  Mail, MessageCircle, Paperclip, Pause, Play, Send, ShieldCheck,
   SlidersHorizontal, X,
 } from 'lucide-react';
-import { api } from '@/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
 import { Oli } from '@/components/Oli';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { brand } from '@/config/brand';
-import { qk, useMe } from '@/hooks/queries';
+import { useMe } from '@/hooks/queries';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { getLang, t } from '@/i18n';
 import '@/styles/landing.css';
@@ -51,14 +49,10 @@ function exampleCopy(index: number) {
 }
 
 export function Landing() {
-  const nav = useNavigate();
-  const qc = useQueryClient();
   const me = useMe();
   const signedIn = !!me.data;
   const reducedMotion = usePrefersReducedMotion();
   const root = useRef<HTMLDivElement>(null);
-  const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState(false);
   const [selected, setSelected] = useState(0);
   const [waving, setWaving] = useState(false);
   const [motionPaused, setMotionPaused] = useState(false);
@@ -117,26 +111,10 @@ export function Landing() {
     return () => window.clearTimeout(timer);
   }, [waving]);
 
-  const handleMeetOli = async () => {
-    if (signedIn) { nav('/app'); return; }
-    setLoading(true);
-    setLoginError(false);
-    try {
-      const m = await api.loginDemo();
-      qc.setQueryData(qk.me, m);
-      void qc.invalidateQueries({ queryKey: qk.mandate });
-      nav('/onboarding');
-    } catch {
-      setLoginError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const cta = () => (
-    <button type="button" onClick={() => void handleMeetOli()} disabled={loading} className="landing-button landing-button-primary">
-      {loading ? <><LoaderCircle className="landing-loading" size={18} aria-hidden />{l('Conectando…', 'Connecting…')}</> : <>{signedIn ? t('Open app') : brand.cta}<ArrowUpRight size={18} aria-hidden /></>}
-    </button>
+    <a href="https://youtu.be/Sg9IU_9QDLo?si=pgkFHMu8TIMtXKSs" target="_blank" rel="noopener noreferrer" className="landing-button landing-button-primary">
+      {brand.cta}<ArrowUpRight size={18} aria-hidden />
+    </a>
   );
 
   return (
@@ -164,7 +142,6 @@ export function Landing() {
             <p className="landing-hero-detail">{l('Tu guardián financiero lee facturas, aplica tus reglas y te consulta cuando hace falta. Cada decisión, con su porqué.', 'Your financial guardian reads invoices, applies your rules, and brings you in when needed. Every decision comes with a why.')}</p>
             <div className="landing-hero-actions">{cta()}<a href="#how-it-works" className="landing-text-link">{l('Así trabaja Oli', 'See Oli at work')}<ArrowDown size={16} aria-hidden /></a></div>
             <p className="landing-demo-note"><span aria-hidden /><span>{l('Demo con datos ficticios. Sin movimientos de dinero.', 'Demo with fictitious data. No money moves.')}</span></p>
-            {loginError && <p className="landing-error" role="alert">{l('No pudimos abrir la demo.', 'We could not open the demo.')} <Link to="/login">{l('Inicia sesión para continuar', 'Sign in to continue')}</Link></p>}
           </div>
           <div ref={stage} className="landing-hero-stage" data-case={current.id}>
             <div className="landing-stage-top"><span><span className="landing-live-dot" />{l('Tu guardián financiero', 'Your financial guardian')}</span><button type="button" className="landing-motion-control" aria-label={paused ? l('Activar animaciones', 'Play animations') : l('Pausar animaciones', 'Pause animations')} disabled={reducedMotion} onClick={() => setMotionPaused(!motionPaused)}>{paused ? <Play size={14} aria-hidden /> : <Pause size={14} aria-hidden />}</button></div>
