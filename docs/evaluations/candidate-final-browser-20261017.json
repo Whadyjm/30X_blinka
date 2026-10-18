@@ -1,0 +1,255 @@
+{
+  "scope": "READ_ONLY_BROWSER_WALK_OF_ACTUAL_MEASURED_DECISIONS_NOT_NEW_OCR_OR_FRESH_REHEARSAL",
+  "startedAt": "2026-10-18T00:11:48.274Z",
+  "sourceReport": "candidate-ronda-live-2026-10-17T23-57-09-830Z.json",
+  "sourceSha256": "4351b8a9f884cacca4f556cb53c78ea8000d4a1da201f6655375734b9206307d",
+  "candidateVersion": "aae7bc84-ce1d-4ced-94a2-020c41b078b5",
+  "browserErrors": [],
+  "checks": [
+    {
+      "width": 1440,
+      "route": "/app/dashboard",
+      "expectedTextVerified": false,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/rules",
+      "expectedTextVerified": false,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/evaluation",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_53918787-ceaa-4713-b9c6-bf67c031d58d",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_a719dd8d-bb25-4f0b-b3e0-4523dcfa0d69",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_ee980a6b-ff51-45f7-9af4-cb86c69e4886",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_f0f39f6a-fc11-459c-b2b0-7823fdd69600",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_ab6b424d-122a-49d7-b9b1-2ea2d8669943",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_adbbfc29-34b1-46f3-bc09-428502cda1a8",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "route": "/app/bills/inv_da708a99-ec29-46e1-bdf8-a2a28edbe96b",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 1440,
+      "video": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/.impeccable/review/final-candidate-20261017/video-1440/page@2531fd5a528fa9ba7d34cb6de0054847.webm"
+    },
+    {
+      "width": 390,
+      "route": "/app/dashboard",
+      "expectedTextVerified": false,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/rules",
+      "expectedTextVerified": false,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/evaluation",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_53918787-ceaa-4713-b9c6-bf67c031d58d",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_a719dd8d-bb25-4f0b-b3e0-4523dcfa0d69",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_ee980a6b-ff51-45f7-9af4-cb86c69e4886",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_f0f39f6a-fc11-459c-b2b0-7823fdd69600",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_ab6b424d-122a-49d7-b9b1-2ea2d8669943",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_adbbfc29-34b1-46f3-bc09-428502cda1a8",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "route": "/app/bills/inv_da708a99-ec29-46e1-bdf8-a2a28edbe96b",
+      "expectedTextVerified": true,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390,
+        "offenders": []
+      },
+      "noHorizontalOverflow": true
+    },
+    {
+      "width": 390,
+      "video": "/Users/oscarcrescente/Developer/hackatons/30x_2026/blinka-challenge/.impeccable/review/final-candidate-20261017/video-390/page@2527f5b7c8c40cafe18f661738f2f02e.webm"
+    }
+  ],
+  "simulated": true,
+  "summary": {
+    "datasetVersion": "ronda ficticia · lectores y cola reales · c2ebd8b8 histórico",
+    "evaluatedAt": "2026-10-18T00:01:23.453Z",
+    "totalCases": 20,
+    "correctDecisions": 20,
+    "unsafeApprovals": 0,
+    "correctAutonomousCases": 15,
+    "explainedDecisions": 20,
+    "decisionAccuracy": 1,
+    "correctAutonomy": 0.75,
+    "explanationCoverage": 1
+  },
+  "noFinancialWrites": true,
+  "pass": true,
+  "sessionRevoked": true,
+  "finishedAt": "2026-10-18T00:14:09.737Z"
+}

@@ -9,11 +9,18 @@ const sourceBytes=readFileSync(root+'/docs/evaluations/'+path),run=JSON.parse(so
 assert.ok(run.finishedAt && run.results.length===20);
 const hash=b=>createHash('sha256').update(b).digest('hex');
 const candidate=JSON.parse(readFileSync(root+'/docs/evaluations/candidate-release-20261017.json'));
-const auth=JSON.parse(execFileSync(root+'/apps/api/node_modules/.bin/wrangler',['auth','token','--json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
-const query=async(sql,params)=>{const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${candidate.account}/d1/database/349afff1-8b3b-4673-929b-ce6936c68d3a/query`,{method:'POST',headers:{Authorization:`Bearer ${auth.token}`,'Content-Type':'application/json'},body:JSON.stringify({sql,params})});assert.ok(r.ok);const j=await r.json();assert.ok(j.success);return j.result[0].results;};
+let auth=JSON.parse(execFileSync(root+'/apps/api/node_modules/.bin/wrangler',['auth','token','--json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+const query=async(sql,params)=>{
+ for(let attempt=0;attempt<2;attempt++){
+  const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${candidate.account}/d1/database/349afff1-8b3b-4673-929b-ce6936c68d3a/query`,{method:'POST',headers:{Authorization:`Bearer ${auth.token}`,'Content-Type':'application/json'},body:JSON.stringify({sql,params})});
+  if([401,403].includes(r.status)&&attempt===0){execFileSync(root+'/apps/api/node_modules/.bin/wrangler',['whoami'],{stdio:['ignore','pipe','pipe']});auth=JSON.parse(execFileSync(root+'/apps/api/node_modules/.bin/wrangler',['auth','token','--json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));continue;}
+  assert.ok(r.ok,'Cloudflare HTTP_'+r.status);const j=await r.json();assert.ok(j.success);return j.result[0].results;
+ }
+};
 const session='ses_'+randomUUID(),csrf='csrf_'+randomUUID();
 const output=root+'/docs/evaluations/candidate-final-browser-20261017.json';
 const report={scope:'READ_ONLY_BROWSER_WALK_OF_ACTUAL_MEASURED_DECISIONS_NOT_NEW_OCR_OR_FRESH_REHEARSAL',startedAt:new Date().toISOString(),sourceReport:path,sourceSha256:hash(sourceBytes),candidateVersion:candidate.deployedVersion,browserErrors:[],checks:[],simulated:true};
+const save=()=>{const body=JSON.stringify(report,null,2)+'\n';for(const secret of[auth.token,session,csrf])assert.ok(!body.includes(secret));writeFileSync(output,body);};
 const api=async p=>{const r=await fetch(base+'/api/v1'+p,{headers:{Cookie:'oli_session='+session}});assert.equal(r.status,200);return(await r.json()).data;};
 const {chromium}=await import(process.env.OLI_PLAYWRIGHT_MODULE??'/tmp/oli-ui-verification/node_modules/playwright/index.mjs');
 const {decisionView}=await import(root+'/apps/web/src/api/view-model.ts');
@@ -38,7 +45,7 @@ try{
    await page.waitForFunction(()=>document.documentElement.scrollWidth<=innerWidth,{timeout:5000}).catch(()=>{});
    const layout=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,offenders:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1).slice(0,8).map(e=>({tag:e.tagName,className:String(e.className).slice(0,160),right:e.getBoundingClientRect().right}))}));
    const name=route.split('/').at(-1);await page.screenshot({path:dir+`/${width}-${name}.png`,fullPage:true});
-   report.checks.push({width,route,expectedTextVerified:!!expectedText,layout,noHorizontalOverflow:layout.scrollWidth<=width});
+   report.checks.push({width,route,expectedTextVerified:!!expectedText,layout,noHorizontalOverflow:layout.scrollWidth<=width});save();
    // Leave readable moments in the backup recording, then show the actual decision trace.
    await page.waitForTimeout(width===1440?6000:1800);
    if(route.includes('/bills/')){await page.getByRole('heading',{name:/^(Rastro de decisión|Decision trace)$/}).scrollIntoViewIfNeeded();await page.waitForTimeout(width===1440?3500:1000);}
@@ -51,6 +58,6 @@ try{
 }catch(e){report.error={name:e.name,message:e.message.slice(0,1600)};process.exitCode=1;}
 finally{
  if(browser)await browser.close();
- await query('DELETE FROM sessions WHERE token_hash=? AND org_id=?',[hash(session),run.orgId]);report.sessionRevoked=true;report.finishedAt=new Date().toISOString();
+ try{await query('DELETE FROM sessions WHERE token_hash=? AND org_id=?',[hash(session),run.orgId]);report.sessionRevoked=true;}catch(e){report.sessionRevoked=false;report.cleanupError=e.message;process.exitCode=1;}report.finishedAt=new Date().toISOString();
  const body=JSON.stringify(report,null,2)+'\n';for(const secret of[auth.token,session,csrf])assert.ok(!body.includes(secret));writeFileSync(output,body);console.log(JSON.stringify({output,pass:report.pass,error:report.error,checks:report.checks.length}));
 }

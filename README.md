@@ -2,7 +2,7 @@
 
 Oli lee facturas de una empresa ficticia y decide si autoriza, frena o solicita revisión humana según su mandato. Guarda la decisión, la política aplicada y una explicación. Las autorizaciones y reservas son simuladas; no mueve dinero.
 
-**Aplicación:** [oli30x.ultramare.dev](https://oli30x.ultramare.dev). **Alcance:** [reto original](master_files/RETO_BLINKA.md). **Entrega:** [guion, evidencia y horario](docs/ENTREGA_20261018.md).
+**Aplicación:** [oli30x.ultramare.dev](https://oli30x.ultramare.dev). **Alcance:** [reto original](master_files/RETO_BLINKA.md). **Entrega:** [guion, evidencia y horario](docs/ENTREGA_20261018.md). **Resultado medido:** [20/20 decisiones correctas en Ronda](docs/evaluations/FINAL_CANDIDATE_20261017.md).
 
 ## Recorrido de demostración
 
@@ -11,7 +11,7 @@ Oli lee facturas de una empresa ficticia y decide si autoriza, frena o solicita 
 3. Cargar una factura ficticia en Facturas y esperar el resultado de los lectores y la cola.
 4. Abrir el detalle para ver el original privado, los datos leídos, las reglas y la explicación. Una excepción admisible solicita decisión humana; una lectura incierta requiere aclaración y no permite saltarse el control.
 5. Revisar el historial y el presupuesto. Repetir una petición no crea otra reserva; una segunda copia se evalúa como duplicado.
-6. Abrir Evaluación para consultar la medición histórica identificada. Su dataset y versión son los evaluados, aunque la interfaz se haya actualizado después.
+6. Abrir Calidad de Oli / Evaluación para consultar la medición histórica identificada. Su dataset y versión son los evaluados, aunque la interfaz se haya actualizado después.
 
 Los documentos, acuerdos y expectativas están en [fixtures de empresas](docs/fixtures/company-journey/README.md). Los reportes originales conservan también errores técnicos y abstenciones. Las muestras usadas para corregir el sistema se presentan como regresiones, no como pruebas nuevas.
 

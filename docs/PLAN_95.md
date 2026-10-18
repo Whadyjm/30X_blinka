@@ -6,7 +6,7 @@ Fuente superior: [RETO_BLINKA.md](../master_files/RETO_BLINKA.md). Oscar mantien
 
 Plazo confirmado por Oscar: **18 de octubre de 2026 a las 12:00 m de Caracas**. La candidata de backend y la muestra nueva tienen prioridad sobre funciones adicionales. El cierre se prepara sobre una versión publicada identificable, con evidencia de seguridad, autonomía y recorrido desde navegador. Después de la validación solo entran correcciones de bloqueos y seguridad; cada una obliga a repetir sus comprobaciones afectadas.
 
-La [prueba posterior de tres empresas](evaluations/COMPANY_JOURNEYS_20261017.md) encontró una aprobación indebida de un duplicado cuando el antecedente tenía proveedor sin resolver. La [corrección local y su regresión](evaluations/PRIORITY_FIXES_20261017.md) ya impiden esa autorización sin reservar presupuesto. También recuperan formatos de lectura independiente y distinguen fallos transitorios tipados. La repetición con respuestas primarias congeladas mejora de 27/60 a 50/60 recorridos correctos y observa cero aprobaciones indebidas. Falta desplegar y medir lectores reales con documentos nuevos antes de considerar 95; esta regresión no acredita ese cierre.
+La [prueba posterior de tres empresas](evaluations/COMPANY_JOURNEYS_20261017.md) encontró una aprobación indebida de un duplicado cuando el antecedente tenía proveedor sin resolver. La [corrección local y su regresión](evaluations/PRIORITY_FIXES_20261017.md) ya impiden esa autorización sin reservar presupuesto. También recuperan formatos de lectura independiente y distinguen fallos transitorios tipados. La repetición con respuestas primarias congeladas mejora de 27/60 a 50/60 recorridos correctos y observa cero aprobaciones indebidas. La [candidata final](evaluations/FINAL_CANDIDATE_20261017.md) ya está publicada: la nueva muestra Ronda dio 20/20 decisiones completas correctas, 8/8 normales automáticas, 75% de autonomía y cero aprobaciones indebidas observadas. Los dos recorridos humanos y el control P0 adicional pasaron. La [verificación de escritorio y móvil](evaluations/candidate-final-browser-20261017.json) pasó veinte pantallas. Las lecturas no fueron perfectas en todos los campos: el reporte distingue exactitud literal, equivalencia de política y decisiones. Quedan el ensayo del equipo y las limitaciones documentales descritas abajo; no se afirman como resueltas.
 
 ## Punto de partida
 
@@ -29,10 +29,10 @@ Las estimaciones son horas de trabajo activo, orientativas. Oscar y Whady pueden
 
 ## 1 Preparar una candidata identificable
 
-- [ ] Revisar y consolidar únicamente cambios propios, preservando el trabajo concurrente.
-- [ ] Registrar commit y hashes de los archivos pertinentes, migraciones, versión del Worker y configuración de lectores. Identificar el bundle frontend que se sirve.
-- [ ] Preparar una empresa ficticia de ensayo con proveedores, acuerdos y presupuesto coherentes con el guion. Usar un entorno aislado y conservar la base compartida existente.
-- [ ] Preparar el conjunto reservado antes de tocar lectores o prompts; conservarlo sin ejecutar hasta el bloque 4.
+- [x] Revisar y consolidar únicamente cambios propios, preservando el trabajo concurrente.
+- [x] Registrar commit y hashes de los archivos pertinentes, migraciones, versión del Worker y configuración de lectores. Identificar el bundle frontend que se sirve.
+- [x] Preparar una empresa ficticia de ensayo con proveedores, acuerdos y presupuesto coherentes con el guion. Usar un entorno aislado y conservar la base compartida existente.
+- [x] Preparar el conjunto reservado antes de tocar lectores o prompts; conservarlo sin ejecutar hasta el bloque 4.
 
 Termina cuando cada prueba y reporte identifica exactamente el código y la configuración que evalúa. Los cambios posteriores obligan a repetir las comprobaciones afectadas.
 
@@ -40,11 +40,11 @@ Termina cuando cada prueba y reporte identifica exactamente el código y la conf
 
 Hoy `GET /api/v1/evaluation/summary` devuelve `data:null`. Reutilizar la página Evaluation y los reportes existentes mediante un resumen validado en servidor. Servir un reporte histórico identificado no requiere invocar modelos desde la pantalla.
 
-- [ ] Oscar conecta el endpoint a una corrida inmutable identificada y valida sus contadores; nunca reconstruye respuestas esperadas como resultados observados.
+- [x] Oscar conecta el endpoint a una corrida inmutable identificada y valida sus contadores; nunca reconstruye respuestas esperadas como resultados observados.
 - [ ] Ajustar `packages/contracts`, `docs/API.md` y el adapter web según el alcance necesario. El adapter actual devuelve `groups:[]` y `cases:[]`; exponer el detalle si se ofrece comparación por caso.
-- [ ] Incluir fecha, versión evaluada, dataset, tamaño, alcance y origen de las mediciones. Identificar por separado regresión, conjunto reservado, lectores solos y procesamiento completo.
+- [x] Incluir fecha, versión evaluada, dataset, tamaño, alcance y origen de las mediciones. Identificar por separado regresión, conjunto reservado, lectores solos y procesamiento completo.
 - [ ] Whady muestra decisiones correctas, aprobaciones indebidas observadas, autonomía y cobertura de explicación, con acceso al detalle o al reporte correspondiente.
-- [ ] Un cambio de versión permite reconocer que un reporte es histórico y qué versión midió. Una caída del endpoint muestra error, sin cifras de respaldo inventadas.
+- [x] Un cambio de versión permite reconocer que un reporte es histórico y qué versión midió. Una caída del endpoint muestra error, sin cifras de respaldo inventadas.
 
 Termina cuando las cifras visibles coinciden con el archivo fuente y una persona entiende qué se midió. El 62% actual de autonomía no se incrementa cambiando el denominador ni convirtiendo escalaciones esperadas en aprobaciones.
 
@@ -68,13 +68,13 @@ Preparar 20 documentos ficticios: ocho facturas normales elegibles para aprobaci
 Las trampas deben cubrir duplicados, proveedor desconocido, desacuerdo comercial, exceso del automático con revisión humana, exceso del techo, presupuesto insuficiente, moneda o fecha ambigua y contradicción de totales. Los negativos incluyen comprobante, cotización, nota de entrega e imagen ilegible.
 
 - [ ] Fijar hashes, campos esperados, acción, necesidad humana, contexto de presupuesto y antecedentes antes de ejecutar. Revisar etiquetas visualmente entre ambos responsables.
-- [ ] Reutilizar el runner existente con cambios mínimos para el nuevo manifest y el procesamiento completo. El runner actual de holdout mide lectores; por sí solo no mide decisiones financieras.
-- [ ] Enviar al lector exclusivamente el documento. Políticas, acuerdos y etiquetas permanecen en servidor y harness, fuera de la entrada del extractor.
-- [ ] Separar cada escenario y su contexto. No cargar los 50 casos históricos juntos en una empresa: sus presupuestos y antecedentes son independientes.
-- [ ] Ejecutar una corrida completa acotada por llamadas y coste; incluir fallos técnicos y abstenciones en el reporte. No reintentar un resultado incierto buscando uno favorable.
-- [ ] Comparar decisión, motivos requeridos, necesidad humana, campos aprobados y reserva. Conservar latencias y uso reportado.
+- [x] Reutilizar el runner existente con cambios mínimos para el nuevo manifest y el procesamiento completo. El runner actual de holdout mide lectores; por sí solo no mide decisiones financieras.
+- [x] Enviar al lector exclusivamente el documento. Políticas, acuerdos y etiquetas permanecen en servidor y harness, fuera de la entrada del extractor.
+- [x] Separar cada escenario y su contexto. No cargar los 50 casos históricos juntos en una empresa: sus presupuestos y antecedentes son independientes.
+- [x] Ejecutar una corrida completa acotada por llamadas y coste; incluir fallos técnicos y abstenciones en el reporte. No reintentar un resultado incierto buscando uno favorable.
+- [x] Comparar decisión, motivos requeridos, necesidad humana, campos aprobados y reserva. Conservar latencias y uso reportado.
 
-Objetivos fijados antes de medir: cero aprobaciones indebidas observadas; 20/20 decisiones con explicación; al menos 19/20 decisiones completas correctas; al menos siete de las ocho facturas normales aprobadas automáticamente con campos correctos. El resto debe mantener revisión o bloqueo seguro. Estos son objetivos nuevos, no resultados actuales.
+Objetivos fijados antes de medir: cero aprobaciones indebidas observadas; 20/20 decisiones con explicación; al menos 19/20 decisiones completas correctas; al menos siete de las ocho facturas normales aprobadas automáticamente con campos correctos. El resto debe mantener revisión o bloqueo seguro. Los objetivos se cumplieron en la corrida final Ronda, con el alcance y la auditoría de publicación concurrente indicados en el informe final.
 
 Si se usa un fallo para modificar código o prompts, conservar esa corrida como fallida y reclasificar el conjunto como regresión. Preparar otra muestra reservada para volver a afirmar generalización.
 
@@ -93,9 +93,9 @@ Usar la versión candidata final en el entorno de ensayo y lectores reales. Reco
 | Cambio de reglas con revisión pendiente | Rechazo de la solicitud obsoleta y conservación del historial |
 | Doble envío o confirmación concurrente | Una sola autorización y una sola reserva |
 
-- [ ] Verificar estados de procesamiento, enlace privado al original, explicación e historial en escritorio y móvil.
-- [ ] La acción principal y el siguiente paso deben ser comprensibles sin abrir código ni JSON. Una lectura incierta debe indicar que requiere documento corregido; reanalizar aplica reglas a la lectura guardada.
-- [ ] Registrar versión, IDs ficticios, decisiones, reservas y resultado del replay. Conservar capturas o vídeo del recorrido, sin credenciales.
+- [x] Verificar estados de procesamiento, enlace privado al original, explicación e historial en escritorio y móvil.
+- [x] La acción principal y el siguiente paso deben ser comprensibles sin abrir código ni JSON. Una lectura incierta debe indicar que requiere documento corregido; reanalizar aplica reglas a la lectura guardada.
+- [x] Registrar versión, IDs ficticios, decisiones, reservas y resultado del replay. Conservar capturas o vídeo del recorrido, sin credenciales.
 - [ ] Si se demuestra correo con imágenes inline, completar el reenvío real pendiente descrito en [EMAIL.md](EMAIL.md). Si no se verifica, excluir ese recorrido del guion.
 
 Termina cuando los ocho casos cumplen su expectativa en la candidata final. Un fallo de seguridad detiene el cierre; un fallo del proveedor queda registrado y se muestra como estado técnico, nunca como una aprobación.
@@ -114,8 +114,8 @@ Termina cuando los ocho casos cumplen su expectativa en la candidata final. Un f
 Mensaje central: «Oli revisa las facturas, autoriza las que cumplen el mandato, frena las que lo incumplen y pide una decisión humana cuando corresponde. Cada decisión queda registrada y explicada».
 
 - [ ] Ensayar dos veces sobre datos frescos aislados, sin editar contadores ni borrar historial para recuperar el estado.
-- [ ] Tener vídeo del recorrido real y reportes descargables como respaldo, identificados como grabación y medición previa.
-- [ ] Preparar respuestas sobre qué pasa si el lector se equivoca, cambia la política, llega el mismo documento dos veces o se cae el proveedor.
+- [x] Tener videos de consulta de decisiones reales y reportes descargables como respaldo, identificados como grabación y medición previa; no se presentan como una nueva lectura ni como grabación de cada clic humano original.
+- [x] Preparar respuestas sobre qué pasa si el lector se equivoca, cambia la política, llega el mismo documento dos veces o se cae el proveedor.
 - [ ] Congelar funcionalidades cuando comience el ensayo final; admitir solo correcciones de bloqueos o seguridad y repetir los controles afectados.
 
 ## Criterios de cierre de 95

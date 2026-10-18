@@ -1,5 +1,7 @@
 # Correcciones prioritarias de los recorridos de empresas
 
+Este informe conserva la regresión intermedia. El [cierre posterior](FINAL_CANDIDATE_20261017.md) documenta despliegue, corrección de disponibilidad PDF y la última muestra nueva.
+
 El motor local ya frena el duplicado que se autorizó indebidamente en Brisa. Las correcciones de lectura independiente aumentan los recorridos correctos de 27/60 a 50/60 en regresión, conservando la abstención ante discrepancias. Se observaron cero aprobaciones indebidas en la repetición; falta una corrida nueva con lectores reales para medir la candidata completa.
 
 ## Correcciones implementadas

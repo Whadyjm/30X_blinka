@@ -1,0 +1,1057 @@
+{
+  "scope": "LIVE_DEMO_STAGING_FROM_KNOWN_FROZEN_DOCUMENTS_NOT_NEW_HOLDOUT_OR_ACCURACY_METRICS",
+  "startedAt": "2026-10-18T00:13:06.015Z",
+  "orgId": "org_demo",
+  "sourceManifestSha256": "d730dae5b668b0c000b6535ad061e120c527608b1a4ee795ef66b547bfffabb1",
+  "limits": {
+    "uploadedDocuments": 3,
+    "uniqueKnownDocuments": 2,
+    "manualReviews": 0,
+    "externalReaderRetries": 0
+  },
+  "existingInvoicesAndPolicyModified": false,
+  "results": [
+    {
+      "label": "automatic",
+      "sourceCase": "001",
+      "sourceFile": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "6666351c80dafb7a489736a8800ba4725d86c77ca3f6ef7fc33eed9f7a496ac9",
+        "sizeBytes": 1166
+      },
+      "invoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+      "detail": {
+        "id": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+        "status": "DECIDED",
+        "source": "HUMAN_UPLOAD",
+        "file": {
+          "name": "demo-automatic.pdf",
+          "mimeType": "application/pdf",
+          "sizeBytes": 1166,
+          "url": "/api/v1/invoices/inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f/file"
+        },
+        "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+        "vendorName": "Aspen Backup Demo LLC",
+        "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+        "invoiceNumber": "RD-001-2026",
+        "amountMinor": 13000,
+        "currency": "USD",
+        "issuedAt": "2026-10-14",
+        "dueDate": "2026-10-29",
+        "servicePeriod": "2026-10",
+        "description": "Database backup retention",
+        "extractionWarnings": [],
+        "latestDecision": {
+          "id": "dec_9ac732e2-a95c-4c8e-b9ce-979b3e890eb8",
+          "invoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+          "action": "APPROVE",
+          "reasons": [
+            "POLICY_ALLOWED"
+          ],
+          "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+          "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+          "policyVersion": 5,
+          "checkedAt": "2026-10-18T00:13:14.093Z",
+          "needsHumanApproval": false,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 13000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 390000,
+            "vendorAllowed": true,
+            "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a"
+          },
+          "trace": [
+            {
+              "rule": "DOCUMENT_TYPE",
+              "outcome": "PASS",
+              "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+              "evidence": {
+                "documentType": "INVOICE"
+              }
+            },
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                "amountMinor": 13000,
+                "agreedAmountMinor": 13000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Database backup retention",
+                "agreedConcept": "Database backup retention"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 13000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 13000,
+                "availableMinor": 390000,
+                "reservedMinor": 110000,
+                "budgetLimitMinor": 500000,
+                "policyMonthlyBudgetMinor": 500000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe está dentro de ambos umbrales automáticos.",
+              "evidence": {
+                "amountMinor": 13000,
+                "automaticLimitMinor": 30000,
+                "reviewAboveMinor": 30000
+              }
+            }
+          ],
+          "simulated": true
+        },
+        "approvalRequest": null,
+        "processingError": null,
+        "createdAt": "2026-10-18T00:13:08.346Z",
+        "updatedAt": "2026-10-18T00:13:14.093Z",
+        "extraction": {
+          "vendorName": "Aspen Backup Demo LLC",
+          "invoiceNumber": "RD-001-2026",
+          "amountMinor": 13000,
+          "currency": "USD",
+          "issuedAt": "2026-10-14",
+          "dueDate": "2026-10-29",
+          "servicePeriod": "2026-10",
+          "description": "Database backup retention",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Aspen Backup Demo LLC"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: RD-001-2026"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: USD 130.00"
+            },
+            {
+              "field": "currency",
+              "source": "page:1",
+              "quote": "Total: USD 130.00"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-14"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-29"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Database backup retention"
+            }
+          ]
+        },
+        "decisions": [
+          {
+            "id": "dec_9ac732e2-a95c-4c8e-b9ce-979b3e890eb8",
+            "invoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+            "action": "APPROVE",
+            "reasons": [
+              "POLICY_ALLOWED"
+            ],
+            "humanExplanation": "La factura cumple el mandato y es elegible para aprobación simulada tras reservar presupuesto de forma atómica.",
+            "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+            "policyVersion": 5,
+            "checkedAt": "2026-10-18T00:13:14.093Z",
+            "needsHumanApproval": false,
+            "actor": {
+              "kind": "SYSTEM",
+              "userId": null
+            },
+            "facts": {
+              "amountMinor": 13000,
+              "currency": "USD",
+              "automaticLimitMinor": 30000,
+              "hardLimitMinor": 100000,
+              "budgetAvailableBeforeMinor": 390000,
+              "vendorAllowed": true,
+              "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a"
+            },
+            "trace": [
+              {
+                "rule": "DOCUMENT_TYPE",
+                "outcome": "PASS",
+                "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+                "evidence": {
+                  "documentType": "INVOICE"
+                }
+              },
+              {
+                "rule": "EXTRACTION",
+                "outcome": "PASS",
+                "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+                "evidence": {
+                  "status": "CROSS_CHECKED",
+                  "issues": ""
+                }
+              },
+              {
+                "rule": "VENDOR",
+                "outcome": "PASS",
+                "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+                "evidence": {
+                  "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                  "allowed": true,
+                  "requireAllowedVendor": true
+                }
+              },
+              {
+                "rule": "AGREEMENT",
+                "outcome": "PASS",
+                "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+                "evidence": {
+                  "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                  "amountMinor": 13000,
+                  "agreedAmountMinor": 13000,
+                  "toleranceMinor": 0,
+                  "currency": "USD",
+                  "agreedCurrency": "USD",
+                  "description": "Database backup retention",
+                  "agreedConcept": "Database backup retention"
+                }
+              },
+              {
+                "rule": "CURRENCY",
+                "outcome": "PASS",
+                "explanation": "La moneda coincide con el mandato.",
+                "evidence": {
+                  "currency": "USD"
+                }
+              },
+              {
+                "rule": "HARD_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe no supera el techo absoluto.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "hardLimitMinor": 100000
+                }
+              },
+              {
+                "rule": "BUDGET",
+                "outcome": "PASS",
+                "explanation": "El presupuesto disponible cubre el importe.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "availableMinor": 390000,
+                  "reservedMinor": 110000,
+                  "budgetLimitMinor": 500000,
+                  "policyMonthlyBudgetMinor": 500000
+                }
+              },
+              {
+                "rule": "AUTO_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe está dentro de ambos umbrales automáticos.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "automaticLimitMinor": 30000,
+                  "reviewAboveMinor": 30000
+                }
+              }
+            ],
+            "simulated": true
+          }
+        ]
+      }
+    },
+    {
+      "label": "duplicate",
+      "sourceCase": "001",
+      "sourceFile": {
+        "path": "documents/001.pdf",
+        "mimeType": "application/pdf",
+        "sha256": "6666351c80dafb7a489736a8800ba4725d86c77ca3f6ef7fc33eed9f7a496ac9",
+        "sizeBytes": 1166
+      },
+      "invoiceId": "inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+      "detail": {
+        "id": "inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+        "status": "DECIDED",
+        "source": "HUMAN_UPLOAD",
+        "file": {
+          "name": "demo-duplicate.pdf",
+          "mimeType": "application/pdf",
+          "sizeBytes": 1166,
+          "url": "/api/v1/invoices/inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8/file"
+        },
+        "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+        "vendorName": "Aspen Backup Demo LLC",
+        "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+        "invoiceNumber": "RD-001-2026",
+        "amountMinor": 13000,
+        "currency": "USD",
+        "issuedAt": "2026-10-14",
+        "dueDate": "2026-10-29",
+        "servicePeriod": "2026-10",
+        "description": "Database backup retention",
+        "extractionWarnings": [],
+        "latestDecision": {
+          "id": "dec_2e4b50ee-7e32-4d8c-a72d-c4a7980fd62f",
+          "invoiceId": "inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+          "action": "BLOCK",
+          "reasons": [
+            "DUPLICATE_INVOICE"
+          ],
+          "humanExplanation": "Bloqueada para pago simulado. Ya existe este mismo documento en la empresa. El proveedor ya presentó este número de factura normalizado. Esta obligación del acuerdo ya tiene una reserva activa.",
+          "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+          "policyVersion": 5,
+          "checkedAt": "2026-10-18T00:13:16.846Z",
+          "needsHumanApproval": false,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 13000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 377000,
+            "vendorAllowed": true,
+            "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a"
+          },
+          "trace": [
+            {
+              "rule": "DOCUMENT_TYPE",
+              "outcome": "PASS",
+              "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+              "evidence": {
+                "documentType": "INVOICE"
+              }
+            },
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "DUPLICATE_HASH",
+              "outcome": "BLOCK",
+              "explanation": "Ya existe este mismo documento en la empresa.",
+              "evidence": {
+                "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                "sha256": "6666351c80dafb7a489736a8800ba4725d86c77ca3f6ef7fc33eed9f7a496ac9"
+              }
+            },
+            {
+              "rule": "DUPLICATE_NUMBER",
+              "outcome": "BLOCK",
+              "explanation": "El proveedor ya presentó este número de factura normalizado.",
+              "evidence": {
+                "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                "normalizedInvoiceNumber": "RD0012026"
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                "amountMinor": 13000,
+                "agreedAmountMinor": 13000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Database backup retention",
+                "agreedConcept": "Database backup retention"
+              }
+            },
+            {
+              "rule": "DUPLICATE_OBLIGATION",
+              "outcome": "BLOCK",
+              "explanation": "Esta obligación del acuerdo ya tiene una reserva activa.",
+              "evidence": {
+                "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                "servicePeriod": "2026-10"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 13000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 13000,
+                "availableMinor": 377000,
+                "reservedMinor": 123000,
+                "budgetLimitMinor": 500000,
+                "policyMonthlyBudgetMinor": 500000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe está dentro de ambos umbrales automáticos.",
+              "evidence": {
+                "amountMinor": 13000,
+                "automaticLimitMinor": 30000,
+                "reviewAboveMinor": 30000
+              }
+            }
+          ],
+          "simulated": true
+        },
+        "approvalRequest": null,
+        "processingError": null,
+        "createdAt": "2026-10-18T00:13:14.603Z",
+        "updatedAt": "2026-10-18T00:13:16.846Z",
+        "extraction": {
+          "vendorName": "Aspen Backup Demo LLC",
+          "invoiceNumber": "RD-001-2026",
+          "amountMinor": 13000,
+          "currency": "USD",
+          "issuedAt": "2026-10-14",
+          "dueDate": "2026-10-29",
+          "servicePeriod": "2026-10",
+          "description": "Database backup retention",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Aspen Backup Demo LLC"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: RD-001-2026"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: USD 130.00"
+            },
+            {
+              "field": "currency",
+              "source": "page:1",
+              "quote": "Total: USD 130.00"
+            },
+            {
+              "field": "issuedAt",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-14"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-29"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Database backup retention"
+            }
+          ]
+        },
+        "decisions": [
+          {
+            "id": "dec_2e4b50ee-7e32-4d8c-a72d-c4a7980fd62f",
+            "invoiceId": "inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+            "action": "BLOCK",
+            "reasons": [
+              "DUPLICATE_INVOICE"
+            ],
+            "humanExplanation": "Bloqueada para pago simulado. Ya existe este mismo documento en la empresa. El proveedor ya presentó este número de factura normalizado. Esta obligación del acuerdo ya tiene una reserva activa.",
+            "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+            "policyVersion": 5,
+            "checkedAt": "2026-10-18T00:13:16.846Z",
+            "needsHumanApproval": false,
+            "actor": {
+              "kind": "SYSTEM",
+              "userId": null
+            },
+            "facts": {
+              "amountMinor": 13000,
+              "currency": "USD",
+              "automaticLimitMinor": 30000,
+              "hardLimitMinor": 100000,
+              "budgetAvailableBeforeMinor": 377000,
+              "vendorAllowed": true,
+              "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a"
+            },
+            "trace": [
+              {
+                "rule": "DOCUMENT_TYPE",
+                "outcome": "PASS",
+                "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+                "evidence": {
+                  "documentType": "INVOICE"
+                }
+              },
+              {
+                "rule": "EXTRACTION",
+                "outcome": "PASS",
+                "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+                "evidence": {
+                  "status": "CROSS_CHECKED",
+                  "issues": ""
+                }
+              },
+              {
+                "rule": "DUPLICATE_HASH",
+                "outcome": "BLOCK",
+                "explanation": "Ya existe este mismo documento en la empresa.",
+                "evidence": {
+                  "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                  "sha256": "6666351c80dafb7a489736a8800ba4725d86c77ca3f6ef7fc33eed9f7a496ac9"
+                }
+              },
+              {
+                "rule": "DUPLICATE_NUMBER",
+                "outcome": "BLOCK",
+                "explanation": "El proveedor ya presentó este número de factura normalizado.",
+                "evidence": {
+                  "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                  "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                  "normalizedInvoiceNumber": "RD0012026"
+                }
+              },
+              {
+                "rule": "VENDOR",
+                "outcome": "PASS",
+                "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+                "evidence": {
+                  "vendorId": "vendor_da21c0c8-b85a-49a4-a4bf-c8e808bf8ec8",
+                  "allowed": true,
+                  "requireAllowedVendor": true
+                }
+              },
+              {
+                "rule": "AGREEMENT",
+                "outcome": "PASS",
+                "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+                "evidence": {
+                  "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                  "amountMinor": 13000,
+                  "agreedAmountMinor": 13000,
+                  "toleranceMinor": 0,
+                  "currency": "USD",
+                  "agreedCurrency": "USD",
+                  "description": "Database backup retention",
+                  "agreedConcept": "Database backup retention"
+                }
+              },
+              {
+                "rule": "DUPLICATE_OBLIGATION",
+                "outcome": "BLOCK",
+                "explanation": "Esta obligación del acuerdo ya tiene una reserva activa.",
+                "evidence": {
+                  "agreementId": "agr_6b54dbc3-1b36-4f9a-9da8-1497af8bda1a",
+                  "priorInvoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+                  "servicePeriod": "2026-10"
+                }
+              },
+              {
+                "rule": "CURRENCY",
+                "outcome": "PASS",
+                "explanation": "La moneda coincide con el mandato.",
+                "evidence": {
+                  "currency": "USD"
+                }
+              },
+              {
+                "rule": "HARD_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe no supera el techo absoluto.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "hardLimitMinor": 100000
+                }
+              },
+              {
+                "rule": "BUDGET",
+                "outcome": "PASS",
+                "explanation": "El presupuesto disponible cubre el importe.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "availableMinor": 377000,
+                  "reservedMinor": 123000,
+                  "budgetLimitMinor": 500000,
+                  "policyMonthlyBudgetMinor": 500000
+                }
+              },
+              {
+                "rule": "AUTO_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe está dentro de ambos umbrales automáticos.",
+                "evidence": {
+                  "amountMinor": 13000,
+                  "automaticLimitMinor": 30000,
+                  "reviewAboveMinor": 30000
+                }
+              }
+            ],
+            "simulated": true
+          }
+        ]
+      }
+    },
+    {
+      "label": "humanPending",
+      "sourceCase": "010",
+      "sourceFile": {
+        "path": "documents/010.png",
+        "mimeType": "image/png",
+        "sha256": "1db04947d20b349f140ba90eb3bf629a57d7e0ffad6070c0dcd036d69d07487c",
+        "sizeBytes": 54995
+      },
+      "invoiceId": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+      "detail": {
+        "id": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+        "status": "DECIDED",
+        "source": "HUMAN_UPLOAD",
+        "file": {
+          "name": "demo-humanPending.png",
+          "mimeType": "image/png",
+          "sizeBytes": 54995,
+          "url": "/api/v1/invoices/inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc/file"
+        },
+        "vendorId": "vendor_ed272670-733b-4d66-9534-a290983556f7",
+        "vendorName": "Lotus Research Demo Ltd",
+        "agreementId": "agr_eaea6a48-b783-4b84-9abf-1090554842c2",
+        "invoiceNumber": "RD-010-2026",
+        "amountMinor": 35000,
+        "currency": "USD",
+        "issuedAt": "2026-10-14",
+        "dueDate": "2026-10-29",
+        "servicePeriod": "2026-10",
+        "description": "Operations workflow review",
+        "extractionWarnings": [],
+        "latestDecision": {
+          "id": "dec_8e98a070-6738-41d2-ae22-73b9340bb186",
+          "invoiceId": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+          "action": "ESCALATE",
+          "reasons": [
+            "AMOUNT_ABOVE_AUTO_LIMIT",
+            "HUMAN_APPROVAL_REQUIRED"
+          ],
+          "humanExplanation": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+          "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+          "policyVersion": 5,
+          "checkedAt": "2026-10-18T00:13:22.559Z",
+          "needsHumanApproval": true,
+          "actor": {
+            "kind": "SYSTEM",
+            "userId": null
+          },
+          "facts": {
+            "amountMinor": 35000,
+            "currency": "USD",
+            "automaticLimitMinor": 30000,
+            "hardLimitMinor": 100000,
+            "budgetAvailableBeforeMinor": 377000,
+            "vendorAllowed": true,
+            "agreementId": "agr_eaea6a48-b783-4b84-9abf-1090554842c2"
+          },
+          "trace": [
+            {
+              "rule": "DOCUMENT_TYPE",
+              "outcome": "PASS",
+              "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+              "evidence": {
+                "documentType": "INVOICE"
+              }
+            },
+            {
+              "rule": "EXTRACTION",
+              "outcome": "PASS",
+              "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+              "evidence": {
+                "status": "CROSS_CHECKED",
+                "issues": ""
+              }
+            },
+            {
+              "rule": "VENDOR",
+              "outcome": "PASS",
+              "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+              "evidence": {
+                "vendorId": "vendor_ed272670-733b-4d66-9534-a290983556f7",
+                "allowed": true,
+                "requireAllowedVendor": true
+              }
+            },
+            {
+              "rule": "AGREEMENT",
+              "outcome": "PASS",
+              "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+              "evidence": {
+                "agreementId": "agr_eaea6a48-b783-4b84-9abf-1090554842c2",
+                "amountMinor": 35000,
+                "agreedAmountMinor": 35000,
+                "toleranceMinor": 0,
+                "currency": "USD",
+                "agreedCurrency": "USD",
+                "description": "Operations workflow review",
+                "agreedConcept": "Operations workflow review"
+              }
+            },
+            {
+              "rule": "CURRENCY",
+              "outcome": "PASS",
+              "explanation": "La moneda coincide con el mandato.",
+              "evidence": {
+                "currency": "USD"
+              }
+            },
+            {
+              "rule": "HARD_LIMIT",
+              "outcome": "PASS",
+              "explanation": "El importe no supera el techo absoluto.",
+              "evidence": {
+                "amountMinor": 35000,
+                "hardLimitMinor": 100000
+              }
+            },
+            {
+              "rule": "BUDGET",
+              "outcome": "PASS",
+              "explanation": "El presupuesto disponible cubre el importe.",
+              "evidence": {
+                "amountMinor": 35000,
+                "availableMinor": 377000,
+                "reservedMinor": 123000,
+                "budgetLimitMinor": 500000,
+                "policyMonthlyBudgetMinor": 500000
+              }
+            },
+            {
+              "rule": "AUTO_LIMIT",
+              "outcome": "ESCALATE",
+              "explanation": "El importe supera el límite automático.",
+              "evidence": {
+                "amountMinor": 35000,
+                "automaticLimitMinor": 30000
+              }
+            },
+            {
+              "rule": "HUMAN_REVIEW",
+              "outcome": "ESCALATE",
+              "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+              "evidence": {
+                "amountMinor": 35000,
+                "reviewAboveMinor": 30000,
+                "humanApprovalEnabled": true
+              }
+            }
+          ],
+          "simulated": true
+        },
+        "approvalRequest": {
+          "id": "apr_6531898f-cf85-4251-96a5-8ee79e3f724a",
+          "invoiceId": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+          "decisionId": "dec_8e98a070-6738-41d2-ae22-73b9340bb186",
+          "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+          "state": "PENDING",
+          "reason": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+          "canApprove": true,
+          "reviewerId": null,
+          "reviewComment": null,
+          "createdAt": "2026-10-18T00:13:22.559Z",
+          "decidedAt": null
+        },
+        "processingError": null,
+        "createdAt": "2026-10-18T00:13:17.485Z",
+        "updatedAt": "2026-10-18T00:13:22.559Z",
+        "extraction": {
+          "vendorName": "Lotus Research Demo Ltd",
+          "invoiceNumber": "RD-010-2026",
+          "amountMinor": 35000,
+          "currency": "USD",
+          "issuedAt": "2026-10-14",
+          "dueDate": "2026-10-29",
+          "servicePeriod": "2026-10",
+          "description": "Operations workflow review",
+          "extractionWarnings": [],
+          "evidence": [
+            {
+              "field": "vendorName",
+              "source": "page:1",
+              "quote": "Supplier: Lotus Research Demo Ltd"
+            },
+            {
+              "field": "invoiceNumber",
+              "source": "page:1",
+              "quote": "Invoice number: RD-010-2026"
+            },
+            {
+              "field": "amountMinor",
+              "source": "page:1",
+              "quote": "Total: USD 350.00"
+            },
+            {
+              "field": "issueDate",
+              "source": "page:1",
+              "quote": "Issue date: 2026-10-14"
+            },
+            {
+              "field": "dueDate",
+              "source": "page:1",
+              "quote": "Due date: 2026-10-29"
+            },
+            {
+              "field": "servicePeriod",
+              "source": "page:1",
+              "quote": "Service period: 2026-10"
+            },
+            {
+              "field": "description",
+              "source": "page:1",
+              "quote": "Description: Operations workflow review"
+            }
+          ]
+        },
+        "decisions": [
+          {
+            "id": "dec_8e98a070-6738-41d2-ae22-73b9340bb186",
+            "invoiceId": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+            "action": "ESCALATE",
+            "reasons": [
+              "AMOUNT_ABOVE_AUTO_LIMIT",
+              "HUMAN_APPROVAL_REQUIRED"
+            ],
+            "humanExplanation": "Requiere revisión. El importe supera el límite automático. El importe requiere autorización humana dentro de las demás reglas.",
+            "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+            "policyVersion": 5,
+            "checkedAt": "2026-10-18T00:13:22.559Z",
+            "needsHumanApproval": true,
+            "actor": {
+              "kind": "SYSTEM",
+              "userId": null
+            },
+            "facts": {
+              "amountMinor": 35000,
+              "currency": "USD",
+              "automaticLimitMinor": 30000,
+              "hardLimitMinor": 100000,
+              "budgetAvailableBeforeMinor": 377000,
+              "vendorAllowed": true,
+              "agreementId": "agr_eaea6a48-b783-4b84-9abf-1090554842c2"
+            },
+            "trace": [
+              {
+                "rule": "DOCUMENT_TYPE",
+                "outcome": "PASS",
+                "explanation": "El lector identificó el documento como una factura. La autorización requiere comprobar la lectura y las reglas vigentes.",
+                "evidence": {
+                  "documentType": "INVOICE"
+                }
+              },
+              {
+                "rule": "EXTRACTION",
+                "outcome": "PASS",
+                "explanation": "Los cuatro campos críticos coinciden con la lectura separada del mismo documento.",
+                "evidence": {
+                  "status": "CROSS_CHECKED",
+                  "issues": ""
+                }
+              },
+              {
+                "rule": "VENDOR",
+                "outcome": "PASS",
+                "explanation": "El proveedor coincide exactamente con el registro de la empresa.",
+                "evidence": {
+                  "vendorId": "vendor_ed272670-733b-4d66-9534-a290983556f7",
+                  "allowed": true,
+                  "requireAllowedVendor": true
+                }
+              },
+              {
+                "rule": "AGREEMENT",
+                "outcome": "PASS",
+                "explanation": "Importe, moneda y concepto coinciden con el acuerdo activo.",
+                "evidence": {
+                  "agreementId": "agr_eaea6a48-b783-4b84-9abf-1090554842c2",
+                  "amountMinor": 35000,
+                  "agreedAmountMinor": 35000,
+                  "toleranceMinor": 0,
+                  "currency": "USD",
+                  "agreedCurrency": "USD",
+                  "description": "Operations workflow review",
+                  "agreedConcept": "Operations workflow review"
+                }
+              },
+              {
+                "rule": "CURRENCY",
+                "outcome": "PASS",
+                "explanation": "La moneda coincide con el mandato.",
+                "evidence": {
+                  "currency": "USD"
+                }
+              },
+              {
+                "rule": "HARD_LIMIT",
+                "outcome": "PASS",
+                "explanation": "El importe no supera el techo absoluto.",
+                "evidence": {
+                  "amountMinor": 35000,
+                  "hardLimitMinor": 100000
+                }
+              },
+              {
+                "rule": "BUDGET",
+                "outcome": "PASS",
+                "explanation": "El presupuesto disponible cubre el importe.",
+                "evidence": {
+                  "amountMinor": 35000,
+                  "availableMinor": 377000,
+                  "reservedMinor": 123000,
+                  "budgetLimitMinor": 500000,
+                  "policyMonthlyBudgetMinor": 500000
+                }
+              },
+              {
+                "rule": "AUTO_LIMIT",
+                "outcome": "ESCALATE",
+                "explanation": "El importe supera el límite automático.",
+                "evidence": {
+                  "amountMinor": 35000,
+                  "automaticLimitMinor": 30000
+                }
+              },
+              {
+                "rule": "HUMAN_REVIEW",
+                "outcome": "ESCALATE",
+                "explanation": "El importe requiere autorización humana dentro de las demás reglas.",
+                "evidence": {
+                  "amountMinor": 35000,
+                  "reviewAboveMinor": 30000,
+                  "humanApprovalEnabled": true
+                }
+              }
+            ],
+            "simulated": true
+          }
+        ]
+      }
+    }
+  ],
+  "policyVersionId": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+  "before": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 500000,
+      "reservedMinor": 110000,
+      "availableMinor": 390000
+    }
+  ],
+  "error": {
+    "name": "AssertionError",
+    "message": "The expression evaluated to a falsy value:\n\n  assert.ok(detail.latestDecision.needsHumanApproval && detail.approvalRequest?.state === 'PENDING' && detail.approvalRequest.canDecide)\n"
+  },
+  "ready": false,
+  "sessionRevoked": true,
+  "finishedAt": "2026-10-18T00:13:23.690Z"
+}

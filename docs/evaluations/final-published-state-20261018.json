@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-18T00:21:33.783Z",
+  "workerVersion": "aae7bc84-ce1d-4ced-94a2-020c41b078b5",
+  "backendBundleSha256": "3f09b5e5c7d8573ebbd5370a474c9dd8babeea4ff32c5138ea7bc67ab1ad53ee",
+  "backendMatchesValidatedFinalRelease": true,
+  "fullBackendSourceCommit": "2ae21aba53dcdc80d18e1fac9d2feac0cb1c2b8a",
+  "health": 200,
+  "correctD1Binding": true,
+  "liveDemoHumanStillPending": true,
+  "financialWrites": 0
+}

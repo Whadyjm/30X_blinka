@@ -1,0 +1,8 @@
+{
+  "scope": "COMPLETED_READ_ONLY_SCREEN_RECORDING_WITH_TOOL_AUTH_EXPIRY_AT_FINAL_LEDGER_CHECK",
+  "recordedAt": "2026-10-18T00:11:46.310646+00:00",
+  "mediaDirectory": ".impeccable/review/final-candidate-20261017-first-recording",
+  "desktopAndMobileScreenshots": 20,
+  "finalVerificationPassed": false,
+  "failure": "Cloudflare OAuth token expired before final ledger verification and cleanup; original safe error log retained. This is not counted as a successful audit. Read-only browser verification will be repeated; no invoice reprocessing."
+}

@@ -1,0 +1,73 @@
+{
+  "scope": "READ_ONLY_RECONCILIATION_OF_PREPARED_LIVE_DEMO_NOT_NEW_MODEL_READS_OR_EVALUATION",
+  "checkedAt": "2026-10-18T00:14:25.087Z",
+  "source": "docs/evaluations/live-demo-prepared-20261017.json",
+  "sourceSha256": "d9b036385f25be110d2b2edc95985a207355954cd2b428ba57011b7f5bf8f36e",
+  "originalGuardPreserved": {
+    "name": "AssertionError",
+    "message": "The expression evaluated to a falsy value:\n\n  assert.ok(detail.latestDecision.needsHumanApproval && detail.approvalRequest?.state === 'PENDING' && detail.approvalRequest.canDecide)\n"
+  },
+  "explanation": "Preparation checked the frontend name canDecide instead of the HTTP contract canApprove. The original guard failure is preserved; current server records are verified without reprocessing or resetting history.",
+  "modelsCalled": 0,
+  "invoiceMutations": 0,
+  "cases": [
+    {
+      "label": "automatic",
+      "invoiceId": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+      "amountMinor": 13000,
+      "currency": "USD",
+      "action": "APPROVE",
+      "reasons": [
+        "POLICY_ALLOWED"
+      ],
+      "pendingHumanDecision": false,
+      "canApprove": false
+    },
+    {
+      "label": "duplicate",
+      "invoiceId": "inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_f12ae5eb-c869-47e2-ada2-ea662812c0f8",
+      "amountMinor": 13000,
+      "currency": "USD",
+      "action": "BLOCK",
+      "reasons": [
+        "DUPLICATE_INVOICE"
+      ],
+      "pendingHumanDecision": false,
+      "canApprove": false
+    },
+    {
+      "label": "humanPending",
+      "invoiceId": "inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc",
+      "amountMinor": 35000,
+      "currency": "USD",
+      "action": "ESCALATE",
+      "reasons": [
+        "AMOUNT_ABOVE_AUTO_LIMIT",
+        "HUMAN_APPROVAL_REQUIRED"
+      ],
+      "pendingHumanDecision": true,
+      "canApprove": true
+    }
+  ],
+  "ownedReservations": [
+    {
+      "invoice_id": "inv_d656a5ff-6b37-4e77-ae15-ad7e10dfdd2f",
+      "amount_minor": 13000
+    }
+  ],
+  "budgets": [
+    {
+      "id": "budget_demo_current",
+      "currency": "USD",
+      "periodKey": "2026-10",
+      "limitMinor": 500000,
+      "reservedMinor": 123000,
+      "availableMinor": 377000
+    }
+  ],
+  "ready": true,
+  "sessionRevoked": true
+}

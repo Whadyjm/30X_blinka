@@ -1,24 +1,23 @@
 {
-  "createdAt": "2026-10-17T23:49:15.820Z",
+  "createdAt": "2026-10-18T00:04:02.090Z",
   "deadline": "2026-10-18T12:00:00-04:00",
   "worker": "oli-api",
   "account": "fbaa64f96579f93b2db32a1eb12ff6c9",
-  "previousVersion": "cdd0dde3-0067-42d5-873a-57576adc795a",
-  "previousCandidateVersion": "cdd0dde3-0067-42d5-873a-57576adc795a",
-  "previousBundleSha256": "9703934b3e23441685611105fe54e2122101bb229b4b565d651441d8ade5d8fa",
+  "previousVersion": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+  "previousCandidateVersion": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+  "previousBundleSha256": "a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea",
   "transportFixCommit": "f5818a85874fa0abe944818cab514817fad26c9d",
   "fallbackFixCommit": "c13d1a3adb19ae0573d4ed5ac2e794cca8ffdb99",
+  "nativePdfFixCommit": "8ff8fe41dd741d006271ed1440c1f777b4d9a0d6",
   "correctionCommit": "8057263a1ed24cded822de764fc22423cf94c44d",
   "changedFiles": [
-    "packages/extraction/src/openrouter.ts",
-    "apps/api/worker/document.js",
-    "apps/api/worker/extraction-probe.js"
+    "apps/api/worker/evaluation-data.js"
   ],
   "sources": {
     "packages/extraction/src/openrouter.ts": {
-      "publishedSha256": "1a6e72fc86fc5ac8ec660ca2d897fc5f08fed721181a386245c7c3d3abfcc524",
-      "candidateSha256": "fbf4631f412fc5c4c229a5274d106ce378f436a272c7a7bd137c4906574887dd",
-      "changed": true
+      "publishedSha256": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc",
+      "candidateSha256": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc",
+      "changed": false
     },
     "packages/contracts/src/index.ts": {
       "publishedSha256": "a7eab37383bb3560e310a2f1b9471a73b6a9c57b1727bc3840a0c388766512bc",
@@ -36,14 +35,14 @@
       "changed": false
     },
     "apps/api/worker/document.js": {
-      "publishedSha256": "51a6a7bc5e22d9480245cc8cfa1924a5a803633cd5aef8e567ff8ebb99122699",
+      "publishedSha256": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
       "candidateSha256": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
-      "changed": true
+      "changed": false
     },
     "apps/api/worker/extraction-probe.js": {
-      "publishedSha256": "eb4a5e28d9bba43a2a90f77c4427ce96a9a377fef2cab46ef764d1fe3f59666d",
+      "publishedSha256": "85d0ab7b27aa200e8e6b6773cbd03a3b940d0c6a3777288202013ecbe776a021",
       "candidateSha256": "85d0ab7b27aa200e8e6b6773cbd03a3b940d0c6a3777288202013ecbe776a021",
-      "changed": true
+      "changed": false
     },
     "apps/api/worker/auth.js": {
       "publishedSha256": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
@@ -137,8 +136,8 @@
     },
     "apps/api/worker/evaluation-data.js": {
       "publishedSha256": "fcb4fb28b2d61cff45fdc9025f6c726782b4556ba0cf2e5c0e39bb6d08e0ad49",
-      "candidateSha256": "fcb4fb28b2d61cff45fdc9025f6c726782b4556ba0cf2e5c0e39bb6d08e0ad49",
-      "changed": false
+      "candidateSha256": "320daee807cf26c7f06e3a88eb6ed6f6a381f88a93b86e15ab49dd33fd71d0f2",
+      "changed": true
     },
     "apps/api/worker/evaluation.js": {
       "publishedSha256": "bdf4a98189d0c370c85c9ab35c0df8e0be28cf7157cfc7ee431f8641bb45963d",
@@ -146,9 +145,10 @@
       "changed": false
     },
     "apps/api/worker/api.js": {
-      "publishedSha256": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b",
-      "candidateSha256": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b",
-      "changed": false
+      "publishedSha256": "824c0619a1873462e05172febc8bf61dc3bf2bbde8e39980804feea0e7d74a3d",
+      "candidateSha256": "824c0619a1873462e05172febc8bf61dc3bf2bbde8e39980804feea0e7d74a3d",
+      "changed": false,
+      "publishedSourceMapSha256": "9c346dbd98ce695affa1d6cf373b9d8adad172e268004089437c8ae4578ec69b"
     },
     "apps/api/worker/index.js": {
       "publishedSha256": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
@@ -158,26 +158,52 @@
   },
   "frontendPreserved": true,
   "verifiedPublicAssets": [
-    "/assets/index-S_bCDw5B.js",
+    "/assets/index-D_GpLzBb.js",
     "/assets/Button-Cgocdm9u.js",
-    "/assets/index-BYj1TvAQ.css"
+    "/assets/index-CsF6xXlS.css"
   ],
-  "frontendSnapshot": "/tmp/oli-conversation-presence-publish-20261017/release/apps/web/dist",
-  "note": "Bounded operational model fallback plus read-only historical evaluation evidence; financial policy, independent corroboration and current frontend preserved.",
-  "deliveryCommit": "d44c0e5c9787f1d58c44c50378ff2f64bf4cccbd",
-  "bundleSha256": "b174f1046f2a6b87c1715c8bc5ac84da589fbe10e3c63040ba02b4c9178be54e",
-  "deployedVersion": "c6d442ca-fe2e-4dba-80c2-9faf978db704",
+  "frontendSnapshot": "/tmp/oli-product-clarity-publish-20261017/release/apps/web/dist",
+  "reconciledExternalPublishedRoute": "GET /api/v1/mandate/versions",
+  "note": "Historical measured evaluation data on the verified published backend; existing read-only policy history endpoint and current frontend preserved. Any previously stale source map is rebuilt from reconciled source.",
+  "rootReleaseCommit": "2ae21aba53dcdc80d18e1fac9d2feac0cb1c2b8a",
+  "fullBackendSourceCommit": "2ae21aba53dcdc80d18e1fac9d2feac0cb1c2b8a",
+  "deliveryCommit": "2ae21aba53dcdc80d18e1fac9d2feac0cb1c2b8a",
+  "bundleSha256": "3f09b5e5c7d8573ebbd5370a474c9dd8babeea4ff32c5138ea7bc67ab1ad53ee",
+  "deployedVersion": "aae7bc84-ce1d-4ced-94a2-020c41b078b5",
   "publishedBundleExact": true,
   "frontendUnchangedAfterDeploy": true,
-  "deployedAt": "2026-10-17T23:49:52.302Z",
+  "deployedAt": "2026-10-18T00:06:03.913Z",
   "health": {
     "ok": true,
     "service": "oli-api"
   },
   "verification": {
-    "api": 135,
-    "extraction": 29,
+    "api": 136,
+    "extraction": 30,
     "exactBundledRuntime": 1,
-    "jobsSubset": 17
+    "jobsSubset": 17,
+    "artifactProjection": 1,
+    "rondaActualDecisions": 20,
+    "rondaCorrect": 20,
+    "rondaUnsafeApprovals": 0,
+    "targetedUnresolvedDuplicatePass": true
+  },
+  "browserVerification": {
+    "path": "docs/evaluations/candidate-final-browser-20261017.json",
+    "sha256": "64eaa5d93dd50e88a306733098feb34cf446f13e25dd87d6c6010e3a3303925e",
+    "viewports": [
+      1440,
+      390
+    ],
+    "screens": 20,
+    "javascriptErrors": 0,
+    "horizontalOverflows": 0,
+    "pass": true
+  },
+  "liveDemoReadiness": {
+    "path": "docs/evaluations/live-demo-readiness-20261017.json",
+    "sha256": "302fb640502bf083bbdc25941c0ef8e1185087ba3ebfff8ec088810e9f51ff8c",
+    "ready": true,
+    "pendingHumanApprovals": 1
   }
 }

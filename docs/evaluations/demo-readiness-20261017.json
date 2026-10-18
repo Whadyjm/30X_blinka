@@ -1,0 +1,167 @@
+{
+  "checkedAt": "2026-10-18T00:07:14.932Z",
+  "scope": "READ_ONLY_EXISTING_DEMO_READINESS_NO_POLICY_OR_INVOICE_MUTATIONS",
+  "organization": "org_demo",
+  "mandate": {
+    "active": {
+      "id": "pol_fc3e80d6-99f5-4a46-a0a8-514ae266b23c",
+      "version": 5,
+      "status": "ACTIVE",
+      "rules": {
+        "currency": "USD",
+        "automaticLimitMinor": 30000,
+        "hardLimitMinor": 100000,
+        "monthlyBudgetMinor": 500000,
+        "requireAllowedVendor": true,
+        "requireAgreement": true,
+        "humanApprovalEnabled": true,
+        "reviewAboveMinor": 30000,
+        "processDaysBeforeDue": 0,
+        "scopedDelegations": []
+      },
+      "activatedAt": "2026-10-17T23:36:39.254Z",
+      "activatedBy": "user_demo_owner"
+    },
+    "draft": null
+  },
+  "dashboard": {
+    "counts": {
+      "total": 14,
+      "approved": 3,
+      "blocked": 4,
+      "escalated": 5,
+      "needsHumanApproval": 0,
+      "processing": 0,
+      "failed": 2
+    },
+    "budgets": [
+      {
+        "id": "budget_demo_current",
+        "currency": "USD",
+        "periodKey": "2026-10",
+        "limitMinor": 500000,
+        "reservedMinor": 110000,
+        "availableMinor": 390000
+      }
+    ],
+    "generatedAt": "2026-10-18T00:07:15.906Z",
+    "simulated": true
+  },
+  "pendingRequests": 0,
+  "pendingExamples": [],
+  "currentCaseExamples": [
+    {
+      "invoiceId": "inv_3e664e57-fc8e-4ced-bcd0-177a7f2a443e",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_3e664e57-fc8e-4ced-bcd0-177a7f2a443e"
+    },
+    {
+      "invoiceId": "inv_d9c8997b-fed7-4288-878d-5a05bcdea9d0",
+      "action": "ESCALATE",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_d9c8997b-fed7-4288-878d-5a05bcdea9d0"
+    },
+    {
+      "invoiceId": "inv_dd0ba5fb-4155-4a9c-83e7-5e2e3d7d5950",
+      "action": "BLOCK",
+      "reasons": [
+        "UNKNOWN_VENDOR",
+        "MISSING_AGREEMENT"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_dd0ba5fb-4155-4a9c-83e7-5e2e3d7d5950"
+    },
+    {
+      "invoiceId": "inv_0815dd53-ea43-4a5a-bc68-ad51c6f10c0d",
+      "action": "BLOCK",
+      "reasons": [
+        "NOT_AN_INVOICE",
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_0815dd53-ea43-4a5a-bc68-ad51c6f10c0d"
+    },
+    {
+      "invoiceId": "inv_ea1ec69c-0580-4453-a26d-4f897c7ffcfc",
+      "action": "BLOCK",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA",
+        "DUPLICATE_INVOICE"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_ea1ec69c-0580-4453-a26d-4f897c7ffcfc"
+    },
+    {
+      "invoiceId": "inv_8e61da7f-83d3-4067-9fe3-a865e407d41a",
+      "action": "BLOCK",
+      "reasons": [
+        "DOCUMENT_TYPE_UNCERTAIN",
+        "INVALID_OR_MISSING_DATA",
+        "DUPLICATE_INVOICE"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_8e61da7f-83d3-4067-9fe3-a865e407d41a"
+    },
+    {
+      "invoiceId": "inv_0c4ba2f0-f239-4129-babe-febd3dd004dc",
+      "action": "ESCALATE",
+      "reasons": [
+        "DOCUMENT_TYPE_UNCERTAIN",
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_0c4ba2f0-f239-4129-babe-febd3dd004dc"
+    },
+    {
+      "invoiceId": "inv_65f4f202-c331-4f96-8cbf-645d1e61f9d7",
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_65f4f202-c331-4f96-8cbf-645d1e61f9d7"
+    },
+    {
+      "invoiceId": "inv_db5bdd23-e89b-4b29-8117-11297991c5ad",
+      "action": "ESCALATE",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_db5bdd23-e89b-4b29-8117-11297991c5ad"
+    },
+    {
+      "invoiceId": "inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c",
+      "action": "APPROVE",
+      "reasons": [
+        "HUMAN_APPROVED"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_429b5a09-c18f-4e57-a1c8-1573778b4e1c"
+    },
+    {
+      "invoiceId": "inv_c1aabc98-d096-44e1-83f4-2926247b16dd",
+      "action": "ESCALATE",
+      "reasons": [
+        "DOCUMENT_TYPE_UNCERTAIN",
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_c1aabc98-d096-44e1-83f4-2926247b16dd"
+    },
+    {
+      "invoiceId": "inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea",
+      "action": "APPROVE",
+      "reasons": [
+        "HUMAN_APPROVED"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_8be0d07b-6098-4aae-883c-c67c60d1c7ea"
+    },
+    {
+      "invoiceId": "inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55",
+      "action": "APPROVE",
+      "reasons": [
+        "POLICY_ALLOWED"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_5b32e8f2-06cc-4789-8fa4-131f57e8ef55"
+    },
+    {
+      "invoiceId": "inv_8a063721-1c58-42ee-92fb-264f58d00d70",
+      "action": "ESCALATE",
+      "reasons": [
+        "INVALID_OR_MISSING_DATA"
+      ],
+      "url": "https://oli30x.ultramare.dev/app/bills/inv_8a063721-1c58-42ee-92fb-264f58d00d70"
+    }
+  ],
+  "sessionRevoked": true,
+  "existingInvoiceNamesOmitted": true
+}
