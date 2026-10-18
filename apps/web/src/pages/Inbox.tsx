@@ -12,14 +12,14 @@ export function Inbox() {
   return <>
     <PageHeader title={t('Inbox')} subtitle={t('What arrived for Oli, and what happened next.')} actions={<>
       <Button variant="ghost" loading={query.isFetching} onClick={() => void query.refetch()} icon={<RefreshCw className="size-4" aria-hidden />}>{t('Refresh')}</Button>
-      <Link to="/app/integrations" className={buttonClass('secondary')}>{t('Oli’s email')}</Link>
+      <Link to="/app/integrations?channel=email" className={buttonClass('secondary')}>{t('Oli’s email')}</Link>
     </>} />
     <p role="status" className="mb-4 text-xs text-ash">{t(query.isError ? 'Could not check for new email. Retrying automatically.' : 'Checking for new email every 5 seconds while the app is open.')}</p>
     {read.isError && <div className="mb-4"><InlineAlert>{errorMessage(read.error)}</InlineAlert></div>}
     {query.isLoading ? <Skeleton className="h-60" /> : query.isError ? <Card><ErrorState error={query.error} onRetry={() => void query.refetch()} /></Card>
       : !query.data?.messages.length ? <Card><EmptyState icon={<Mail className="size-6" aria-hidden />} title={t('Ready for your first email')}
         body={t('Share Oli’s address with a supplier. Their documents will appear here as soon as the email arrives.')}
-        action={<Link to="/app/integrations" className={buttonClass()}>{t('Get Oli’s address')}</Link>} /></Card>
+        action={<Link to="/app/integrations?channel=email" className={buttonClass()}>{t('Get Oli’s address')}</Link>} /></Card>
         : <Card><ul className="divide-y divide-hairline">
           {query.data.messages.map(message => <li key={message.id} className={`p-5 sm:p-6 ${!message.readAt ? 'bg-bone/40' : ''}`}>
             <article>

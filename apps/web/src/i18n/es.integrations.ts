@@ -1,4 +1,12 @@
 export const esIntegrations: Record<string, string> = {
+  Telegram: 'Telegram',
+  'OliSkill for agents': 'OliSkill para agentes',
+  'OLI email': 'Email de OLI',
+  'Back to integrations': 'Volver a integraciones',
+  'Choose how to send your invoices to Oli.': 'Elige cómo enviar tus facturas a Oli.',
+  'Invoice channels': 'Canales para tus facturas',
+  'Connect your AI agent to send invoices and read Oli’s decisions.': 'Conecta tu agente de IA para enviar facturas y consultar las decisiones de Oli.',
+  'Get an email address where your suppliers can send their invoices.': 'Obtén una dirección de email donde tus proveedores puedan enviar sus facturas.',
   Close: 'Cerrar',
   Revoked: 'Revocado',
   Expired: 'Vencido',

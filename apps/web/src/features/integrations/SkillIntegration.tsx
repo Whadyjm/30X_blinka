@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowUpRight, Bot, Check, Copy, Download, X } from 'lucide-react';
+import { Check, Copy, Download } from 'lucide-react';
 import type { SkillConnection } from '@oli/contracts';
 import { api, errorMessage } from '@/api';
 import { Button, buttonClass } from '@/components/ui/Button';
@@ -67,10 +67,8 @@ export function SkillIntegration() {
   const owner = me.data?.role === 'owner';
   const queryKey = ['integrations', 'skill', me.data?.org?.id];
   const query = useQuery({ queryKey, queryFn: () => api.getSkillIntegration(), enabled: owner, retry: false });
-  const [open, setOpen] = useState(false);
   const [tab, setTab] = useState<'install' | 'connections'>('install');
   const [copiedSetup, setCopiedSetup] = useState<string | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
   const [name, setName] = useState('');
   const [secret, setSecret] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -90,41 +88,23 @@ export function SkillIntegration() {
     try { await navigator.clipboard.writeText(secret); setCopied(true); }
     catch { setError(t('Could not copy the key. Select it and copy it manually.')); }
   };
-  useEffect(() => {
-    if (open) dialog.current?.showModal();
-    else dialog.current?.close();
-  }, [open]);
   const copySetup = async (kind: string, text: string) => {
     try { await navigator.clipboard.writeText(text); setCopiedSetup(kind); }
     catch { setError(t('Could not copy. Select the text and copy it manually.')); }
   };
   const apiUrl = new URL(`${env.apiBase}/agent`, window.location.origin).href;
   const setup = skillSetup(apiUrl, new URL('/skills/oli-skill.tar.gz', window.location.origin).href);
-  const close = () => { setOpen(false); setSecret(null); setError(null); setCopiedSetup(null); };
-  return <>
-    <Card className="mb-6 p-5 sm:p-8">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-4">
-          <Bot className="mt-1 size-8 shrink-0 text-ink" strokeWidth={1.5} aria-hidden />
-          <div><h2 className="text-xl text-ink">Oli Skill</h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-slate-600">{t('Let your AI agent send invoices to Oli. Oli checks your company’s rules and returns the decision and explanation.')}</p>
-          </div>
-        </div>
-        <Button variant="secondary" className="shrink-0" onClick={() => setOpen(true)} icon={<ArrowUpRight className="size-4" aria-hidden />}>{t('Connect agent')}</Button>
-      </div>
-    </Card>
-    <dialog ref={dialog} onCancel={close} onClose={close} aria-labelledby="oli-skill-title" className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-full max-w-2xl overflow-hidden border-l border-hairline bg-paper p-0 text-ink backdrop:bg-black/30">
-      <div className="flex h-full flex-col">
-        <div className="flex shrink-0 items-start justify-between gap-4 border-b border-hairline p-5 sm:px-8 sm:py-6">
+  return <Card>
+      <div>
+        <div className="border-b border-hairline p-5 sm:px-8 sm:py-6">
           <div><h2 id="oli-skill-title" className="text-xl">{t('Connect your agent to Oli')}</h2>
             <p className="mt-2 text-sm text-slate-600">{t('Install Oli Skill and keep financial decisions in Oli.')}</p>
           </div>
-          <Button variant="ghost" size="sm" onClick={close} aria-label={t('Close')} icon={<X className="size-5" aria-hidden />} />
         </div>
         <div className="flex shrink-0 gap-1 border-b border-hairline px-5 pt-3 sm:px-8" aria-label={t('Oli Skill sections')}>
           {(['install', 'connections'] as const).map(value => <Button key={value} variant="ghost" className={tab === value ? 'rounded-none border-b-2 border-ink' : 'rounded-none text-slate-600'} aria-pressed={tab === value} onClick={() => setTab(value)}>{t(value === 'install' ? 'Installation' : 'Connections')}</Button>)}
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-5 sm:p-8">
+        <div className="p-5 sm:p-8">
           {tab === 'install' ? <div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-base">{t('Follow these steps')}</h3>
@@ -190,6 +170,5 @@ export function SkillIntegration() {
           <p className="mt-7 border-t border-hairline pt-4 text-xs leading-relaxed text-slate-600">{t('Demo only: use fictitious invoices. Approvals are simulated and no money moves.')}</p>
         </div>
       </div>
-    </dialog>
-  </>;
+    </Card>;
 }
