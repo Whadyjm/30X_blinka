@@ -112,9 +112,9 @@ export function Landing() {
   }, [waving]);
 
   const cta = () => (
-    <Link to={signedIn ? '/app' : '/login'} className="landing-button landing-button-primary">
-      {signedIn ? t('Open app') : brand.cta}<ArrowUpRight size={18} aria-hidden />
-    </Link>
+    <a href="https://youtu.be/Sg9IU_9QDLo?si=pgkFHMu8TIMtXKSs" target="_blank" rel="noopener noreferrer" className="landing-button landing-button-primary">
+      {brand.cta}<ArrowUpRight size={18} aria-hidden />
+    </a>
   );
 
   return (
