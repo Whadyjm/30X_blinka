@@ -1,0 +1,25 @@
+{
+  "scope": "Datos controlados en navegador local; sin correo real ni llamadas al modelo.",
+  "attentionSevenBreakdown": {
+    "approval": 3,
+    "blocked": 4
+  },
+  "statusColors": true,
+  "fourTilesAndUploadPreserved": true,
+  "historyFiveVersions": true,
+  "historyChangesHighlighted": true,
+  "mailPollsAcrossRoutes": true,
+  "initialEmailsSilent": true,
+  "newMailPopup": true,
+  "popupHasInboxLink": true,
+  "pollingAndReadDoNotRepeatPopup": true,
+  "inboxAutomaticallyUpdated": true,
+  "qualityPurposeExplained": true,
+  "viewports": [
+    1440,
+    390,
+    320
+  ],
+  "errors": [],
+  "result": "PASS"
+}

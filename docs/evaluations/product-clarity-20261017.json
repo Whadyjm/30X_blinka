@@ -1,0 +1,112 @@
+{
+  "date": "2026-10-17T23:59:55.959Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "cf60d70",
+  "version": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+  "scope": "Lecturas reales y respuesta inbox controlada en navegador para popup. Solo login/logout; sin correos reales, nuevas facturas, reglas ni decisiones.",
+  "counts": {
+    "blocked": 4,
+    "approval": 0,
+    "clarification": 5,
+    "failed": 2,
+    "attention": 11,
+    "invoices": 14,
+    "ruleVersions": 5
+  },
+  "inboxReads": 4,
+  "checks": [
+    "Desglose de atención coincide con API paginada; suma sin duplicados; colores semánticos, cuatro tiles y botón amarillo intactos",
+    "Historial real incluye todas las versiones ordenadas; versión activa única; consultas sin activar reglas",
+    "Calidad de Oli explica propósito, datos ficticios, fecha y límites de la prueba histórica",
+    "Bundle publicado: polling global y popup probado con respuesta de inbox interceptada solo en navegador; primer resultado silencioso y sin duplicar aviso; sin envío de correo real"
+  ],
+  "errors": [],
+  "mutations": [],
+  "result": "PASS",
+  "request": [
+    "Historial de reglas anteriores",
+    "Bandeja con actualización y aviso de correo nuevo",
+    "Desglose del total de atención y color por estado",
+    "Explicar Evaluación"
+  ],
+  "localBrowserChecks": {
+    "scope": "Datos controlados en navegador local; sin correo real ni llamadas al modelo.",
+    "attentionSevenBreakdown": {
+      "approval": 3,
+      "blocked": 4
+    },
+    "statusColors": true,
+    "fourTilesAndUploadPreserved": true,
+    "historyFiveVersions": true,
+    "historyChangesHighlighted": true,
+    "mailPollsAcrossRoutes": true,
+    "initialEmailsSilent": true,
+    "newMailPopup": true,
+    "popupHasInboxLink": true,
+    "pollingAndReadDoNotRepeatPopup": true,
+    "inboxAutomaticallyUpdated": true,
+    "qualityPurposeExplained": true,
+    "viewports": [
+      1440,
+      390,
+      320
+    ],
+    "errors": [],
+    "result": "PASS"
+  },
+  "packagedRuntimeChecks": {
+    "result": "PASS",
+    "actualPublishedBundleWithSingleRoute": true,
+    "localCompatibilityDate": "2026-07-30",
+    "productionCompatibilityDatePreserved": "2026-10-16",
+    "historyReadOnly": true,
+    "pagination": true,
+    "organizationIsolation": true,
+    "unauthenticatedRejected": true,
+    "invalidPaginationRejected": true,
+    "noExternalNetwork": true
+  },
+  "backendDelta": {
+    "scope": "Single read-only authenticated org-scoped mandate history route. All other published Worker bytes preserved.",
+    "baseSha256": "dc7f3431002452d5955ba8278e0ad8037c40f849164443d2ce70098d0fae15f9",
+    "patchedSha256": "a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea",
+    "allOtherWorkerCodePreserved": true,
+    "addedRoute": "GET /api/v1/mandate/versions"
+  },
+  "deploymentVerification": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "a99dfbd8346da77329319745d698fe336252a2d980bcf49d58bcb331750ac0ea",
+    "deployment": {
+      "id": "14a7fd00-21c4-4a63-b12a-f46aea13be42",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "tiamat.agency@gmail.com",
+      "annotations": {
+        "workers/message": "Dashboard con desglose, historial de reglas, avisos de correo y calidad (cf60d70)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "049fcd19-54c4-41c2-8e81-e9dccbb76182",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-17T23:59:33.056029Z"
+    }
+  },
+  "baseVersion": "c2ebd8b8-e2b7-4316-8904-df56ac40591d",
+  "regressionTests": {
+    "files": 8,
+    "passed": 34,
+    "scope": "Frontend con Worker/D1 local y validación de historial; no mide extractor ni decisiones end-to-end"
+  },
+  "i18nKeysCovered": 871,
+  "build": "TypeScript + Vite: PASS local y release aislado",
+  "wranglerDryRun": "PASS",
+  "mailNotificationScope": "Popup dentro de la app abierta; polling solicitado cada5s, sujeto a temporización del navegador. Prueba de llegada controlada en navegador, sin enviar correo real.",
+  "screenshots": [
+    ".impeccable/review/product-clarity/",
+    ".impeccable/review/product-clarity-production/"
+  ]
+}
