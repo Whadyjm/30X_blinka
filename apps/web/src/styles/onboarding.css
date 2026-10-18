@@ -56,7 +56,7 @@
 .onboarding-uploaded { display: flex; align-items: flex-start; gap: 16px; padding: 24px; background: var(--color-bone); border-radius: 12px; }
 .onboarding-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 20px; padding: 20px 4px 0; }
 .onboarding-actions button { min-height: 44px; height: auto; padding-top: 12px; padding-bottom: 12px; text-align: center; }
-.onboarding ::selection { background: var(--color-highlighter); color: var(--color-ink); }
+.onboarding ::selection { background: var(--color-highlighter); color: var(--color-on-accent); }
 .onboarding input { caret-color: var(--color-ink); }
 
 @media (max-width: 959px) {

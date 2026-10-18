@@ -86,7 +86,7 @@ export function BillDetail() {
         </div>
       </div>
 
-      <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-hairline bg-white p-4">
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-hairline bg-paper p-4">
         <div className="max-w-prose text-sm leading-relaxed text-slate-600"><p className="text-ink">{t(trashed ? 'This invoice is in Deleted.' : 'Invoice record')}</p><p>{t('The document, decisions and budget reservations are preserved. Moving to Deleted does not cancel processing or authorizations.')}</p></div>
         <InvoiceTrashButton invoiceId={inv.id} title={inv.vendorName ?? inv.fileName ?? inv.id} />
       </div>
@@ -140,7 +140,7 @@ export function BillDetail() {
               {inv.approval && inv.approval.state !== 'PENDING' && <ApprovalResult approval={inv.approval} />}
 
               {pendingApproval && (
-                <div className="rounded-xl bg-white p-4 ring-1 ring-inset ring-ink">
+                <div className="rounded-xl bg-paper p-4 ring-1 ring-inset ring-ink">
                   <h3 className="mb-1 text-sm text-ink">{t('Oli needs your decision')}</h3>
                   <p className="mb-3 text-sm text-slate-600">{t('Oli doesn’t have the authority to approve this on its own. Your policy lets an owner or approver decide.')}</p>
                   <ApprovalPanel approvalId={pendingApproval.id} expectedDecisionId={pendingApproval.decisionId} expectedPolicyVersionId={pendingApproval.policyVersionId}
@@ -274,7 +274,7 @@ function Timeline({ events }: { events: AuditEvent[] }) {
         return (
           <li key={e.id} className="relative flex gap-3 pb-4 last:pb-0">
             {i < arr.length - 1 && <span className="absolute left-[5px] top-3 h-full w-px bg-hairline" aria-hidden />}
-            <span className="relative mt-1.5 size-[11px] shrink-0 rounded-sm bg-ink ring-4 ring-white" aria-hidden />
+            <span className="relative mt-1.5 size-[11px] shrink-0 rounded-sm bg-ink ring-4 ring-paper" aria-hidden />
             <div className="min-w-0 text-sm">
               <p className="text-ink">{known ? t(known) : humanize(e.type)}</p>
               <p className="text-xs text-slate-500">

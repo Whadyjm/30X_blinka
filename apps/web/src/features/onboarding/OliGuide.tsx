@@ -53,7 +53,7 @@ export function OliGuide({ step, section, direction, state, name, busy, hasError
           <span className="onboarding-burst">{Array.from({ length: 10 }, (_, i) => <i key={i} style={{ '--a': `${i * 36}deg` } as React.CSSProperties} />)}</span>
         )}
         <div ref={oliBox} className="onboarding-oli-pulse">
-        <Oli state={currentState} dark={false} size={280} particles={1800} speed={0.7} paused={reduced} followCursor />
+        <Oli state={currentState} size={280} particles={1800} speed={0.7} paused={reduced} followCursor />
         </div>
       </div>
       <div className="onboarding-guide-copy oli-speech-bubble" key={`copy-${step}-${section}`} data-direction={direction}>

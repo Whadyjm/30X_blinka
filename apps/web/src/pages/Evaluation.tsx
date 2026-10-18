@@ -40,12 +40,12 @@ export function Evaluation() {
       {isMock && <div className="mb-4"><InlineAlert tone="warn">{t('These numbers come from the mock API, not the real policy engine.')}</InlineAlert></div>}
 
       <section aria-label={t('Key metrics')} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <div className={cn('rounded-2xl p-5', safe ? 'border border-hairline bg-highlighter text-ink' : 'bg-ink text-white')}>
+        <div className={cn('rounded-2xl p-5', safe ? 'border border-hairline bg-highlighter text-on-accent' : 'bg-ink text-on-ink')}>
           <p className="flex items-center gap-1.5 text-sm">
             {safe ? <ShieldCheck className="size-4" aria-hidden /> : <AlertTriangle className="size-4" aria-hidden />} {t('Unsafe approvals')}
           </p>
           <p className="mt-2 text-[28px] leading-none tabular-nums">{s.unsafeApprovals}</p>
-          <p className={cn('text-xs', safe ? 'text-ink/70' : 'text-white/70')}>{t('Target: 0')}</p>
+          <p className={cn('text-xs', safe ? 'text-on-accent/70' : 'text-on-ink/70')}>{t('Target: 0')}</p>
         </div>
         <Metric label={t('Decision accuracy')} value={pct(s.decisionAccuracy)} hint={t('Correct decisions / labelled cases')} />
         <Metric label={t('Correct autonomy')} value={pct(s.correctAutonomy)} hint={t('Correct without asking a person')} />
@@ -106,7 +106,7 @@ export function Evaluation() {
 
 function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-white p-5">
+    <div className="rounded-2xl border border-hairline bg-paper p-5">
       <p className="text-sm text-ash">{label}</p>
       <p className="mt-2 text-[28px] leading-none tabular-nums text-ink">{value}</p>
       <p className="mt-1 text-xs text-ash">{hint}</p>

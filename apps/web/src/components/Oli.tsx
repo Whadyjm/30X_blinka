@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { OliCanvas } from '../../../../packages/oli/src/renderer.js';
 import type { OliOptions, OliState } from '../../../../packages/oli/src/renderer.d.ts';
+import { useTheme } from '@/theme/ThemeProvider';
 
 export type { OliState };
 export interface OliProps extends OliOptions {
@@ -14,13 +15,15 @@ export function Oli({
   state = 'idle',
   size = 240,
   speed = 1,
-  dark = false,
+  dark: darkOverride,
   paused = false,
   particles = 1600,
   className,
   label = 'Oli',
   followCursor = false,
 }: OliProps) {
+  const { resolved } = useTheme();
+  const dark = darkOverride ?? resolved === 'dark';
   const canvas = useRef<HTMLCanvasElement>(null);
   const renderer = useRef<OliCanvas | null>(null);
   const latest = useRef({ state, speed, dark, paused });

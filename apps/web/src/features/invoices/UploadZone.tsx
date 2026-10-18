@@ -34,8 +34,8 @@ export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
         onDragLeave={() => setOver(false)}
         onDrop={onDrop}
         className={cn(
-          'flex flex-col items-center gap-3 rounded-xl border-2 border-dashed bg-white px-6 py-8 text-center transition-colors',
-          over ? 'border-ink bg-white' : 'border-smoke',
+          'flex flex-col items-center gap-3 rounded-xl border-2 border-dashed bg-paper px-6 py-8 text-center transition-colors',
+          over ? 'border-ink bg-paper' : 'border-smoke',
         )}
       >
         <div className="grid size-12 place-items-center rounded-xl bg-bone text-ink">
@@ -62,7 +62,7 @@ export function UploadZone({ invoices }: { invoices: InvoiceSummary[] }) {
       </div>
 
       {items.length > 0 && (
-        <div className="mt-4 rounded-2xl border border-hairline bg-white" aria-live="polite">
+        <div className="mt-4 rounded-2xl border border-hairline bg-paper" aria-live="polite">
           <div className="flex items-center justify-between border-b border-hairline px-4 py-2.5">
             <h2 className="text-sm text-ink">{t('This batch')}</h2>
             <button type="button" onClick={clearFinished} className="text-xs text-slate-500 hover:text-ink">

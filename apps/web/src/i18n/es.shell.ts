@@ -1,5 +1,12 @@
 /** Spanish: shell, landing, login, home, onboarding, navigation, route guards. */
 export const esShell: Record<string, string> = {
+  Appearance: 'Apariencia',
+  Light: 'Claro',
+  Dark: 'Oscuro',
+  System: 'Sistema',
+  'Switch to light mode': 'Cambiar a modo claro',
+  'Switch to dark mode': 'Cambiar a modo oscuro',
+  'Choose light, warm dark, or follow your device. Saved in this browser.': 'Elige claro, oscuro cálido o el tema de tu dispositivo. Se guarda en este navegador.',
   // not found / coming soon
   'This page doesn’t exist': 'Esta página no existe',
   'Back home': 'Volver al inicio',

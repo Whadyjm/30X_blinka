@@ -7,7 +7,7 @@ import { Button } from './Button';
 import { Orb } from './Orb';
 
 export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('rounded-2xl border border-hairline bg-white', className)} {...rest} />;
+  return <div className={cn('rounded-2xl border border-hairline bg-paper', className)} {...rest} />;
 }
 
 export function CardHeader({ title, subtitle, action }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode }) {
@@ -72,7 +72,7 @@ export function EmptyState({ title, body, action, icon }: { title: string; body?
 export function ErrorState({ error, onRetry, title }: { error: unknown; onRetry?: () => void; title?: string }) {
   return (
     <div role="alert" className="flex flex-col items-center gap-2 px-6 py-10 text-center">
-      <div className="grid size-12 place-items-center rounded-xl bg-ink text-white">
+      <div className="grid size-12 place-items-center rounded-xl bg-ink text-on-ink">
         <AlertTriangle className="size-6" aria-hidden />
       </div>
       <p className="font-medium text-slate-900">{title ?? t('Couldn’t load this')}</p>
@@ -89,10 +89,10 @@ export function ErrorState({ error, onRetry, title }: { error: unknown; onRetry?
 export function InlineAlert({ tone = 'error', children }: { tone?: 'error' | 'warn' | 'info' | 'success'; children: ReactNode }) {
   // Monochrome hierarchy: error = solid ink, warn = ink outline, info = bone, success = highlighter.
   const tones = {
-    error: 'bg-ink text-white',
-    warn: 'bg-white text-ink ring-1 ring-inset ring-ink',
+    error: 'bg-ink text-on-ink',
+    warn: 'bg-paper text-ink ring-1 ring-inset ring-ink',
     info: 'bg-bone text-slate-700',
-    success: 'bg-highlighter text-ink',
+    success: 'bg-highlighter text-on-accent',
   };
   return (
     <div role={tone === 'error' ? 'alert' : 'status'} className={cn('rounded-xl px-4 py-3 text-sm', tones[tone])}>

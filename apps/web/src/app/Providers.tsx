@@ -4,6 +4,7 @@ import { ApiError, UNAUTHORIZED_EVENT } from '@/api';
 import { ToastProvider } from '@/components/ui/Toast';
 import { I18nProvider } from '@/i18n/I18nProvider';
 import { qk } from '@/hooks/queries';
+import { ThemeProvider } from '@/theme/ThemeProvider';
 
 function makeClient() {
   return new QueryClient({
@@ -31,9 +32,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={client}>
-      <I18nProvider>
+      <ThemeProvider><I18nProvider>
         <ToastProvider>{children}</ToastProvider>
-      </I18nProvider>
+      </I18nProvider></ThemeProvider>
     </QueryClientProvider>
   );
 }

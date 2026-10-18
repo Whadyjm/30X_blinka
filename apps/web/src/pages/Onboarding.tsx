@@ -16,6 +16,7 @@ import sampleInvoiceUrl from '../../../../examples/invoices/hosting.pdf?url';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import type { OliState } from '@/components/Oli';
 import { Button } from '@/components/ui/Button';
 import { ErrorState, InlineAlert, PageLoading } from '@/components/ui/Card';
@@ -251,7 +252,7 @@ export function Onboarding() {
       <div className="onboarding-shell">
         <header className="onboarding-header">
           <Logo />
-          <LanguageSwitcher />
+          <div className="flex flex-wrap items-center justify-end gap-3"><ThemeSwitcher compact /><LanguageSwitcher /></div>
         </header>
         {restart && (
           <Link to="/app/settings" className="mb-5 inline-flex items-center gap-2 text-sm text-ash hover:text-ink">

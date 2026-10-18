@@ -15,20 +15,20 @@ interface StepTheme {
 
 const OUTCOME_THEME: Record<TraceStep['result'], StepTheme> = {
   PASS: {
-    dotClass: 'bg-highlighter text-ink ring-2 ring-ink',
-    badgeClass: 'bg-highlighter text-ink font-medium',
+    dotClass: 'bg-highlighter text-on-accent ring-2 ring-ink',
+    badgeClass: 'bg-highlighter text-on-accent font-medium',
     icon: CheckCircle2,
     label: 'Passed',
   },
   FAIL: {
-    dotClass: 'bg-ink text-white ring-2 ring-ink',
-    badgeClass: 'bg-ink text-white',
+    dotClass: 'bg-ink text-on-ink ring-2 ring-ink',
+    badgeClass: 'bg-ink text-on-ink',
     icon: Ban,
     label: 'Failed',
   },
   WARN: {
-    dotClass: 'bg-white text-ink ring-2 ring-ink',
-    badgeClass: 'bg-white text-ink ring-1 ring-inset ring-ink',
+    dotClass: 'bg-paper text-ink ring-2 ring-ink',
+    badgeClass: 'bg-paper text-ink ring-1 ring-inset ring-ink',
     icon: AlertCircle,
     label: 'Needs attention',
   },
@@ -69,19 +69,19 @@ export function DecisionTrace({ decision }: { decision: PolicyDecision }) {
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs">
             {passedCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-highlighter px-2.5 py-1 text-ink">
+              <span className="inline-flex items-center gap-1 rounded-md bg-highlighter px-2.5 py-1 text-on-accent">
                 <CheckCircle2 className="size-3.5" aria-hidden />
                 {t('{n} passed', { n: passedCount })}
               </span>
             )}
             {warnCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-white px-2.5 py-1 text-ink ring-1 ring-inset ring-ink">
+              <span className="inline-flex items-center gap-1 rounded-md bg-paper px-2.5 py-1 text-ink ring-1 ring-inset ring-ink">
                 <Clock className="size-3.5" aria-hidden />
                 {t('{n} need attention', { n: warnCount })}
               </span>
             )}
             {failCount > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-ink px-2.5 py-1 text-white">
+              <span className="inline-flex items-center gap-1 rounded-md bg-ink px-2.5 py-1 text-on-ink">
                 <Ban className="size-3.5" aria-hidden />
                 {t('{n} blocked', { n: failCount })}
               </span>
@@ -167,7 +167,7 @@ function TimelineStep({
       {/* Prominent timeline dot */}
       <div
         className={cn(
-          'absolute -left-[27px] sm:-left-[31px] top-1.5 z-10 flex size-7 sm:size-8 items-center justify-center rounded-full shadow-sm ring-4 ring-white transition-transform group-hover:scale-105',
+          'absolute -left-[27px] sm:-left-[31px] top-1.5 z-10 flex size-7 sm:size-8 items-center justify-center rounded-full shadow-sm ring-4 ring-paper transition-transform group-hover:scale-105',
           theme.dotClass
         )}
         aria-hidden
@@ -176,7 +176,7 @@ function TimelineStep({
       </div>
 
       {/* Step card container */}
-      <div className="rounded-xl border border-hairline bg-white p-4 sm:p-5 transition-colors hover:border-slate-300">
+      <div className="rounded-xl border border-hairline bg-paper p-4 sm:p-5 transition-colors hover:border-slate-300">
         {/* Header: Title, index and outcome badge */}
         <div className="flex flex-wrap items-start justify-between gap-2.5">
           <div className="min-w-0 flex-1">

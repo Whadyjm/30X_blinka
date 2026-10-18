@@ -27,7 +27,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             role={toast.tone === 'error' ? 'alert' : 'status'}
             className={cn(
               'pointer-events-auto flex max-w-md items-start gap-2 rounded-xl px-4 py-3 text-sm',
-              toast.tone === 'success' ? 'bg-highlighter text-ink' : toast.tone === 'info' ? 'border border-hairline bg-white text-ink' : 'bg-ink text-white',
+              toast.tone === 'success' ? 'bg-highlighter text-on-accent' : toast.tone === 'info' ? 'border border-hairline bg-paper text-ink' : 'bg-ink text-on-ink',
             )}
           >
             {toast.tone === 'info' ? <Mail className="mt-0.5 size-4 shrink-0" aria-hidden /> : toast.tone === 'success' ? <CheckCircle2 className="mt-0.5 size-4 shrink-0" aria-hidden /> : <XCircle className="mt-0.5 size-4 shrink-0" aria-hidden />}

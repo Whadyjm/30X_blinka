@@ -1,0 +1,56 @@
+/* Logo animado de Oli: solo ojos y cejas se mueven; la silueta queda fija.
+   Duraciones distintas (no múltiplos) para que parpadeo y mirada no se sincronicen. */
+.oli-logo-eye,
+.oli-logo-brows,
+.oli-logo-gaze {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.oli-logo-eye {
+  animation: oli-blink 6.4s ease-in-out infinite;
+}
+.oli-logo-brows {
+  animation: oli-brows 6.4s ease-in-out infinite;
+}
+.oli-logo-gaze {
+  animation: oli-gaze 17s ease-in-out infinite;
+}
+
+/* Parpadeo doble ocasional, rápido (~140ms) y con pausa larga */
+@keyframes oli-blink {
+  0%, 30%, 33.2%, 100% { transform: scaleY(1); }
+  31.6% { transform: scaleY(0.1); }
+  /* segundo parpadeo, más tarde en el ciclo */
+  78%, 81.2% { transform: scaleY(1); }
+  79.6% { transform: scaleY(0.1); }
+}
+
+/* Las cejas se elevan un poco al parpadear: da expresión amable */
+@keyframes oli-brows {
+  0%, 29%, 34%, 77%, 82%, 100% { transform: translateY(0); }
+  31.6% { transform: translateY(0.5px); }
+  79.6% { transform: translateY(0.5px); }
+}
+
+/* Miradas breves a un lado y otro, con pausas largas mirando al frente */
+@keyframes oli-gaze {
+  0%, 14%, 30%, 52%, 70%, 100% { transform: translate(0, 0); }
+  18%, 25% { transform: translate(-0.9px, -0.2px); }
+  56%, 64% { transform: translate(0.9px, 0.1px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oli-logo-eye,
+  .oli-logo-brows,
+  .oli-logo-gaze {
+    animation: none;
+  }
+}
+
+/* Pestaña oculta: se pausa (ver Logo.tsx) */
+:root[data-tab-hidden] .oli-logo-eye,
+:root[data-tab-hidden] .oli-logo-brows,
+:root[data-tab-hidden] .oli-logo-gaze {
+  animation-play-state: paused;
+}

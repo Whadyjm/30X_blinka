@@ -6,6 +6,7 @@ import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useToast } from '@/components/ui/Toast';
 import { env } from '@/config/env';
 import { invalidateMoney, useApprovals, useInbox, useMe } from '@/hooks/queries';
@@ -73,13 +74,13 @@ export function AppLayout() {
           end={it.end}
           onClick={() => setOpen(false)}
           className={({ isActive }) =>
-            cn('flex items-center gap-3 rounded-md px-3 py-2 text-sm', isActive ? 'bg-highlighter text-ink' : 'text-slate-700 hover:bg-bone')
+            cn('flex items-center gap-3 rounded-md px-3 py-2 text-sm', isActive ? 'bg-highlighter text-on-accent' : 'text-slate-700 hover:bg-bone')
           }
         >
           <it.icon className="size-5" aria-hidden />
           <span className="flex-1">{t(it.label)}</span>
           {it.badge ? (
-            <span className="rounded-md bg-ink px-2 py-0.5 text-xs text-white" aria-label={t('{n} pending', { n: it.badge })}>
+            <span className="rounded-md bg-ink px-2 py-0.5 text-xs text-on-ink" aria-label={t('{n} pending', { n: it.badge })}>
               {it.badge}
             </span>
           ) : null}
@@ -92,13 +93,14 @@ export function AppLayout() {
     <div className="flex min-h-screen flex-col">
       <DemoBanner />
       <div className="flex flex-1">
-        <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-white p-4 lg:flex">
+        <aside className="hidden w-60 shrink-0 flex-col border-r border-hairline bg-paper p-4 lg:flex">
           <Link to="/app" className="mb-6 px-1">
             <Logo />
           </Link>
           {links}
           <div className="mt-auto space-y-3 border-t border-hairline pt-4 text-sm">
             <LanguageSwitcher />
+            <ThemeSwitcher compact />
             <div>
               <p className="truncate text-ink">{me?.org?.name}</p>
               <p className="truncate text-xs text-slate-500">
@@ -112,11 +114,12 @@ export function AppLayout() {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex h-16 shrink-0 items-center justify-between border-b border-hairline bg-white px-4 lg:hidden">
+          <header className="flex h-16 shrink-0 items-center justify-between border-b border-hairline bg-paper px-4 lg:hidden">
             <Link to="/app">
               <Logo />
             </Link>
             <div className="flex items-center gap-2">
+              <ThemeSwitcher compact />
               <LanguageSwitcher />
               <button type="button" aria-label={open ? t('Close menu') : t('Open menu')} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="grid size-11 place-items-center rounded-md hover:bg-bone">
                 {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
@@ -124,7 +127,7 @@ export function AppLayout() {
             </div>
           </header>
           {open && (
-            <div className="border-b border-hairline bg-white p-3 lg:hidden">
+            <div className="border-b border-hairline bg-paper p-3 lg:hidden">
               {links}
               <button type="button" onClick={signOut} className="mt-2 flex items-center gap-2 px-3 py-2 text-sm text-slate-600">
                 <LogOut className="size-4" aria-hidden /> {t('Sign out')}

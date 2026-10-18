@@ -113,7 +113,7 @@ function MandateTab({ isOwner }: { isOwner: boolean }) {
     return (
       <Card>
         <CardHeader
-          title={<span className="inline-flex items-center gap-2">{t('Mandate')} <span className="rounded-md bg-highlighter px-2 py-0.5 text-xs text-ink">{t('v{n} active', { n: active.version })}</span></span>}
+          title={<span className="inline-flex items-center gap-2">{t('Mandate')} <span className="rounded-md bg-highlighter px-2 py-0.5 text-xs text-on-accent">{t('v{n} active', { n: active.version })}</span></span>}
           subtitle={
             active.createdAt
               ? active.createdByName

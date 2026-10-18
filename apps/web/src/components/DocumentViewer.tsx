@@ -54,17 +54,17 @@ export function DocumentViewer({ invoice }: { invoice: InvoiceDetail }) {
     <div>
       <div className="overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200">
         {isPdf ? (preview ? (
-          <object data={preview} type="application/pdf" className="h-[32rem] w-full" aria-label={alt} onError={() => setFailed(true)}>
-            <div className="p-6 text-center text-sm text-slate-600">
+          <object data={preview} type="application/pdf" className="document-original h-[32rem] w-full" aria-label={alt} onError={() => setFailed(true)}>
+            <div className="p-6 text-center text-sm text-brand-ink/70">
               {t('Your browser can’t display this PDF inline.')}{' '}
-              <a href={url} target="_blank" rel="noreferrer" className="text-ink underline">
+              <a href={url} target="_blank" rel="noreferrer" className="text-brand-ink underline">
                 {t('Open it in a new tab')}
               </a>
               .
             </div>
           </object>
         ) : <p className="p-6 text-sm text-slate-600" role="status">{t('Loading original document…')}</p>) : (
-          <img src={url} alt={alt} className="max-h-[32rem] w-full object-contain" onError={() => setFailed(true)} />
+          <img src={url} alt={alt} className="document-original max-h-[32rem] w-full object-contain" onError={() => setFailed(true)} />
         )}
       </div>
       <a href={url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs text-ink underline underline-offset-2">

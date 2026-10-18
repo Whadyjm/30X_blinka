@@ -19,7 +19,7 @@ export function LanguageSwitcher({ className, dark = false }: { className?: stri
             onClick={() => setLang(l.code)}
             className={cn(
               'px-2.5 py-1 text-xs uppercase tracking-[0.05em]',
-              active ? 'bg-highlighter text-ink' : dark ? 'text-white hover:bg-white/10' : 'bg-white text-ash hover:bg-bone hover:text-ink',
+              active ? 'bg-highlighter text-on-accent' : dark ? 'text-white hover:bg-white/10' : 'bg-paper text-ash hover:bg-bone hover:text-ink',
             )}
           >
             {l.label}

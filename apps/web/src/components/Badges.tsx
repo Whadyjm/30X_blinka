@@ -19,12 +19,12 @@ import { outcomeLabel, type Outcome } from '@/lib/outcome';
  * `title` values are English i18n keys, translated at render time.
  */
 const STYLES: Record<Outcome, { cls: string; Icon: LucideIcon; title: string }> = {
-  APPROVED: { cls: 'bg-highlighter text-ink', Icon: CheckCircle2, title: 'Approved' },
-  BLOCKED: { cls: 'bg-ink text-white', Icon: Ban, title: 'Blocked by your rules' },
-  NEEDS_APPROVAL: { cls: 'bg-white text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
+  APPROVED: { cls: 'bg-highlighter text-on-accent', Icon: CheckCircle2, title: 'Approved' },
+  BLOCKED: { cls: 'bg-ink text-on-ink', Icon: Ban, title: 'Blocked by your rules' },
+  NEEDS_APPROVAL: { cls: 'bg-paper text-ink ring-1 ring-inset ring-ink', Icon: Hand, title: 'Needs a human decision' },
   NEEDS_REVIEW: { cls: 'bg-bone text-ink ring-1 ring-inset ring-smoke', Icon: AlertCircle, title: 'Needs correction or clarification' },
   PROCESSING: { cls: 'bg-bone text-ash', Icon: AlertCircle, title: 'Being processed' },
-  FAILED: { cls: 'bg-white text-ink border border-dashed border-ink', Icon: AlertCircle, title: 'Processing failed. Nothing was approved.' },
+  FAILED: { cls: 'bg-paper text-ink border border-dashed border-ink', Icon: AlertCircle, title: 'Processing failed. Nothing was approved.' },
   REJECTED: { cls: 'bg-bone text-ash ring-1 ring-inset ring-smoke', Icon: XCircle, title: 'Rejected by a reviewer' },
 };
 
@@ -40,8 +40,8 @@ export function OutcomeBadge({ outcome, className }: { outcome: Outcome; classNa
 
 const TONE: Record<ReasonTone, string> = {
   ok: 'bg-bone text-ink',
-  warn: 'bg-white text-ink ring-1 ring-inset ring-ink',
-  block: 'bg-ink text-white',
+  warn: 'bg-paper text-ink ring-1 ring-inset ring-ink',
+  block: 'bg-ink text-on-ink',
   info: 'bg-bone text-ash',
 };
 

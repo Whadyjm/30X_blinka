@@ -46,7 +46,7 @@ export function ExtractionPanel({ extracted, pending }: { extracted: ExtractedIn
         })}
       </dl>
       {extracted.extractionWarnings.length > 0 && (
-        <ul className="m-4 space-y-1 rounded-xl bg-white p-3 text-sm text-ink ring-1 ring-inset ring-ink">
+        <ul className="m-4 space-y-1 rounded-xl bg-paper p-3 text-sm text-ink ring-1 ring-inset ring-ink">
           {extracted.extractionWarnings.map((w, i) => (
             <li key={i} className="flex gap-2">
               <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />

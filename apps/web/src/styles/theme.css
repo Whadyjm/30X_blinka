@@ -1,0 +1,90 @@
+/* Warm charcoal surfaces, ivory type and the existing Oli highlighter accent. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-canvas: #191715;
+  --color-bone: #1c1917;
+  --color-paper: #23201d;
+  --color-ink: #f1e9dd;
+  --color-obsidian: #d5c9b9;
+  --color-ash: #b4aa9e;
+  --color-hairline: #49413a;
+  --color-smoke: #534a41;
+  --color-on-ink: #211e1b;
+  --color-logo-face: #211e1b;
+  --color-field-border: #8a7c6d;
+  --color-status-block-surface: #3b2526;
+  --color-status-block-ink: #f0afb3;
+  --color-status-block-dot: #ec98a1;
+  --color-status-approval-surface: #382e1e;
+  --color-status-approval-ink: #e7c98e;
+  --color-status-approval-dot: #e7c98e;
+  --color-status-review-surface: #27323b;
+  --color-status-review-ink: #b4cde5;
+  --color-status-review-dot: #b4cde5;
+  --color-skeleton-base: #2c2723;
+  --color-skeleton-peak: #39312b;
+  --color-slate-50: #1c1917;
+  --color-slate-100: #302b26;
+  --color-slate-200: #49413a;
+  --color-slate-300: #817467;
+  --color-slate-400: #b1a596;
+  --color-slate-500: #b4aa9e;
+  --color-slate-600: #c7bdb0;
+  --color-slate-700: #ddd3c5;
+  --color-slate-800: #ece3d7;
+  --color-slate-900: #f1e9dd;
+  --color-indigo-50: var(--color-bone);
+  --color-indigo-100: var(--color-slate-100);
+  --color-indigo-200: var(--color-smoke);
+  --color-indigo-300: var(--color-slate-400);
+  --color-indigo-400: var(--color-ash);
+  --color-indigo-500: var(--color-slate-700);
+  --color-indigo-600: var(--color-ink);
+  --color-indigo-700: var(--color-ink);
+  --color-indigo-800: var(--color-ink);
+  --color-indigo-900: var(--color-ink);
+  --color-emerald-50: var(--color-bone);
+  --color-emerald-100: var(--color-slate-100);
+  --color-emerald-200: var(--color-smoke);
+  --color-emerald-300: var(--color-slate-400);
+  --color-emerald-400: var(--color-ash);
+  --color-emerald-500: var(--color-slate-700);
+  --color-emerald-600: var(--color-ink);
+  --color-emerald-700: var(--color-ink);
+  --color-emerald-800: var(--color-ink);
+  --color-emerald-900: var(--color-ink);
+  --color-amber-50: var(--color-bone);
+  --color-amber-100: var(--color-slate-100);
+  --color-amber-200: var(--color-smoke);
+  --color-amber-300: var(--color-slate-400);
+  --color-amber-400: var(--color-ash);
+  --color-amber-500: var(--color-slate-700);
+  --color-amber-600: var(--color-ink);
+  --color-amber-700: var(--color-ink);
+  --color-amber-800: var(--color-ink);
+  --color-amber-900: var(--color-ink);
+  --color-rose-50: var(--color-bone);
+  --color-rose-100: var(--color-slate-100);
+  --color-rose-200: var(--color-smoke);
+  --color-rose-300: var(--color-slate-400);
+  --color-rose-400: var(--color-ash);
+  --color-rose-500: var(--color-slate-700);
+  --color-rose-600: var(--color-ink);
+  --color-rose-700: var(--color-ink);
+  --color-rose-800: var(--color-ink);
+  --color-rose-900: var(--color-ink);
+  --color-sky-50: var(--color-bone);
+  --color-sky-100: var(--color-slate-100);
+  --color-sky-200: var(--color-smoke);
+  --color-sky-600: var(--color-ink);
+}
+
+/* Focus, selection and native form controls follow the active surface. */
+html { scrollbar-color: var(--color-smoke) var(--color-canvas); }
+::selection { background: var(--color-highlighter); color: var(--color-on-accent); }
+input, textarea { caret-color: var(--color-ink); }
+input[type='checkbox'], input[type='radio'] { accent-color: var(--color-ink); }
+:root[data-theme='dark'] dialog::backdrop { background: rgb(15 12 10 / 65%); }
+
+/* Documents retain their original rendering; only the surrounding viewer changes. */
+.document-original { color-scheme: light; background: #ffffff; color: #0c0a08; }

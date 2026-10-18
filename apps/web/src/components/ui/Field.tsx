@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn';
 import { fromMinor, toMinor } from '@/lib/money';
 
 const control =
-  'block w-full rounded-[10px] border-0 bg-white px-4 py-2.5 text-sm text-ink ring-1 ring-inset ring-[rgba(33,33,33,0.15)] placeholder:text-slate-400 focus:ring-2 focus:ring-ink disabled:bg-bone disabled:text-ash';
+  'block w-full rounded-[10px] border-0 bg-paper px-4 py-2.5 text-sm text-ink ring-1 ring-inset ring-field-border placeholder:text-slate-500 focus:ring-2 focus:ring-ink disabled:bg-bone disabled:text-ash';
 
 type FieldShellProps = { label: string; hint?: ReactNode; error?: string | null; id: string; children: ReactNode; optional?: boolean };
 
@@ -13,7 +13,7 @@ function FieldShell({ label, hint, error, id, children, optional }: FieldShellPr
     <div>
       <label htmlFor={id} className="mb-1 block text-sm font-medium text-slate-800">
         {label}
-        {optional && <span className="ml-1 font-normal text-slate-400">({t('optional')})</span>}
+        {optional && <span className="ml-1 font-normal text-slate-500">({t('optional')})</span>}
       </label>
       {children}
       {error ? (
@@ -145,7 +145,7 @@ export function Toggle({ label, description, checked, onChange, disabled }: { la
         onClick={() => onChange(!checked)}
         className={cn('relative h-6 w-11 shrink-0 rounded-md transition-colors disabled:opacity-50', checked ? 'bg-ink' : 'bg-smoke')}
       >
-        <span className={cn('absolute left-0.5 top-0.5 size-5 rounded-[4px] bg-white transition-transform', checked && 'translate-x-5')} />
+        <span className={cn('absolute left-0.5 top-0.5 size-5 rounded-[4px] bg-paper transition-transform', checked && 'translate-x-5')} />
       </button>
     </div>
   );

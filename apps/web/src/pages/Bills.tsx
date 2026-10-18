@@ -77,7 +77,7 @@ export function Bills() {
                 onClick={() => set('outcome', f.key)}
                 className={cn('rounded-md px-3 py-1 text-sm', outcome === f.key ? 'bg-highlighter text-on-accent' : 'text-slate-600 hover:bg-bone')}
               >
-                {t(f.label)} <span className={cn('ml-0.5 text-xs', outcome === f.key ? 'text-ink/60' : 'text-slate-400')}>{count(f.key)}</span>
+                {t(f.label)} <span className={cn('ml-0.5 text-xs', outcome === f.key ? 'text-on-accent/70' : 'text-ash')}>{count(f.key)}</span>
               </button>
             ))}
           </div>
@@ -89,7 +89,7 @@ export function Bills() {
               placeholder={t('Search vendor, number, file…')}
               value={q}
               onChange={(e) => set('q', e.target.value)}
-              className="w-full rounded-[10px] border-0 bg-paper py-2 pl-9 pr-3 text-sm ring-1 ring-inset ring-field-border focus:ring-2 focus:ring-ink"
+              className="w-full rounded-[10px] border-0 bg-paper py-2 pl-9 pr-3 text-sm ring-1 ring-inset ring-field-border placeholder:text-slate-500 focus:ring-2 focus:ring-ink"
             />
           </div>
         </div>

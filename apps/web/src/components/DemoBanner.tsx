@@ -15,7 +15,7 @@ export function DemoBanner() {
   if (env.apiMode !== 'mock') return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-start gap-x-5 gap-y-1 bg-obsidian px-4 py-2 text-[11px] uppercase tracking-[0.05em] text-white sm:justify-center" role="note">
+    <div className="flex flex-wrap items-center justify-start gap-x-5 gap-y-1 bg-night px-4 py-2 text-[11px] uppercase tracking-[0.05em] text-white sm:justify-center" role="note">
       <span className="inline-flex items-center gap-1.5">
         <ShieldCheck className="size-3.5 text-highlighter" aria-hidden />
         {brand.envLabel}

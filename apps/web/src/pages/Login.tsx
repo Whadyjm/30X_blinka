@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { api, errorMessage } from '@/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { Button } from '@/components/ui/Button';
 import { Card, InlineAlert } from '@/components/ui/Card';
 import { TextField } from '@/components/ui/Field';
@@ -47,7 +48,8 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <div className="flex justify-end px-4 pt-4 sm:px-6">
+      <div className="flex flex-wrap items-center justify-end gap-3 px-4 pt-4 sm:px-6">
+        <ThemeSwitcher compact />
         <LanguageSwitcher />
       </div>
       <div className="grid flex-1 place-items-center px-4 py-10">

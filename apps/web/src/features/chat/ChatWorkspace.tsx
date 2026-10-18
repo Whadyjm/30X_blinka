@@ -119,7 +119,7 @@ export function ChatWorkspace() {
   };
   const submit = (event: FormEvent) => { event.preventDefault(); void send(); };
 
-  return <section id="oli-chat" ref={root} className={cn('oli-chat relative -mx-4 -mt-6 flex min-h-0 flex-col overflow-hidden bg-white md:mx-0 md:mt-0 md:rounded-2xl md:border md:border-hairline', dragging && 'ring-2 ring-inset ring-ink')}
+  return <section id="oli-chat" ref={root} className={cn('oli-chat relative -mx-4 -mt-6 flex min-h-0 flex-col overflow-hidden bg-paper md:mx-0 md:mt-0 md:rounded-2xl md:border md:border-hairline', dragging && 'ring-2 ring-inset ring-ink')}
     aria-label={t('Chat with Oli')} onDragOver={e => { if (channel === 'WEB') { e.preventDefault(); setDragging(true); } }}
     onDragLeave={e => { if (!(e.relatedTarget instanceof Node) || !e.currentTarget.contains(e.relatedTarget)) setDragging(false); }}
     onDrop={e => { e.preventDefault(); setDragging(false); attach(Array.from(e.dataTransfer.files)); }}>
@@ -137,7 +137,7 @@ export function ChatWorkspace() {
           {channel === 'WEB' && closedThreads.length > 0 && <details className="relative" onKeyDown={e => { if (e.key === 'Escape') { e.currentTarget.open = false; e.currentTarget.querySelector('summary')?.focus(); } }}
             onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) e.currentTarget.open = false; }}>
             <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-md text-ink hover:bg-bone [&::-webkit-details-marker]:hidden" aria-label={t('Closed conversations')} title={t('Closed conversations')}><History className="size-5" aria-hidden /></summary>
-            <div className="absolute right-0 top-full z-20 max-h-60 w-72 max-w-[85vw] overflow-y-auto rounded-md border border-hairline bg-white p-2">
+            <div className="absolute right-0 top-full z-20 max-h-60 w-72 max-w-[85vw] overflow-y-auto rounded-md border border-hairline bg-paper p-2">
               <p className="px-3 py-2 text-sm text-slate-600">{t('Reopen a conversation')}</p>
               {closedThreads.map(thread => <button key={thread.id} type="button" disabled={busy || !!web.pending} className="block min-h-11 w-full truncate rounded-md px-3 text-left text-sm hover:bg-bone disabled:opacity-40"
                 onClick={e => { rememberClosed(closedIds.filter(id => id !== thread.id)); selectWebConversation(thread.id); e.currentTarget.closest('details')!.open = false; tabToFocus.current = thread.id; }}>{thread.title || t('Invoice conversation')}</button>)}
@@ -172,7 +172,7 @@ export function ChatWorkspace() {
           {thread.title || t('Invoice conversation')}
           </button>
           <button type="button" disabled={busy || !!web.pending} onClick={() => closeConversation(thread.id)} aria-label={t('Close conversation: {title}', { title: thread.title || t('New conversation') })}
-            title={t('Close conversation')} className="grid size-11 shrink-0 place-items-center rounded-md hover:bg-white disabled:opacity-40 md:size-8"><X className="size-3.5" aria-hidden /></button>
+            title={t('Close conversation')} className="grid size-11 shrink-0 place-items-center rounded-md hover:bg-paper disabled:opacity-40 md:size-8"><X className="size-3.5" aria-hidden /></button>
         </div>)}
       </div>}
       <div id={channel === 'WEB' ? 'web-thread-panel' : undefined} role={channel === 'WEB' ? 'tabpanel' : undefined}
@@ -206,8 +206,8 @@ export function ChatWorkspace() {
       </div>
       </div>
       {!nearBottom && !empty && <button type="button" onClick={() => { shouldFollow.current = true; log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }); }} aria-label={t('Go to latest message')}
-        className="absolute bottom-40 right-5 grid size-11 place-items-center rounded-full border border-hairline bg-white text-ink"><ArrowDown className="size-5" aria-hidden /></button>}
-      <div className="chat-composer shrink-0 border-t border-hairline bg-white px-3 pt-3 md:px-6">
+        className="absolute bottom-40 right-5 grid size-11 place-items-center rounded-full border border-hairline bg-paper text-ink"><ArrowDown className="size-5" aria-hidden /></button>}
+      <div className="chat-composer shrink-0 border-t border-hairline bg-paper px-3 pt-3 md:px-6">
         {conversation.error && <div role="alert" className="mb-2 space-y-2 text-sm text-ink"><p>{conversation.error}</p><button className={buttonClass('secondary', 'sm')} disabled={conversation.sending} onClick={() => void conversation.retry()}>{t('Retry')}</button>
           {conversation.pending && <button className={buttonClass('ghost', 'sm')} disabled={conversation.sending} onClick={conversation.dismiss}>{t('Dismiss failed message')}</button>}</div>}
         {channel === 'TELEGRAM' ? <div className="flex flex-wrap items-center justify-between gap-2 py-2">
@@ -215,13 +215,13 @@ export function ChatWorkspace() {
           <a href="https://t.me/Oliblinkabot" target="_blank" rel="noopener noreferrer" className={buttonClass('secondary', 'md')}>{t('Continue in Telegram')}<Send className="size-4" aria-hidden /></a>
         </div> : <form onSubmit={submit}>
           {files.length > 0 && <div className="mb-2 flex flex-wrap gap-2">{files.map((file, index) => <span key={index} className="inline-flex min-w-0 items-center gap-1 rounded-md bg-bone pl-3 text-sm"><FileText className="size-4 shrink-0" aria-hidden /><span className="max-w-40 truncate">{file.name}</span><button type="button" className="grid size-11 place-items-center" aria-label={t('Remove file')} onClick={() => setFiles(old => old.filter((_, i) => i !== index))}><X className="size-4" aria-hidden /></button></span>)}</div>}
-          <div className="flex items-end gap-1 rounded-3xl border border-slate-300 bg-white p-1 focus-within:border-ink">
+          <div className="flex items-end gap-1 rounded-3xl border border-slate-300 bg-paper p-1 focus-within:border-ink">
             <button type="button" disabled={busy || !!web.pending} onClick={() => fileInput.current?.click()} className="grid size-11 shrink-0 place-items-center rounded-full text-ink hover:bg-bone disabled:opacity-40" aria-label={t('Attach invoice (PDF, PNG, JPG)')}><Paperclip className="size-5" aria-hidden /></button>
             <input ref={fileInput} type="file" multiple accept={UPLOAD.accept} className="sr-only" aria-label={t('Attach invoice')} onChange={e => { attach(Array.from(e.target.files ?? [])); e.target.value = ''; }} />
             <textarea ref={textarea} rows={1} maxLength={4000} value={draft} aria-label={t('Message to Oli')} placeholder={t('Ask Oli...')}
               onChange={e => setDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing && matchMedia('(pointer: fine)').matches) { e.preventDefault(); void send(); } }}
               className="block max-h-36 min-h-11 min-w-0 flex-1 resize-none border-0 bg-transparent px-1 py-2.5 text-base leading-6 text-ink placeholder:text-slate-600 focus:outline-none" />
-            <button type="submit" disabled={!web.canSend || (!draft.trim() && !files.length)} aria-label={t('Send message to Oli')} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-white disabled:bg-bone disabled:text-slate-500"><ArrowUp className="size-5" aria-hidden /></button>
+            <button type="submit" disabled={!web.canSend || (!draft.trim() && !files.length)} aria-label={t('Send message to Oli')} className="grid size-11 shrink-0 place-items-center rounded-full bg-ink text-on-ink disabled:bg-bone disabled:text-slate-500"><ArrowUp className="size-5" aria-hidden /></button>
           </div>
           {web.pending && !web.sending && !web.error && <button type="button" className={buttonClass('secondary', 'sm', 'mt-2')} onClick={() => void web.retry()}>{t('Resume pending message')}</button>}
           {inputError && <p role="alert" className="mt-2 text-sm text-ink">{inputError}</p>}

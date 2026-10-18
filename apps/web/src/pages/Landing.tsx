@@ -5,6 +5,7 @@ import { Ban, CheckCircle2, Hand } from 'lucide-react';
 import { api } from '@/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
+import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { buttonClass } from '@/components/ui/Button';
 import { Beam } from '@/components/ui/Beam';
 import { brand } from '@/config/brand';
@@ -13,9 +14,9 @@ import { t } from '@/i18n';
 
 // Title/body are English i18n keys, translated at render time.
 const OUTCOMES = [
-  { Icon: CheckCircle2, title: 'Approved', body: 'Authorized vendor, matches the agreement, inside your limits, budget available. Approved.', cls: 'bg-highlighter text-ink' },
-  { Icon: Hand, title: 'Needs approval', body: 'A real exception — like an amount above the automatic limit. Oli asks you and re-checks everything before confirming.', cls: 'bg-white text-ink ring-1 ring-inset ring-ink' },
-  { Icon: Ban, title: 'Blocked', body: 'Duplicate, unauthorized vendor, over the ceiling or out of budget. A “yes” can’t override these.', cls: 'bg-ink text-white' },
+  { Icon: CheckCircle2, title: 'Approved', body: 'Authorized vendor, matches the agreement, inside your limits, budget available. Approved.', cls: 'bg-highlighter text-on-accent' },
+  { Icon: Hand, title: 'Needs approval', body: 'A real exception — like an amount above the automatic limit. Oli asks you and re-checks everything before confirming.', cls: 'bg-paper text-ink ring-1 ring-inset ring-ink' },
+  { Icon: Ban, title: 'Blocked', body: 'Duplicate, unauthorized vendor, over the ceiling or out of budget. A “yes” can’t override these.', cls: 'bg-ink text-on-ink' },
 ];
 
 export function Landing() {
@@ -40,10 +41,11 @@ export function Landing() {
   };
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-hairline bg-white">
+      <header className="border-b border-hairline bg-paper">
         <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-4 sm:px-6">
           <Logo />
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+            <ThemeSwitcher compact />
             <LanguageSwitcher />
             <Link to={signedIn ? '/app' : '/login'} className={buttonClass('secondary', 'sm')}>
               {signedIn ? t('Open app') : t('Sign in')}
@@ -77,7 +79,7 @@ export function Landing() {
 
         <section id="outcomes" aria-label={t('Possible outcomes')} className="mx-auto grid w-full max-w-[1200px] gap-4 px-4 pb-24 sm:grid-cols-3 sm:px-6">
           {OUTCOMES.map(({ Icon, title, body, cls }) => (
-            <div key={title} className="rounded-2xl border border-hairline bg-white p-6">
+            <div key={title} className="rounded-2xl border border-hairline bg-paper p-6">
               <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs ${cls}`}>
                 <Icon className="size-3.5" aria-hidden /> {t(title)}
               </span>
@@ -86,7 +88,7 @@ export function Landing() {
           ))}
         </section>
 
-        <section className="bg-obsidian">
+        <section className="bg-night">
           <div className="mx-auto w-full max-w-[1200px] px-4 py-20 sm:px-6">
             <p className="caption mb-4 !text-slate-400">{t('The idea')}</p>
             <p className="max-w-3xl text-[28px] leading-[1.14] text-white sm:text-[40px] sm:leading-[1.05]">{brand.pitch}</p>

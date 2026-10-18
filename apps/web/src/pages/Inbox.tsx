@@ -27,7 +27,7 @@ export function Inbox() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="min-w-0 break-words text-base font-semibold text-ink">{message.subject}</h2>
-                    {!message.readAt && <span className="rounded-md bg-highlighter px-2 py-0.5 text-xs text-ink">{t('New')}</span>}
+                    {!message.readAt && <span className="rounded-md bg-highlighter px-2 py-0.5 text-xs text-on-accent">{t('New')}</span>}
                   </div>
                   <p className="mt-1 break-all text-sm text-slate-600">{message.sender}</p>
                   <time dateTime={message.receivedAt} className="mt-1 block text-xs text-slate-500">{formatDateTime(message.receivedAt)}</time>

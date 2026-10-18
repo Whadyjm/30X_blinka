@@ -113,7 +113,7 @@ export function SkillIntegration() {
         <Button variant="secondary" className="shrink-0" onClick={() => setOpen(true)} icon={<ArrowUpRight className="size-4" aria-hidden />}>{t('Connect agent')}</Button>
       </div>
     </Card>
-    <dialog ref={dialog} onCancel={close} onClose={close} aria-labelledby="oli-skill-title" className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-full max-w-2xl overflow-hidden border-l border-hairline bg-white p-0 text-ink backdrop:bg-black/30">
+    <dialog ref={dialog} onCancel={close} onClose={close} aria-labelledby="oli-skill-title" className="fixed inset-y-0 left-auto right-0 m-0 h-dvh max-h-none w-full max-w-2xl overflow-hidden border-l border-hairline bg-paper p-0 text-ink backdrop:bg-black/30">
       <div className="flex h-full flex-col">
         <div className="flex shrink-0 items-start justify-between gap-4 border-b border-hairline p-5 sm:px-8 sm:py-6">
           <div><h2 id="oli-skill-title" className="text-xl">{t('Connect your agent to Oli')}</h2>

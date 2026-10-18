@@ -59,7 +59,7 @@ export function Dashboard() {
           <CardHeader
             title={t('Needs your attention')}
             subtitle={t('Approval requests, blocked invoices and corrections. Each label explains the next step.')}
-            action={!invoices.isLoading && stats.needsYouCount > 0 ? <span className="shrink-0 rounded-md bg-ink px-2.5 py-1 text-sm tabular-nums text-white">{stats.needsYouCount}</span> : undefined}
+            action={!invoices.isLoading && stats.needsYouCount > 0 ? <span className="shrink-0 rounded-md bg-ink px-2.5 py-1 text-sm tabular-nums text-on-ink">{stats.needsYouCount}</span> : undefined}
           />
           {invoices.isLoading ? <LoadingRows /> : list.length === 0 ? (
             <EmptyState title={t('Start with your first invoice')} body={t('Upload your first invoice and Oli will review it against your rules.')} action={<Link to="/app/bills" className={buttonClass('primary')}>{t('Upload invoices')}</Link>} />
@@ -132,9 +132,9 @@ export function Dashboard() {
 }
 
 const TONES = {
-  emerald: 'bg-highlighter text-ink',
-  rose: 'bg-ink text-white',
-  amber: 'bg-white text-ink ring-1 ring-inset ring-ink',
+  emerald: 'bg-highlighter text-on-accent',
+  rose: 'bg-ink text-on-ink',
+  amber: 'bg-paper text-ink ring-1 ring-inset ring-ink',
   indigo: 'bg-bone text-ink',
 } as const;
 
@@ -147,7 +147,7 @@ function Stat({ label, value, icon, tone, to, loading, breakdown }: {
   loading?: boolean;
   breakdown?: { label: string; count: number; tone: string }[];
 }) {
-  const className = 'rounded-2xl border border-hairline bg-white p-4 transition-colors hover:border-ink sm:p-5';
+  const className = 'rounded-2xl border border-hairline bg-paper p-4 transition-colors hover:border-ink sm:p-5';
   const content = <>
     <div className={`grid size-9 place-items-center rounded-lg ${TONES[tone]}`} aria-hidden>{icon}</div>
     {loading ? <Skeleton className="mt-3 h-8 w-12" /> : <p className="mt-3 text-[28px] leading-none tabular-nums text-ink">{value}</p>}

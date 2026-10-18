@@ -7,7 +7,7 @@ export function InvoiceTrashHistory({ invoiceId }: { invoiceId?: string }) {
   const history = useInvoiceTrash();
   const events = (history.data ?? []).filter(event => !invoiceId || event.invoiceId === invoiceId);
   if (!events.length) return null;
-  return <details className="rounded-xl border border-hairline bg-white p-5">
+  return <details className="rounded-xl border border-hairline bg-paper p-5">
     <summary className="min-h-11 cursor-pointer text-sm text-ink">{t('Deletion and restore history')}</summary>
     <p className="mb-3 text-xs text-ash">{t('The latest 20 movements. Earlier entries remain on record.')}</p>
     <ul className="divide-y divide-hairline">{events.slice(0, 20).map(event => <li key={event.id} className="space-y-1 py-3 text-sm [overflow-wrap:anywhere]">

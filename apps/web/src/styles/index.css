@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './theme.css';
 
 /*
  * OLI visual system — "Ramp" style reference.
@@ -29,6 +30,23 @@
   --color-hairline: #e5e7eb;
   --color-smoke: #d3d3d3;
   --color-canvas: #f4f2f0;
+  --color-on-accent: #0c0a08;
+  --color-on-ink: #ffffff;
+  --color-brand-ink: #0c0a08;
+  --color-logo-face: #e4f222;
+  --color-night: #1a1919;
+  --color-field-border: rgba(33, 33, 33, 0.15);
+  --color-status-block-surface: #fff1f2;
+  --color-status-block-ink: #9f1239;
+  --color-status-block-dot: #be123c;
+  --color-status-approval-surface: #fffbeb;
+  --color-status-approval-ink: #92400e;
+  --color-status-approval-dot: #b45309;
+  --color-status-review-surface: #eff6ff;
+  --color-status-review-ink: #1e40af;
+  --color-status-review-dot: #1d4ed8;
+  --color-skeleton-base: #ece9e6;
+  --color-skeleton-peak: #f4f2f0;
 
   /* Radii: tags/buttons 6, inputs 10, wash 12, cards 16. No pills on UI elements. */
   --radius-sm: 4px;
@@ -113,7 +131,7 @@
     color-scheme: light;
   }
   body {
-    @apply bg-bone text-ink antialiased;
+    @apply bg-canvas text-ink antialiased;
     font-family: var(--font-sans);
     font-weight: 400;
     font-feature-settings: 'ss01' on;
@@ -122,7 +140,7 @@
   h2,
   h3,
   h4 {
-    color: var(--color-ink);
+    color: inherit;
     font-weight: 400;
     font-feature-settings: 'ss01' on;
   }
@@ -235,7 +253,7 @@ a {
   }
 }
 .skeleton {
-  background: linear-gradient(90deg, #ece9e6 25%, #f4f2f0 50%, #ece9e6 75%);
+  background: linear-gradient(90deg, var(--color-skeleton-base) 25%, var(--color-skeleton-peak) 50%, var(--color-skeleton-base) 75%);
   background-size: 200% 100%;
   animation: oli-shimmer 1.4s infinite linear;
 }

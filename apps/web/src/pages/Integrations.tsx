@@ -54,7 +54,7 @@ export function Integrations() {
           <section aria-labelledby="telegram-title">
             <div className="mb-6 flex items-center justify-between gap-4">
               <Send className="size-8 text-ink" strokeWidth={1.5} aria-hidden />
-              <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs ${connection ? 'bg-highlighter text-ink' : 'bg-bone text-slate-600'}`}>
+              <span className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs ${connection ? 'bg-highlighter text-on-accent' : 'bg-bone text-slate-600'}`}>
                 {connection && <Check className="size-3.5" aria-hidden />}
                 {connection ? t('Connected') : t('Not connected')}
               </span>
