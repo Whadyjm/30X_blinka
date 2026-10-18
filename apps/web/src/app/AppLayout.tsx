@@ -74,10 +74,10 @@ export function AppLayout() {
           end={it.end}
           onClick={() => setOpen(false)}
           className={({ isActive }) =>
-            cn('flex items-center gap-3 rounded-md px-3 py-2 text-sm', isActive ? 'bg-highlighter text-on-accent' : 'text-slate-700 hover:bg-bone')
+            cn('oli-nav-link flex items-center gap-3 rounded-md px-3 py-2 text-sm', isActive ? 'bg-highlighter text-on-accent' : 'text-slate-700 hover:bg-bone')
           }
         >
-          <it.icon className="size-5" aria-hidden />
+          <it.icon className="oli-nav-icon size-5" aria-hidden />
           <span className="flex-1">{t(it.label)}</span>
           {it.badge ? (
             <span className="rounded-md bg-ink px-2 py-0.5 text-xs text-on-ink" aria-label={t('{n} pending', { n: it.badge })}>
