@@ -1,0 +1,83 @@
+{
+  "featureCommit": "f1aaf16",
+  "published": {
+    "date": "2026-10-18T01:43:55.670Z",
+    "host": "https://oli30x.ultramare.dev",
+    "commit": "f1aaf16",
+    "version": "63b2781a-b3e6-4739-8bd4-f9f99e5733a1",
+    "scope": "Lecturas autenticadas reales; botón comprobado sin pulsarlo. Cero relecturas, decisiones o cambios de factura en producción por esta prueba.",
+    "invoiceId": "inv_0c4ba2f0-f239-4129-babe-febd3dd004dc",
+    "buttonEnabled": true,
+    "originalAlreadyStored": true,
+    "viewports": [
+      1440,
+      390
+    ],
+    "invoiceUnchanged": true,
+    "actualInvoiceMutationsToServer": 0,
+    "errors": [],
+    "result": "PASS"
+  },
+  "localUi": {
+    "scope": "Fixtures controlados en navegador local; no relecturas en producción",
+    "viewports": [
+      1440,
+      390
+    ],
+    "enabledForUncertainRead": true,
+    "expectedDecisionAndPolicy": true,
+    "processingDisablesRepeat": true,
+    "pollsDespiteOldDecision": true,
+    "historyRetained": true,
+    "approvalAvailableAfterEligibleReading": true,
+    "errors": [],
+    "result": "PASS"
+  },
+  "validation": {
+    "frontendTests": {
+      "files": 14,
+      "passed": 57
+    },
+    "apiSequentialCore": {
+      "passed": 89,
+      "files": [
+        "integration.test.mjs",
+        "jobs.test.mjs",
+        "chat.test.mjs",
+        "telegram.test.mjs"
+      ],
+      "scope": "Incluye cinco casos nuevos de relectura: corrección archivada, incertidumbre, rol/concurrencia, límites de intentos y documento no factura. Proveedores simulados, D1 local; no mide exactitud del extractor real."
+    },
+    "initialParallelApiSuite": {
+      "passed": 143,
+      "failed": 5,
+      "explanation": "Cuatro ETIMEDOUT en conexiones locales de Miniflare y un fallo de confirmación Telegram bajo carga. Los cinco casos pasaron al ejecutar sus cuatro archivos de forma secuencial (89/89)."
+    },
+    "packagedWorkerWorkerd": {
+      "passed": 1,
+      "scope": "Worker compilado con dependencias de release, D1/R2/cola y proveedor simulado."
+    },
+    "typecheck": "PASS",
+    "build": "PASS",
+    "dryRun": "PASS",
+    "spanishKeys": 937
+  },
+  "migration": {
+    "name": "0011_invoice_rereads.sql",
+    "remoteApplied": true,
+    "scope": "Historial de lecturas append-only y excepciones acotadas para proyección/reapertura de job. Documento y decisiones previas permanecen inmutables; sin reinicio de intentos."
+  },
+  "runtime": {
+    "matchesBuiltCandidate": true,
+    "bindingsPreserved": true,
+    "sha256": "132e97189fc648d09e3b447f7003e80bb8192b5bab84642621fe08a4828207ac",
+    "basePublishedSourceFilesVerified": 29,
+    "baseSourceCommit": "94cfc5f77d2b81a7847591a5a47ebfcf184b7730",
+    "baseBundleSha256": "f15093451248c557318905647159ee746f50895c2d539be14ccd144df7cb4b6c"
+  },
+  "limitations": [
+    "No se pulsó Volver a leer original en producción; Orlando conserva la decisión/lectura anterior hasta que el usuario lo inicie.",
+    "Una relectura no garantiza autorización: se validan clasificación, corroboración, identidad, duplicados, reglas y presupuesto.",
+    "Se conserva el máximo vitalicio de intentos del job y la cuota/cooldown por hash."
+  ]
+}
