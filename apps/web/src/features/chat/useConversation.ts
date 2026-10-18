@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChatMessageInputSchema, type ChatChannel, type ChatReply } from '@oli/contracts';
-import { api, errorMessage } from '@/api';
+import { api, ApiError, errorMessage } from '@/api';
 import { invalidateMoney } from '@/hooks/queries';
 import { submitChat, type Submission } from './submission';
 
@@ -12,7 +12,7 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   const operation = useRef<Submission | null>(null);
   const locked = useRef(false);
   const [sending, setSending] = useState(false);
-  const [failure, setFailure] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
   const [freshReply, setFreshReply] = useState<{ scope: string; turnId: string } | null>(null);
   const finishReveal = useCallback((turnId: string) => setFreshReply(current => current?.turnId === turnId ? null : current), []);
   const storageKey = `oli.chat.pending:${scope}:${channel}`;
@@ -46,6 +46,11 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
     }
   };
 
+  const clearPending = () => {
+    operation.current = null; setPending(null);
+    try { sessionStorage.removeItem(storageKey); } catch { /* Optional storage. */ }
+  };
+
   const deliver = async () => {
     if (locked.current || !operation.current) return;
     locked.current = true; setSending(true); setFailure(null);
@@ -53,10 +58,14 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
       const current = operation.current;
       const reply = await submitChat(api, current, checkpoint);
       rememberReply(reply, current);
-      try { sessionStorage.removeItem(storageKey); } catch { /* Optional storage. */ }
-      operation.current = null; setPending(null);
+      clearPending();
     } catch (error) {
-      setFailure(errorMessage(error));
+      setFailure(error);
+      if (error instanceof ApiError && error.code === 'CHAT_RETRY_LIMIT') {
+        clearPending();
+        if (id) void history.refetch();
+        void conversations.refetch();
+      }
     } finally {
       locked.current = false; setSending(false);
       void invalidateMoney(qc);
@@ -80,7 +89,8 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   return {
     id, conversations: conversations.data ?? [], revealTurnId: freshReply?.scope === scope ? freshReply.turnId : null, finishReveal,
     turns: history.data?.turns ?? [], pending, sending, loading, processing,
-    error: failure ?? (conversations.error ? errorMessage(conversations.error) : history.error ? errorMessage(history.error) : null),
+    error: failure ? errorMessage(failure) : conversations.error ? errorMessage(conversations.error) : history.error ? errorMessage(history.error) : null,
+    canRetry: !(failure instanceof ApiError && failure.code === 'CHAT_RETRY_LIMIT'),
     canSend: channel === 'WEB' && !!scope && !loading && !sending && !processing && !pending && !conversations.isError && !history.isError,
     async send(text: string, files: File[]) {
       if (channel !== 'WEB' || locked.current || operation.current) return;
@@ -90,13 +100,12 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
     },
     dismiss() {
       if (locked.current) return;
-      operation.current = null; setPending(null); setFailure(null);
-      try { sessionStorage.removeItem(storageKey); } catch { /* Optional storage. */ }
+      clearPending(); setFailure(null);
       if (id) void history.refetch();
       void conversations.refetch();
     },
     retry: () => operation.current ? deliver() : conversations.isError || !id ? conversations.refetch() : history.refetch(),
     selectConversation(next: string) { if (!locked.current && !operation.current && conversations.data?.some(c => c.id === next && c.channel === channel)) { setFreshReply(null); setSelection({ scope, id: next }); setFailure(null); } },
-    newConversation() { if (channel === 'WEB' && !locked.current && !operation.current) { setFreshReply(null); setSelection({ scope, id: null }); setFailure(null); } },
+    newConversation() { if (channel === 'WEB' && !locked.current) { clearPending(); setFreshReply(null); setSelection({ scope, id: null }); setFailure(null); } },
   };
 }

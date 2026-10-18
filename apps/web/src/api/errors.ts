@@ -46,6 +46,7 @@ export class ContractError extends Error {
 /** Short, human, non-leaky message for the UI. */
 export function errorMessage(e: unknown): string {
   if (e instanceof ApiError) {
+    if (e.code === 'CHAT_RETRY_LIMIT') return t('This message has reached its retry limit. You can write a new message or start a new conversation.');
     if (e.isNetwork) return t('Can’t reach the server. Check your connection and try again.');
     if (e.isForbidden) return e.message || t('You don’t have permission to do that.');
     return e.message || t('Something went wrong.');

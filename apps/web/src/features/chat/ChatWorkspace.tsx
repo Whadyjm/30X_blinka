@@ -48,7 +48,7 @@ export function ChatWorkspace() {
   const webTabs = web.id === null ? [{ id: null, title: t('New conversation') }, ...openThreads] : openThreads;
   const webTabId = (id: string | null) => `web-thread-${id ?? 'new'}`;
   const selectWebConversation = (id: string | null) => {
-    if (busy || web.pending || id === web.id) return;
+    if ((id === null ? web.sending || web.loading : busy || !!web.pending) || (id !== null && id === web.id)) return;
     drafts.current.set(web.id, { text: draft, files });
     const saved = drafts.current.get(id);
     setDraft(saved?.text ?? ''); setFiles(saved?.files ?? []); setInputError(null);
@@ -150,7 +150,7 @@ export function ChatWorkspace() {
                 onClick={e => { rememberClosed(closedIds.filter(id => id !== thread.id)); selectWebConversation(thread.id); e.currentTarget.closest('details')!.open = false; tabToFocus.current = thread.id; }}>{thread.title || t('Invoice conversation')}</button>)}
             </div>
           </details>}
-          {channel === 'WEB' && <button type="button" disabled={busy || !!web.pending} onClick={() => selectWebConversation(null)}
+          {channel === 'WEB' && <button type="button" disabled={web.sending || web.loading} onClick={() => selectWebConversation(null)}
             className="grid size-11 place-items-center rounded-md text-ink hover:bg-bone disabled:opacity-40" aria-label={t('New conversation')} title={t('New conversation')}><Plus className="size-5" aria-hidden /></button>}
         </div>
       </div>
@@ -215,7 +215,7 @@ export function ChatWorkspace() {
       {!nearBottom && !empty && <button type="button" onClick={() => { shouldFollow.current = true; log.current?.scrollTo({ top: log.current.scrollHeight, behavior: 'smooth' }); }} aria-label={t('Go to latest message')}
         className="absolute bottom-40 right-5 grid size-11 place-items-center rounded-full border border-hairline bg-paper text-ink"><ArrowDown className="size-5" aria-hidden /></button>}
       <div className="chat-composer shrink-0 border-t border-hairline bg-paper px-3 pt-3 md:px-6">
-        {conversation.error && <div role="alert" className="mb-2 space-y-2 text-sm text-ink"><p>{conversation.error}</p><button className={buttonClass('secondary', 'sm')} disabled={conversation.sending} onClick={() => void conversation.retry()}>{t('Retry')}</button>
+        {conversation.error && <div role="alert" className="mb-2 space-y-2 text-sm text-ink"><p>{conversation.error}</p>{conversation.canRetry && <button className={buttonClass('secondary', 'sm')} disabled={conversation.sending} onClick={() => void conversation.retry()}>{t('Retry')}</button>}
           {conversation.pending && <button className={buttonClass('ghost', 'sm')} disabled={conversation.sending} onClick={conversation.dismiss}>{t('Dismiss failed message')}</button>}</div>}
         {channel === 'TELEGRAM' ? <div className="flex flex-wrap items-center justify-between gap-2 py-2">
           <p className="text-sm text-slate-600">{t('This conversation continues in Telegram.')}</p>
