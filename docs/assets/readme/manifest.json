@@ -1,0 +1,85 @@
+{
+  "capturedAt": "2026-10-18T13:10:16.975Z",
+  "application": "https://oli30x.ultramare.dev",
+  "repositorySourceCommit": "22b36a7",
+  "scope": "Read-only screenshots with fictitious demo data. Session sign-in and revocation only; no business changes or model requests. Screenshots are illustrative UI documentation, not new extraction or decision metrics.",
+  "javascriptErrors": [],
+  "sessionsRevoked": true,
+  "images": [
+    {
+      "file": "conversacion.png",
+      "width": 1440,
+      "height": 900,
+      "sizeBytes": 102584,
+      "sha256": "fd8df81674416a7d5a61a8dbcd7f7d2a94ad36378f1e942e0347aca38df615ea",
+      "source": "published-application",
+      "route": "/app"
+    },
+    {
+      "file": "dashboard.png",
+      "width": 1440,
+      "height": 1000,
+      "sizeBytes": 170194,
+      "sha256": "386fb69246db2e52d1e643815142f1543f4a8c269f323352a851a82fd6cba90b",
+      "source": "published-application",
+      "route": "/app/dashboard"
+    },
+    {
+      "file": "decision.png",
+      "width": 1440,
+      "height": 1050,
+      "sizeBytes": 175716,
+      "sha256": "1c25440a86fb85b7dcf891cd4ef35b745c3a541c986a2942467129d68bc7f536",
+      "source": "published-application",
+      "route": "/app/bills/inv_dc9898ef-9d51-4762-a5f3-eb4e1d2600dc"
+    },
+    {
+      "file": "movil.png",
+      "width": 390,
+      "height": 844,
+      "sizeBytes": 55652,
+      "sha256": "1fbcb2e5436f8454f5d2ac3c52a360a88c3feb3c01366bcf083b816240c393b1",
+      "source": "published-application",
+      "route": "/app"
+    },
+    {
+      "file": "oli-expresiones.png",
+      "width": 1440,
+      "height": 350,
+      "sizeBytes": 109814,
+      "sha256": "0590272ce450ddb50fb0ee2f9da1bf2f3c7ddd8aa3136b9b16b575c823a96ad2",
+      "source": "project-mascot-renderer",
+      "composition": "cover.html",
+      "view": "expressions"
+    },
+    {
+      "file": "oli-portada.png",
+      "width": 1440,
+      "height": 560,
+      "sizeBytes": 123182,
+      "sha256": "eb2a1cd5f2b79cd510b2ce73a7f8057ab51f7062e304724baf50bc7d4633fc59",
+      "source": "project-mascot-renderer",
+      "composition": "cover.html",
+      "view": "hero"
+    },
+    {
+      "file": "reglas.png",
+      "width": 1440,
+      "height": 1000,
+      "sizeBytes": 96847,
+      "sha256": "d6a5884ef6b03d34f6830eac833a5d7d543a185554594dd4e5ec9748f3af646a",
+      "source": "published-application",
+      "route": "/app/rules"
+    },
+    {
+      "file": "oli-portada-movil.png",
+      "width": 720,
+      "height": 840,
+      "sizeBytes": 107693,
+      "sha256": "da42c2d31f48bd0e1adf65c72f0ccaefe84c58780cc087e0c1e6cca39b0dfef9",
+      "source": "project-mascot-renderer",
+      "composition": "cover.html",
+      "view": "mobile"
+    }
+  ]
+}
