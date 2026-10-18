@@ -1,8 +1,8 @@
 export const esChat: Record<string, string> = {
+  'I could not finish this request. We can make one change first and then the next, or register up to 20 vendors together. No changes were applied.': 'No pude terminar esta solicitud. Podemos hacer primero un cambio y después el siguiente, o registrar hasta 20 proveedores juntos. No se ejecutó ningún cambio.',
   'This reply was written while invoices were processing. See their current status below.': 'Esta respuesta se escribió mientras se procesaban las facturas. Consulta su estado actual debajo.',
   'This message has reached its retry limit. You can write a new message or start a new conversation.': 'Este mensaje agotó sus reintentos. Puedes escribir otro mensaje o abrir una conversación nueva.',
   'Register vendors': 'Registrar proveedores por lote',
-  'Oli reached the limit of queries or proposals for this message. Ask for a batch of up to 20 vendors, or split other tasks into smaller steps. No changes were applied.': 'Oli alcanzó el límite de consultas o propuestas de este mensaje. Pide un lote de hasta 20 proveedores o divide las otras tareas en pasos más pequeños. No se ejecutó ningún cambio.',
   'Conversations': 'Conversaciones',
   'Show Telegram conversation on Home': 'Ver conversación de Telegram en Home',
   'Only changes this browser’s view. Your Telegram bot stays connected.': 'Solo cambia la vista en este navegador. Tu bot de Telegram sigue conectado.',

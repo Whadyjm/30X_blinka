@@ -1,4 +1,5 @@
 export const esOnboarding: Record<string, string> = {
+  'This sample uses USD. Upload an invoice in your rules’ currency instead.': 'Este ejemplo usa USD. Sube una factura en la moneda de tus reglas.',
   'Approval': 'Aprobación',
   'Budget': 'Presupuesto',
   'Checks': 'Comprobaciones',

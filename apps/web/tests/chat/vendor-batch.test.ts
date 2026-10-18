@@ -22,9 +22,10 @@ it('renders all proposed vendor names and explicit permissions before batch conf
   client.clear();
 });
 
-it('a failed turn still explains the tool limit after reloading its history', () => {
+it('a failed turn gives a concrete next step after reloading its history', () => {
   applyLang('es');
-  expect(chatFailureMessage('CHAT_TOOL_LIMIT')).toContain('límite de consultas o propuestas');
+  expect(chatFailureMessage('CHAT_TOOL_LIMIT')).toContain('primero un cambio');
+  expect(chatFailureMessage('CHAT_TOOL_LIMIT')).not.toMatch(/rondas|límite de consultas|CHAT_TOOL_LIMIT/);
   expect(chatFailureMessage('CHAT_TOOL_LIMIT')).toContain('hasta 20 proveedores');
   expect(chatFailureMessage('CHAT_TOOL_LIMIT')).toContain('No se ejecutó ningún cambio');
   expect(chatFailureMessage('CHAT_UNAVAILABLE')).not.toContain('CHAT_UNAVAILABLE');

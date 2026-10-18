@@ -19,6 +19,16 @@ export function readingNeedsReview(decision: PolicyDecision): boolean {
   return reading ? reading.result !== 'PASS' : decision.reasons.includes('INVALID_OR_MISSING_DATA');
 }
 
+/** A value being present does not mean it has been checked against the document. */
+export function unverifiedExtractionFields(extracted?: ExtractedInvoice | null): Set<string> {
+  const warnings = extracted?.extractionWarnings ?? [];
+  if (warnings.some(w => /^INDEPENDENT_READ_(?:UNAVAILABLE|MISMATCH):\*$/.test(w) || w === 'INDEPENDENT_OCR_UNCERTAIN')) {
+    return new Set(Object.keys(FIELD_LABELS));
+  }
+  return new Set(warnings.flatMap(w => [...w.matchAll(/(?:INDEPENDENT_READ_MISMATCH|INDEPENDENT_READ_UNAVAILABLE|FIELD_MISMATCH|CORROBORATION_FIELD_UNAVAILABLE):([a-zA-Z]+)/g)]
+    .map(match => match[1]!).filter(field => FIELD_LABELS[field])));
+}
+
 /** Presentation only: describe uncertainty without changing the recorded result. */
 export function extractionExplanation(extracted?: ExtractedInvoice | null, step?: TraceStep): string[] {
   let issues = '';
@@ -30,6 +40,7 @@ export function extractionExplanation(extracted?: ExtractedInvoice | null, step?
   } catch { /* Unknown evidence stays available in Logs. */ }
 
   const warnings = extracted?.extractionWarnings ?? [];
+  const checkingUnavailable = warnings.includes('INDEPENDENT_READ_UNAVAILABLE:*');
   const signals = [issues, ...warnings].join(', ');
   const mismatches = new Set<string>();
   const missing = new Set<string>();
@@ -46,16 +57,17 @@ export function extractionExplanation(extracted?: ExtractedInvoice | null, step?
   const fields = (keys: Set<string>) => new Intl.ListFormat(getLocale(), { style: 'long', type: 'conjunction' })
     .format([...keys].map(key => t(FIELD_LABELS[key]!)));
   const messages: string[] = [];
+  if (checkingUnavailable) messages.push(t('I read the invoice details, but could not finish checking them. It stays in review. Use “Read original again” to retry, or check the original before confirming the details.'));
   if (mismatches.size) messages.push(t('Please check these invoice details: {fields}. I could not confirm them confidently; this does not mean your invoice is wrong.', { fields: fields(mismatches) }));
   if (unconfirmed.size) messages.push(t('I found these details but could not fully check them: {fields}. You can review them against the original document.', { fields: fields(unconfirmed) }));
   if (missing.size) messages.push(t('I could not read these required details: {fields}.', { fields: fields(missing) }));
-  if (/CORROBORATION_REQUIRED|SOURCE_MISMATCH|SAME_READ|INVALID_SOURCE/.test(issues)) {
+  if (!checkingUnavailable && /CORROBORATION_REQUIRED|SOURCE_MISMATCH|SAME_READ|INVALID_SOURCE/.test(issues)) {
     messages.push(t('I could not finish checking the document. You can review its details yourself or ask me to try again.'));
   }
   for (const note of READING_NOTES) {
     if (warnings.some(w => note.pattern.test(w))) messages.push(t(note.message));
   }
-  if (warnings.some(w => !/^INDEPENDENT_READ_(?:MISMATCH|UNAVAILABLE):[a-zA-Z]+$/.test(w)
+  if (warnings.some(w => !/^INDEPENDENT_READ_(?:MISMATCH|UNAVAILABLE):(?:[a-zA-Z]+|\*)$/.test(w)
     && !READING_NOTES.some(note => note.pattern.test(w)))) {
     messages.push(t('There are other details that need your attention. You can see the full notes in Logs.'));
   }

@@ -263,7 +263,8 @@ test('Telegram conserva la explicación específica de CHAT_TOOL_LIMIT', async t
   tooMany.tool_calls = Array.from({ length: 5 }, () => tool('list_vendors', {}).tool_calls[0]);
   s.modelSteps.push(tooMany);
   await s.webhook(s.update({ text: 'Una petición con demasiadas acciones' })); await s.drain();
-  assert.match(s.sent.at(-1).text, /máximo de 4/);
+  assert.match(s.sent.at(-1).text, /necesita más pasos/);
+  assert.match(s.sent.at(-1).text, /primero un cambio/);
   assert.match(s.sent.at(-1).text, /lote de hasta 20/);
   assert.match(s.sent.at(-1).text, /No se ejecutó ningún cambio/);
 });

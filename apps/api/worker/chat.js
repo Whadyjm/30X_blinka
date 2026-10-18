@@ -28,11 +28,14 @@ export async function completeChat(env, session, history, input, channel = 'web'
       : 'Recibí tus facturas. Las tarjetas muestran el progreso y se actualizan al terminar. Consulta ahí el resultado de cada una.',
     cards, prepared, calls, rounds: 0 };
   }
-  const messages = [{ role: 'system', content: chatPrompt(session, channel) }, ...history,
+  const activePolicy = await stmt(env.DB, "SELECT version, policy_json FROM policy_versions WHERE org_id = ? AND status = 'ACTIVE'", session.organization.id).first();
+  const policy = activePolicy ? { version: activePolicy.version, rules: JSON.parse(activePolicy.policy_json) } : null;
+  const messages = [{ role: 'system', content: chatPrompt(session, channel, policy) }, ...history,
     { role: 'user', content: JSON.stringify({ message: input.text, attachedInvoices: cards.map(modelCard) }) }];
   const deadline = Date.now() + 35_000;
   let toolCount = 0;
-  for (let round = 0; round < 3; round++) {
+  // Three tool rounds plus one text-only finish; the deadline and four-tool budget still apply.
+  for (let round = 0; round < 4; round++) {
     const remaining = Math.min(20_000, deadline - Date.now());
     if (remaining < 500) throw new HttpError(504, 'CHAT_TIMEOUT');
     let payload;
@@ -40,7 +43,7 @@ export async function completeChat(env, session, history, input, channel = 'web'
       const response = await meteredFetch(env.DB, session.organization.id, 'CHAT')('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST', signal: AbortSignal.timeout(remaining),
         headers: { Authorization: `Bearer ${env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: MODEL, messages, tools: toolsFor(session), tool_choice: 'auto',
+        body: JSON.stringify({ model: MODEL, messages, tools: round === 3 ? [] : toolsFor(session), tool_choice: round === 3 ? 'none' : 'auto',
           temperature: 0, max_tokens: 3000, stream: false, provider: { require_parameters: true } }),
       });
       if (!response.ok) { await response.body?.cancel(); throw new HttpError(response.status === 429 ? 503 : 502, 'CHAT_PROVIDER_UNAVAILABLE'); }
@@ -56,8 +59,10 @@ export async function completeChat(env, session, history, input, channel = 'web'
       if (typeof msg.content !== 'string' || !msg.content.trim() || msg.content.length > 8000) throw new HttpError(502, 'CHAT_INVALID_OUTPUT');
       return { text: msg.content, cards, prepared, calls, rounds: round + 1 };
     }
+    if (round === 3) throw new HttpError(502, 'CHAT_TOOL_LIMIT',
+      'No pude completar la solicitud. Vamos por partes: pide primero un cambio y después el siguiente. No se ejecutó ningún cambio.');
     if (!Array.isArray(msg.tool_calls) || (toolCount += msg.tool_calls.length) > 4) throw new HttpError(502, 'CHAT_TOOL_LIMIT',
-      'Esta solicitud superó el máximo de 4 consultas o propuestas por mensaje. Para registrar varios proveedores, pide un lote de hasta 20; para otras tareas, divide la solicitud en pasos más pequeños. No se ejecutó ningún cambio.');
+      'Esta solicitud necesita más pasos. Podemos hacer primero un cambio, o registrar proveedores en un lote de hasta 20. No se ejecutó ningún cambio.');
     messages.push({ role: 'assistant', content: typeof msg.content === 'string' ? msg.content : null, tool_calls: msg.tool_calls });
     const usedIds = new Set();
     for (const call of msg.tool_calls) {
@@ -83,7 +88,7 @@ export async function completeChat(env, session, history, input, channel = 'web'
     }
   }
   throw new HttpError(502, 'CHAT_TOOL_LIMIT',
-    'Alcancé el máximo de 3 rondas de consultas para responder a este mensaje y no pude terminar. Divide la solicitud en pasos más pequeños; los proveedores pueden agruparse en lotes de hasta 20. No se ejecutó ningún cambio.');
+    'No pude completar la solicitud. Vamos por partes: pide primero un cambio y después el siguiente. No se ejecutó ningún cambio.');
 }
 
 async function conversation(env, session, conversationId, channel = null) {

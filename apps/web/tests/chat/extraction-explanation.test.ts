@@ -6,7 +6,7 @@ import { ExtractionPanel } from '../../src/components/ExtractionPanel';
 import { InvoiceLogs } from '../../src/components/InvoiceLogs';
 import { ExtractedInvoiceSchema, InvoiceDetailSchema, PolicyDecisionSchema } from '../../src/contracts';
 import { applyLang } from '../../src/i18n';
-import { extractionExplanation, invoiceExplanation, readingNeedsReview } from '../../src/lib/extraction-explanation';
+import { extractionExplanation, invoiceExplanation, readingNeedsReview, unverifiedExtractionFields } from '../../src/lib/extraction-explanation';
 
 const extracted = ExtractedInvoiceSchema.parse({
   vendorName: 'Empresa de logística, S. L.', invoiceNumber: '2024-0001',
@@ -26,6 +26,28 @@ const decision = PolicyDecisionSchema.parse({
 });
 
 afterEach(() => applyLang('en'));
+
+it('preserves read values and gives a concrete retry when checking is unavailable', () => {
+  applyLang('es');
+  const read = { ...extracted, extractionWarnings: ['INDEPENDENT_READ_UNAVAILABLE:*'] };
+  const before = JSON.stringify(read);
+  const messages = extractionExplanation(read, { rule: 'EXTRACTION', result: 'WARN', evidence: '{"issues":"CORROBORATION_REQUIRED:*"}' });
+  expect(messages).toHaveLength(1);
+  expect(messages[0]).toContain('Leí los datos');
+  expect(messages[0]).toContain('Volver a leer original');
+  expect(messages[0]).toContain('Quedó en revisión');
+  expect(messages.join(' ')).not.toMatch(/Qwen|429|INDEPENDENT|corrobor/i);
+  expect(JSON.stringify(read)).toBe(before);
+});
+
+it('marks an inferred or differing currency as unchecked even when its value is present', () => {
+  const read = { ...extracted, currency: 'USD', extractionWarnings: ['INDEPENDENT_READ_UNAVAILABLE:currency'] };
+  expect([...unverifiedExtractionFields(read)]).toEqual(['currency']);
+  expect(read.currency).toBe('USD');
+  expect(unverifiedExtractionFields({ ...read, extractionWarnings: ['INDEPENDENT_READ_MISMATCH:currency'] }).has('currency')).toBe(true);
+  expect(unverifiedExtractionFields({ ...read, extractionWarnings: [] }).size).toBe(0);
+  expect(unverifiedExtractionFields({ ...read, extractionWarnings: ['INDEPENDENT_READ_UNAVAILABLE:*'] }).has('currency')).toBe(true);
+});
 
 it('explains the reported invoice in Spanish without architecture jargon or blaming the invoice', () => {
   applyLang('es');

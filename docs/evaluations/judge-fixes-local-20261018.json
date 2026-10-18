@@ -1,0 +1,139 @@
+{
+  "scope": "BRANCH_LOCAL_RETEST_WITH_CONTROLLED_MODEL_AND_PDF_CONVERSION_RESPONSES_NOT_A_NEW_LIVE_OCR_EVALUATION",
+  "branch": "fix/judge-experience-20261018",
+  "baseCommit": "8d5fd26edcbd6cf233e639147280dcd50238c545",
+  "productionChanged": false,
+  "pushed": false,
+  "deployed": false,
+  "fixes": [
+    {
+      "finding": "Onboarding sample blocked",
+      "change": "Added matching Demo Cloud Hosting vendor/agreement and separate PDF without another tenant agreement ID. Non-USD policies get an explicit sample warning.",
+      "verified": "Fresh organization + ordinary API directory/policy/upload/process yields APPROVE and one USD200 reservation with a new agreement ID."
+    },
+    {
+      "finding": "Chat omitted global limits",
+      "change": "Current organization policy is queried on every conversation turn and included separately from agreements and budget.",
+      "verified": "Regression changes policy through API and checks that the next model request contains new limits."
+    },
+    {
+      "finding": "Third tool round discarded prepared proposal",
+      "change": "Retained three tool rounds and four-tool/35s limits; added one text-only completion request with tools disabled. Atomic ONBOARD_INVOICE_VENDOR is explicitly guided in the prompt.",
+      "verified": "Prepared third-round proposal returns PENDING without vendor mutation; explicit confirmation resolves same invoice. A provider requesting more tools during final completion is rejected without publishing proposals."
+    },
+    {
+      "finding": "Image checking failure hard to understand",
+      "change": "Explains that values were read but checking was unavailable, keeps review, and names retry/original-review actions. Failed-turn history gives a plain recovery step.",
+      "verified": "UI regression preserves extracted values and omits provider codes and internal architecture."
+    },
+    {
+      "finding": "Currency inferred as USD could be confirmed unnoticed",
+      "change": "Adds a currency row, per-field unchecked markers and a warning that $ alone does not prove USD.",
+      "verified": "Browser checks warning visible, checkbox unchecked and confirmation disabled; desktop/mobile fit."
+    }
+  ],
+  "browser": {
+    "scope": "LOCAL_CANDIDATE_REAL_WORKER_D1_R2_WITH_CONTROLLED_PROVIDER_RESPONSES_NOT_LIVE_OCR",
+    "checks": [
+      {
+        "name": "Fresh onboarding example is approved with the newly created directory",
+        "pass": true,
+        "action": "APPROVE"
+      },
+      {
+        "name": "Currency warning appears beside unchecked confirmation",
+        "pass": true,
+        "text": "¿Quieres aprobar esta factura?\n\nNo pude comprobar del todo esta factura, pero tú puedes revisarla y decidir. Si confirmas, registraré tu aprobación después de comprobar las reglas de gasto.\n\nProveedor\nDemo Cloud Hosting (ficticio)\nNúmero de factura\n5c80063a-c2ef-48bb-b7ee-1f23a3eb2f81\nMonto\n$200.00 USD\nMoneda\nUSD\nSin comprobar en el original\nFecha de vencimiento\n31 oct 2026\nFecha de emisión\n17 oct 2026\nPeriodo del servicio\n2026-10\nDescripción\nHosting mensual ficticio\nLa moneda que aparece aquí no está comprobada. Un símbolo como $ no identifica por sí solo USD. Confirma la moneda con el emisor antes de aprobar.\nAbrir original\nRevisé estos datos en el documento original y quiero aprobar esta factura.\nAgrega una nota (opcional)\nSí, aprobar factura\nDejar en revisión\n\nTu nombre y tu confirmación quedarán registrados. Esto autoriza la factura; no se envía dinero."
+      },
+      {
+        "name": "Third-round proposal finishes with a pending card, without executing",
+        "pass": true
+      },
+      {
+        "name": "Explicit proposal confirmation resolves the same invoice and keeps its block",
+        "pass": true
+      },
+      {
+        "name": "Currency modal fits viewport",
+        "width": 1440,
+        "pass": true
+      },
+      {
+        "name": "Currency modal fits viewport",
+        "width": 390,
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "sampleInvoiceId": "inv_147576ad-c8b8-48b3-bcc9-ebf46a3a94dd",
+    "uncertainId": "inv_b5ce03f4-ed51-4d78-8752-c209b2e39ff5",
+    "unknownId": "inv_1ee8d921-0414-444c-9417-4e418dd9c744",
+    "pass": true
+  },
+  "validation": {
+    "frontendTests": {
+      "passed": 74,
+      "total": 74
+    },
+    "chatTargeted": {
+      "passed": 24,
+      "total": 24
+    },
+    "onboardingTargeted": {
+      "passed": 1,
+      "total": 1
+    },
+    "domainContractsExtraction": {
+      "passed": 139,
+      "total": 139
+    },
+    "d1": {
+      "passed": 14,
+      "total": 14
+    },
+    "workerRuntime": {
+      "passed": 1,
+      "total": 1
+    },
+    "frontendBuild": "PASS including TypeScript",
+    "workerPackaging": "PASS wrangler deploy --dry-run; no upload",
+    "interfaceDetector": [],
+    "fullApi": {
+      "passed": 166,
+      "total": 167,
+      "failed": 1,
+      "failure": "Pre-existing historical report SHA256 mismatch; unchanged from main."
+    }
+  },
+  "limits": [
+    "No new production calls to OCR/chat providers; their availability and natural responses are not measured by controlled-provider tests.",
+    "The previous production corpus metrics are unchanged; do not compare local controlled results as a new accuracy percentage.",
+    "Qwen429 availability is not fixed; safety still sends uncertain reads to review.",
+    "Historical report SHA256 mismatch remains outside these fixes.",
+    "Concurrent main checkout changes are not included; reconcile them before any release."
+  ],
+  "nextGate": "Retest with real providers before deciding push/deploy.",
+  "rawEvidenceDirectory": "/tmp/oli-judge-fixes-results",
+  "sourceSha256": {
+    "apps/api/worker/chat.js": "e6b30b60729b2c71aae0c265977b0e057afeaa9dd242834cdae609a2e96bc30b",
+    "apps/api/worker/chat-prompt.js": "99478f017126a3c5f96ee33613bcb6a0d486c4beb2cee356ed805ba3fd6573ad",
+    "apps/web/src/features/onboarding/sampleSet.ts": "86f06663fe9f3b11535c0f7ae2f705eec7c5b6506a1b0d6398132be6107c2be1",
+    "apps/web/src/pages/Onboarding.tsx": "eb3597512094c8a98c96fe6029de7c6fb38c6995274fe6c6529466069f0f7b3e",
+    "apps/web/src/lib/extraction-explanation.ts": "4d82f6d956c856d0a5f0feeff6a3150d79068f9c62e7d3b2098dc1a3be2ddc16",
+    "apps/web/src/features/approvals/ManualInvoiceApproval.tsx": "2b27e181f9174b69b1b8e83f0fa346c6d5015d54ff41ee32775c153d63545ef4",
+    "examples/invoices/onboarding-hosting.pdf": "54fef86f6c5c79952fb49fcef5fa86b972de0b1e19098e9a1d56d220bfc8fb93"
+  },
+  "recordedAt": "2026-10-18T16:39:11.319762+00:00",
+  "evidenceFiles": {
+    "api-all-final.log": "8675ec4adf64027abcae5ef9680fd3056c0cb05e95cf0ff830069a2ab8853178",
+    "web-tests-final.log": "aeff10076518173e436307de9757341e4360f4f6ee418365dadc99839cd6b4d5",
+    "web-build-final.log": "a77fec3ee5c3d889c6cc8540e675434f4898d7b9f8b13689960dedf811399e0a",
+    "onboarding-test.log": "3f03b2630fe1366f56ad32e8ca5208c1dd19ddaa0261ed7bbe238f01b14065a6",
+    "core-tests.log": "5a5c2c09be407921b4416e66d2ab4a6765beff45f51d1bdc3f3fc89af113712c",
+    "d1-tests.log": "beed4616ee215aa8c4d83a987666edc5c736454e9e8a201f4e66b3c6d427ba30",
+    "runtime-build.log": "41d83090cb7197974c4ec4af362fea2449520a031a722cc3fa71ecb0e999edbd",
+    "runtime-test.log": "071fa21749c7b9d6d811c2f6aafd5551bbf11500ed5b7d9e657ec0bfee57558a",
+    "browser-report.json": "d89ea431f57673486e152e4bc458a576361339cfdfab6466e0d036bb65b40dc2",
+    "design-check.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  }
+}

@@ -12,7 +12,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { api, errorMessage } from '@/api';
-import sampleInvoiceUrl from '../../../../examples/invoices/hosting.pdf?url';
+import sampleInvoiceUrl from '../../../../examples/invoices/onboarding-hosting.pdf?url';
 import { DemoBanner } from '@/components/DemoBanner';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
@@ -351,8 +351,9 @@ export function Onboarding() {
                       <div className="onboarding-sample-invoice">
                         <FileCheck className="size-5 shrink-0" aria-hidden="true" />
                         <div><p className="text-sm">{t('No invoice handy? Try this one.')}</p><p className="mt-1 text-xs text-ash">{t('Demo Cloud Hosting · USD 200 · PDF')}</p></div>
-                        <Button variant="ghost" size="sm" loading={uploading} onClick={() => void handleLoadSample()}>{t('Try sample')}</Button>
+                        <Button variant="ghost" size="sm" loading={uploading} disabled={cur !== 'USD'} onClick={() => void handleLoadSample()}>{t('Try sample')}</Button>
                       </div>
+                      {cur !== 'USD' && <p className="text-sm text-slate-600">{t('This sample uses USD. Upload an invoice in your rules’ currency instead.')}</p>}
                     </>
                   ) : (
                     <div className="onboarding-uploaded" role="status">

@@ -10,6 +10,7 @@ import { useConfirmInvoiceReview } from '@/hooks/queries';
 import { t } from '@/i18n';
 import { formatDate } from '@/lib/dates';
 import { formatMoneyWithCode } from '@/lib/money';
+import { unverifiedExtractionFields } from '@/lib/extraction-explanation';
 
 export function ManualInvoiceApproval({ invoice, policyVersionId, canDecide }: {
   invoice: InvoiceDetail; policyVersionId?: string; canDecide: boolean;
@@ -21,14 +22,16 @@ export function ManualInvoiceApproval({ invoice, policyVersionId, canDecide }: {
   const review = useConfirmInvoiceReview();
   const toast = useToast();
   const fields = invoice.extracted;
+  const unverified = unverifiedExtractionFields(fields);
   const complete = fields && fields.vendorName && fields.amountMinor != null && fields.currency && fields.dueDate;
   const rows = [
-    ['Vendor', fields?.vendorName], ['Invoice number', fields?.invoiceNumber],
-    ['Amount', fields?.amountMinor == null ? null : formatMoneyWithCode(fields.amountMinor, fields.currency)],
-    ['Due date', fields?.dueDate ? formatDate(fields.dueDate) : null],
-    ['Issue date', fields?.issuedAt ? formatDate(fields.issuedAt) : null],
-    ['Service period', fields?.servicePeriod],
-    ['Description', fields?.description],
+    ['vendorName', 'Vendor', fields?.vendorName], ['invoiceNumber', 'Invoice number', fields?.invoiceNumber],
+    ['amountMinor', 'Amount', fields?.amountMinor == null ? null : formatMoneyWithCode(fields.amountMinor, fields.currency)],
+    ['currency', 'Currency', fields?.currency],
+    ['dueDate', 'Due date', fields?.dueDate ? formatDate(fields.dueDate) : null],
+    ['issuedAt', 'Issue date', fields?.issuedAt ? formatDate(fields.issuedAt) : null],
+    ['servicePeriod', 'Service period', fields?.servicePeriod],
+    ['description', 'Description', fields?.description],
   ];
   const open = () => { setConfirmed(false); setComment(''); review.reset(); dialog.current?.showModal(); };
   return <>
@@ -58,11 +61,14 @@ export function ManualInvoiceApproval({ invoice, policyVersionId, canDecide }: {
           {t('I could not fully check this invoice. You can review its details and make the decision. If you confirm, I will record your approval after checking the spending rules.')}
         </p>
         <dl className="divide-y divide-hairline text-sm">
-          {rows.map(([label, value]) => <div key={label} className="flex justify-between gap-4 py-2">
+          {rows.map(([field, label, value]) => <div key={field} className="flex justify-between gap-4 py-2">
             <dt className="shrink-0 text-slate-600">{t(label!)}</dt>
-            <dd className="min-w-0 break-words text-right">{value || t('Not found')}</dd>
+            <dd className="min-w-0 break-words text-right">{value || t('Not found')}
+              {value && unverified.has(field!) && <span className="block text-xs font-medium text-slate-700">{t('Not verified against the original')}</span>}
+            </dd>
           </div>)}
         </dl>
+        {unverified.has('currency') && <InlineAlert tone="warn">{t('The currency shown has not been verified. A symbol such as $ does not identify USD by itself. Confirm the currency with the issuer before approving.')}</InlineAlert>}
         <a href={invoice.fileUrl || `/api/v1/invoices/${encodeURIComponent(invoice.id)}/file`} target="_blank" rel="noopener noreferrer"
           className="inline-block text-sm underline underline-offset-4">{t('Open original')}</a>
         {!complete && <InlineAlert tone="warn">{t('Required details are missing. They need to be corrected before you can confirm approval.')}</InlineAlert>}

@@ -84,6 +84,49 @@ test('chat usa herramientas reales, persiste historial y replay no vuelve a gast
   assert.equal(usage.status, 200); assert.equal(usage.data.calls, 2); assert.equal(usage.data.unreportedCalls, 2);
 });
 
+test('chat recibe la política vigente de su empresa en cada turno, separada de los acuerdos', async t => {
+  const h = await setup(t);
+  const before = (await h.api('/mandate')).data.active;
+  const checkPolicy = policy => payload => {
+    assert.ok(payload.messages[0].content.includes(JSON.stringify({ version: policy.version, rules: policy.rules })));
+    assert.match(payload.messages[0].content, /límites globales/);
+    return Response.json({ choices: [h.text('Estos son tus límites vigentes.')] });
+  };
+  h.model(checkPolicy(before));
+  assert.equal((await h.chat('¿Cuáles son mis límites globales?')).status, 200);
+  const saved = await h.api('/mandate/draft', { method: 'PUT', data: {
+    expectedRevision: null, basedOnPolicyVersionId: before.id,
+    rules: { ...before.rules, automaticLimitMinor: 20000, reviewAboveMinor: 20000, hardLimitMinor: 160000 },
+  } });
+  assert.equal(saved.status, 200);
+  const active = await h.api('/mandate/activate', { method: 'POST', key: crypto.randomUUID(), data: {
+    draftId: saved.data.id, expectedRevision: saved.data.revision, expectedActivePolicyVersionId: before.id, confirmed: true,
+  } });
+  assert.equal(active.status, 200);
+  h.model(checkPolicy(active.data));
+  assert.equal((await h.chat('¿Y cuáles son ahora?')).status, 200);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+});
+
+test('una propuesta en la tercera ronda termina con texto sin ampliar permisos ni ejecutar cambios', async t => {
+  const h = await setup(t);
+  const invoice = await h.invoice();
+  h.model(h.tool('list_vendors', {}), h.tool('inspect_invoice', { invoiceId: invoice.id }),
+    h.tool('prepare_change', { proposal: h.onboard(invoice) }), payload => {
+      assert.equal(payload.tool_choice, 'none'); assert.deepEqual(payload.tools, []);
+      return Response.json({ choices: [h.text('Revisa proveedor y acuerdo y confirma la propuesta.')] });
+    });
+  const response = await h.chat('Registrar proveedor y acuerdo con los términos indicados', crypto.randomUUID(), null, [invoice.id]);
+  assert.equal(response.status, 200, JSON.stringify(response));
+  assert.equal(response.data.actions.length, 1);
+  assert.equal(response.data.actions[0].proposal.kind, 'ONBOARD_INVOICE_VENDOR');
+  assert.equal(response.data.actions[0].status, 'PENDING');
+  assert.equal(h.calls.length, 4);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors WHERE name=?').bind(vendor.name).first('n'), 0);
+  assert.equal(await h.DB.prepare('SELECT count(*) n FROM budget_reservations').first('n'), 0);
+  assert.equal((await h.confirm(response.data.actions[0])).data.invoice.latestDecision.action, 'APPROVE');
+});
+
 test('usage retains all chat rounds, failed output and Telegram tokens without spending on replay', async t => {
   const h = await setup(t);
   const response = choice => () => Response.json({ choices: [choice], usage: {
@@ -229,7 +272,7 @@ test('límite de herramientas explica causa y siguiente paso sin publicar propue
   h.model(h.tool('prepare_change', { proposal }), tooMany);
   const result = await h.chat('Una solicitud con demasiadas acciones');
   assert.equal(result.error.code, 'CHAT_TOOL_LIMIT');
-  assert.match(result.error.message, /máximo de 4/);
+  assert.match(result.error.message, /necesita más pasos/);
   assert.match(result.error.message, /lote de hasta 20/);
   assert.match(result.error.message, /No se ejecutó ningún cambio/);
   assert.equal(await h.DB.prepare('SELECT count(*) n FROM chat_actions').first('n'), 0);
@@ -237,11 +280,15 @@ test('límite de herramientas explica causa y siguiente paso sin publicar propue
 
 test('límite de rondas explica que faltó terminar sin crear proveedores', async t => {
   const h = await setup(t);
-  h.model(h.tool('prepare_change', { proposal: { kind: 'CREATE_VENDOR', data: vendor } }), h.tool('list_vendors', {}), h.tool('list_vendors', {}));
+  h.model(h.tool('prepare_change', { proposal: { kind: 'CREATE_VENDOR', data: vendor } }), h.tool('list_vendors', {}), h.tool('list_vendors', {}),
+    payload => {
+      assert.equal(payload.tool_choice, 'none');
+      return Response.json({ choices: [h.tool('prepare_change', { proposal: { kind: 'CREATE_VENDOR', data: vendor } })] });
+    });
   const result = await h.chat('Otra solicitud que no logra terminar');
   assert.equal(result.error.code, 'CHAT_TOOL_LIMIT');
-  assert.match(result.error.message, /máximo de 3 rondas/);
-  assert.match(result.error.message, /Divide la solicitud/);
+  assert.match(result.error.message, /Vamos por partes/);
+  assert.match(result.error.message, /No se ejecutó ningún cambio/);
   assert.equal(await h.DB.prepare('SELECT count(*) n FROM chat_actions').first('n'), 0);
   assert.equal(await h.DB.prepare('SELECT count(*) n FROM vendors WHERE name=?').bind(vendor.name).first('n'), 0);
 });

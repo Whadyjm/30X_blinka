@@ -1,6 +1,9 @@
 /** Spanish: Bills, bill detail, approvals, evaluation, upload, decision trace, extraction, badges. */
 export const esBills: Record<string, string> = {
   Logs: 'Logs',
+  'Not verified against the original': 'Sin comprobar en el original',
+  'The currency shown has not been verified. A symbol such as $ does not identify USD by itself. Confirm the currency with the issuer before approving.': 'La moneda que aparece aquí no está comprobada. Un símbolo como $ no identifica por sí solo USD. Confirma la moneda con el emisor antes de aprobar.',
+  'I read the invoice details, but could not finish checking them. It stays in review. Use “Read original again” to retry, or check the original before confirming the details.': 'Leí los datos de la factura, pero no pude terminar de comprobarlos. Quedó en revisión. Pulsa «Volver a leer original» para reintentar o revisa el original antes de confirmar los datos.',
   'The document shows more than one party. Please confirm who is charging you before approving the invoice.': 'En el documento aparece más de una persona o empresa. Confirma quién te está cobrando antes de aprobar la factura.',
   'APPROVE INVOICE': 'APROBAR FACTURA',
   'Only an owner or approver can confirm this invoice.': 'Solo el propietario o un aprobador puede confirmar esta factura.',
