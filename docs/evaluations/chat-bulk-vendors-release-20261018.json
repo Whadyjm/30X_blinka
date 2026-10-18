@@ -1,0 +1,50 @@
+{
+  "worker": "oli-api",
+  "url": "https://oli30x.ultramare.dev",
+  "sourceCommit": "72d1d0473032237b1a36089d18b0637b6644d22c",
+  "deployedVersion": "7cfe0cde-3f97-490c-978e-50572b87f041",
+  "sourceFiles": {
+    "apps/api/worker/chat-actions.js": "f426cb4fc4bed12d0d45f7f8484b6566e32681a6bfc49789e74f2aaeecc9966e",
+    "apps/api/worker/chat-prompt.js": "a04f369e779af83f117e496f2ebdbe923780f3c8e53d74889e6bf5cb131839df",
+    "apps/api/worker/chat-tools.js": "a4c29ae3f654bc442274bb5bd56959c6c862b444ce3fbe08b37fe7f97401b618",
+    "apps/api/worker/chat.js": "7a4fb7018f400ed204cc8ca0a7aa69bfc2d8cce190f0035bfa2ccdf3dd1e21af",
+    "apps/api/worker/telegram-chat.js": "b09aeb9c66cea9546227aec9c1255727f6e0bc86fe7bb784d1f376960a88b074",
+    "apps/api/tests/chat.test.mjs": "f009411e43d47d1588857784c5ff4b7c976b26d9142df55076eda017c4c7460b",
+    "apps/api/tests/telegram.test.mjs": "be6832f47f14325120e17845f397bc71ab68e1ffccf0c48e843274e588a5dc94",
+    "packages/contracts/src/index.ts": "a8f5d549663d98332dc3ec95975bd12c11d51126b9219101fc8d272f52052829",
+    "packages/contracts/tests/conversation.test.ts": "8cb9a8eadb8f82f3d32f6040f8ed95252b447afe8b749bf39b07b788cc0e1693",
+    "apps/web/src/features/chat/ChatReply.tsx": "8a14a5e6b8b61087cbda77b4668c61b7432e3a004db559fb50a2001bc681f1d0",
+    "apps/web/src/features/chat/ChatWorkspace.tsx": "1c9e207f5fe0fbe62d260a2811ada13fe6cfa64758630139173099a6851bb8d8",
+    "apps/web/src/features/chat/failure-message.ts": "8a89c5baf8f5d7f8f241f732f6de218aae33238ebab077e0e6a278a476e27a6f",
+    "apps/web/src/i18n/es.chat.ts": "36125bf4e2bd9df410b344a084d1036e8b08ee7885f1050515de54beefd5b82c",
+    "apps/web/tests/chat/vendor-batch.test.ts": "defab9b119bfa3374c48523bda333a3d4f35859df88b2ebd6698020d75c49d7c",
+    "docs/API.md": "2432b668834785fb99e20e85bec24f98642bf1130bfe95aa253cd49c197ba134",
+    "docs/CONVERSATION_FRONTEND_HANDOFF.md": "d8778ab6c7caa4272ae90dfa4b38bd745cdf537286b1638dbfcb778bf1c990d7"
+  },
+  "isolatedSnapshot": true,
+  "tests": {
+    "api": {
+      "passed": 144,
+      "total": 144,
+      "testConcurrency": 1
+    },
+    "contracts": {
+      "passed": 29,
+      "total": 29
+    },
+    "web": {
+      "passed": 53,
+      "total": 53
+    },
+    "bundledWorker": {
+      "passed": 1,
+      "total": 1
+    },
+    "typecheck": true,
+    "build": true
+  },
+  "liveReport": "chat-bulk-vendors-live-20261018.json",
+  "liveReportSha256": "0b241483f0421ce7a8d0cd2b0f1d04d33473ab6805f4cf6c7a8b1fd961477983",
+  "livePass": true,
+  "noHumanConfirmationInProductionSmoke": true
+}

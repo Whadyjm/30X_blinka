@@ -1,0 +1,42 @@
+{
+  "scope": "REAL_CHAT_PROPOSAL_AND_BROWSER_ONLY_NO_VENDOR_CONFIRMATION_NO_INVOICE_READING",
+  "startedAt": "2026-10-18T01:34:42.733Z",
+  "orgId": "org_bulk_smoke_44639ce4",
+  "simulated": true,
+  "checks": [
+    {
+      "name": "real_model_one_proposal_thirteen_exact_vendors",
+      "pass": true,
+      "kind": "CREATE_VENDORS",
+      "count": 13
+    },
+    {
+      "name": "browser_full_proposal",
+      "width": 1440,
+      "count": 13,
+      "layout": {
+        "width": 1440,
+        "scrollWidth": 1440
+      },
+      "pass": true
+    },
+    {
+      "name": "browser_full_proposal",
+      "width": 390,
+      "count": 13,
+      "layout": {
+        "width": 390,
+        "scrollWidth": 390
+      },
+      "pass": true
+    }
+  ],
+  "browserErrors": [],
+  "conversationId": "chat_982aee1c-ae37-4047-b1d1-098e410aa1f2",
+  "turnId": "turn_23d4a581-e9c6-4471-ae0c-a98b427715a0",
+  "noVendorsCreated": true,
+  "noReservations": true,
+  "pass": true,
+  "sessionRevoked": true,
+  "finishedAt": "2026-10-18T01:34:57.147Z"
+}
