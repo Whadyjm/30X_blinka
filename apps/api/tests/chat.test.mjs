@@ -352,3 +352,17 @@ test('dos requests del mismo turno no duplican llamadas al modelo; adjuntos ajen
   const second = await h.chat('Hola', key); assert.equal(second.error.code, 'CHAT_IN_PROGRESS'); assert.equal(h.calls.length, 1);
   release(); assert.equal((await first).status, 200);
 });
+
+test('diez facturas adjuntas y cuatro consultas caben en la respuesta; once se rechazan antes del modelo', async t => {
+  const h = await setup(t), invoiceIds = [];
+  for (let n = 0; n < 10; n++) invoiceIds.push((await h.invoice()).id);
+  const queries = Array.from({ length: 4 }, () => h.tool('get_budget', { period: 'CURRENT_MONTH' }).message.tool_calls[0]);
+  h.model({ finish_reason: 'tool_calls', message: { content: null, tool_calls: queries } }, h.text('Recibí las diez facturas y consulté el presupuesto.'));
+  const result = await h.chat('Revisa estas diez facturas', crypto.randomUUID(), null, invoiceIds);
+  assert.equal(result.status, 200, JSON.stringify(result));
+  assert.equal(result.data.cards.length, 14);
+  assert.equal(result.data.cards.filter(card => card.type === 'INVOICE').length, 10);
+  assert.equal(h.calls.length, 2);
+  const excessive = await h.chat('Demasiadas facturas', crypto.randomUUID(), null, [...invoiceIds, invoiceIds[0]]);
+  assert.equal(excessive.status, 400); assert.equal(h.calls.length, 2);
+});

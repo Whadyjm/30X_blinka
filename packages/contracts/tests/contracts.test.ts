@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { z } from 'zod';
 import {
-  ActivateMandateSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
+  ChatActionInputSchema, ActivateMandateSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, CurrencySchema, DateSchema,
   ExtractedInvoiceSchema, InvoiceQuerySchema, InvoiceSchema, MAX_INVOICE_BYTES,
   MandateRulesSchema, MinorUnitsSchema, PaginationSchema, PolicyDecisionSchema,
@@ -33,7 +33,8 @@ test('los ejemplos JSON publicados respetan los esquemas compartidos', () => {
   const invoiceEnvelope = z.strictObject({ data: InvoiceSchema });
   const emptyPage = z.strictObject({ data: z.array(z.never()), pagination: PaginationSchema });
   for (const example of examples) {
-    if ('expectedDecisionId' in example) ReviewApprovalSchema.parse(example);
+    if ('kind' in example) ChatActionInputSchema.parse(example);
+    else if ('expectedDecisionId' in example) ReviewApprovalSchema.parse(example);
     else if ('rules' in example) SaveMandateDraftSchema.parse(example);
     else if ('action' in example) PolicyDecisionSchema.parse(example);
     else if ('state' in example) ApprovalRequestSchema.parse(example);

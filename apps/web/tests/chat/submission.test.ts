@@ -13,6 +13,19 @@ function setup(n = 2) {
 }
 
 describe('Home attachment and message delivery', () => {
+  it('uploads and dispatches ten files using their individual receipts', async () => {
+    const { api, operation, run } = setup(10);
+    await run();
+    expect(api.uploadInvoice).toHaveBeenCalledTimes(10);
+    expect(api.processInvoice).toHaveBeenCalledTimes(10);
+    expect(operation.input?.invoiceIds).toHaveLength(10);
+  });
+  it('rejects eleven files before uploading any document', async () => {
+    const { api, run } = setup(11);
+    await expect(run()).rejects.toThrow();
+    expect(api.uploadInvoice).not.toHaveBeenCalled();
+    expect(api.sendChatMessage).not.toHaveBeenCalled();
+  });
   it('waits for real upload receipts and passes only invoice IDs to the chat', async () => {
     const { api, operation, run } = setup();
     await run();

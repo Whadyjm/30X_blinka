@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useLocation } from 'react-router';
-import { ArrowDown, ArrowUp, FileText, History, LayoutDashboard, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
-import type { ChatChannel } from '@oli/contracts';
+import { ArrowDown, ArrowUp, FileText, History, LayoutDashboard, MessageSquare, FileUp, Paperclip, Plus, Send, X } from 'lucide-react';
+import { CHAT_MAX_ATTACHMENTS, type ChatChannel } from '@oli/contracts';
 import { buttonClass } from '@/components/ui/Button';
 import { UPLOAD } from '@/config/env';
 import { useMe } from '@/hooks/queries';
@@ -111,13 +111,35 @@ export function ChatWorkspace() {
     if (textarea.current) { textarea.current.style.height = 'auto'; textarea.current.style.height = `${Math.min(textarea.current.scrollHeight, 144)}px`; }
   }, [draft, channel]);
 
-  const attach = (incoming: File[]) => {
+  const attach = useCallback((incoming: File[]) => {
     if (channel !== 'WEB' || busy || web.pending) return;
-    if (files.length + incoming.length > 4) { setInputError(t('You can attach up to 4 files at a time.')); return; }
+    if (files.length + incoming.length > CHAT_MAX_ATTACHMENTS) { setInputError(t('You can attach up to {n} files at a time.', { n: CHAT_MAX_ATTACHMENTS })); return; }
     if (incoming.some(f => !UPLOAD.mimeTypes.includes(f.type))) { setInputError(t('Only PDF, PNG or JPEG files are accepted.')); return; }
     if (incoming.some(f => !f.size || f.size > UPLOAD.maxBytes)) { setInputError(t('Each file must be between 1 byte and 5 MB.')); return; }
     setInputError(null); setFiles(old => [...old, ...incoming]);
-  };
+  }, [channel, busy, web.pending, files.length]);
+  useEffect(() => {
+    let depth = 0;
+    const isFileDrag = (event: DragEvent) => event.dataTransfer?.types.includes('Files') === true;
+    const enter = (event: DragEvent) => { if (isFileDrag(event)) { depth++; setDragging(true); } };
+    const over = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = channel === 'WEB' && !busy && !web.pending ? 'copy' : 'none';
+    };
+    const leave = () => { depth = Math.max(0, depth - 1); if (depth === 0) setDragging(false); };
+    const clear = () => { depth = 0; setDragging(false); };
+    const drop = (event: DragEvent) => {
+      if (!isFileDrag(event)) return;
+      event.preventDefault(); clear(); attach(Array.from(event.dataTransfer!.files));
+    };
+    window.addEventListener('dragenter', enter); window.addEventListener('dragover', over);
+    window.addEventListener('dragleave', leave); window.addEventListener('drop', drop); window.addEventListener('dragend', clear);
+    return () => {
+      window.removeEventListener('dragenter', enter); window.removeEventListener('dragover', over);
+      window.removeEventListener('dragleave', leave); window.removeEventListener('drop', drop); window.removeEventListener('dragend', clear);
+    };
+  }, [channel, busy, web.pending, attach]);
   const send = async (text = draft) => {
     if (!web.canSend || channel !== 'WEB' || (!text.trim() && !files.length)) return;
     drafts.current.delete(web.id);
@@ -127,9 +149,17 @@ export function ChatWorkspace() {
   const submit = (event: FormEvent) => { event.preventDefault(); void send(); };
 
   return <section id="oli-chat" ref={root} className={cn('oli-chat relative -mx-4 -mt-6 flex min-h-0 flex-col overflow-hidden bg-paper md:mx-0 md:mt-0 md:rounded-2xl md:border md:border-hairline', dragging && 'ring-2 ring-inset ring-ink')}
-    aria-label={t('Chat with Oli')} onDragOver={e => { if (channel === 'WEB') { e.preventDefault(); setDragging(true); } }}
-    onDragLeave={e => { if (!(e.relatedTarget instanceof Node) || !e.currentTarget.contains(e.relatedTarget)) setDragging(false); }}
-    onDrop={e => { e.preventDefault(); setDragging(false); attach(Array.from(e.dataTransfer.files)); }}>
+    aria-label={t('Chat with Oli')}>
+    {dragging && <div role="status" aria-live="polite" className="pointer-events-none fixed inset-0 z-[100] grid place-items-center bg-paper/95 p-8 text-center text-ink">
+      <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-ink/40 md:inset-8" aria-hidden />
+      <div className="relative max-w-xl">
+        <FileUp className="mx-auto mb-6 size-14" strokeWidth={1.5} aria-hidden />
+        {channel === 'WEB' && !busy && !web.pending ? <>
+          <p><span className="block text-5xl leading-tight sm:text-7xl">{t('DROP HERE')}</span><span className="mt-2 block text-2xl sm:text-3xl">{t('your documents')}</span></p>
+          <p className="mt-6 text-sm leading-relaxed text-slate-600">{t('Up to {n} files per message · PDF, PNG or JPEG · 5 MB each', { n: CHAT_MAX_ATTACHMENTS })}</p>
+        </> : <p className="text-xl leading-relaxed">{t(channel !== 'WEB' ? 'Switch to web chat to attach documents.' : 'Wait for the current message to finish before attaching documents.')}</p>}
+      </div>
+    </div>}
     <header className="shrink-0 border-b border-hairline px-4 pt-3 md:px-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 md:gap-3">

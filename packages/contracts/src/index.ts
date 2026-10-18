@@ -442,9 +442,10 @@ export const ChatActionSchema = z.strictObject({
   status: z.enum(['PENDING', 'CONFIRMED', 'CANCELLED', 'EXPIRED']),
   createdAt: TimestampSchema, expiresAt: TimestampSchema,
 });
+export const CHAT_MAX_ATTACHMENTS = 10;
 export const ChatMessageInputSchema = z.strictObject({
   conversationId: ChatIdSchema.nullable(), text: z.string().trim().max(4000),
-  invoiceIds: z.array(ChatIdSchema).max(4),
+  invoiceIds: z.array(ChatIdSchema).max(CHAT_MAX_ATTACHMENTS),
 }).refine(v => v.text.length > 0 || v.invoiceIds.length > 0, 'Escribe un mensaje o adjunta una factura.');
 export const ChatPeriodSchema = z.union([PeriodKeySchema, z.enum(['CURRENT_MONTH', 'PREVIOUS_MONTH'])]);
 export const ChatToolInputSchemas = {
@@ -478,7 +479,7 @@ export const ChatCardSchema = z.discriminatedUnion('type', [
 ]);
 export const ChatReplySchema = z.strictObject({
   conversationId: ChatIdSchema, turnId: ChatIdSchema, text: z.string().max(8000),
-  cards: z.array(ChatCardSchema).max(12), actions: z.array(ChatActionSchema).max(4),
+  cards: z.array(ChatCardSchema).max(CHAT_MAX_ATTACHMENTS + 4), actions: z.array(ChatActionSchema).max(4),
   createdAt: TimestampSchema, model: z.literal('deepseek/deepseek-v4.1-flash'),
 });
 export const ConfirmChatActionSchema = z.strictObject({ confirmed: z.literal(true) });

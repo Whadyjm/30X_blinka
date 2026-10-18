@@ -1,3 +1,5 @@
+import { CHAT_MAX_ATTACHMENTS } from '@oli/contracts';
+import { t } from '@/i18n';
 import type { OliApi } from '@/api';
 import { validateFile } from '@/features/invoices/useUploadQueue';
 
@@ -12,6 +14,7 @@ export type Submission = {
 
 /** Mutate only the in-flight operation: retries reuse received files and the exact message body/key. */
 export async function submitChat(api: OliApi, operation: Submission, checkpoint: () => void) {
+  if (operation.files.length > CHAT_MAX_ATTACHMENTS) throw new Error(t('You can attach up to {n} files at a time.', { n: CHAT_MAX_ATTACHMENTS }));
   for (const item of operation.files) {
     if (!item.invoiceId) {
       const problem = validateFile(item.file);
