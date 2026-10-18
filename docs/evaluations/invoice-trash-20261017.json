@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-18T00:23:00.040Z",
+  "host": "https://oli30x.ultramare.dev",
+  "commit": "d6b1cfa",
+  "version": "5244f8ea-a504-47f1-836c-9de44862bd9a",
+  "scope": "Lecturas reales; dos comandos de papelera interceptados solo en navegador. Sin borrar, restaurar ni modificar facturas reales del servidor.",
+  "checks": [
+    "API de papelera autenticada y lista real; pestaña Eliminadas; controles OWNER; aprobada no se presenta como pagada",
+    "UI publicada: eliminar/restaurar y registro con actor probados mediante respuestas controladas solo en navegador",
+    "Servidor sin nuevos eventos ni cambios de decisión por la prueba de UI"
+  ],
+  "counts": {
+    "invoices": 17,
+    "deleted": 0,
+    "historyEvents": 0
+  },
+  "controlledBrowserCommands": 2,
+  "actualTrashMutationsToServer": 0,
+  "errors": [],
+  "result": "PASS",
+  "request": "Papelera e historial de facturas eliminadas; aclarar si hay historial de pagadas.",
+  "localBrowserChecks": {
+    "scope": "Fixtures y movimientos controlados solo en navegador local; sin cambios en producción.",
+    "deleteToTrash": true,
+    "restore": true,
+    "activeListHidesDeleted": true,
+    "deletedTabCounts": true,
+    "decisionPreserved": true,
+    "actorAndTimeHistory": true,
+    "restoreHistoryRetained": true,
+    "detailMarksDeleted": true,
+    "dashboardLinksTrashAndExplainsBudget": true,
+    "approvedNotPaidCopy": true,
+    "viewports": [
+      1440,
+      390,
+      320
+    ],
+    "errors": [],
+    "result": "PASS"
+  },
+  "packagedRuntimeChecks": {
+    "result": "PASS",
+    "packagedWorker": true,
+    "localCompatibilityDate": "2026-07-30",
+    "trashAndRestore": true,
+    "appendOnlyHistory": true,
+    "idempotentReplay": true,
+    "staleGuard": true,
+    "ownerOnly": true,
+    "authenticatedRead": true,
+    "originalFileAndInvoiceRetained": true,
+    "budgetUnchanged": true,
+    "noExternalNetwork": true
+  },
+  "sourcePreservation": {
+    "publishedBundleSha256": "3f09b5e5c7d8573ebbd5370a474c9dd8babeea4ff32c5138ea7bc67ab1ad53ee",
+    "backendSourceCommit": "2ae21aba53dcdc80d18e1fac9d2feac0cb1c2b8a",
+    "verifiedSourceFiles": [
+      "packages/extraction/src/openrouter.ts",
+      "packages/contracts/src/index.ts",
+      "packages/domain/src/index.ts",
+      "apps/api/worker/http.js",
+      "apps/api/worker/document.js",
+      "apps/api/worker/extraction-probe.js",
+      "apps/api/worker/auth.js",
+      "apps/api/worker/repository.js",
+      "apps/api/worker/configuration.js",
+      "apps/api/worker/processing.js",
+      "apps/api/worker/jobs.js",
+      "apps/api/worker/invoices.js",
+      "apps/api/worker/legacy-document-type.js",
+      "apps/api/worker/reanalysis-limits.js",
+      "apps/api/worker/reevaluation.js",
+      "apps/api/worker/chat-actions.js",
+      "apps/api/worker/chat-tools.js",
+      "apps/api/worker/chat-prompt.js",
+      "apps/api/worker/chat.js",
+      "apps/api/worker/telegram-invoice.js",
+      "apps/api/worker/telegram-chat.js",
+      "apps/api/worker/telegram.js",
+      "apps/api/worker/email.js",
+      "apps/api/worker/skill.js",
+      "apps/api/worker/evaluation-data.js",
+      "apps/api/worker/evaluation.js",
+      "apps/api/worker/api.js",
+      "apps/api/worker/index.js"
+    ],
+    "result": "PASS",
+    "changedSourceFiles": [
+      "apps/api/worker/api.js",
+      "apps/api/worker/invoice-trash.js",
+      "packages/contracts/src/index.ts"
+    ],
+    "allExistingApiCodePreserved": true,
+    "existingContractSchemasUnchanged": true,
+    "readersDomainAndFinancialModulesUnchanged": true
+  },
+  "deploymentVerification": {
+    "runtimeSourcePreserved": true,
+    "bindingsPreserved": true,
+    "sha256": "7619ffc58c479589528f499d10e5ec9e5d842ebe9a0de439a4c27c295700b061",
+    "deployment": {
+      "id": "63d941d4-d5b9-4c50-b45e-5b549e27f43c",
+      "source": "wrangler",
+      "strategy": "percentage",
+      "author_email": "tiamat.agency@gmail.com",
+      "annotations": {
+        "workers/message": "Facturas: papelera recuperable e historial sin borrar decisiones (d6b1cfa)",
+        "workers/triggered_by": "deployment"
+      },
+      "versions": [
+        {
+          "version_id": "5244f8ea-a504-47f1-836c-9de44862bd9a",
+          "percentage": 100
+        }
+      ],
+      "created_on": "2026-10-18T00:22:36.765262Z"
+    }
+  },
+  "baseVersion": "aae7bc84-ce1d-4ced-94a2-020c41b078b5",
+  "regressionTests": {
+    "files": 9,
+    "passed": 36,
+    "scope": "Frontend y Worker/D1 local; incluye reserva no nula intacta, archivo/decisión retenidos y duplicado bloqueado tras eliminar. No mide exactitud del extractor."
+  },
+  "i18nKeysCovered": 891,
+  "build": "TypeScript + Vite: PASS, release aislado",
+  "wranglerDryRun": "PASS",
+  "semantics": {
+    "visibilityOnly": true,
+    "processingContinues": true,
+    "decisionsAndReservationsRetained": true,
+    "appendOnlyAudit": true,
+    "ownerMutationsOnly": true,
+    "noPaidState": true,
+    "approvedMeansSimulatedAuthorization": true
+  },
+  "concurrentWork": "Cambios de tema ajenos conservados en el workspace. El commit usa blobs de la release aislada para no incorporar estilos concurrentes.",
+  "screenshots": [
+    ".impeccable/review/invoice-trash/",
+    ".impeccable/review/invoice-trash-production/"
+  ]
+}
