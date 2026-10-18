@@ -18,7 +18,7 @@ const GUIDANCE = [
   { title: 'You set the boundaries.', body: 'Tell me what I can approve, what needs your attention and where I must stop.', hint: 'Your automatic limit is only one check. Every other rule must pass too.', state: 'understanding' },
   { title: 'Let’s meet your vendors.', body: 'Your vendor list tells me who is authorized. Agreements tell me what to expect on their invoices.', hint: 'Start with the sample set, or add your own fictional vendors and agreements.', state: 'listening' },
   { title: 'One last look, together.', body: 'These are the rules I’ll follow. Take your time: I’ll only activate them when you confirm.', hint: 'You can update your rules in Settings. Previous decisions keep their history.', state: 'focused' },
-  { title: 'We’re ready to begin.', body: 'Your rules are active. Try a first invoice and follow its journey, or meet me on your dashboard.', hint: 'An uploaded invoice still needs to be read and checked. Received doesn’t mean approved.', state: 'celebrating' },
+  { title: 'Your rules are active.', body: 'Now I can review invoices under your rules. Check the vendor and agreement before trying your first one.', hint: 'An uploaded invoice still needs to be read and checked. Received doesn’t mean approved.', state: 'celebrating' },
 ] as const;
 
 export function OliGuide({ step, section, direction, state, name, busy, hasError, uploaded }: {
