@@ -70,7 +70,7 @@ export function Login() {
             </> : <p className="mb-5 text-sm text-ash">{t('Sign in with your demo credentials. No real money is moved.')}</p>}
 
             <form onSubmit={submit} className="space-y-4" noValidate>
-              <TextField label={t('Email')} type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <TextField label={t('Email or username')} type="text" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required />
               <TextField label={t('Password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
               {error && <InlineAlert>{error}</InlineAlert>}
               <Button type="submit" variant="secondary" className="w-full" loading={busy === 'login'} disabled={busy !== null || !email || !password}>

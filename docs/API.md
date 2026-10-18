@@ -79,6 +79,11 @@ Contrato de sesión mínimo, independiente del proveedor de autenticación que i
 | GET | `/me` | Sin body | `200 { data: Session }` |
 | DELETE | `/session` | Sin body | `204`, elimina sesión |
 
+El campo `email` acepta el correo o el alias demo configurado en el backend
+mediante `DEMO_USERNAME`. El alias no concede permisos por sí solo: sigue exigiendo
+la contraseña demo y resuelve únicamente el usuario/empresa provisionados.
+`Session.user.email` conserva el correo real del registro.
+
 ```ts
 type Role = 'OWNER' | 'APPROVER';
 type Session = {

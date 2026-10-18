@@ -39,8 +39,10 @@ export async function login(request, env) {
     RETURNING attempts`, key, seconds, seconds, seconds, seconds).first();
   if (attempt.attempts > 10) throw new HttpError(429, 'RATE_LIMITED', 'Espera 15 minutos antes de volver a intentar.');
   const passwordMatches = await equalSecret(input.password, env.DEMO_PASSWORD);
+  const aliasMatches = !!env.DEMO_USERNAME && input.email.toLowerCase() === env.DEMO_USERNAME.toLowerCase();
   const user = await stmt(env.DB, `SELECT u.id FROM users u JOIN memberships m ON m.user_id = u.id
-    WHERE u.id = ? AND m.org_id = ? AND lower(u.email) = ?`, env.DEMO_USER_ID, env.DEMO_ORG_ID, input.email.toLowerCase()).first();
+    WHERE u.id = ? AND m.org_id = ? AND (lower(u.email) = ? OR ? = 1)`,
+  env.DEMO_USER_ID, env.DEMO_ORG_ID, input.email.toLowerCase(), Number(aliasMatches)).first();
   if (!passwordMatches || !user) throw new HttpError(401, 'INVALID_CREDENTIALS');
   const token = id('ses');
   await stmt(env.DB, `INSERT INTO sessions(token_hash, org_id, user_id, csrf_token, expires_at) VALUES (?, ?, ?, ?, ?)`,
