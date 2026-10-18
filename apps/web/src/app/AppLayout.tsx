@@ -4,9 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Bot, CheckSquare, FileText, Inbox, LayoutDashboard, LogOut, Menu, MessageCircle, Plug, Settings, SlidersHorizontal, Trophy, X } from 'lucide-react';
 import { api } from '@/api';
 import { DemoBanner } from '@/components/DemoBanner';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Logo } from '@/components/Logo';
-import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useToast } from '@/components/ui/Toast';
 import { env } from '@/config/env';
 import { invalidateMoney, useApprovals, useInbox, useMe } from '@/hooks/queries';
@@ -60,7 +58,7 @@ export function AppLayout() {
     { to: '/app/approvals', label: 'Approvals', icon: CheckSquare, badge: pending },
     { to: '/app/rules', label: 'Rules', icon: SlidersHorizontal },
     { to: '/app/integrations', label: 'Integrations', icon: Plug },
-    { to: '/app/evaluation', label: 'Oli quality checks', icon: Trophy },
+    { to: '/app/evaluation', label: 'Performance', icon: Trophy },
     { to: '/app/settings', label: 'Settings', icon: Settings },
     ...(env.features.agentAccess ? [{ to: '/app/agent-access', label: 'Agent access', icon: Bot }] : []),
   ];
@@ -99,8 +97,6 @@ export function AppLayout() {
           </Link>
           {links}
           <div className="mt-auto space-y-3 border-t border-hairline pt-4 text-sm">
-            <LanguageSwitcher />
-            <ThemeSwitcher compact />
             <div>
               <p className="truncate text-ink">{me?.org?.name}</p>
               <p className="truncate text-xs text-slate-500">
@@ -119,8 +115,6 @@ export function AppLayout() {
               <Logo />
             </Link>
             <div className="flex items-center gap-2">
-              <ThemeSwitcher compact />
-              <LanguageSwitcher />
               <button type="button" aria-label={open ? t('Close menu') : t('Open menu')} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="grid size-11 place-items-center rounded-md hover:bg-bone">
                 {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
               </button>

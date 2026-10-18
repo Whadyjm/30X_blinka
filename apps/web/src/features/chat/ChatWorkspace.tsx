@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { ArrowDown, ArrowUp, FileText, History, LayoutDashboard, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
 import type { ChatChannel } from '@oli/contracts';
 import { buttonClass } from '@/components/ui/Button';
@@ -15,13 +15,15 @@ import { useTelegramHistoryPreference } from './useTelegramHistoryPreference';
 const suggestions = ['¿Qué facturas necesitan mi revisión?', '¿Cómo va el presupuesto de este mes?'];
 export function ChatWorkspace() {
   const me = useMe();
+  const location = useLocation();
+  const reviewInvoiceId = typeof location.state?.reviewInvoiceId === 'string' ? location.state.reviewInvoiceId : null;
   const scope = me.data?.org ? `${me.data.org.id}:${me.data.user.id}` : '';
   const telegramPreference = useTelegramHistoryPreference(scope);
   const web = useConversation(scope, 'WEB'), telegram = useConversation(telegramPreference.visible ? scope : '', 'TELEGRAM');
   const [selectedChannel, setChannel] = useState<ChatChannel>('WEB');
   const channel = telegramPreference.visible ? selectedChannel : 'WEB';
   const conversation = channel === 'WEB' ? web : telegram;
-  const [draft, setDraft] = useState(''), [files, setFiles] = useState<File[]>([]);
+  const [draft, setDraft] = useState(() => reviewInvoiceId ? t('Help me resolve invoice {id}. Explain what is missing and prepare any changes for my confirmation.', { id: reviewInvoiceId }) : ''), [files, setFiles] = useState<File[]>([]);
   const drafts = useRef(new Map<string | null, { text: string; files: File[] }>());
   const tabToFocus = useRef<string | null | undefined>(undefined);
   const [closed, setClosed] = useState<{ scope: string; ids: string[] }>({ scope: '', ids: [] });

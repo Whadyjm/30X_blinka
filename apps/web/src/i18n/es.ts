@@ -3,6 +3,7 @@
  * Split by area so they can be edited independently; merged here.
  * Run `node tools/check-i18n.mjs` to list t('…') literals that have no entry.
  */
+import { esPerformance } from './es.performance';
 import { esCore } from './es.core';
 import { esShell } from './es.shell';
 import { esBills } from './es.bills';
@@ -23,4 +24,5 @@ export const es: Record<string, string> = {
   ...esChat,
   ...esOnboarding,
   ...esDashboard,
+  ...esPerformance,
 };

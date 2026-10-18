@@ -3,6 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import { buttonClass } from '@/components/ui/Button';
 import { InlineAlert, PageHeader } from '@/components/ui/Card';
 import { Toggle } from '@/components/ui/Field';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTelegramHistoryPreference } from '@/features/chat/useTelegramHistoryPreference';
 import { useMe } from '@/hooks/queries';
@@ -21,6 +22,13 @@ export function Settings() {
           <p className="text-sm text-slate-600">{t('Choose light, warm dark, or follow your device. Saved in this browser.')}</p>
         </div>
         <ThemeSwitcher />
+      </section>
+      <section className="mb-8 max-w-2xl space-y-4 border-t border-hairline pt-6" aria-labelledby="language-heading">
+        <div className="space-y-2">
+          <h2 id="language-heading" className="text-xl">{t('Language')}</h2>
+          <p className="text-sm text-slate-600">{t('Choose the language for this browser.')}</p>
+        </div>
+        <LanguageSwitcher className="[&_button]:min-h-11 [&_button]:min-w-20 [&_button]:text-sm" />
       </section>
       <section className="mb-8 max-w-2xl space-y-4 border-t border-hairline pt-6" aria-labelledby="chat-preferences-heading">
         <h2 id="chat-preferences-heading" className="text-xl">{t('Conversations')}</h2>

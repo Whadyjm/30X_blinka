@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router';
 import { ArrowLeft, Check, RotateCcw } from 'lucide-react';
 import { ApiError, errorMessage } from '@/api';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonClass } from '@/components/ui/Button';
 import { OutcomeBadge, ReasonChips, SourceBadge } from '@/components/Badges';
 import { DecisionTrace } from '@/components/DecisionTrace';
 import { DocumentViewer } from '@/components/DocumentViewer';
@@ -59,11 +59,15 @@ export function BillDetail() {
   const canDecide = role === 'owner' || role === 'approver';
   const resolved = d?.decision === 'APPROVE' || inv.decisionHistory.some(h => h.decision === 'APPROVE')
     || ['APPROVED', 'REJECTED'].includes(inv.approval?.state ?? '');
+  const needsNewRead = d?.reasons.includes('INVALID_OR_MISSING_DATA') === true;
+  const needsVendorOnboarding = d?.reasons.includes('UNKNOWN_VENDOR') === true;
   const reanalysisHint = resolved ? 'An authorized or manually rejected invoice keeps its recorded resolution.'
+    : needsNewRead ? 'The saved reading is uncertain. Upload a clearer invoice to obtain a new reading.'
+    : needsVendorOnboarding ? 'Resolve the vendor with Oli before updating this review.'
     : role !== 'owner' ? 'Only an owner can reanalyze invoices.'
       : !d?.id || !inv.extracted ? 'A completed document reading is needed before reanalyzing.'
         : 'Checks the current rules using the saved reading. The original document and earlier decisions stay unchanged.';
-  const canReevaluate = role === 'owner' && !resolved && !!d?.id && !!inv.extracted && !!mandate.data?.active?.id && outcome !== 'PROCESSING';
+  const canReevaluate = role === 'owner' && !resolved && !needsNewRead && !needsVendorOnboarding && !!d?.id && !!inv.extracted && !!mandate.data?.active?.id && outcome !== 'PROCESSING';
 
   return (
     <>
@@ -86,6 +90,34 @@ export function BillDetail() {
         </div>
       </div>
 
+      {(outcome === 'NEEDS_REVIEW' || outcome === 'NEEDS_APPROVAL' || outcome === 'BLOCKED') && (
+        <Card className="mb-6">
+          <CardHeader title={t('Resolve review')} subtitle={t('Correct what is missing, update the review, then approve or reject when the rules allow it.')} />
+          <div className="space-y-4 p-5">
+            {pendingApproval && (
+              <div>
+                <h3 className="mb-1 text-sm text-ink">{t('Approve or reject this invoice')}</h3>
+                <p className="mb-3 text-sm text-slate-600">{t('Oli doesn’t have the authority to approve this on its own. Your policy lets an owner or approver decide.')}</p>
+                <ApprovalPanel approvalId={pendingApproval.id} expectedDecisionId={pendingApproval.decisionId} expectedPolicyVersionId={pendingApproval.policyVersionId}
+                  canDecide={canDecide && pendingApproval.canDecide === true} cannotDecideReason={t(!canDecide ? 'Only an owner or approver can decide exceptions.' : 'This request uses earlier rules. Update the review before deciding.')} />
+              </div>
+            )}
+
+            {!pendingApproval && <NotApprovable inv={inv} />}
+            {!pendingApproval?.canDecide && <div className="space-y-2 border-t border-hairline pt-4">
+              <Button variant="secondary" icon={<RotateCcw className="size-4" aria-hidden />} loading={reevaluate.isPending}
+                disabled={!canReevaluate} aria-describedby="reanalysis-hint"
+                onClick={() => reevaluate.mutate({ id: inv.id, expectedDecisionId: d!.id!, expectedPolicyVersionId: String(mandate.data!.active!.id) })}>
+                {t(reevaluate.isPending ? 'Reanalyzing…' : 'Update review')}
+              </Button>
+              <p id="reanalysis-hint" className="text-sm text-slate-600">{t(reanalysisHint)}</p>
+              {reevaluate.isError && <InlineAlert>{errorMessage(reevaluate.error)}</InlineAlert>}
+              {reevaluate.isSuccess && <p role="status" className="text-sm text-slate-600">{t('Analysis updated. The previous decision is in the history.')}</p>}
+            </div>}
+            {pendingApproval?.canDecide && <p className="text-sm text-slate-600">{t('Approval records an authorization and reserves budget. No payment is executed.')}</p>}
+          </div>
+        </Card>
+      )}
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-hairline bg-paper p-4">
         <div className="max-w-prose text-sm leading-relaxed text-slate-600"><p className="text-ink">{t(trashed ? 'This invoice is in Deleted.' : 'Invoice record')}</p><p>{t('The document, decisions and budget reservations are preserved. Moving to Deleted does not cancel processing or authorizations.')}</p></div>
         <InvoiceTrashButton invoiceId={inv.id} title={inv.vendorName ?? inv.fileName ?? inv.id} />
@@ -138,27 +170,6 @@ export function BillDetail() {
               )}
 
               {inv.approval && inv.approval.state !== 'PENDING' && <ApprovalResult approval={inv.approval} />}
-
-              {pendingApproval && (
-                <div className="rounded-xl bg-paper p-4 ring-1 ring-inset ring-ink">
-                  <h3 className="mb-1 text-sm text-ink">{t('Oli needs your decision')}</h3>
-                  <p className="mb-3 text-sm text-slate-600">{t('Oli doesn’t have the authority to approve this on its own. Your policy lets an owner or approver decide.')}</p>
-                  <ApprovalPanel approvalId={pendingApproval.id} expectedDecisionId={pendingApproval.decisionId} expectedPolicyVersionId={pendingApproval.policyVersionId}
-                    canDecide={canDecide && pendingApproval.canDecide === true} cannotDecideReason={t('Only an owner or approver can decide exceptions.')} />
-                </div>
-              )}
-
-              {outcome === 'NEEDS_REVIEW' && !pendingApproval && <NotApprovable inv={inv} />}
-              <div className="space-y-2 border-t border-hairline pt-4">
-                <Button variant="secondary" icon={<RotateCcw className="size-4" aria-hidden />} loading={reevaluate.isPending}
-                  disabled={!canReevaluate} aria-describedby="reanalysis-hint"
-                  onClick={() => reevaluate.mutate({ id: inv.id, expectedDecisionId: d!.id!, expectedPolicyVersionId: String(mandate.data!.active!.id) })}>
-                  {t(reevaluate.isPending ? 'Reanalyzing…' : 'Reanalyze invoice')}
-                </Button>
-                <p id="reanalysis-hint" className="text-sm text-slate-600">{t(reanalysisHint)}</p>
-                {reevaluate.isError && <InlineAlert>{errorMessage(reevaluate.error)}</InlineAlert>}
-                {reevaluate.isSuccess && <p role="status" className="text-sm text-slate-600">{t('Analysis updated. The previous decision is in the history.')}</p>}
-              </div>
             </div>
           </Card>
 
@@ -243,6 +254,8 @@ function ApprovalResult({ approval }: { approval: NonNullable<InvoiceDetail['app
 
 // English source hints (i18n keys) — translated at render time.
 const UNBLOCK: Record<string, string> = {
+  UNKNOWN_VENDOR: 'Register the vendor and confirm their agreement with Oli before reviewing again.',
+  INSUFFICIENT_BUDGET: 'Review the available budget in Rules before reviewing again.',
   INVALID_OR_MISSING_DATA: 'Upload a clearer copy so the missing fields can be read.',
   POSSIBLE_DUPLICATE: 'Clarify the possible duplicate and upload a corrected document. This cannot be approved with an exception.',
   AGREEMENT_MISMATCH: 'Correct the document or agreement before processing a corrected invoice.',
@@ -254,8 +267,14 @@ function NotApprovable({ inv }: { inv: InvoiceDetail }) {
   const hints = (inv.decision?.reasons ?? []).map((r) => UNBLOCK[r]).filter((h): h is string => !!h);
   return (
     <InlineAlert tone="warn">
-      <p>{t('A human “yes” isn’t allowed for this one.')}</p>
+      <p>{t('This invoice needs corrections before approval.')}</p>
+      {inv.decision?.explanation && <p className="mt-2">{inv.decision.explanation}</p>}
       <p className="mt-0.5">{t('Your current policy doesn’t let anyone approve it as-is. A policy change or corrected data is needed first.')}</p>
+      <div className="my-3 flex flex-wrap gap-2">
+        {inv.decision?.reasons.includes('UNKNOWN_VENDOR') && <Link to="/app" state={{ reviewInvoiceId: inv.id }} className={buttonClass('primary')}>{t('Resolve with Oli')}</Link>}
+        <Link to="/app/rules" className={buttonClass('secondary')}>{t('Review rules and agreements')}</Link>
+        <Link to="/app/bills" className={buttonClass('secondary')}>{t('Upload corrected invoice')}</Link>
+      </div>
       {hints.length > 0 && (
         <ul className="mt-2 list-disc space-y-0.5 pl-5">
           {[...new Set(hints)].map((h) => <li key={h}>{t(h)}</li>)}
