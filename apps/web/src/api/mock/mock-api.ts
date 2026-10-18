@@ -589,6 +589,9 @@ export const mockApi: OliApi = {
   async processInvoice() {
     await lag(); // idempotent no-op: the mock pipeline advances on its own
   },
+  async rereadInvoice() {
+    throw new ApiError({ status: 503, code: 'SERVICE_UNAVAILABLE', message: 'New document readings require the live API.' });
+  },
   async reevaluateInvoice(id, input) {
     await lag(); const d = auth(); requireOwner(d);
     const inv = d.invoices.find(i => i.id === id);

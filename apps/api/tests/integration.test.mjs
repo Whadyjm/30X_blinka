@@ -581,3 +581,89 @@ test('tipo no factura bloquea y tipo incierto escala aun con datos financieros c
   }
   assert.deepEqual(await ledger(), { reserved: 0, reservations: 0, decisions: 2 });
 });
+
+async function prepareReread(t) {
+  const s = await setup(t), queued = [];
+  s.env.INVOICE_QUEUE = { send: async message => queued.push(message) };
+  const invoice = await s.upload();
+  const previous = (await processInvoice(s.env, 'org_demo', invoice.id, s.read(extraction({ amountMinor: null }), {
+    documentType: undefined, corroboration: null,
+  }))).data;
+  const { consumeInvoiceJobs } = await import('../worker/jobs.js');
+  const message = { body: { kind: 'INVOICE_JOB', jobId: `invoice_job:${invoice.id}` }, ack() {}, retry() { throw new Error('Unexpected queue retry'); } };
+  await consumeInvoiceJobs({ messages: [message] }, s.env);
+  queued.length = 0;
+  return { ...s, previous, invoice, queued, consume: process => consumeInvoiceJobs({ messages: [message] }, s.env, process),
+    request: (overrides = {}) => s.api(`/invoices/${invoice.id}/reread`, { method: 'POST', key: crypto.randomUUID(), data: reanalysisInput(previous), ...overrides }) };
+}
+
+test('relectura: cola corrige lectura antigua, conserva original/historial y reserva una vez', async t => {
+  const s = await prepareReread(t);
+  const old = await stmt(s.DB, 'SELECT * FROM invoices WHERE id=?', s.invoice.id).first();
+  await assert.rejects(stmt(s.DB, 'UPDATE invoices SET amount_minor=123 WHERE id=?', s.invoice.id).run(), /INVOICE_FACTS_IMMUTABLE/);
+  const key = crypto.randomUUID(), requested = await s.request({ key });
+  assert.equal(requested.status, 202, JSON.stringify(requested));
+  assert.equal(requested.data.status, 'RECEIVED'); assert.equal(requested.data.extraction, null);
+  assert.equal(requested.data.latestDecision.id, s.previous.latestDecision.id);
+  assert.deepEqual((await s.request({ key })).data, requested.data); assert.equal(s.queued.length, 1);
+  await assert.rejects(stmt(s.DB, 'UPDATE invoices SET amount_minor=123 WHERE id=?', s.invoice.id).run(), /INVOICE_FACTS_IMMUTABLE/);
+  await s.consume((env, org, invoice) => processInvoice(env, org, invoice, s.read()));
+  const detail = (await s.api(`/invoices/${s.invoice.id}`)).data;
+  assert.equal(detail.status, 'DECIDED'); assert.equal(detail.latestDecision.action, 'APPROVE');
+  assert.equal(detail.extraction.amountMinor, 20000); assert.equal(detail.decisions.length, 2);
+  assert.deepEqual(detail.decisions[0], s.previous.latestDecision);
+  assert.deepEqual(await s.ledger(), { reserved: 20000, reservations: 1, decisions: 2 });
+  assert.equal(await stmt(s.DB, 'SELECT count(*) AS n FROM invoices').first('n'), 1);
+  const archive = await stmt(s.DB, 'SELECT * FROM invoice_rereads WHERE invoice_id=?', s.invoice.id).first();
+  assert.equal(archive.previous_read_json, old.extracted_json); assert.equal(JSON.parse(archive.previous_facts_json).amount_minor, null);
+  const current = await stmt(s.DB, 'SELECT * FROM invoices WHERE id=?', s.invoice.id).first();
+  for (const field of ['file_key','file_name','file_sha256','file_size_bytes','file_mime_type']) assert.equal(current[field], old[field]);
+  await assert.rejects(stmt(s.DB, 'UPDATE invoices SET amount_minor=123 WHERE id=?', s.invoice.id).run(), /INVOICE_FACTS_IMMUTABLE/);
+  await assert.rejects(stmt(s.DB, 'UPDATE invoices SET file_name=? WHERE id=?', 'changed.pdf', s.invoice.id).run(), /INVOICE_FACTS_IMMUTABLE/);
+  await assert.rejects(stmt(s.DB, 'DELETE FROM invoice_rereads WHERE id=?', archive.id).run(), /READ_HISTORY_IMMUTABLE/);
+  await assert.rejects(stmt(s.DB, 'UPDATE invoice_rereads SET previous_read_json=? WHERE id=?', '{}', archive.id).run(), /READ_HISTORY_IMMUTABLE/);
+  assert.equal((await s.request({ data: reanalysisInput(detail) })).status, 409);
+});
+
+test('relectura: incertidumbre, prohibición documental y cooldown no se convierten en autorización', async t => {
+  const s = await prepareReread(t);
+  assert.equal((await s.request()).status, 202);
+  await s.consume((env, org, invoice) => processInvoice(env, org, invoice, s.read(extraction(), { corroboration: null })));
+  const current = (await s.api(`/invoices/${s.invoice.id}`)).data;
+  assert.equal(current.latestDecision.action, 'ESCALATE'); assert.equal(current.approvalRequest, null);
+  assert.deepEqual(await s.ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+  const cooldown = await s.request({ data: reanalysisInput(current) });
+  assert.equal(cooldown.status, 429); assert.equal(cooldown.error.code, 'REANALYSIS_COOLDOWN');
+});
+
+test('relectura: valida política, decisión, payload, concurrencia y rol vigente antes de autorizar', async t => {
+  const s = await prepareReread(t);
+  assert.equal((await s.request({ data: { ...reanalysisInput(s.previous), expectedDecisionId: 'stale' } })).status, 409);
+  assert.equal((await s.request({ data: { ...reanalysisInput(s.previous), expectedPolicyVersionId: 'stale' } })).status, 409);
+  assert.equal((await s.request({ data: { ...reanalysisInput(s.previous), extraction: extraction() } })).status, 400);
+  const results = await Promise.all([s.request(), s.request()]);
+  assert.deepEqual(results.map(r => r.status).sort(), [202,409]);
+  assert.equal(await stmt(s.DB, 'SELECT count(*) AS n FROM invoice_rereads').first('n'), 1); assert.equal(s.queued.length, 1);
+  await stmt(s.DB, "UPDATE memberships SET role='APPROVER' WHERE org_id='org_demo' AND user_id='user_demo_owner'").run();
+  await s.consume((env, org, invoice) => processInvoice(env, org, invoice, s.read()));
+  assert.equal((await s.request()).status, 403);
+  assert.deepEqual(await s.ledger(), { reserved: 0, reservations: 0, decisions: 1 });
+});
+
+test('relectura: presupuesto de intentos y jobs terminales no se reinician', async t => {
+  const s = await prepareReread(t);
+  await stmt(s.DB, 'UPDATE invoice_jobs SET attempts=3 WHERE invoice_id=?', s.invoice.id).run();
+  assert.equal((await s.request()).status, 409);
+  await assert.rejects(stmt(s.DB, 'UPDATE invoice_jobs SET attempts=0 WHERE invoice_id=?', s.invoice.id).run(), /JOB_ATTEMPTS_IMMUTABLE/);
+  await assert.rejects(stmt(s.DB, "UPDATE invoice_jobs SET state='PENDING' WHERE invoice_id=?", s.invoice.id).run(), /JOB_TERMINAL/);
+});
+
+test('relectura: un comprobante no factura permanece bloqueado con la nueva lectura', async t => {
+  const s = await prepareReread(t);
+  assert.equal((await s.request()).status, 202);
+  await s.consume((env, org, invoice) => processInvoice(env, org, invoice, s.read(extraction(), { documentType: 'PAYMENT_RECEIPT' })));
+  const current = (await s.api(`/invoices/${s.invoice.id}`)).data;
+  assert.equal(current.latestDecision.action, 'BLOCK'); assert.ok(current.latestDecision.reasons.includes('NOT_AN_INVOICE'));
+  assert.equal(current.approvalRequest, null);
+  assert.deepEqual(await s.ledger(), { reserved: 0, reservations: 0, decisions: 2 });
+});

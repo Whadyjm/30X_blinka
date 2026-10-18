@@ -39,11 +39,11 @@ describe('HTTP shared contract boundary', () => {
     expect((await api.getInvoice(detail.id)).source).toBe('EMAIL');
     await api.readInboxMessage('mail-test'); await api.disableEmail();
   });
-  it('reanalyzes with current policy/decision guards and retains its key after a lost response', async () => {
+  it.each(['reevaluate', 'reread'] as const)('%s preserves guards and its key after a lost response', async action => {
     const keys: string[] = []; let attempts = 0;
     const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
       if (String(url).endsWith('/me')) return response(session);
-      expect(String(url)).toBe('/api/v1/invoices/test-id/reevaluate');
+      expect(String(url)).toBe(`/api/v1/invoices/test-id/${action}`);
       const headers = new Headers(init?.headers);
       expect(headers.get('X-CSRF-Token')).toBe('csrf-test');
       expect(JSON.parse(String(init?.body))).toEqual({ expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId });
@@ -52,8 +52,9 @@ describe('HTTP shared contract boundary', () => {
       return response(detail);
     } });
     const input = { expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId };
-    await expect(api.reevaluateInvoice('test-id', input)).rejects.toMatchObject({ code: 'NETWORK' });
-    expect((await api.reevaluateInvoice('test-id', input)).decision?.id).toBe(detail.latestDecision.id);
+    const run = () => action === 'reread' ? api.rereadInvoice('test-id', input) : api.reevaluateInvoice('test-id', input);
+    await expect(run()).rejects.toMatchObject({ code: 'NETWORK' });
+    expect((await run()).decision?.id).toBe(detail.latestDecision.id);
     expect(keys[0]).toBeTruthy(); expect(keys[1]).toBe(keys[0]);
   });
   it('uses /session, memory-only CSRF, private file URL, canonical decisions and DELETE logout', async () => {

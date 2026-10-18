@@ -90,3 +90,12 @@ it('explains a total of seven as four blocked and three requiring approval, with
   expect(stats.needsApprovalCount).toBe(3);
   expect(stats.upcoming).toHaveLength(0);
 });
+
+
+it('polls a requested reread even while a previous review decision is retained', () => {
+  const old = escalated('reading-again', false, { status: 'PARSING' });
+  const stats = computeStats([old], today);
+  expect(stats.processingCount).toBe(1);
+  expect(stats.needsReviewCount).toBe(0);
+  expect(stats.approvedCount).toBe(0);
+});

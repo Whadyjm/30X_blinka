@@ -78,6 +78,7 @@ export interface OliApi {
   getInvoice(id: string): Promise<InvoiceDetail>;
   /** Idempotent. Safe to call repeatedly. */
   processInvoice(id: string): Promise<void>;
+  rereadInvoice(id: string, input: { expectedDecisionId: string; expectedPolicyVersionId: string }): Promise<InvoiceDetail>;
   reevaluateInvoice(id: string, input: { expectedDecisionId: string; expectedPolicyVersionId: string }): Promise<InvoiceDetail>;
   /** URL the browser can load in <img>/<object> (same-origin, cookie auth). */
   invoiceFileUrl(invoice: Pick<InvoiceDetail, 'id' | 'fileUrl'>): string;

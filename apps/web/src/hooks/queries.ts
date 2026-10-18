@@ -106,6 +106,14 @@ export function useProcessInvoice() {
   return useMutation({ mutationFn: (id: string) => api.processInvoice(id), onSettled: () => invalidateMoney(qc) });
 }
 
+export function useRereadInvoice() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (input: { id: string; expectedDecisionId: string; expectedPolicyVersionId: string }) =>
+    api.rereadInvoice(input.id, { expectedDecisionId: input.expectedDecisionId, expectedPolicyVersionId: input.expectedPolicyVersionId }),
+    onSuccess: (invoice) => qc.setQueryData(qk.invoice(invoice.id), invoice),
+    onSettled: () => invalidateMoney(qc) });
+}
+
 export function useReevaluateInvoice() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: (input: { id: string; expectedDecisionId: string; expectedPolicyVersionId: string }) =>

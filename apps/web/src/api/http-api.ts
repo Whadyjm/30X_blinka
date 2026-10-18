@@ -201,6 +201,10 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
       // A timeout is ambiguous: the server may still be working. Callers keep polling this same invoice.
       parse('/process', envelope(z.union([InvoiceDetailSchema, InvoiceSchema])), await raw('POST', `/invoices/${encodeURIComponent(id)}/process`, { timeoutMs: 90000 }));
     },
+    async rereadInvoice(id, input) {
+      const path = `/invoices/${encodeURIComponent(id)}/reread`;
+      return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ReevaluateInvoiceSchema.parse(input))).data);
+    },
     async reevaluateInvoice(id, input) {
       const path = `/invoices/${encodeURIComponent(id)}/reevaluate`;
       return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ReevaluateInvoiceSchema.parse(input))).data);

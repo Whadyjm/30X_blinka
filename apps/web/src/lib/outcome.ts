@@ -12,6 +12,7 @@ type OutcomeInput = Pick<InvoiceSummary, 'status' | 'decision' | 'approval'>;
 export function getOutcome(inv: OutcomeInput): Outcome {
   const approval = inv.approval?.state;
   if (inv.status === 'FAILED') return 'FAILED';
+  if (['RECEIVED', 'PARSING', 'READY', 'PROCESSING'].includes(inv.status)) return 'PROCESSING';
 
   switch (inv.decision?.decision) {
     case 'APPROVE':

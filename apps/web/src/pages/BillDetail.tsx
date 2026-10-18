@@ -11,7 +11,7 @@ import { Orb } from '@/components/ui/Orb';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
-import { useInvoiceTrash, useInvoice, useMandate, useMe, useProcessInvoice, useReevaluateInvoice } from '@/hooks/queries';
+import { useInvoiceTrash, useInvoice, useMandate, useMe, useProcessInvoice, useRereadInvoice, useReevaluateInvoice } from '@/hooks/queries';
 import { InvoiceTrashButton } from '@/features/invoices/InvoiceTrashButton';
 import { InvoiceTrashHistory } from '@/features/invoices/InvoiceTrashHistory';
 import { invoiceTrashState } from '@/lib/invoice-trash';
@@ -40,6 +40,7 @@ export function BillDetail() {
   const me = useMe();
   const process = useProcessInvoice();
   const reevaluate = useReevaluateInvoice();
+  const reread = useRereadInvoice();
   const mandate = useMandate();
   const trash = useInvoiceTrash();
 
@@ -59,14 +60,15 @@ export function BillDetail() {
   const canDecide = role === 'owner' || role === 'approver';
   const resolved = d?.decision === 'APPROVE' || inv.decisionHistory.some(h => h.decision === 'APPROVE')
     || ['APPROVED', 'REJECTED'].includes(inv.approval?.state ?? '');
-  const needsNewRead = d?.reasons.includes('INVALID_OR_MISSING_DATA') === true;
+  const needsNewRead = d?.reasons.some(r => r === 'INVALID_OR_MISSING_DATA' || r === 'DOCUMENT_TYPE_UNCERTAIN') === true;
   const needsVendorOnboarding = d?.reasons.includes('UNKNOWN_VENDOR') === true;
   const reanalysisHint = resolved ? 'An authorized or manually rejected invoice keeps its recorded resolution.'
-    : needsNewRead ? 'The saved reading is uncertain. Upload a clearer invoice to obtain a new reading.'
+    : needsNewRead ? 'Read the saved original again to verify the document and its fields. You do not need to upload it again.'
     : needsVendorOnboarding ? 'Resolve the vendor with Oli before updating this review.'
     : role !== 'owner' ? 'Only an owner can reanalyze invoices.'
       : !d?.id || !inv.extracted ? 'A completed document reading is needed before reanalyzing.'
         : 'Checks the current rules using the saved reading. The original document and earlier decisions stay unchanged.';
+  const canReread = role === 'owner' && !resolved && !!d?.id && inv.status === 'DECIDED' && !!mandate.data?.active?.id;
   const canReevaluate = role === 'owner' && !resolved && !needsNewRead && !needsVendorOnboarding && !!d?.id && !!inv.extracted && !!mandate.data?.active?.id && outcome !== 'PROCESSING';
 
   return (
@@ -90,7 +92,7 @@ export function BillDetail() {
         </div>
       </div>
 
-      {(outcome === 'NEEDS_REVIEW' || outcome === 'NEEDS_APPROVAL' || outcome === 'BLOCKED') && (
+      {(outcome === 'NEEDS_REVIEW' || outcome === 'NEEDS_APPROVAL' || outcome === 'BLOCKED' || (outcome === 'PROCESSING' && !!d)) && (
         <Card className="mb-6">
           <CardHeader title={t('Resolve review')} subtitle={t('Correct what is missing, update the review, then approve or reject when the rules allow it.')} />
           <div className="space-y-4 p-5">
@@ -103,14 +105,23 @@ export function BillDetail() {
               </div>
             )}
 
-            {!pendingApproval && <NotApprovable inv={inv} />}
+            {!pendingApproval && outcome !== 'PROCESSING' && <NotApprovable inv={inv} />}
             {!pendingApproval?.canDecide && <div className="space-y-2 border-t border-hairline pt-4">
-              <Button variant="secondary" icon={<RotateCcw className="size-4" aria-hidden />} loading={reevaluate.isPending}
+              <div className="flex flex-wrap gap-2">
+                <Button variant={needsNewRead ? 'primary' : 'secondary'} icon={<RotateCcw className="size-4" aria-hidden />} loading={reread.isPending}
+                  disabled={!canReread || reevaluate.isPending} aria-describedby="reanalysis-hint"
+                  onClick={() => reread.mutate({ id: inv.id, expectedDecisionId: d!.id!, expectedPolicyVersionId: String(mandate.data!.active!.id) })}>
+                  {t(reread.isPending ? 'Requesting a new reading…' : 'Read original again')}
+                </Button>
+                {!needsNewRead && <Button variant="secondary" icon={<RotateCcw className="size-4" aria-hidden />} loading={reevaluate.isPending}
                 disabled={!canReevaluate} aria-describedby="reanalysis-hint"
                 onClick={() => reevaluate.mutate({ id: inv.id, expectedDecisionId: d!.id!, expectedPolicyVersionId: String(mandate.data!.active!.id) })}>
                 {t(reevaluate.isPending ? 'Reanalyzing…' : 'Update review')}
-              </Button>
+                </Button>}
+              </div>
               <p id="reanalysis-hint" className="text-sm text-slate-600">{t(reanalysisHint)}</p>
+              {reread.isError && <InlineAlert>{errorMessage(reread.error)}</InlineAlert>}
+              {reread.isSuccess && <p role="status" className="text-sm text-slate-600">{t('New reading requested. The original and earlier decisions are preserved.')}</p>}
               {reevaluate.isError && <InlineAlert>{errorMessage(reevaluate.error)}</InlineAlert>}
               {reevaluate.isSuccess && <p role="status" className="text-sm text-slate-600">{t('Analysis updated. The previous decision is in the history.')}</p>}
             </div>}
@@ -147,6 +158,7 @@ export function BillDetail() {
             </div>
             <div className="space-y-4 p-5">
               {outcome === 'PROCESSING' && <ProcessingSteps status={inv.status} />}
+              {outcome === 'PROCESSING' && d && <p className="text-sm text-slate-600">{t('The previous decision remains in the history while Oli reads the original again.')}</p>}
               {outcome === 'PROCESSING' && <Button variant="secondary" onClick={() => void q.refresh()} loading={q.isFetching}>{t('Refresh')}</Button>}
 
               {outcome === 'FAILED' && (
@@ -256,7 +268,7 @@ function ApprovalResult({ approval }: { approval: NonNullable<InvoiceDetail['app
 const UNBLOCK: Record<string, string> = {
   UNKNOWN_VENDOR: 'Register the vendor and confirm their agreement with Oli before reviewing again.',
   INSUFFICIENT_BUDGET: 'Review the available budget in Rules before reviewing again.',
-  INVALID_OR_MISSING_DATA: 'Upload a clearer copy so the missing fields can be read.',
+  INVALID_OR_MISSING_DATA: 'Start by reading the saved original again. Oli will show which fields still need clarification.',
   POSSIBLE_DUPLICATE: 'Clarify the possible duplicate and upload a corrected document. This cannot be approved with an exception.',
   AGREEMENT_MISMATCH: 'Correct the document or agreement before processing a corrected invoice.',
   MISSING_AGREEMENT: 'Add an agreement for this vendor in Rules.',

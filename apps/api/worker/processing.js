@@ -86,6 +86,9 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
     RETURNING *`, token, time, time, invoiceId, orgId, new Date(Date.now() - 120000).toISOString()).first();
   if (!claimed) return { data: await getInvoice(env.DB, orgId, invoiceId), status: 202 };
   try {
+    const reread = await stmt(env.DB, `SELECT r.id,r.user_id FROM invoice_rereads r WHERE r.org_id=? AND r.invoice_id=?
+      AND r.expected_decision_id=(SELECT id FROM decisions WHERE org_id=r.org_id AND invoice_id=r.invoice_id ORDER BY created_at DESC,rowid DESC LIMIT 1)`, orgId, invoiceId).first();
+    const artifactVersion = reread ? `${READER_VERSION}:reread:${reread.id}` : READER_VERSION;
     let storedRead = claimed.extracted_json ? JSON.parse(claimed.extracted_json) : null;
     // An undecided legacy checkpoint cannot bypass the current reader's safety rules.
     if (read === readDocument && storedRead?.provenance?.configVersion !== READER_VERSION) storedRead = null;
@@ -95,9 +98,9 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
       const bytes = new Uint8Array(await object.arrayBuffer());
       if (bytes.length !== claimed.file_size_bytes || await sha256(bytes) !== claimed.file_sha256) throw new Error('DOCUMENT_INTEGRITY_FAILED');
       const artifacts = read === readDocument ? Object.fromEntries(await Promise.all(['PRIMARY', 'SECONDARY'].map(async kind =>
-        [kind, await getReadArtifact(env.DB, orgId, claimed.file_sha256, READER_VERSION, kind)]))) : {};
+        [kind, await getReadArtifact(env.DB, orgId, claimed.file_sha256, artifactVersion, kind)]))) : {};
       storedRead = await read(env, { mimeType: claimed.file_mime_type }, bytes, claimed.file_sha256, {
-        artifacts, checkpoint: (kind, artifact) => putReadArtifact(env.DB, orgId, claimed.file_sha256, READER_VERSION, kind, artifact),
+        artifacts, checkpoint: (kind, artifact) => putReadArtifact(env.DB, orgId, claimed.file_sha256, artifactVersion, kind, artifact),
       });
       // The adapter is a server-owned trust boundary, not a route input.
       storedRead.extraction = ExtractedInvoiceSchema.parse(storedRead.extraction);
@@ -117,14 +120,17 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
       if (state.invoice.status === 'DECIDED') return { data: await getInvoice(env.DB, orgId, invoiceId), status: 200 };
       if (state.invoice.processing_token !== token) return { data: await getInvoice(env.DB, orgId, invoiceId), status: 202 };
       const evaluation = evaluateStored(storedRead, state);
-      const guardId = id('guard');
+      const guardId = id('guard'), roleGuard = reread ? id('guard') : null;
       try {
         await env.DB.batch([
           guard(env.DB, orgId, state.revision, guardId),
+          ...(reread ? [stmt(env.DB, `INSERT INTO commit_guards(id,valid) VALUES (?,EXISTS(
+            SELECT 1 FROM memberships WHERE org_id=? AND user_id=? AND role='OWNER'))`, roleGuard, orgId, reread.user_id)] : []),
           stmt(env.DB, 'UPDATE invoices SET vendor_id = ?, agreement_id = ? WHERE id = ? AND org_id = ?', evaluation.vendorId, evaluation.agreementId, invoiceId, orgId),
           ...decisionStatements(env.DB, orgId, evaluation, storedRead),
           stmt(env.DB, 'UPDATE invoices SET processing_token = NULL, processing_started_at = NULL WHERE id = ? AND org_id = ?', invoiceId, orgId),
           clearGuard(env.DB, guardId),
+          ...(roleGuard ? [clearGuard(env.DB, roleGuard)] : []),
         ]);
         console.log(JSON.stringify({ event: 'invoice_processing_completed', invoiceId, action: evaluation.candidate.action, durationMs: Math.round(performance.now() - started), readerVersion: storedRead.provenance?.configVersion ?? null, cache: storedRead.provenance?.cache ?? null }));
         return { data: await getInvoice(env.DB, orgId, invoiceId), status: 200 };
