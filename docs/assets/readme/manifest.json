@@ -56,8 +56,8 @@
       "file": "oli-portada.png",
       "width": 1440,
       "height": 560,
-      "sizeBytes": 123182,
-      "sha256": "eb2a1cd5f2b79cd510b2ce73a7f8057ab51f7062e304724baf50bc7d4633fc59",
+      "sizeBytes": 125755,
+      "sha256": "a840a3601e9dcee08ec82c3b71ac4b84a65fee4836b9b219a271761f0df59f31",
       "source": "project-mascot-renderer",
       "composition": "cover.html",
       "view": "hero"
@@ -75,8 +75,8 @@
       "file": "oli-portada-movil.png",
       "width": 720,
       "height": 840,
-      "sizeBytes": 107693,
-      "sha256": "da42c2d31f48bd0e1adf65c72f0ccaefe84c58780cc087e0c1e6cca39b0dfef9",
+      "sizeBytes": 110261,
+      "sha256": "ffecca83d36f7d10298e5ef32f857b11b9e1580705132fe0854f07bebabf180c",
       "source": "project-mascot-renderer",
       "composition": "cover.html",
       "view": "mobile"

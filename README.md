@@ -2,7 +2,7 @@
   <a href="https://oli30x.ultramare.dev">
     <picture>
       <source media="(max-width: 600px)" srcset="docs/assets/readme/oli-portada-movil.png">
-      <img src="docs/assets/readme/oli-portada.png" alt="Oli. Tu empresa pone las reglas. Oli decide con ellas: lee facturas, respeta límites y explica cada decisión." width="100%">
+      <img src="docs/assets/readme/oli-portada.png" alt="Oli, tu guardián financiero. Un agente de IA que sigue tus reglas, conectado a tus canales y a otros agentes." width="100%">
     </picture>
   </a>
 </p>
@@ -14,15 +14,30 @@
   <a href="#probar-en-local">Probar en local</a>
 </p>
 
-# De la factura a una decisión explicada
+# Oli, tu guardián financiero
 
-Oli es un agente de cuentas por pagar. Una empresa define sus proveedores, acuerdos y límites; Oli lee cada factura, contrasta la información y decide si puede autorizarla, debe frenarla o necesita que una persona intervenga. Cada decisión queda registrada con sus motivos y la política que la permitió.
+**Un agente de IA que cuida las decisiones de pago de tu empresa siguiendo tus reglas.**
+
+Oli reúne un dashboard de control web y móvil, una interfaz conversacional, canales de integración y una skill para que otros agentes deleguen la revisión de facturas desde sus orquestadores o harnesses. Tú defines el mandato; Oli lee los documentos, contrasta los datos y aplica tus reglas para autorizar, frenar o escalar cada caso a una persona.
+
+Tu mandato define su autonomía: a quién puede autorizar, por cuánto, con qué acuerdos y dentro de qué presupuesto. Cada decisión conserva una explicación y un rastro auditable. Puedes trabajar con Oli directamente o incorporarla a un flujo multiagente; la autoridad sobre la autorización permanece en Oli y sus controles.
 
 Construida para el [reto Blinka de 30X](master_files/RETO_BLINKA.md). **Todas las empresas y facturas de esta demo son ficticias. Las autorizaciones y reservas son simuladas; Oli no mueve dinero.** El acceso a la aplicación publicada se facilita por un canal privado.
 
 ![Dashboard de Oli con facturas que necesitan atención, decisiones registradas y presupuesto disponible.](docs/assets/readme/dashboard.png)
 
-*Un lugar para saber qué está resuelto, qué necesita tu atención y cuánto presupuesto queda.*
+*Tu centro de control: supervisa la autonomía de Oli, revisa excepciones y consulta decisiones y presupuesto.*
+
+## Un agente, varios puntos de entrada
+
+| Cómo trabajas con Oli | Para qué sirve |
+| --- | --- |
+| **Dashboard web y móvil** | Configurar el mandato, revisar facturas, resolver intervenciones humanas y consultar el historial. |
+| **Conversación con Oli** | Consultar tus cuentas por pagar, adjuntar documentos y confirmar propuestas de cambios mediante herramientas acotadas. |
+| **Telegram y correo** | Incorporar documentos desde los canales de trabajo de la empresa al mismo flujo de revisión. |
+| **Oli Skill para otros agentes** | Delegar la revisión desde un orquestador o harness compatible con skills o herramientas HTTP, y recuperar la decisión de Oli. |
+
+Cada canal llega al mismo guardián: los documentos pasan por los controles de lectura, el mandato vigente y el motor de política antes de una autorización.
 
 ## Así trabaja Oli
 
@@ -69,7 +84,15 @@ La misma aplicación se adapta al móvil para consultar cuentas, revisar el esta
   <img src="docs/assets/readme/movil.png" alt="Oli en un teléfono: conversación, mascota y controles para adjuntar documentos y escribir." width="280">
 </p>
 
-Además de la web, el proyecto incluye ingreso por [Telegram](docs/TELEGRAM.md), una [bandeja de correo](docs/EMAIL.md) y una [Oli Skill](apps/web/public/skills/oli/SKILL.md) para agentes con acceso limitado. Los canales comparten el flujo de procesamiento y sus controles: la entrada de un documento no concede autorización.
+Además del dashboard y la conversación, puedes incorporar documentos mediante [Telegram](docs/TELEGRAM.md) y una [bandeja de correo](docs/EMAIL.md). Los canales comparten el flujo de procesamiento y sus controles: la entrada de un documento no concede autorización.
+
+## Oli dentro de tu ecosistema agéntico
+
+La [Oli Skill](apps/web/public/skills/oli/SKILL.md) permite que otro agente delegue la revisión de una factura a Oli y lleve su decisión de vuelta al flujo de trabajo. Puedes incorporarla a un orquestador o harness que admita skills; también está disponible el contrato HTTP para runtimes con herramientas de red.
+
+El agente coordinador envía el documento original, solicita su evaluación y consulta el resultado. Oli se encarga de leer, corroborar y decidir bajo el mandato de la empresa. La conexión tiene una clave propia y acceso limitado a las facturas que presentó: no puede cambiar tus reglas ni resolver excepciones humanas.
+
+**Tus agentes coordinan el trabajo. Oli custodia las autorizaciones de pago siguiendo tus reglas.** Cuando hace falta una persona, el flujo vuelve al dashboard para su intervención y queda registrado.
 
 ## Qué medimos
 
@@ -101,7 +124,7 @@ flowchart LR
     E --> G[("D1: decisión y reserva")]
 ```
 
-El Worker coordina el flujo. El motor puro de `packages/domain` evalúa la política; D1 registra las decisiones y crea la reserva de forma atómica al autorizar. El servidor calcula los hashes y la identidad de la evidencia. Las citas o la confianza del modelo no prueban exactitud por sí mismas.
+El Worker es el runtime que coordina a Oli: conecta el modelo y sus herramientas acotadas con los canales, los lectores y la persistencia. El motor puro de `packages/domain` evalúa la política; D1 registra las decisiones y crea la reserva de forma atómica al autorizar. El servidor calcula los hashes y la identidad de la evidencia. Las citas o la confianza del modelo no prueban exactitud por sí mismas.
 
 | Capa | Implementación |
 | --- | --- |
@@ -109,6 +132,7 @@ El Worker coordina el flujo. El motor puro de `packages/domain` evalúa la polí
 | API y procesamiento | Cloudflare Workers y Queues |
 | Persistencia | D1 para registros; R2 para documentos privados |
 | Lectura | Modelos vía OpenRouter y corroboración independiente según el formato |
+| Integración con otros agentes | Oli Skill, cliente Python y API HTTP con permisos por conexión |
 | Mascota | Canvas 2D de partículas, con renderer y wrapper React propios |
 
 ## Probar en local
@@ -146,12 +170,13 @@ Los proveedores se simulan en estas pruebas; sus resultados no son métricas OCR
 | Los registros y las reservas | [Base de datos](packages/database/README.md) |
 | Los casos ficticios y sus expectativas | [Fixtures de empresas](docs/fixtures/company-journey/README.md) |
 | La mascota y sus estados | [Paquete Oli](packages/oli/README.md) |
+| Cómo delegar desde otro agente o harness | [Oli Skill y contrato de integración](apps/web/public/skills/oli/SKILL.md) |
 | La preparación del repositorio público | [Publicación y saneamiento](docs/PUBLICACION.md) |
 
 ---
 
 ![Cuatro expresiones de la mascota Oli de partículas: escuchando, pensando, concentrada y celebrando.](docs/assets/readme/oli-expresiones.png)
 
-<p align="center"><strong>Decidir. Registrar. Explicar.</strong><br>Oli para el reto Blinka · Oscar y Whady</p>
+<p align="center"><strong>Tu guardián financiero. Tus reglas, en cada decisión.</strong><br>Oli para el reto Blinka · Oscar y Whady</p>
 
 <sub>Las capturas muestran la aplicación publicada el 18 de octubre de 2026 con datos de demostración; no representan una nueva corrida del benchmark. La portada y las expresiones se renderizaron con la mascota del proyecto. <a href="docs/assets/readme/README.md">Origen de las imágenes</a>.</sub>
