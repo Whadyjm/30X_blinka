@@ -41,6 +41,7 @@ export function Dashboard() {
         actions={<Beam><Link to="/app/bills" className={buttonClass('primary', 'md')}><Upload className="size-4" aria-hidden />{t('Upload invoices')}</Link></Beam>}
       />
 
+      {invoices.deletedCount > 0 && <p className="mb-4 text-sm text-ash"><Link to="/app/bills?outcome=DELETED" className="underline underline-offset-4">{t('{n} invoices in Deleted', { n: invoices.deletedCount })}</Link> · {t('Their existing reservations remain included in the budget.')}</p>}
       <div id="dashboard-stats" className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label={t('Needs your attention')} value={stats.needsYouCount} icon={<Hand className="size-5" />} tone="amber" to="#dashboard-attention" loading={invoices.isLoading} breakdown={[
           { label: t('Awaiting your approval'), count: stats.needsApprovalCount, tone: 'NEEDS_APPROVAL' },

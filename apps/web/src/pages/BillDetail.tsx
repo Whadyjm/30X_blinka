@@ -11,7 +11,10 @@ import { Orb } from '@/components/ui/Orb';
 import type { AuditEvent, InvoiceDetail } from '@/contracts';
 import { DECISION_LABEL, humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
-import { useInvoice, useMandate, useMe, useProcessInvoice, useReevaluateInvoice } from '@/hooks/queries';
+import { useInvoiceTrash, useInvoice, useMandate, useMe, useProcessInvoice, useReevaluateInvoice } from '@/hooks/queries';
+import { InvoiceTrashButton } from '@/features/invoices/InvoiceTrashButton';
+import { InvoiceTrashHistory } from '@/features/invoices/InvoiceTrashHistory';
+import { invoiceTrashState } from '@/lib/invoice-trash';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
 import { dueLabel, formatDate, formatDateTime } from '@/lib/dates';
@@ -38,6 +41,7 @@ export function BillDetail() {
   const process = useProcessInvoice();
   const reevaluate = useReevaluateInvoice();
   const mandate = useMandate();
+  const trash = useInvoiceTrash();
 
   if (q.isLoading) return <PageLoading label={t('Loading invoice')} />;
   if (q.isError) {
@@ -47,6 +51,7 @@ export function BillDetail() {
   const inv = q.data;
   if (!inv) return null;
 
+  const trashed = invoiceTrashState(trash.data ?? []).get(inv.id)?.trashed === true;
   const outcome = getOutcome(inv);
   const d = inv.decision;
   const pendingApproval = inv.approval?.state === 'PENDING' ? inv.approval : null;
@@ -81,6 +86,11 @@ export function BillDetail() {
         </div>
       </div>
 
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-hairline bg-white p-4">
+        <div className="max-w-prose text-sm leading-relaxed text-slate-600"><p className="text-ink">{t(trashed ? 'This invoice is in Deleted.' : 'Invoice record')}</p><p>{t('The document, decisions and budget reservations are preserved. Moving to Deleted does not cancel processing or authorizations.')}</p></div>
+        <InvoiceTrashButton invoiceId={inv.id} title={inv.vendorName ?? inv.fileName ?? inv.id} />
+      </div>
+      <div className="mb-5"><InvoiceTrashHistory invoiceId={inv.id} /></div>
       <div className="grid gap-6 lg:grid-cols-5">
         {/* left: document + extraction */}
         <div className="min-w-0 space-y-6 lg:col-span-2">

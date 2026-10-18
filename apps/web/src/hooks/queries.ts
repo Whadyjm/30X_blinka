@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
+import type { InvoiceTrashEvent } from '@oli/contracts';
+import { invoiceTrashState } from '@/lib/invoice-trash';
 import { api, ApiError } from '@/api';
 import type { ApprovalDecisionInput, FinanceMandate, MandateDraftInput } from '@/contracts';
 import { isInFlight } from '@/lib/outcome';
@@ -13,6 +15,7 @@ export const qk = {
   vendors: ['vendors'] as const,
   agreements: ['agreements'] as const,
   invoices: ['invoices'] as const,
+  invoiceTrash: ['invoice-trash'] as const,
   invoice: (id: string) => ['invoice', id] as const,
   approvals: ['approvals'] as const,
   evaluation: ['evaluation'] as const,
@@ -53,7 +56,8 @@ export function useAgreements(enabled = true) {
 }
 
 /** Polls while anything is still being processed, then stops by itself. */
-export function useInvoices() {
+export function useInvoices(includeDeleted = false) {
+  const trash = useInvoiceTrash();
   const started = useRef<number | null>(null);
   const query = useQuery({
     queryKey: qk.invoices,
@@ -64,7 +68,23 @@ export function useInvoices() {
       return Date.now() - started.current < POLL_WINDOW_MS ? POLL_MS : false;
     },
   });
-  return { ...query, refresh: () => { started.current = Date.now(); return query.refetch(); } };
+  const latest = invoiceTrashState(trash.data ?? []);
+  const refresh = () => { started.current = Date.now(); return Promise.all([query.refetch(), trash.refetch()]); };
+  return { ...query, deletedCount: query.data?.filter(invoice => latest.get(invoice.id)?.trashed).length ?? 0, data: trash.isSuccess ? query.data?.filter(invoice => includeDeleted || !latest.get(invoice.id)?.trashed) : undefined,
+    isLoading: query.isLoading || trash.isLoading, isError: query.isError || trash.isError, error: query.error ?? trash.error,
+    refetch: refresh, refresh };
+}
+
+export function useInvoiceTrash() {
+  return useQuery({ queryKey: qk.invoiceTrash, queryFn: () => api.listInvoiceTrash() });
+}
+
+export function useSetInvoiceTrash() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (input: { id: string; trashed: boolean; expectedEventId: string | null }) => api.setInvoiceTrash(input.id, { trashed: input.trashed, expectedEventId: input.expectedEventId }),
+    onSuccess: event => qc.setQueryData<InvoiceTrashEvent[]>(qk.invoiceTrash, old => [event, ...(old ?? []).filter(item => item.id !== event.id)]),
+    onSettled: () => Promise.all([invalidateMoney(qc), qc.invalidateQueries({ queryKey: qk.invoiceTrash })]),
+  });
 }
 
 export function useInvoice(id: string) {

@@ -22,6 +22,7 @@ import type {
 } from '@/contracts';
 import { UPLOAD } from '@/config/env';
 import { ApiError } from '../errors';
+import type { InvoiceTrashEvent } from '@oli/contracts';
 import type { OliApi } from '../types';
 import { mockEvaluate, type EngineContext } from './engine';
 import {
@@ -53,6 +54,7 @@ type Meta = { t0: number; scenario: string; fileName: string | null; agentName: 
 
 type Db = {
   signedIn: boolean;
+  trashEvents?: InvoiceTrashEvent[];
   userName?: string | null;
   org: { id: string; name: string; defaultCurrency: string } | null;
   role: Role;
@@ -370,6 +372,16 @@ export const mockApi: OliApi = {
   async getEmailIntegration() { return { available: false, mailbox: null }; },
   async enableEmail() { throw new ApiError({ status: 503, code: 'EMAIL_NOT_CONFIGURED', message: 'Email is temporarily unavailable.' }); },
   async disableEmail() {},
+  async listInvoiceTrash() { await lag(); return auth().trashEvents ?? []; },
+  async setInvoiceTrash(invoiceId, input) {
+    await lag(); const d = auth(); requireOwner(d);
+    if (!d.invoices.some(invoice => invoice.id === invoiceId)) throw new ApiError({ status: 404, code: 'NOT_FOUND', message: 'Invoice not found' });
+    const current = d.trashEvents?.find(event => event.invoiceId === invoiceId);
+    if ((current?.id ?? null) !== input.expectedEventId) throw new ApiError({ status: 409, code: 'TRASH_CHANGED', message: 'Refresh the invoice history.' });
+    const invoice = d.invoices.find(item => item.id === invoiceId)!;
+    const event = { id: crypto.randomUUID(), invoiceId, invoiceName: invoice.vendorName ?? invoice.fileName ?? invoiceId, trashed: input.trashed, at: nowIso(), userId: SEED_USER.id, userName: d.userName ?? SEED_USER.name };
+    d.trashEvents = [event, ...(d.trashEvents ?? [])]; persist(); return event;
+  },
   async getInbox() { return { messages: [], unreadCount: 0 }; },
   async readInboxMessage() {},
   async getTelegramIntegration() { return { available: false, connection: null }; },

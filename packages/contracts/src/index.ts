@@ -511,3 +511,12 @@ export const InboxSchema = z.strictObject({ messages: z.array(InboxMessageSchema
 export type EmailIntegration = z.infer<typeof EmailIntegrationSchema>;
 export type InboxMessage = z.infer<typeof InboxMessageSchema>;
 export type Inbox = z.infer<typeof InboxSchema>;
+
+
+// Visibility is separate from invoice processing, decisions and budget reservations.
+export const InvoiceTrashEventSchema = z.strictObject({
+  id: IdSchema, invoiceId: IdSchema, invoiceName: z.string(), trashed: z.boolean(), at: TimestampSchema,
+  userId: IdSchema, userName: z.string().nullable(),
+});
+export const SetInvoiceTrashSchema = z.strictObject({ trashed: z.boolean(), expectedEventId: IdSchema.nullable() });
+export type InvoiceTrashEvent = z.infer<typeof InvoiceTrashEventSchema>;

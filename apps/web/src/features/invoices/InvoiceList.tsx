@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { ChevronRight } from 'lucide-react';
 import { OutcomeBadge, SourceBadge } from '@/components/Badges';
@@ -12,7 +13,7 @@ export function invoiceTitle(i: InvoiceSummary) {
 }
 
 /** Responsive list: table on ≥md, stacked cards below. */
-export function InvoiceList({ invoices, compact = false }: { invoices: InvoiceSummary[]; compact?: boolean }) {
+export function InvoiceList({ invoices, compact = false, actions }: { invoices: InvoiceSummary[]; compact?: boolean; actions?: (invoice: InvoiceSummary) => ReactNode }) {
   return (
     <>
       <div className="hidden md:block">
@@ -25,6 +26,7 @@ export function InvoiceList({ invoices, compact = false }: { invoices: InvoiceSu
               <th scope="col" className="px-3 py-2.5 font-normal">{t('Due')}</th>
               {!compact && <th scope="col" className="px-3 py-2.5 font-normal">{t('Source')}</th>}
               <th scope="col" className="px-3 py-2.5 font-normal">{t('Status')}</th>
+              {actions && <th scope="col" className="px-3 py-2.5 font-normal">{t('Actions')}</th>}
               <th scope="col" className="w-8" />
             </tr>
           </thead>
@@ -51,6 +53,7 @@ export function InvoiceList({ invoices, compact = false }: { invoices: InvoiceSu
                     <OutcomeBadge outcome={o} />
                     {o === 'PROCESSING' && <span className="ml-2 text-xs text-slate-400">{processingLabel(i.status)}</span>}
                   </td>
+                  {actions && <td className="px-3 py-2">{actions(i)}</td>}
                   <td className="pr-4 text-slate-300 group-hover:text-ink">
                     <ChevronRight className="size-4" aria-hidden />
                   </td>
@@ -79,6 +82,7 @@ export function InvoiceList({ invoices, compact = false }: { invoices: InvoiceSu
                 <SourceBadge source={i.source} agentName={i.requestingAgentName} />
               </div>
             </Link>
+            {actions && <div className="px-4 pb-3">{actions(i)}</div>}
           </li>
         ))}
       </ul>

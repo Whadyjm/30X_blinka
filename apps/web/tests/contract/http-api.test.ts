@@ -130,11 +130,12 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
     const env = { DB, INVOICES: await runtime.getR2Bucket('INVOICES'), DEMO_ORG_ID: 'org_demo', DEMO_USER_ID: 'user_demo_owner',
       DEMO_PASSWORD: 'test-only', OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: async () => ({ format: 'markdown',
         data: `EMISOR / SUPPLIER\n${current.vendorName}\nNúmero / Number\n${current.invoiceNumber}\nEmisión / Issued\n${current.issuedAt}\nPeriodo de servicio\n${current.servicePeriod}\nMoneda / Currency\nUSD\nVencimiento / Due\n2026-10-31\nCONCEPTO / DESCRIPTION\n${current.description}\nTOTAL A COBRAR\nUSD ${(current.amountMinor / 100).toFixed(2)}` }) } };
-    let cookie = ''; let loseUpload = false;
+    let cookie = ''; let loseUpload = false; let loseTrash = false;
     const fetchImpl: typeof fetch = async (input, init) => {
       const headers = new Headers(init?.headers); headers.set('Origin', 'https://oli.invalid'); if (cookie) headers.set('Cookie', cookie);
       const result = await worker.fetch(new Request(new URL(String(input), 'https://oli.invalid'), { ...init, headers }), env);
       if (result.headers.has('Set-Cookie')) cookie = result.headers.get('Set-Cookie').split(';')[0];
+      if (loseTrash && String(input).endsWith('/trash') && init?.method === 'POST') { loseTrash = false; throw new TypeError('lost trash response'); }
       if (loseUpload && String(input).endsWith('/invoices') && init?.method === 'POST') { loseUpload = false; throw new TypeError('lost committed response'); }
       return result;
     };
@@ -181,7 +182,36 @@ it('real Worker + D1/R2: login, stale draft, activation, upload retry, decision 
     expect(resolved.decision?.reasons).toContain('HUMAN_APPROVED'); expect(resolved.decisionHistory).toHaveLength(1);
     expect((await api.getMandate()).budget?.reservedMinor).toBe(65000);
     expect(await DB.prepare('SELECT count(*) AS n FROM budget_reservations').first('n')).toBe(2);
+
+    const budgetBeforeTrash = (await api.getMandate()).budget;
+    const originalDecision = (await api.getInvoice(uploaded.id)).decision;
+    loseTrash = true;
+    const trashInput = { trashed: true, expectedEventId: null };
+    await expect(api.setInvoiceTrash(uploaded.id, trashInput)).rejects.toMatchObject({ code: 'NETWORK' });
+    const trashed = await api.setInvoiceTrash(uploaded.id, trashInput);
+    expect((await api.listInvoiceTrash()).filter(event => event.invoiceId === uploaded.id)).toHaveLength(1);
+    expect((await api.getInvoice(uploaded.id)).decision).toEqual(originalDecision);
+    expect((await fetchImpl(`/api/v1/invoices/${uploaded.id}/file`)).status).toBe(200);
+    expect((await api.getMandate()).budget).toEqual(budgetBeforeTrash);
+    const copyInTrash = await api.uploadInvoice(file, 'copy-while-original-in-trash'); await api.processInvoice(copyInTrash.id);
+    expect(getOutcome(await api.getInvoice(copyInTrash.id))).toBe('BLOCKED');
+    expect((await api.getMandate()).budget).toEqual(budgetBeforeTrash);
+    const restored = await api.setInvoiceTrash(uploaded.id, { trashed: false, expectedEventId: trashed.id });
+    expect(restored.trashed).toBe(false);
+    const trashHistory = (await api.listInvoiceTrash()).filter(event => event.invoiceId === uploaded.id);
+    expect(trashHistory.map(event => event.trashed)).toEqual([false, true]);
+    await expect(api.setInvoiceTrash(uploaded.id, { trashed: true, expectedEventId: trashed.id })).rejects.toMatchObject({ status: 409, code: 'TRASH_CHANGED' });
+    expect((await api.listInvoiceTrash()).filter(event => event.invoiceId === uploaded.id)).toHaveLength(2);
+    await expect(DB.prepare('DELETE FROM audit_events WHERE id = ?').bind(trashed.id).run()).rejects.toThrow();
+    await DB.batch([
+      DB.prepare("INSERT INTO invoices(id,org_id,file_key,file_name,file_mime_type,file_size_bytes,file_sha256) VALUES ('inv_foreign_trash','org_history_other','foreign/key','foreign.pdf','application/pdf',10,?)").bind('a'.repeat(64)),
+    ]);
+    await expect(api.setInvoiceTrash('inv_foreign_trash', { trashed: true, expectedEventId: null })).rejects.toMatchObject({ status: 404 });
+    await DB.prepare("UPDATE memberships SET role = 'APPROVER' WHERE org_id='org_demo' AND user_id='user_demo_owner'").run();
+    await expect(api.setInvoiceTrash(uploaded.id, { trashed: true, expectedEventId: restored.id })).rejects.toMatchObject({ status: 403 });
+    expect((await api.getMandate()).budget).toEqual(budgetBeforeTrash);
     await api.logout(); expect(await api.me()).toBeNull();
     await expect(api.listMandateVersions()).rejects.toMatchObject({ status: 401 });
+    await expect(api.listInvoiceTrash()).rejects.toMatchObject({ status: 401 });
   } finally { await runtime.dispose(); }
 });

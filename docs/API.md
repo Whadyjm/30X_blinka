@@ -923,3 +923,23 @@ idempotencia y persistencia; no son métricas del extractor ni de decisiones end
 la activa y las anteriores `SUPERSEDED`, con reglas, fecha e identidad de activación.
 Solo expone versiones de la organización autenticada. Consultarlo no cambia el mandato,
 no reactiva versiones ni afecta decisiones previas. Los borradores se consultan en `/mandate`.
+
+
+### Papelera de facturas
+
+`GET /invoice-trash?page=1&pageSize=100` devuelve `Envelope<InvoiceTrashEvent[]>`
+con paginación y eventos de la empresa autenticada, del más reciente al más antiguo.
+Cada evento incluye `id`, `invoiceId`, `invoiceName`, `trashed`, `at`, `userId` y
+`userName`. El primer evento de cada factura determina su visibilidad actual.
+
+`POST /invoices/:id/trash` requiere OWNER, CSRF e Idempotency-Key y recibe
+`{ trashed: boolean, expectedEventId: string | null }`. Devuelve el evento registrado.
+El servidor comprueba atómicamente el último evento; un estado obsoleto devuelve
+`409 TRASH_CHANGED`. `trashed:false` restaura la factura. Cada acción se agrega al
+registro de auditoría inmutable, sin borrado de filas ni de R2.
+
+La papelera solo cambia visibilidad. No cancela trabajos, decisiones, solicitudes
+humanas ni reservas. Los documentos permanecen dentro de los controles de duplicados,
+acuerdos y presupuesto. Los endpoints financieros y las lecturas originales conservan
+los registros; el cliente oculta eliminadas de la lista activa y permite consultarlas.
+No existe estado PAID ni historial de pagos: APPROVE es autorización simulada.

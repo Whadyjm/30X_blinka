@@ -19,7 +19,7 @@ import type {
   VendorInput,
 } from '@/contracts';
 import type { z } from 'zod';
-import type { ChatMessageInputSchema, ChatHistorySchema, ChatConversationsSchema, ChatReply, ChatCard, ChatAction, ChatActionResult } from '@oli/contracts';
+import type { InvoiceTrashEvent, ChatMessageInputSchema, ChatHistorySchema, ChatConversationsSchema, ChatReply, ChatCard, ChatAction, ChatActionResult } from '@oli/contracts';
 import type { EmailIntegration, Inbox, TelegramIntegration, TelegramLink } from '@oli/contracts';
 import type { CreatedSkillConnection, SkillConnection, SkillIntegration } from '@oli/contracts';
 
@@ -49,6 +49,8 @@ export interface OliApi {
   enableEmail(): Promise<EmailIntegration>;
   disableEmail(): Promise<void>;
   getInbox(): Promise<Inbox>;
+  listInvoiceTrash(): Promise<InvoiceTrashEvent[]>;
+  setInvoiceTrash(id: string, input: { trashed: boolean; expectedEventId: string | null }): Promise<InvoiceTrashEvent>;
   readInboxMessage(id: string): Promise<void>;
 
   // Server-owned conversation and changes; sending a message never confirms a proposal.

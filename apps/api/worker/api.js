@@ -13,6 +13,7 @@ import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest
 import { configureTelegram, createTelegramLink, disconnectTelegram, telegramStatus } from './telegram.js';
 import { disableEmail, emailStatus, enableEmail, inbox, readInboxMessage } from './email.js';
 import { createSkillConnection, handleAgentRequest, revokeSkillConnection, skillConnections, updateSkillConnection } from './skill.js';
+import { invoiceTrashEvents, setInvoiceTrash } from './invoice-trash.js';
 import { evaluationReport, evaluationSummary } from './evaluation.js';
 
 function query(url, schema) {
@@ -42,6 +43,9 @@ export async function handleApi(request, env) {
     if (path === '/integrations/email' && method === 'GET') return await emailStatus(env, session);
     if (path === '/integrations/email' && method === 'POST') return await enableEmail(env, session);
     if (path === '/integrations/email' && method === 'DELETE') return await disableEmail(env, session);
+    if (path === '/invoice-trash' && method === 'GET') return page(await invoiceTrashEvents(env.DB, orgId), query(url, PaginationQuerySchema));
+    const trashInvoice = path.match(/^\/invoices\/([^/]+)\/trash$/);
+    if (trashInvoice && method === 'POST') return await setInvoiceTrash(request, env, session, trashInvoice[1]);
     if (path === '/inbox' && method === 'GET') return await inbox(env, session);
     const inboxItem = path.match(/^\/inbox\/([^/]+)\/read$/);
     if (inboxItem && method === 'POST') return await readInboxMessage(env, session, inboxItem[1]);

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import {
-  ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
+  InvoiceTrashEventSchema, SetInvoiceTrashSchema, ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
   MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema,
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
@@ -141,6 +141,11 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     async enableEmail() { return parse('/integrations/email', envelope(EmailIntegrationSchema), await raw('POST', '/integrations/email')).data; },
     async disableEmail() { await raw('DELETE', '/integrations/email'); },
     getInbox: () => get('/inbox', InboxSchema),
+    listInvoiceTrash: () => list('/invoice-trash', InvoiceTrashEventSchema),
+    async setInvoiceTrash(id, input) {
+      const path = `/invoices/${encodeURIComponent(id)}/trash`;
+      return parse(path, envelope(InvoiceTrashEventSchema), await command(path, SetInvoiceTrashSchema.parse(input))).data;
+    },
     async readInboxMessage(id) { await raw('POST', `/inbox/${encodeURIComponent(id)}/read`); },
     async listMandateVersions() { return (await list('/mandate/versions', PolicyVersionSchema)).map(policyView); },
     async getMandate() {
