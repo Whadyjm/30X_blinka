@@ -235,6 +235,12 @@ a {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  .chat-prose[aria-busy='true'] :is(p, li, ul, ol, blockquote, pre, h1, h2, h3):has(.chat-reply-word):not(:has(.is-revealed)) {
+    display: none;
+  }
+  .chat-reply-word.is-revealed {
+    animation: oli-reply-word-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
   .oli-nav-icon {
     transform-origin: 50% 65%;
     transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -249,6 +255,11 @@ a {
       transition-duration: 220ms;
     }
   }
+}
+
+@keyframes oli-reply-word-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

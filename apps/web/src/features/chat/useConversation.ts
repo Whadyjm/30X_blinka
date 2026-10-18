@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChatMessageInputSchema, type ChatChannel, type ChatReply } from '@oli/contracts';
 import { api, errorMessage } from '@/api';
@@ -13,6 +13,8 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   const locked = useRef(false);
   const [sending, setSending] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [freshReply, setFreshReply] = useState<{ scope: string; turnId: string } | null>(null);
+  const finishReveal = useCallback((turnId: string) => setFreshReply(current => current?.turnId === turnId ? null : current), []);
   const storageKey = `oli.chat.pending:${scope}:${channel}`;
   const conversations = useQuery({ queryKey: ['chat-conversations', scope, channel], queryFn: () => api.listChatConversations(channel), retry: false, enabled: !!scope,
     refetchInterval: channel === 'TELEGRAM' ? 5000 : false });
@@ -62,6 +64,7 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   };
 
   function rememberReply(reply: ChatReply, current: Submission) {
+    setFreshReply({ scope, turnId: reply.turnId });
     setSelection({ scope, id: reply.conversationId });
     qc.setQueryData(['chat-history', scope, channel, reply.conversationId], (old: typeof history.data) => ({ id: reply.conversationId, channel,
       turns: [...(old?.turns ?? []).filter(turn => turn.id !== reply.turnId), {
@@ -75,7 +78,7 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
   const processing = history.data?.turns.some(turn => turn.state === 'PROCESSING') ?? false;
   const loading = conversations.isLoading || (!!id && history.isLoading);
   return {
-    id, conversations: conversations.data ?? [],
+    id, conversations: conversations.data ?? [], revealTurnId: freshReply?.scope === scope ? freshReply.turnId : null, finishReveal,
     turns: history.data?.turns ?? [], pending, sending, loading, processing,
     error: failure ?? (conversations.error ? errorMessage(conversations.error) : history.error ? errorMessage(history.error) : null),
     canSend: channel === 'WEB' && !!scope && !loading && !sending && !processing && !pending && !conversations.isError && !history.isError,
@@ -93,7 +96,7 @@ export function useConversation(scope: string, channel: ChatChannel = 'WEB') {
       void conversations.refetch();
     },
     retry: () => operation.current ? deliver() : conversations.isError || !id ? conversations.refetch() : history.refetch(),
-    selectConversation(next: string) { if (!locked.current && !operation.current && conversations.data?.some(c => c.id === next && c.channel === channel)) { setSelection({ scope, id: next }); setFailure(null); } },
-    newConversation() { if (channel === 'WEB' && !locked.current && !operation.current) { setSelection({ scope, id: null }); setFailure(null); } },
+    selectConversation(next: string) { if (!locked.current && !operation.current && conversations.data?.some(c => c.id === next && c.channel === channel)) { setFreshReply(null); setSelection({ scope, id: next }); setFailure(null); } },
+    newConversation() { if (channel === 'WEB' && !locked.current && !operation.current) { setFreshReply(null); setSelection({ scope, id: null }); setFailure(null); } },
   };
 }

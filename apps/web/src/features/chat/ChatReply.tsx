@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ChatAction, ChatActionResult, ChatCard, ChatReply as Reply } from '@oli/contracts';
@@ -12,9 +12,10 @@ import { formatDateTime } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
 import { ChatText } from './ChatText';
 
-export function ChatReply({ reply, readOnly = false }: { reply: Reply; readOnly?: boolean }) {
+export function ChatReply({ reply, readOnly = false, animate = false, onRevealProgress, onRevealDone }: { reply: Reply; readOnly?: boolean; animate?: boolean; onRevealProgress?: () => void; onRevealDone?: (turnId: string) => void }) {
+  const finishReveal = useCallback(() => onRevealDone?.(reply.turnId), [onRevealDone, reply.turnId]);
   return <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
-    <ChatText text={reply.text} />
+    <ChatText text={reply.text} animate={animate} onRevealProgress={onRevealProgress} onRevealDone={finishReveal} />
     {reply.cards.map((card, i) => <ChatCardView key={i} card={card} />)}
     {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} readOnly={readOnly} />)}
   </div>;

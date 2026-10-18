@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useLocation } from 'react-router';
 import { ArrowDown, ArrowUp, FileText, History, LayoutDashboard, MessageSquare, Paperclip, Plus, Send, X } from 'lucide-react';
 import type { ChatChannel } from '@oli/contracts';
@@ -22,6 +22,7 @@ export function ChatWorkspace() {
   const web = useConversation(scope, 'WEB'), telegram = useConversation(telegramPreference.visible ? scope : '', 'TELEGRAM');
   const [selectedChannel, setChannel] = useState<ChatChannel>('WEB');
   const channel = telegramPreference.visible ? selectedChannel : 'WEB';
+  useEffect(() => { if (channel !== 'WEB' && web.revealTurnId) web.finishReveal(web.revealTurnId); }, [channel, web.revealTurnId, web.finishReveal]);
   const conversation = channel === 'WEB' ? web : telegram;
   const [draft, setDraft] = useState(() => reviewInvoiceId ? t('Help me resolve invoice {id}. Explain what is missing and prepare any changes for my confirmation.', { id: reviewInvoiceId }) : ''), [files, setFiles] = useState<File[]>([]);
   const drafts = useRef(new Map<string | null, { text: string; files: File[] }>());
@@ -34,6 +35,9 @@ export function ChatWorkspace() {
   const [nearBottom, setNearBottom] = useState(true), [dragging, setDragging] = useState(false);
   const root = useRef<HTMLElement>(null), log = useRef<HTMLDivElement>(null), textarea = useRef<HTMLTextAreaElement>(null), fileInput = useRef<HTMLInputElement>(null);
   const shouldFollow = useRef(true);
+  const followReply = useCallback(() => {
+    if (shouldFollow.current && log.current) log.current.scrollTop = log.current.scrollHeight;
+  }, []);
   const busy = web.sending || web.processing || web.loading;
   const empty = conversation.turns.length === 0 && !conversation.pending && !conversation.loading;
   const showCompanion = channel === 'WEB' && !empty;
@@ -196,7 +200,7 @@ export function ChatWorkspace() {
             {turn.text && <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">{turn.text}</p>}
             {turn.invoiceIds.length > 0 && <div className="flex flex-wrap gap-2">{turn.invoiceIds.map(id => <Link key={id} to={`/app/bills/${encodeURIComponent(id)}`} className="inline-flex min-h-11 items-center gap-2 text-sm underline underline-offset-4"><FileText className="size-4" aria-hidden />{t('View invoice')}</Link>)}</div>}
           </div></div>
-          <div className="text-base leading-7 text-ink">{turn.reply ? <ChatReply reply={turn.reply} readOnly={channel === 'TELEGRAM'} /> : <p role="status" className="text-slate-600">{t(turn.state === 'FAILED' ? 'This message failed. Please try again.' : 'Oli is thinking...')}</p>}</div>
+          <div className="text-base leading-7 text-ink">{turn.reply ? <ChatReply reply={turn.reply} readOnly={channel === 'TELEGRAM'} animate={channel === 'WEB' && turn.id === web.revealTurnId} onRevealProgress={followReply} onRevealDone={web.finishReveal} /> : <p role="status" className="text-slate-600">{t(turn.state === 'FAILED' ? 'This message failed. Please try again.' : 'Oli is thinking...')}</p>}</div>
         </div>)}
         {conversation.pending && <div className="mx-auto max-w-3xl space-y-5">
           <div className="flex justify-end"><div className="max-w-[90%] rounded-2xl bg-bone px-4 py-3 text-base leading-7">
