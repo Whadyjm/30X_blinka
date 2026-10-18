@@ -1,0 +1,97 @@
+{
+  "featureCommit": "a2ec430",
+  "published": {
+    "date": "2026-10-18T02:02:53.452Z",
+    "host": "https://oli30x.ultramare.dev",
+    "commit": "a2ec430",
+    "version": "3969033b-c472-4bf3-b512-06d55418f2d8",
+    "scope": "UI publicada: arrastre y selección sintéticos sin enviar. API: diez IDs inexistentes alcanzan comprobación de pertenencia (404), once se rechazan por validación (400). Sin nuevos turnos, cargas ni llamadas al modelo.",
+    "viewports": [
+      1440,
+      390
+    ],
+    "overlayAndCopy": true,
+    "tenSelectable": true,
+    "elevenRejectedBeforeUpload": true,
+    "serverBoundary": [
+      {
+        "count": 10,
+        "status": 404,
+        "code": "NOT_FOUND"
+      },
+      {
+        "count": 11,
+        "status": 400,
+        "code": "VALIDATION_ERROR"
+      }
+    ],
+    "newConversationTurns": false,
+    "actualInvoiceUploads": 0,
+    "pageApiWrites": 0,
+    "errors": [],
+    "result": "PASS"
+  },
+  "localUi": {
+    "scope": "Mock local, sin cargas ni mensajes en producción",
+    "viewports": [
+      1440,
+      390
+    ],
+    "viewportOverlay": true,
+    "nestedDragDoesNotFlicker": true,
+    "textDragIgnored": true,
+    "elevenRejectedBeforeUpload": true,
+    "tenFilesDelivered": true,
+    "errors": [],
+    "result": "PASS"
+  },
+  "validation": {
+    "frontendTestsPassed": 59,
+    "frontendTestFiles": 14,
+    "contractTestsPassed": 29,
+    "apiChatTestsPassed": 20,
+    "packagedWorkerWorkerdTestsPassed": 1,
+    "typecheck": "PASS",
+    "productionBuild": "PASS",
+    "wranglerDryRun": "PASS",
+    "scope": "Proveedores simulados en pruebas de envío/modelo; no son métricas de precisión del extractor."
+  },
+  "limits": {
+    "chatFilesPerMessage": 10,
+    "bytesPerFile": 5242880,
+    "replyCards": 14,
+    "toolsPerTurn": 4
+  },
+  "runtime": {
+    "matchesCandidateByteForByte": true,
+    "bindingsPreserved": true,
+    "sha256": "5e51a58bf16259f86f382e8c529097b4c44cc9a56528b9a02e0b0acad2159bdc",
+    "baseBackendFilesVerified": 30
+  },
+  "publishedUiPreservation": {
+    "version": "6499fa33-30bd-442d-8c73-1279959d43da",
+    "entryAssetsVerified": true,
+    "preservedPublishedSourceFiles": [
+      "apps/web/index.html",
+      "apps/web/src/config/brand.ts",
+      "apps/web/src/features/chat/ChatMascot.tsx",
+      "apps/web/src/features/chat/ChatWorkspace.tsx",
+      "apps/web/src/features/chat/OliTickle.tsx",
+      "apps/web/src/i18n/es.chat.ts",
+      "apps/web/src/i18n/es.core.ts",
+      "apps/web/src/i18n/es.shell.ts",
+      "apps/web/src/pages/AskOli.tsx",
+      "apps/web/src/pages/Landing.tsx",
+      "apps/web/src/styles/chat-mascot.css",
+      "apps/web/src/styles/chat-board.css",
+      "packages/oli/src/renderer.js",
+      "packages/oli/test/lifecycle.test.js"
+    ],
+    "onlyOverlay": "a2ec430 shared ChatWorkspace/es.chat hunks"
+  },
+  "limitations": [
+    "No se cargaron ni procesaron facturas reales en la verificación de producción.",
+    "La prueba del servidor usa IDs inexistentes para alcanzar la validación de pertenencia con diez y rechazar once antes de cualquier llamada al modelo.",
+    "El ingreso por correo conserva límites independientes."
+  ]
+}
