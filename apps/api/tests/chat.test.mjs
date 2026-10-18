@@ -391,3 +391,34 @@ test('diez facturas adjuntas y cuatro consultas caben en la respuesta; once se r
   const excessive = await h.chat('Demasiadas facturas', crypto.randomUUID(), null, [...invoiceIds, invoiceIds[0]]);
   assert.equal(excessive.status, 400); assert.equal(h.calls.length, 2);
 });
+
+test('el recibo de diez adjuntos pendientes no promete seguimiento ni gasta modelo y el intake refleja la decisión posterior', async t => {
+  const h = await setup(t), invoiceIds = [];
+  h.model(); // Any provider call would fail this test.
+  for (let n = 0; n < 10; n++) {
+    const uploaded = await h.api('/invoices', { method: 'POST', file: { bytes: '%PDF-1.4 pending ' + crypto.randomUUID() }, key: crypto.randomUUID() });
+    assert.equal(uploaded.status, 201);
+    invoiceIds.push(uploaded.data.id);
+  }
+  const key = crypto.randomUUID();
+  const result = await h.chat('', key, null, invoiceIds);
+  assert.equal(result.status, 200, JSON.stringify(result));
+  assert.equal(result.data.cards.length, 10);
+  assert.ok(result.data.cards.every(card => card.intake.status === 'PROCESSING'));
+  assert.match(result.data.text, /tarjetas/);
+  assert.doesNotMatch(result.data.text, /te avis|las reviso|volveré/);
+  assert.deepEqual((await h.chat('', key, null, invoiceIds)).data, result.data);
+  assert.equal(h.calls.length, 0);
+  const processed = await processInvoice(h.env, 'org_demo', invoiceIds[0], async (_env, _file, _bytes, documentSha256) => ({
+    extraction: { vendorName: vendor.name, invoiceNumber: 'RECEIPT-TEST', amountMinor: 8900, currency: 'USD',
+      issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10', description: 'Internet ficticio', extractionWarnings: [], evidence: [] },
+    documentType: 'INVOICE', documentSha256, primaryReadId: 'receipt-read',
+    corroboration: corroboratePdfText(`Proveedor: ${vendor.name}\nMoneda: USD\nVencimiento: 2026-10-31\nTotal: USD 89.00`, documentSha256),
+  }));
+  assert.equal(processed.data.status, 'DECIDED');
+  const intake = await h.api(`/invoices/${invoiceIds[0]}/intake`);
+  assert.equal(intake.data.invoice.status, 'DECIDED');
+  assert.notEqual(intake.data.intake.status, 'PROCESSING');
+  const history = await h.api('/chat/conversations/' + result.data.conversationId);
+  assert.equal(history.data.turns[0].reply.cards[0].intake.status, 'PROCESSING');
+});

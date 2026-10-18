@@ -21,6 +21,13 @@ export async function completeChat(env, session, history, input, channel = 'web'
   if (!env.OPENROUTER_API_KEY) throw new HttpError(503, 'CHAT_UNAVAILABLE', 'La conversación no está configurada.');
   const cards = [], prepared = [], calls = [];
   for (const invoiceId of new Set(input.invoiceIds)) cards.push(await inspectInvoice(env, session, invoiceId));
+  // A receipt for pending uploads needs no model promise about a future turn.
+  if (!input.text.trim() && cards.some(card => card.intake.status === 'PROCESSING')) {
+    return { text: channel === 'telegram'
+      ? 'Recibí tus facturas. El procesamiento sigue en curso; puedes volver a consultar su estado.'
+      : 'Recibí tus facturas. Las tarjetas muestran el progreso y se actualizan al terminar. Consulta ahí el resultado de cada una.',
+    cards, prepared, calls, rounds: 0 };
+  }
   const messages = [{ role: 'system', content: chatPrompt(session, channel) }, ...history,
     { role: 'user', content: JSON.stringify({ message: input.text, attachedInvoices: cards.map(modelCard) }) }];
   const deadline = Date.now() + 35_000;

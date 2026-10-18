@@ -403,6 +403,13 @@ Referencias a proveedor/acuerdo deben pertenecer a la empresa de la sesión.
    60 segundos; al agotar ese tiempo mostrar «Sigue procesando» con actualización manual,
    sin inventar un fallo o repetir automáticamente la subida.
 
+En el chat, las tarjetas individuales y los listados consultan `GET /invoices/:id/intake`
+cada2s mientras siga `PROCESSING`, sin cortar al minuto. Al abrir la conversación se
+consultan de nuevo incluso si el snapshot histórico ya parecía terminado. El texto
+histórico no se reescribe; la UI identifica las respuestas creadas durante el
+procesamiento y muestra los estados actuales en las tarjetas. El chat no promete
+un turno posterior automático al terminar.
+
 Repetir `process` devuelve el trabajo/resultado existente y nunca reserva dos veces.
 Los fallos técnicos transitorios vuelven a `RECEIVED` con `processingError.retryable=true` mientras esperan el siguiente intento automático. Hay como máximo tres intentos por factura, con espera de 30/120 segundos; repetir el endpoint no reinicia ese límite. Al agotarlo o ante un error permanente, queda `FAILED` con `retryable=false`.
 Una factura ya decidida no se reevalúa por llamar `process`; el endpoint explícito `/reevaluate` descrito abajo vuelve a comprobar las reglas.

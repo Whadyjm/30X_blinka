@@ -1,4 +1,5 @@
 export const esChat: Record<string, string> = {
+  'This reply was written while invoices were processing. See their current status below.': 'Esta respuesta se escribió mientras se procesaban las facturas. Consulta su estado actual debajo.',
   'This message has reached its retry limit. You can write a new message or start a new conversation.': 'Este mensaje agotó sus reintentos. Puedes escribir otro mensaje o abrir una conversación nueva.',
   'Register vendors': 'Registrar proveedores por lote',
   'Oli reached the limit of queries or proposals for this message. Ask for a batch of up to 20 vendors, or split other tasks into smaller steps. No changes were applied.': 'Oli alcanzó el límite de consultas o propuestas de este mensaje. Pide un lote de hasta 20 proveedores o divide las otras tareas en pasos más pequeños. No se ejecutó ningún cambio.',

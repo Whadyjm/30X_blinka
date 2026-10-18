@@ -77,9 +77,13 @@ Primera solicitud:
 { "conversationId": null, "text": "¿Cómo va mi presupuesto?", "invoiceIds": [] }
 ```
 
-Siguientes solicitudes usan el `conversationId` retornado. `text`: máximo4000 caracteres; `invoiceIds`: hasta4 IDs propios. Se exige texto o al menos una factura. Una clave UUID por turno; si se pierde la respuesta, repetir exactamente el mismo body y clave. No regenerar la clave ni añadir el nuevo conversationId en ese reintento.
+Siguientes solicitudes usan el `conversationId` retornado. `text`: máximo4000 caracteres; `invoiceIds`: hasta10 IDs propios. Se exige texto o al menos una factura. Una clave UUID por turno; si se pierde la respuesta, repetir exactamente el mismo body y clave. No regenerar la clave ni añadir el nuevo conversationId en ese reintento.
 
 Los archivos siguen el flujo existente: `POST /invoices` (multipart, un archivo por solicitud, máximo5MiB), `POST /invoices/:id/process` y polling por ID. Cada archivo mantiene su propia clave de subida. Conservar los IDs y enviarlos al chat: no poner base64, texto OCR o supuestas extracciones en el mensaje. El chat inspecciona los IDs; no inicia llamadas OCR por una instrucción del modelo. Una factura aún procesándose muestra `PROCESSING`; el frontend termina el polling y consulta `/intake` otra vez.
+
+Las tarjetas `INVOICE` y cada fila de `INVOICES` consultan `GET /invoices/:id/intake` al abrirse y comparten caché por ID. Mientras `intake.status=PROCESSING`, siguen consultando cada2s hasta un estado final o salir del chat; no se detienen silenciosamente al minuto. Los errores se muestran con actualización manual y el foco vuelve a consultar el estado. El texto y los snapshots persistidos se conservan como historial: si el turno se escribió durante el procesamiento, la UI lo aclara y presenta las tarjetas actualizadas debajo.
+
+Un envío sin texto con adjuntos pendientes recibe un acuse determinista, sin llamada al modelo. El chat no genera otro turno automáticamente al terminar: el acuse indica consultar las tarjetas (en Telegram, volver a preguntar). El prompt tampoco permite prometer avisos o revisiones posteriores automáticas.
 
 V1 responde JSON al finalizar; no hay streaming/SSE. Usar un timeout de60s para mensajes y el timeout de90s de procesamiento existente. Mientras espera, Oli puede mostrar `thinking`; escribir/enfocar usa `listening`, terminar `understanding` y reposo `idle`. Son estados visuales, no una fuente de decisiones financieras.
 

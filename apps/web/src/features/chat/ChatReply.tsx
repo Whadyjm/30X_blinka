@@ -1,6 +1,6 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ChatAction, ChatActionResult, ChatCard, ChatReply as Reply } from '@oli/contracts';
 import { api, errorMessage } from '@/api';
 import { invoiceView } from '@/api/view-model';
@@ -11,10 +11,14 @@ import { t } from '@/i18n';
 import { formatDateTime } from '@/lib/dates';
 import { formatMoney } from '@/lib/money';
 import { ChatText } from './ChatText';
+import { invoiceIntakeQuery } from './invoice-intake-query';
 
 export function ChatReply({ reply, readOnly = false, animate = false, onRevealProgress, onRevealDone }: { reply: Reply; readOnly?: boolean; animate?: boolean; onRevealProgress?: () => void; onRevealDone?: (turnId: string) => void }) {
   const finishReveal = useCallback(() => onRevealDone?.(reply.turnId), [onRevealDone, reply.turnId]);
+  const wasProcessing = reply.cards.some(card => card.type === 'INVOICE' ? card.intake.status === 'PROCESSING'
+    : card.type === 'INVOICES' && card.invoices.some(invoice => !['DECIDED', 'FAILED'].includes(invoice.status)));
   return <div className="min-w-0 space-y-3 [overflow-wrap:anywhere]">
+    {wasProcessing && <p className="text-sm">{t('This reply was written while invoices were processing. See their current status below.')}</p>}
     <ChatText text={reply.text} animate={animate} onRevealProgress={onRevealProgress} onRevealDone={finishReveal} />
     {reply.cards.map((card, i) => <ChatCardView key={i} card={card} />)}
     {reply.actions.map(action => <ActionReview key={action.id} snapshot={action} readOnly={readOnly} />)}
@@ -29,10 +33,7 @@ const intakeLabels = {
 
 export function ChatCardView({ card }: { card: ChatCard }) {
   if (card.type === 'INVOICE') return <InvoiceCard snapshot={card} />;
-  if (card.type === 'INVOICES') return <div className="min-w-0 overflow-x-auto">
-    {card.invoices.length ? <InvoiceList invoices={card.invoices.map(invoiceView)} compact /> : <p>{t('No matching records.')}</p>}
-    {card.truncated && <p>{t('More records are available in Bills.')}</p>}
-  </div>;
+  if (card.type === 'INVOICES') return <InvoiceListCard snapshot={card} />;
   if (card.type === 'BUDGET') return <div className="space-y-2">
     <p>{t('Budget')} · {card.periodKey}</p>
     {card.budgets.length === 0 && <p>{t('No matching records.')}</p>}
@@ -66,16 +67,25 @@ export function ChatCardView({ card }: { card: ChatCard }) {
 }
 
 function InvoiceCard({ snapshot }: { snapshot: Extract<ChatCard, { type: 'INVOICE' }> }) {
-  const started = useRef(Date.now());
-  const live = useQuery({ queryKey: ['invoice-intake', snapshot.invoice.id], queryFn: () => api.getInvoiceIntake(snapshot.invoice.id),
-    initialData: snapshot, enabled: snapshot.intake.status === 'PROCESSING', retry: false,
-    refetchInterval: query => query.state.data?.intake.status === 'PROCESSING' && Date.now() - started.current < 60000 ? 2000 : false });
+  const live = useQuery({ ...invoiceIntakeQuery(snapshot.invoice.id), initialData: snapshot, initialDataUpdatedAt: 0 });
   const card = live.data;
   return <div className="min-w-0 overflow-x-auto space-y-2">
     <p>{t(intakeLabels[card.intake.status])}</p>
     <InvoiceList invoices={[invoiceView(card.invoice)]} compact />
-    {card.intake.status === 'PROCESSING' && <Button size="sm" variant="secondary" loading={live.isFetching} onClick={() => { started.current = Date.now(); void live.refetch(); }}>{t('Refresh')}</Button>}
+    {(card.intake.status === 'PROCESSING' || live.isError) && <Button size="sm" variant="secondary" loading={live.isFetching} onClick={() => void live.refetch()}>{t('Refresh')}</Button>}
     {live.isError && <p role="alert">{errorMessage(live.error)}</p>}
+  </div>;
+}
+
+function InvoiceListCard({ snapshot }: { snapshot: Extract<ChatCard, { type: 'INVOICES' }> }) {
+  const live = useQueries({ queries: snapshot.invoices.map(invoice => invoiceIntakeQuery(invoice.id)) });
+  const error = live.find(query => query.isError)?.error;
+  return <div className="min-w-0 overflow-x-auto space-y-2">
+    {snapshot.invoices.length ? <InvoiceList invoices={snapshot.invoices.map((invoice, index) => invoiceView(live[index]?.data?.invoice ?? invoice))} compact /> : <p>{t('No matching records.')}</p>}
+    {error && <div role="alert" className="space-y-2"><p>{errorMessage(error)}</p>
+      <Button size="sm" variant="secondary" loading={live.some(query => query.isFetching)} onClick={() => { for (const query of live) void query.refetch(); }}>{t('Refresh')}</Button>
+    </div>}
+    {snapshot.truncated && <p>{t('More records are available in Bills.')}</p>}
   </div>;
 }
 
