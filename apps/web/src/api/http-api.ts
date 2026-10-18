@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { AiUsageSchema } from '@oli/contracts';
 import {
   InvoiceTrashEventSchema, SetInvoiceTrashSchema, ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
@@ -84,6 +85,7 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
   }
   const unavailable = () => Promise.reject(new ApiError({ status: 404, code: 'NOT_AVAILABLE', message: t('This feature is not available yet.') }));
   const api: OliApi = {
+    getAiUsage: () => get('/ai/usage', AiUsageSchema),
     async health() {
       const response = await doFetch(`${opts.base.replace(/\/v1$/, '')}/health`);
       if (!response.ok) throw new ApiError({ status: response.status, code: 'SERVICE_UNAVAILABLE', message: defaultMessage(response.status) });

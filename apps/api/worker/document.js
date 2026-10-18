@@ -2,6 +2,7 @@ import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_CONFIG_VERSION, IMAGE_OCR_MODEL, E
 import { CurrencySchema, DateSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
 import { normalizeInvoiceNumber } from '@oli/domain';
 import { HttpError, id, sha256 } from './http.js';
+import { meteredFetch, recordAiCall } from './ai-usage.js';
 
 export function validateDocument(bytes, mimeType) {
   const png = [137, 80, 78, 71, 13, 10, 26, 10].every((b, i) => bytes[i] === b);
@@ -211,6 +212,8 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
   const pdf = file.mimeType === 'application/pdf';
   const imageOcr = !pdf && ['SHADOW', 'ENABLED'].includes(env.IMAGE_OCR_MODE);
   const started = performance.now();
+  const readerDependencies = category => ({ onHttpError: options.onHttpError,
+    ...(options.orgId ? { fetch: meteredFetch(env.DB, options.orgId, category) } : {}) });
   const cached = {
     PRIMARY: validArtifact(options.artifacts?.PRIMARY, 'PRIMARY', documentSha256, file.mimeType),
     SECONDARY: pdf || imageOcr ? validArtifact(options.artifacts?.SECONDARY, 'SECONDARY', documentSha256, file.mimeType) : null,
@@ -219,7 +222,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (cached.PRIMARY) return cached.PRIMARY;
     const began = performance.now();
     const result = await extractInvoiceWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) }, { onHttpError: options.onHttpError });
+      images: pdf ? [] : [{ mimeType: file.mimeType, bytes }], ...(pdf ? { pdf: { bytes } } : {}) }, readerDependencies('INVOICE_EXTRACTION'));
     const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, result,
       durationMs: Math.round(performance.now() - began) };
     await options.checkpoint?.('PRIMARY', artifact);
@@ -230,7 +233,7 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (imageOcr) {
       const began = performance.now();
       const ocr = await transcribeImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
-        image: { mimeType: file.mimeType, bytes } }, { onHttpError: options.onHttpError });
+        image: { mimeType: file.mimeType, bytes } }, readerDependencies('INVOICE_OCR'));
       const parsed = parsePdfText(ocr.text);
       if (ocr.issues.length || /\[ILLEGIBLE\]/i.test(ocr.text)) parsed.issues.push(ocrIssue);
       const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType,
@@ -241,7 +244,9 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (!pdf || !env.AI) return null;
     const began = performance.now();
     let parsed;
-    try { parsed = await readPdfText(env, bytes); }
+    try { parsed = await (options.orgId
+      ? recordAiCall(env.DB, options.orgId, 'PDF_CONVERSION', 'workers-ai/toMarkdown', () => readPdfText(env, bytes))
+      : readPdfText(env, bytes)); }
     catch (error) { return { error: error?.message === 'PDF_TEXT_TIMEOUT' ? 'PDF_TEXT_TIMEOUT' : 'PDF_TEXT_UNAVAILABLE' }; }
     const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType, readId: id('pdftext'), method: 'PDF_TEXT',
       ...parsed, durationMs: Math.round(performance.now() - began) };

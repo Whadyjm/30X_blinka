@@ -100,7 +100,7 @@ export async function processInvoice(env, orgId, invoiceId, read = readDocument)
       const artifacts = read === readDocument ? Object.fromEntries(await Promise.all(['PRIMARY', 'SECONDARY'].map(async kind =>
         [kind, await getReadArtifact(env.DB, orgId, claimed.file_sha256, artifactVersion, kind)]))) : {};
       storedRead = await read(env, { mimeType: claimed.file_mime_type }, bytes, claimed.file_sha256, {
-        artifacts, checkpoint: (kind, artifact) => putReadArtifact(env.DB, orgId, claimed.file_sha256, artifactVersion, kind, artifact),
+        orgId, artifacts, checkpoint: (kind, artifact) => putReadArtifact(env.DB, orgId, claimed.file_sha256, artifactVersion, kind, artifact),
       });
       // The adapter is a server-owned trust boundary, not a route input.
       storedRead.extraction = ExtractedInvoiceSchema.parse(storedRead.extraction);

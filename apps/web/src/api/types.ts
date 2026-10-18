@@ -30,6 +30,7 @@ import type { CreatedSkillConnection, SkillConnection, SkillIntegration } from '
  * Pages must never import either directly; use `api` from '@/api'.
  */
 export interface OliApi {
+  getAiUsage(): Promise<import('@oli/contracts').AiUsage>;
   health(): Promise<{ ok: boolean; service?: string }>;
 
   // session

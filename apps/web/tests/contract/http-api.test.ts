@@ -19,6 +19,17 @@ const response = (data: unknown) => Response.json({ data });
 afterEach(() => vi.restoreAllMocks());
 
 describe('HTTP shared contract boundary', () => {
+  it('validates server AI usage and preserves partial totals', async () => {
+    const counts = { calls: 3, inputTokens: 80, outputTokens: 20, totalTokens: 100, unreportedCalls: 2 };
+    const usage = { ...counts, firstCallAt: '2026-10-17T12:00:00.000Z', breakdown: [{ ...counts, category: 'CHAT' }] };
+    let data: unknown = usage;
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async url => {
+      expect(String(url)).toBe('/api/v1/ai/usage'); return response(data);
+    } });
+    expect(await api.getAiUsage()).toEqual(usage);
+    data = { ...usage, totalTokens: -1 };
+    await expect(api.getAiUsage()).rejects.toBeInstanceOf(ContractError);
+  });
   it('shares email/inbox schemas, preserves EMAIL invoice source and authenticates read/pause commands', async () => {
     const integration = { available: true, mailbox: { address: 'oli+company@example.invalid', enabled: true, createdAt: '2026-10-17T12:00:00.000Z' } };
     const message = { id: 'mail-test', sender: 'supplier@example.invalid', subject: 'Factura', receivedAt: '2026-10-17T12:00:00.000Z',

@@ -358,6 +358,9 @@ function meOf(d: Db): Me {
 // Chat is available through the real Worker only; never simulate successful changes.
 const chatUnavailable = () => Promise.reject(new ApiError({ status: 404, code: 'NOT_AVAILABLE', message: 'Chat requires the live API.' }));
 export const mockApi: OliApi = {
+  async getAiUsage() {
+    return { calls: 0, inputTokens: 0, outputTokens: 0, totalTokens: 0, unreportedCalls: 0, firstCallAt: null, breakdown: [] };
+  },
   async getSkillIntegration() { return { connections: [] }; },
   async createSkillConnection() { throw new ApiError({ status: 503, code: 'NOT_AVAILABLE', message: 'Oli Skill requires the live API.' }); },
   async updateSkillConnection() { throw new ApiError({ status: 503, code: 'NOT_AVAILABLE', message: 'Oli Skill requires the live API.' }); },

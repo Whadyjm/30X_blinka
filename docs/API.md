@@ -972,3 +972,29 @@ humanas ni reservas. Los documentos permanecen dentro de los controles de duplic
 acuerdos y presupuesto. Los endpoints financieros y las lecturas originales conservan
 los registros; el cliente oculta eliminadas de la lista activa y permite consultarlas.
 No existe estado PAID ni historial de pagos: APPROVE es autorización simulada.
+
+### Consumo de IA
+
+`GET /api/v1/ai/usage` requiere sesión y devuelve `Envelope<AiUsage>` para la
+organización autenticada. Contrato en `packages/contracts`: `calls`, `inputTokens`,
+`outputTokens`, `totalTokens`, `unreportedCalls`, `firstCallAt` y `breakdown` con esos
+contadores por `INVOICE_EXTRACTION`, `INVOICE_OCR`, `PDF_CONVERSION` y `CHAT`.
+
+El servidor registra cada intento antes de llamar al proveedor y agrega sus tokens
+reportados antes de validar la respuesta del modelo. Incluye fallbacks, respuestas
+inválidas, rondas con herramientas y chat web/Telegram. No duplica llamadas al
+repetir una respuesta idempotente ni al reutilizar artefactos de lectura. Los tokens
+de razonamiento ya incluidos en salida no se vuelven a sumar.
+
+Los totales suman únicamente valores reportados válidos. `unreportedCalls` cuenta
+llamadas sin alguna de las métricas, incluidas interrupciones o conversión PDF sin
+tokens. Un total parcial no demuestra consumo cero. `firstCallAt` es la primera
+llamada registrada, o `null` si no hay registros. No reconstruye gasto histórico,
+no incluye scripts locales ni endpoints privados de diagnóstico sin organización,
+y no representa la facturación completa de la cuenta del proveedor.
+
+Aplicar **0012_ai_usage.sql** antes de desplegar el Worker. Las tablas de llamadas
+y resultados son append-only; no guardan prompts ni respuestas. Las llamadas de
+producto futuras deben usar `meteredFetch` o `recordAiCall` con la organización
+resuelta en el servidor. Los scripts de evaluación conservan su ejecución sin
+escrituras sobre los datos compartidos.

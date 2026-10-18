@@ -13,8 +13,10 @@ import { esEmail } from './es.email';
 import { esChat } from './es.chat';
 import { esOnboarding } from './es.onboarding';
 import { esDashboard } from './es.dashboard';
+import { esUsage } from './es.usage';
 
 export const es: Record<string, string> = {
+  ...esUsage,
   ...esCore,
   ...esShell,
   ...esBills,

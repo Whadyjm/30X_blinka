@@ -39,6 +39,11 @@ export function useMe() {
   return useQuery({ queryKey: qk.me, queryFn: () => api.me(), staleTime: 60_000, retry: false });
 }
 
+export function useAiUsage(enabled: boolean, orgId?: string) {
+  return useQuery({ queryKey: ['ai-usage', orgId], queryFn: () => api.getAiUsage(), enabled,
+    refetchInterval: 15_000, retry: false });
+}
+
 export function useMandate(enabled = true) {
   return useQuery({ queryKey: qk.mandate, queryFn: () => api.getMandate(), enabled });
 }

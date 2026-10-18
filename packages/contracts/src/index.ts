@@ -4,6 +4,15 @@ export const IdSchema = z.string().trim().min(1);
 export const CurrencySchema = z.currencyCode();
 export const DateSchema = z.iso.date();
 export const TimestampSchema = z.iso.datetime();
+const AiUsageCountsSchema = z.strictObject({
+  calls: z.int().min(0), inputTokens: z.int().min(0), outputTokens: z.int().min(0),
+  totalTokens: z.int().min(0), unreportedCalls: z.int().min(0),
+});
+export const AiUsageSchema = AiUsageCountsSchema.extend({
+  firstCallAt: TimestampSchema.nullable(),
+  breakdown: z.array(AiUsageCountsSchema.extend({ category: z.enum(['INVOICE_EXTRACTION', 'INVOICE_OCR', 'PDF_CONVERSION', 'CHAT']) })),
+});
+export type AiUsage = z.infer<typeof AiUsageSchema>;
 export const PeriodKeySchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 export const MinorUnitsSchema = z.int().min(0);
 export const PositiveMinorUnitsSchema = MinorUnitsSchema.min(1);

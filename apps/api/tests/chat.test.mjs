@@ -80,6 +80,31 @@ test('chat usa herramientas reales, persiste historial y replay no vuelve a gast
   const history = await h.api('/chat/conversations/' + r.data.conversationId);
   assert.equal(history.data.turns.length, 1); assert.equal(history.data.turns[0].state, 'COMPLETED');
   assert.equal(JSON.stringify(r).includes('test-provider-key'), false);
+  const usage = await h.api('/ai/usage');
+  assert.equal(usage.status, 200); assert.equal(usage.data.calls, 2); assert.equal(usage.data.unreportedCalls, 2);
+});
+
+test('usage retains all chat rounds, failed output and Telegram tokens without spending on replay', async t => {
+  const h = await setup(t);
+  const response = choice => () => Response.json({ choices: [choice], usage: {
+    prompt_tokens: 80, completion_tokens: 20, total_tokens: 100,
+  } });
+  h.model(response(h.tool('list_vendors', {})), response(h.text('Listado disponible.')));
+  const key = crypto.randomUUID();
+  const first = await h.chat('Listar proveedores', key); assert.equal(first.status, 200);
+  await h.chat('Listar proveedores', key);
+  assert.equal((await h.api('/ai/usage')).data.totalTokens, 200);
+  h.model(response({ finish_reason: 'length', message: { content: 'Incomplete' } }));
+  assert.equal((await h.chat('Respuesta incompleta')).status, 502);
+  h.model(response(h.text('Hola desde Telegram.')));
+  const request = new Request(origin + '/api/v1/chat/messages', { method: 'POST', headers: {
+    'Idempotency-Key': crypto.randomUUID(), 'Content-Type': 'application/json',
+  }, body: JSON.stringify({ conversationId: null, text: 'Hola', invoiceIds: [] }) });
+  assert.equal((await chatMessage(request, h.env, h.session, 'telegram')).status, 200);
+  const usage = (await h.api('/ai/usage')).data;
+  assert.equal(usage.totalTokens, 400); assert.equal(usage.calls, 4); assert.equal(usage.unreportedCalls, 0);
+  const anonymous = await worker.fetch(new Request(origin + '/api/v1/ai/usage'), h.env);
+  assert.equal(anonymous.status, 401);
 });
 
 test('Web y Telegram filtran historial y contexto, y rechazan cruce de canal incluso con replay cacheado', async t => {

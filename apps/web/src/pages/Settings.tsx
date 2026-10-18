@@ -8,6 +8,7 @@ import { ThemeSwitcher } from '@/components/ThemeSwitcher';
 import { useTelegramHistoryPreference } from '@/features/chat/useTelegramHistoryPreference';
 import { useMe } from '@/hooks/queries';
 import { t } from '@/i18n';
+import { AiUsageSection } from '@/features/settings/AiUsageSection';
 
 export function Settings() {
   const me = useMe();
@@ -16,6 +17,7 @@ export function Settings() {
   return (
     <>
       <PageHeader title={t('Settings')} subtitle={t('Manage your preferences and the rules Oli follows.')} />
+      <AiUsageSection orgId={me.data?.org?.id} />
       <section className="mb-8 max-w-2xl space-y-4 border-t border-hairline pt-6" aria-labelledby="appearance-heading">
         <div className="space-y-2">
           <h2 id="appearance-heading" className="text-xl">{t('Appearance')}</h2>

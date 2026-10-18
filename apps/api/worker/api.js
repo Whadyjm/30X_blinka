@@ -16,6 +16,7 @@ import { disableEmail, emailStatus, enableEmail, inbox, readInboxMessage } from 
 import { createSkillConnection, handleAgentRequest, revokeSkillConnection, skillConnections, updateSkillConnection } from './skill.js';
 import { invoiceTrashEvents, setInvoiceTrash } from './invoice-trash.js';
 import { evaluationReport, evaluationSummary } from './evaluation.js';
+import { aiUsage } from './ai-usage.js';
 
 function query(url, schema) {
   const input = Object.fromEntries(url.searchParams);
@@ -35,6 +36,7 @@ export async function handleApi(request, env) {
     if (path.startsWith('/agent/')) return await handleAgentRequest(request, env, path);
     const session = await authenticate(request, env); const orgId = session.organization.id;
     if (path === '/me' && method === 'GET') { const { tokenHash, ...data } = session; return json({ data }); }
+    if (path === '/ai/usage' && method === 'GET') return json({ data: await aiUsage(env.DB, orgId) });
     if (path === '/session' && method === 'DELETE') return await logout(request, env, session);
     if (path === '/integrations/skill' && method === 'GET') return await skillConnections(env, session);
     if (path === '/integrations/skill/connections' && method === 'POST') return await createSkillConnection(request, env, session);

@@ -4,6 +4,7 @@ import { idempotency } from './repository.js';
 import { actionInsert, inspectInvoice } from './chat-actions.js';
 import { runTool, toolsFor } from './chat-tools.js';
 import { chatPrompt, CHAT_PROMPT_VERSION } from './chat-prompt.js';
+import { meteredFetch } from './ai-usage.js';
 
 const MODEL = 'deepseek/deepseek-v4.1-flash';
 
@@ -29,7 +30,7 @@ export async function completeChat(env, session, history, input, channel = 'web'
     if (remaining < 500) throw new HttpError(504, 'CHAT_TIMEOUT');
     let payload;
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await meteredFetch(env.DB, session.organization.id, 'CHAT')('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST', signal: AbortSignal.timeout(remaining),
         headers: { Authorization: `Bearer ${env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: MODEL, messages, tools: toolsFor(session), tool_choice: 'auto',
