@@ -18,6 +18,7 @@ export type ReasonInfo = {
 };
 
 const CATALOG: Record<string, ReasonInfo> = {
+  HUMAN_DATA_REVIEW: { label: 'Data confirmed by a person', rule: 'A person checked the original invoice details', tone: 'ok', humanApprovable: false },
   HUMAN_APPROVED: { label: 'Approved by a reviewer', rule: 'A permitted exception was authorized after revalidation', tone: 'ok', humanApprovable: false },
   HUMAN_REJECTED: { label: 'Rejected by a reviewer', rule: 'A reviewer rejected this request', tone: 'block', humanApprovable: false },
   ALLOWED_VENDOR: {

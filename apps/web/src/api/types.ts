@@ -81,6 +81,7 @@ export interface OliApi {
   processInvoice(id: string): Promise<void>;
   rereadInvoice(id: string, input: { expectedDecisionId: string; expectedPolicyVersionId: string }): Promise<InvoiceDetail>;
   reevaluateInvoice(id: string, input: { expectedDecisionId: string; expectedPolicyVersionId: string }): Promise<InvoiceDetail>;
+  confirmInvoiceReview(id: string, input: { expectedDecisionId: string; expectedPolicyVersionId: string; confirm: true; comment: string }): Promise<InvoiceDetail>;
   /** URL the browser can load in <img>/<object> (same-origin, cookie auth). */
   invoiceFileUrl(invoice: Pick<InvoiceDetail, 'id' | 'fileUrl'>): string;
 

@@ -126,6 +126,14 @@ export function useReevaluateInvoice() {
     onSettled: () => invalidateMoney(qc) });
 }
 
+export function useConfirmInvoiceReview() {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: (input: { id: string; expectedDecisionId: string; expectedPolicyVersionId: string; confirm: true; comment: string }) =>
+    api.confirmInvoiceReview(input.id, { expectedDecisionId: input.expectedDecisionId, expectedPolicyVersionId: input.expectedPolicyVersionId, confirm: input.confirm, comment: input.comment }),
+    onSuccess: invoice => qc.setQueryData(qk.invoice(invoice.id), invoice),
+    onSettled: () => invalidateMoney(qc) });
+}
+
 export function useApprovals(enabled = true) {
   return useQuery({ queryKey: qk.approvals, queryFn: () => api.listApprovals(), staleTime: 10_000, enabled });
 }

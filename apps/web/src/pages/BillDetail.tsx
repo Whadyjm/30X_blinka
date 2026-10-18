@@ -6,11 +6,13 @@ import { OutcomeBadge, ReasonChips, SourceBadge } from '@/components/Badges';
 import { DecisionTrace } from '@/components/DecisionTrace';
 import { DocumentViewer } from '@/components/DocumentViewer';
 import { ExtractionPanel } from '@/components/ExtractionPanel';
+import { InvoiceLogs } from '@/components/InvoiceLogs';
 import { Card, CardHeader, ErrorState, InlineAlert, PageLoading } from '@/components/ui/Card';
 import { Orb } from '@/components/ui/Orb';
-import type { AuditEvent, InvoiceDetail } from '@/contracts';
-import { DECISION_LABEL, humanize } from '@/contracts/reasons';
+import type { InvoiceDetail } from '@/contracts';
+import { humanize } from '@/contracts/reasons';
 import { ApprovalPanel } from '@/features/approvals/ApprovalPanel';
+import { ManualInvoiceApproval } from '@/features/approvals/ManualInvoiceApproval';
 import { useInvoiceTrash, useInvoice, useMandate, useMe, useProcessInvoice, useRereadInvoice, useReevaluateInvoice } from '@/hooks/queries';
 import { InvoiceTrashButton } from '@/features/invoices/InvoiceTrashButton';
 import { InvoiceTrashHistory } from '@/features/invoices/InvoiceTrashHistory';
@@ -20,19 +22,7 @@ import { cn } from '@/lib/cn';
 import { dueLabel, formatDate, formatDateTime } from '@/lib/dates';
 import { formatMoneyWithCode } from '@/lib/money';
 import { getOutcome, PROCESSING_STEPS, processingLabel } from '@/lib/outcome';
-
-// English source labels (i18n keys) — translated at render time.
-const EVENT_LABEL: Record<string, string> = {
-  INVOICE_RECEIVED: 'Invoice received',
-  EXTRACTION_COMPLETED: 'Document read',
-  DECISION_RECORDED: 'Decision recorded',
-  APPROVAL_REQUESTED: 'Human approval requested',
-  APPROVAL_APPROVED: 'Approved by a reviewer',
-  APPROVAL_REJECTED: 'Rejected by a reviewer',
-  APPROVAL_REVALIDATION_FAILED: 'Re-check failed — not approved',
-  BUDGET_RESERVED: 'Budget reserved',
-  INVOICE_REEVALUATED: 'Invoice reanalyzed',
-};
+import { extractionExplanation, invoiceExplanation, readingNeedsReview } from '@/lib/extraction-explanation';
 
 export function BillDetail() {
   const { id = '' } = useParams();
@@ -94,7 +84,13 @@ export function BillDetail() {
 
       {(outcome === 'NEEDS_REVIEW' || outcome === 'NEEDS_APPROVAL' || outcome === 'BLOCKED' || (outcome === 'PROCESSING' && !!d)) && (
         <Card className="mb-6">
-          <CardHeader title={t('Resolve review')} subtitle={t('Correct what is missing, update the review, then approve or reject when the rules allow it.')} />
+          <CardHeader
+            title={t(d && readingNeedsReview(d) ? 'Why this invoice is in review' : 'Resolve review')}
+            action={<a href="#invoice-logs" className="text-sm text-slate-600 underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink" onClick={() => {
+              const logs = document.getElementById('invoice-logs') as HTMLDetailsElement | null;
+              if (logs) logs.open = true;
+            }}>{t('Logs')}</a>}
+          />
           <div className="space-y-4 p-5">
             {pendingApproval && (
               <div>
@@ -106,6 +102,8 @@ export function BillDetail() {
             )}
 
             {!pendingApproval && outcome !== 'PROCESSING' && <NotApprovable inv={inv} />}
+            {!resolved && outcome !== 'PROCESSING' && !pendingApproval?.canDecide &&
+              <ManualInvoiceApproval invoice={inv} policyVersionId={mandate.data?.active?.id} canDecide={canDecide} />}
             {!pendingApproval?.canDecide && <div className="space-y-2 border-t border-hairline pt-4">
               <div className="flex flex-wrap gap-2">
                 <Button variant={needsNewRead ? 'primary' : 'secondary'} icon={<RotateCcw className="size-4" aria-hidden />} loading={reread.isPending}
@@ -145,7 +143,7 @@ export function BillDetail() {
           </Card>
           <Card>
             <CardHeader title={t('What Oli read')} subtitle={t('Extraction only — Oli doesn’t decide from this alone.')} />
-            <ExtractionPanel extracted={inv.extracted} pending={outcome === 'PROCESSING'} />
+            <ExtractionPanel extracted={inv.extracted} pending={outcome === 'PROCESSING'} confirmed={d?.reasons.includes('HUMAN_APPROVED')} />
           </Card>
         </div>
 
@@ -173,7 +171,9 @@ export function BillDetail() {
 
               {d && (
                 <>
-                  <p className="text-[15px] leading-relaxed text-ink">{d.explanation || t('No explanation was recorded.')}</p>
+                  <p className="text-[15px] leading-relaxed text-ink">{readingNeedsReview(d)
+                    ? t('This is a reading review, not a request to approve an exception.')
+                    : invoiceExplanation(d)}</p>
                   <ReasonChips reasons={d.reasons} />
                   <p className="text-xs text-slate-500">
                     {t('Policy v{n}', { n: String(d.policyVersion ?? '?') })} · {d.checkedAt ? formatDateTime(d.checkedAt) : t('time not recorded')}
@@ -188,30 +188,11 @@ export function BillDetail() {
           {d && (
             <Card>
               <CardHeader title={t('Decision trace')} subtitle={t('Each rule Oli checked, what it found, and the result.')} />
-              <DecisionTrace decision={d} />
+              <DecisionTrace decision={d} extracted={inv.extracted} />
             </Card>
           )}
 
-          {inv.audit.length > 0 && <Card>
-            <CardHeader title={t('Audit log')} subtitle={t('Append-only. Past entries are never edited.')} />
-            <Timeline events={inv.audit} />
-          </Card>}
-
-          {inv.decisionHistory.length > 0 && (
-            <Card>
-              <CardHeader title={t('Earlier decisions')} />
-              <ul className="divide-y divide-hairline">
-                {inv.decisionHistory.map((h, i) => (
-                  <li key={i} className="px-5 py-3 text-sm">
-                    <p className="text-ink">
-                      {t(DECISION_LABEL[h.decision])} · {t('policy v{n}', { n: String(h.policyVersion ?? '?') })} · {formatDateTime(h.checkedAt)}
-                    </p>
-                    <p className="text-slate-600">{h.explanation}</p>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          )}
+          <InvoiceLogs invoice={inv} />
         </div>
       </div>
     </>
@@ -277,6 +258,12 @@ const UNBLOCK: Record<string, string> = {
 
 function NotApprovable({ inv }: { inv: InvoiceDetail }) {
   const hints = (inv.decision?.reasons ?? []).map((r) => UNBLOCK[r]).filter((h): h is string => !!h);
+  if (inv.decision && readingNeedsReview(inv.decision)) {
+    return <InlineAlert tone="warn">
+      <p>{extractionExplanation(inv.extracted, inv.decision.trace?.find(step => step.rule === 'EXTRACTION'))[0]}</p>
+      <p className="mt-2">{t('You can check the original and use “APPROVE INVOICE” to confirm your decision. If a detail is wrong, upload a corrected copy or ask me to check it again.')}</p>
+    </InlineAlert>;
+  }
   return (
     <InlineAlert tone="warn">
       <p>{t('This invoice needs corrections before approval.')}</p>
@@ -293,28 +280,5 @@ function NotApprovable({ inv }: { inv: InvoiceDetail }) {
         </ul>
       )}
     </InlineAlert>
-  );
-}
-
-function Timeline({ events }: { events: AuditEvent[] }) {
-  if (events.length === 0) return <p className="px-5 py-4 text-sm text-slate-500">{t('No events recorded yet.')}</p>;
-  return (
-    <ol className="space-y-0 px-5 py-4">
-      {[...events].reverse().map((e, i, arr) => {
-        const known = EVENT_LABEL[e.type];
-        return (
-          <li key={e.id} className="relative flex gap-3 pb-4 last:pb-0">
-            {i < arr.length - 1 && <span className="absolute left-[5px] top-3 h-full w-px bg-hairline" aria-hidden />}
-            <span className="relative mt-1.5 size-[11px] shrink-0 rounded-sm bg-ink ring-4 ring-paper" aria-hidden />
-            <div className="min-w-0 text-sm">
-              <p className="text-ink">{known ? t(known) : humanize(e.type)}</p>
-              <p className="text-xs text-slate-500">
-                {e.actorName ?? e.actorKind} · {formatDateTime(e.createdAt)}
-              </p>
-            </div>
-          </li>
-        );
-      })}
-    </ol>
   );
 }

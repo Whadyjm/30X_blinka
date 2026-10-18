@@ -1,4 +1,4 @@
-import { AlertTriangle, HelpCircle } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 import type { ExtractedInvoice } from '@/contracts';
 import { t } from '@/i18n';
 import { formatDate } from '@/lib/dates';
@@ -6,7 +6,7 @@ import { formatMoneyWithCode } from '@/lib/money';
 import { cn } from '@/lib/cn';
 
 /** Extracted fields. Anything the reader couldn't verify is highlighted instead of silently blank (§4.4). */
-export function ExtractionPanel({ extracted, pending }: { extracted: ExtractedInvoice | null | undefined; pending?: boolean }) {
+export function ExtractionPanel({ extracted, pending, confirmed }: { extracted: ExtractedInvoice | null | undefined; pending?: boolean; confirmed?: boolean }) {
   if (!extracted) {
     return <p className="px-5 py-4 text-sm text-slate-500">{pending ? t('Reading the document…') : t('No data was extracted from this document.')}</p>;
   }
@@ -45,28 +45,10 @@ export function ExtractionPanel({ extracted, pending }: { extracted: ExtractedIn
           );
         })}
       </dl>
-      {extracted.extractionWarnings.length > 0 && (
-        <ul className="m-4 space-y-1 rounded-xl bg-paper p-3 text-sm text-ink ring-1 ring-inset ring-ink">
-          {extracted.extractionWarnings.map((w, i) => (
-            <li key={i} className="flex gap-2">
-              <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
-              {w}
-            </li>
-          ))}
-        </ul>
-      )}
-      {extracted.evidence.length > 0 && (
-        <details className="border-t border-hairline px-5 py-3 text-sm">
-          <summary className="text-slate-600">{t('Evidence from the document ({n})', { n: extracted.evidence.length })}</summary>
-          <ul className="mt-2 space-y-1.5">
-            {extracted.evidence.map((e, i) => (
-              <li key={i} className="text-slate-600">
-                <span className="text-ink">{e.field}</span> · {e.source}
-                {e.quote && <span className="block italic">“{e.quote}”</span>}
-              </li>
-            ))}
-          </ul>
-        </details>
+      {extracted.extractionWarnings.length > 0 && !confirmed && (
+        <p className="border-t border-hairline px-5 py-4 text-sm leading-relaxed text-slate-600">
+          {t('Some details still need checking. These are the values I read, not confirmed payment details. See the review and Logs for more information.')}
+        </p>
       )}
     </div>
   );

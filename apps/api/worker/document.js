@@ -1,4 +1,4 @@
-import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_CONFIG_VERSION, IMAGE_OCR_MODEL, ExtractionError, extractInvoiceWithOpenRouter, transcribeImageWithOpenRouter } from '@oli/extraction';
+import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_CONFIG_VERSION, IMAGE_OCR_MODEL, ExtractionError, extractInvoiceWithOpenRouter, readImageWithOpenRouter, IndependentImageFieldsSchema } from '@oli/extraction';
 import { CurrencySchema, DateSchema, DocumentTypeSchema, ExtractedInvoiceSchema, IdSchema, PeriodKeySchema } from '@oli/contracts';
 import { normalizeInvoiceNumber } from '@oli/domain';
 import { HttpError, id, sha256 } from './http.js';
@@ -13,7 +13,7 @@ export function validateDocument(bytes, mimeType) {
   }
 }
 
-const PDF_PARSER_VERSION = 'labelled-v7';
+const PDF_PARSER_VERSION = 'labelled-v8';
 export const READER_VERSION = `${PDF_PARSER_VERSION}:${EXTRACTION_CONFIG_VERSION}:${IMAGE_OCR_CONFIG_VERSION}`;
 const MAX_TEXT_BYTES = 128 * 1024;
 const referenceIssue = 'INDEPENDENT_AGREEMENT_REFERENCE_UNCERTAIN';
@@ -25,9 +25,9 @@ const normalizedText = value => value?.normalize('NFC').trim().replace(/\s+/g, '
 export function parseMoneyMinor(value, currency) {
   if (typeof value !== 'string' || !CurrencySchema.safeParse(currency).success) return null;
   const exponent = new Intl.NumberFormat('en', { style: 'currency', currency }).resolvedOptions().maximumFractionDigits;
-  const prefixed = value.trim().match(/^([A-Z]{3})\s+(.+)$/);
-  if (prefixed && prefixed[1] !== currency) return null;
-  const number = prefixed ? prefixed[2] : value.trim();
+  const marked = value.trim().match(/^(?:([A-Z]{3})\s+|(€)\s*)?(\d[\d.,]*)(?:\s+([A-Z]{3})|\s*(€))?$/);
+  if (!marked || [marked[1], marked[2] && 'EUR', marked[4], marked[5] && 'EUR'].filter(Boolean).some(code => code !== currency)) return null;
+  const number = marked[3];
   if (number.length > 64 || !/^\d[\d.,]*$/.test(number)) return null;
   let integer = number, fraction = '';
   if (number.includes('.') && number.includes(',')) {
@@ -55,12 +55,56 @@ export function parseMoneyMinor(value, currency) {
   return minor > 0n && minor <= BigInt(Number.MAX_SAFE_INTEGER) ? Number(minor) : null;
 }
 
+function totalCurrency(value) {
+  if (typeof value !== 'string') return null;
+  const match = value.trim().match(/^(?:([A-Z]{3})\s+|(€)\s*)?\d[\d.,]*(?:\s+([A-Z]{3})|\s*(€))?$/);
+  if (!match) return null;
+  const codes = [match[1], match[2] && 'EUR', match[3], match[4] && 'EUR'].filter(Boolean);
+  return codes.length && codes.every(code => code === codes[0]) ? codes[0] : null;
+}
+
+export function parseDocumentDate(value) {
+  if (DateSchema.safeParse(value).success) return value;
+  if (typeof value !== 'string') return null;
+  const local = value.match(/^(\d{1,2})[/.](\d{1,2})[/.](\d{4})$/);
+  if (!local) return null;
+  const a = Number(local[1]), b = Number(local[2]);
+  // Neither locale nor a model's preference resolves a genuinely ambiguous date.
+  if (a <= 12 && b <= 12 && a !== b) return null;
+  const day = a > 12 || a === b ? a : b, month = a > 12 || a === b ? b : a;
+  const iso = `${local[3]}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+  return DateSchema.safeParse(iso).success ? iso : null;
+}
+
+export function parseImageRead(ocr) {
+  const raw = IndependentImageFieldsSchema.parse(ocr.fields);
+  const fields = noFields();
+  const original = normalizedText(ocr.text) ?? '';
+  const literal = value => typeof value === 'string' && original.includes(normalizedText(value)) ? value : null;
+  for (const field of ['vendorName', 'invoiceNumber', 'description']) fields[field] = literal(raw[field]);
+  const total = literal(raw.total), markedCurrency = totalCurrency(total);
+  const explicitCurrency = raw.currency && (new RegExp(`\\b${raw.currency}\\b`).test(ocr.text) || raw.currency === 'EUR' && ocr.text.includes('€')) ? raw.currency : null;
+  fields.currency = markedCurrency && explicitCurrency && markedCurrency !== explicitCurrency ? null : markedCurrency ?? explicitCurrency;
+  const currencyClaims = [...ocr.text.matchAll(/(?:^|\n)\s*(?:Moneda\s*\/\s*Currency|Moneda|Currency)\s*[:|]?\s*([A-Z]{3})(?=\s|$)/gi)].map(match => match[1].toUpperCase());
+  if (currencyClaims.some(code => code !== fields.currency)) fields.currency = null;
+  fields.amountMinor = parseMoneyMinor(total, fields.currency);
+  for (const field of ['issuedAt', 'dueDate']) fields[field] = parseDocumentDate(literal(raw[field]));
+  fields.servicePeriod = PeriodKeySchema.safeParse(literal(raw.servicePeriod)).success ? raw.servicePeriod : null;
+  const reference = literal(raw.agreementReference);
+  const agreementReference = reference && /^[\p{L}\p{N}_.:-]{1,200}$/u.test(reference) ? reference : null;
+  // Repeated explicit final totals remain uncertain even when the model chose one of them.
+  if (ocr.text.split(/\r?\n/).filter(line => /^\s*(?:TOTAL(?: A COBRAR| DUE)?|INVOICE TOTAL)\s*[:|]?\s*(?:[A-Z]{3}\s+|€)?\d/i.test(line)).length > 1) fields.amountMinor = null;
+  if (ocr.issues.includes('AMBIGUOUS_VENDOR')) fields.vendorName = null;
+  if (ocr.issues.includes('CONFLICTING_TOTALS')) fields.amountMinor = null;
+  return { fields, agreementReference, issues: ocr.issues.length ? [ocrIssue] : [] };
+}
+
 const labels = [
-  ['vendorName', 'EMISOR\\s*\\/\\s*SUPPLIER|Proveedor(?=\\s*[:|]|\\s*$)|Supplier(?=\\s*[:|]|\\s*$)'],
+  ['vendorName', 'EMISOR\\s*\\/\\s*SUPPLIER|(?:Emisor|Vendedor|Facturado por)(?=\\s*[:|]|\\s*$)|Proveedor(?=\\s*[:|]|\\s*$)|Supplier(?=\\s*[:|]|\\s*$)'],
   ['client', 'Cliente\\s*:|Customer\\s*:'],
-  ['invoiceNumber', 'N[úu]mero\\s*\\/\\s*Number|(?:Invoice number|N[úu]mero)(?=\\s*[:|]|\\s*$)'],
-  ['issuedAt', 'Emisi[oó]n\\s*\\/\\s*Issued|(?:Issue date|Issued date|Emisi[oó]n)(?=\\s*[:|]|\\s*$)'],
-  ['dueDate', 'Vencimiento\\s*\\/\\s*Due|Due date(?=\\s*[:|]|\\s*$)|Vencimiento(?=\\s*[:|]|\\s*$)'],
+  ['invoiceNumber', 'N[úu]mero\\s*\\/\\s*Number|(?:Invoice number|N[úu]mero de factura|Factura n[úu]mero|N[úu]mero)(?=\\s*[:|]|\\s*$)'],
+  ['issuedAt', 'Emisi[oó]n\\s*\\/\\s*Issued|(?:Issue date|Issued date|Fecha de factura|Fecha de emisi[oó]n|Emisi[oó]n)(?=\\s*[:|]|\\s*$)'],
+  ['dueDate', 'Vencimiento\\s*\\/\\s*Due|Due date(?=\\s*[:|]|\\s*$)|Fecha de vencimiento(?=\\s*[:|]|\\s*$)|Vencimiento(?=\\s*[:|]|\\s*$)'],
   ['servicePeriod', 'Periodo de servicio|Service period(?=\\s*[:|]|\\s*$)'],
   ['agreementReference', 'Acuerdo\\s*\\/\\s*Agreement|(?:Agreement reference|Acuerdo)(?=\\s*[:|]|\\s*$)'],
   ['currency', 'Moneda\\s*\\/\\s*Currency|Currency(?=\\s*[:|]|\\s*$)|Moneda(?=\\s*[:|]|\\s*$)'],
@@ -88,7 +132,7 @@ const provided = value => value && !/^(?:NO INDICAD[OA]|N\/A|NOT PROVIDED|NONE|N
 const matchLabel = (line, allowBare = false) => [...labelPatterns, ...(allowBare ? bareLabelPatterns : [])]
   .map(([field, pattern]) => [field, line.match(pattern)]).find(([, match]) => match);
 // Conversion can join separate PDF text items. Single-language labels require an explicit colon.
-const colonBoundary = /(?:Proveedor|Supplier|Cliente|Customer|Invoice number|N[úu]mero|Issue date|Issued date|Emisi[oó]n|Due date|Vencimiento|Service period|Agreement reference|Acuerdo|Currency|Moneda|Description|Concepto|Sub[\s-]*total(?: a cobrar)?|(?<![\p{L}-])(?:Invoice total|Total)|(?:Invoice total|Total(?: due)?)(?=\s*:\s*(?:[A-Z]{3}\s+)?\d)|Notes|Notas)\s*:/giu;
+const colonBoundary = /(?:Proveedor|Supplier|Emisor|Vendedor|Facturado por|Cliente|Customer|Invoice number|N[úu]mero de factura|Factura n[úu]mero|N[úu]mero|Issue date|Issued date|Fecha de factura|Fecha de emisi[oó]n|Emisi[oó]n|Due date|Fecha de vencimiento|Vencimiento|Service period|Agreement reference|Acuerdo|Currency|Moneda|Description|Concepto|Sub[\s-]*total(?: a cobrar)?|(?<![\p{L}-])(?:Invoice total|Total)|(?:Invoice total|Total(?: due)?)(?=\s*:\s*(?:[A-Z]{3}\s+)?\d)|Notes|Notas)\s*:/giu;
 const sectionBoundary = /Datos de prueba\b|P[áa]gina\s+\d+\s+de\s+\d+\b|Detalle de (?:servicio|factura)\b|Unidades\s+Precio\s+Importe\b|Horas\s*:|Fecha de entrega\s*:|Recibido\s*:/gi;
 
 function pdfLines(text) {
@@ -145,9 +189,9 @@ export function parsePdfText(text) {
   fields.invoiceNumber = unique('invoiceNumber');
   fields.description = unique('description');
   for (const [field, schema] of [['currency', CurrencySchema], ['issuedAt', DateSchema], ['dueDate', DateSchema], ['servicePeriod', PeriodKeySchema]]) {
-    const value = unique(field); fields[field] = schema.safeParse(value).success ? value : null;
+    const value = unique(field); fields[field] = ['issuedAt', 'dueDate'].includes(field) ? parseDocumentDate(value) : schema.safeParse(value).success ? value : null;
   }
-  const totalCurrencies = values.amountMinor.map(entry => provided(clean(entry.value))?.match(/^([A-Z]{3})\s+\d[\d.,]*$/)?.[1] ?? null);
+  const totalCurrencies = values.amountMinor.map(entry => totalCurrency(provided(clean(entry.value))));
   if (!values.currency.length && totalCurrencies.length && totalCurrencies.every(value => value === totalCurrencies[0])
     && CurrencySchema.safeParse(totalCurrencies[0]).success) fields.currency = totalCurrencies[0];
   if (totalCurrencies.some(value => value && value !== fields.currency)) fields.currency = null;
@@ -184,8 +228,8 @@ function validArtifact(artifact, kind, documentSha256, mimeType) {
     } else if (artifact.method !== 'OCR' || artifact.ocr?.model !== IMAGE_OCR_MODEL
       || artifact.ocr.configVersion !== IMAGE_OCR_CONFIG_VERSION || artifact.ocr.documentSha256 !== documentSha256
       || artifact.ocr.readId !== artifact.readId || typeof artifact.ocr.text !== 'string'
-      || !artifact.ocr.text.trim() || !Array.isArray(artifact.ocr.issues)
-      || artifact.ocr.issues.some(issue => !['ILLEGIBLE_TEXT', 'AMBIGUOUS_LAYOUT', 'CROPPED_DOCUMENT'].includes(issue))
+      || !artifact.ocr.text.trim() || !IndependentImageFieldsSchema.safeParse(artifact.ocr.fields).success || !Array.isArray(artifact.ocr.issues)
+      || artifact.ocr.issues.some(issue => !['ILLEGIBLE_TEXT', 'AMBIGUOUS_LAYOUT', 'CROPPED_DOCUMENT', 'AMBIGUOUS_VENDOR', 'CONFLICTING_TOTALS', 'AMBIGUOUS_DATE'].includes(issue))
       || new TextEncoder().encode(artifact.ocr.text).length > MAX_TEXT_BYTES) return null;
   }
   return artifact;
@@ -232,9 +276,9 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
     if (cached.SECONDARY) return cached.SECONDARY;
     if (imageOcr) {
       const began = performance.now();
-      const ocr = await transcribeImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
+      const ocr = await readImageWithOpenRouter({ apiKey: env.OPENROUTER_API_KEY, documentSha256,
         image: { mimeType: file.mimeType, bytes } }, readerDependencies('INVOICE_OCR'));
-      const parsed = parsePdfText(ocr.text);
+      const parsed = parseImageRead(ocr);
       if (ocr.issues.length || /\[ILLEGIBLE\]/i.test(ocr.text)) parsed.issues.push(ocrIssue);
       const artifact = { readerVersion: READER_VERSION, documentSha256, mimeType: file.mimeType,
         readId: ocr.readId, method: 'OCR', ...parsed, ocr, durationMs: Math.round(performance.now() - began) };
@@ -256,21 +300,25 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
   const [primaryResult, secondaryResult] = await Promise.allSettled([primaryTask(), secondaryTask()]);
   // Wait for both checkpoints before propagating failure, preserving a successful independent read for retry.
   if (primaryResult.status === 'rejected') throw primaryResult.reason;
-  if (secondaryResult.status === 'rejected') throw secondaryResult.reason;
   const primary = primaryResult.value.result;
-  if (secondaryResult.value?.error) throw new ExtractionError('INDEPENDENT_READ_UNAVAILABLE', primary.attempts ?? [],
-    { stage: 'SECONDARY', issueCodes: [secondaryResult.value.error] });
-  const secondary = secondaryResult.value?.fields ? secondaryResult.value : null;
+  const separateRead = secondaryResult.status === 'fulfilled' ? secondaryResult.value : null;
+  const secondaryFailure = secondaryResult.status === 'rejected' ? secondaryResult.reason : null;
+  const secondaryError = secondaryFailure ? 'INDEPENDENT_READ_UNAVAILABLE' : separateRead?.error ?? null;
+  const secondary = separateRead?.fields ? separateRead : null;
   if (secondary?.ocr && primary.model === secondary.ocr.model) throw new ExtractionError('INVALID_OUTPUT', secondary.ocr.attempts,
     { stage: 'IMAGE_OCR', issueCodes: ['SAME_READER_MODEL'] });
   const extraction = ExtractedInvoiceSchema.parse(primary.extraction);
+  if (secondaryError) extraction.extractionWarnings.push('INDEPENDENT_READ_UNAVAILABLE:*');
   const discrepancies = secondary ? fieldNames.filter(field => {
     const primaryValue = extraction[field], separateValue = secondary.fields[field];
+    if (primaryValue === null || separateValue === null) return false;
     if (field === 'vendorName' || field === 'description') return normalizedText(primaryValue) !== normalizedText(separateValue);
     if (field === 'invoiceNumber') return normalizeInvoiceNumber(primaryValue) !== normalizeInvoiceNumber(separateValue);
     return primaryValue !== separateValue;
   }) : [];
-  extraction.extractionWarnings.push(...(secondary?.issues ?? []), ...discrepancies.map(field => `INDEPENDENT_READ_MISMATCH:${field}`));
+  const unavailable = secondary ? fieldNames.filter(field => extraction[field] !== null && secondary.fields[field] === null) : [];
+  extraction.extractionWarnings.push(...(secondary?.issues ?? []), ...discrepancies.map(field => `INDEPENDENT_READ_MISMATCH:${field}`),
+    ...unavailable.map(field => `INDEPENDENT_READ_UNAVAILABLE:${field}`));
   if (imageOcr && env.IMAGE_OCR_MODE !== 'ENABLED') extraction.extractionWarnings.push('INDEPENDENT_IMAGE_OCR_SHADOW');
   return { extraction, documentType: DocumentTypeSchema.parse(primary.documentType), primaryReadId: primary.readId, documentSha256, corroboration: secondary ? corroborationFor(secondary, documentSha256) : null,
     agreementReference: secondary?.agreementReference ?? null,
@@ -279,7 +327,8 @@ export async function readDocument(env, file, bytes, documentSha256, options = {
         documentSha256, primaryReadId: primary.readId, version: READER_VERSION },
       configVersion: READER_VERSION, attempts: primary.attempts, usage: primary.usage, advisories: primary.advisories ?? [],
       imageOcr: secondary?.ocr ?? null, imageOcrMode: imageOcr ? env.IMAGE_OCR_MODE : 'OFF', pdfText: secondary?.pdfText ?? null,
-      corroborationError: secondary ? null : secondaryResult.value?.error ?? (pdf ? 'PDF_TEXT_UNAVAILABLE' : 'INDEPENDENT_IMAGE_OCR_UNAVAILABLE'),
-      independentDisagreements: discrepancies, independentIssues: secondary?.issues ?? [], cache: { PRIMARY: !!cached.PRIMARY, SECONDARY: !!cached.SECONDARY },
+      corroborationError: secondary ? null : secondaryError ?? (pdf ? 'PDF_TEXT_UNAVAILABLE' : 'INDEPENDENT_IMAGE_OCR_UNAVAILABLE'),
+      secondaryAttempts: secondaryFailure instanceof ExtractionError ? secondaryFailure.attempts : [],
+      independentDisagreements: discrepancies, independentUnavailable: unavailable, independentIssues: secondary?.issues ?? [], cache: { PRIMARY: !!cached.PRIMARY, SECONDARY: !!cached.SECONDARY },
       timings: { totalMs: Math.round(performance.now() - started), primaryMs: primaryResult.value.durationMs, secondaryMs: secondary?.durationMs ?? null } } };
 }

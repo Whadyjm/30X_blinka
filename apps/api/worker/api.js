@@ -8,6 +8,7 @@ import { invoiceFile, reviewApproval, uploadInvoice } from './invoices.js';
 import { processInvoice } from './processing.js';
 import { rereadInvoice } from './reread.js';
 import { reevaluateInvoice } from './reevaluation.js';
+import { confirmInvoiceReview } from './manual-review.js';
 import { enqueueInvoice } from './jobs.js';
 import { chatHistory, chatMessage, listConversations } from './chat.js';
 import { actionDto, cancelAction, confirmAction, getAction, prepareActionRequest, inspectInvoice } from './chat-actions.js';
@@ -100,8 +101,9 @@ export async function handleApi(request, env) {
       const q = query(url, InvoiceQuerySchema);
       return json(await invoicePage(env.DB, orgId, q));
     }
-    const invoice = path.match(/^\/invoices\/([^/]+)(?:\/(process|file|reevaluate|reread))?$/);
+    const invoice = path.match(/^\/invoices\/([^/]+)(?:\/(process|file|reevaluate|reread|confirm-review))?$/);
     if (invoice) {
+      if (method === 'POST' && invoice[2] === 'confirm-review') return await confirmInvoiceReview(request, env, session, invoice[1]);
       if (method === 'POST' && invoice[2] === 'reread') return await rereadInvoice(request, env, session, invoice[1]);
       if (method === 'POST' && invoice[2] === 'reevaluate') return await reevaluateInvoice(request, env, session, invoice[1]);
       if (method === 'GET' && !invoice[2]) return json({ data: await getInvoice(env.DB, orgId, invoice[1]) });

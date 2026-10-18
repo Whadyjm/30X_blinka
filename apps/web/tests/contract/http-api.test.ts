@@ -19,6 +19,22 @@ const response = (data: unknown) => Response.json({ data });
 afterEach(() => vi.restoreAllMocks());
 
 describe('HTTP shared contract boundary', () => {
+  it('confirms a manual review with CSRF, explicit consent and the same key after an ambiguous failure', async () => {
+    const keys: string[] = []; let attempts = 0;
+    const input = { confirm: true as const, comment: 'I checked the original', expectedDecisionId: detail.latestDecision.id, expectedPolicyVersionId: detail.latestDecision.policyVersionId };
+    const api = createHttpApi({ base: '/api/v1', fetchImpl: async (url, init) => {
+      if (String(url).endsWith('/me')) return response(session);
+      expect(String(url)).toBe('/api/v1/invoices/test-id/confirm-review');
+      expect(JSON.parse(String(init?.body))).toEqual(input);
+      const headers = new Headers(init?.headers);
+      expect(headers.get('X-CSRF-Token')).toBe('csrf-test'); keys.push(headers.get('Idempotency-Key')!);
+      if (++attempts === 1) throw new TypeError('response lost');
+      return response(detail);
+    } });
+    await expect(api.confirmInvoiceReview('test-id', input)).rejects.toMatchObject({ code: 'NETWORK' });
+    expect((await api.confirmInvoiceReview('test-id', input)).decision?.id).toBe(detail.latestDecision.id);
+    expect(keys[0]).toBeTruthy(); expect(keys[1]).toBe(keys[0]);
+  });
   it('validates server AI usage and preserves partial totals', async () => {
     const counts = { calls: 3, inputTokens: 80, outputTokens: 20, totalTokens: 100, unreportedCalls: 2 };
     const usage = { ...counts, firstCallAt: '2026-10-17T12:00:00.000Z', breakdown: [{ ...counts, category: 'CHAT' }] };

@@ -11,6 +11,7 @@ export const PolicyInvoiceSchema = z.strictObject({
   primaryReadId: IdSchema,
   extraction: z.unknown(),
   corroboration: z.unknown(),
+  humanReview: z.unknown().optional(),
   // A document reference is a lookup hint, never authorization or a trusted vendor ID.
   agreementReference: IdSchema.nullable(),
   documentType: DocumentTypeSchema.nullable().optional().default(null),
@@ -75,7 +76,7 @@ export function evaluateInvoice(rawInvoice: PolicyInvoice, rawContext: PolicyCon
 
   const check = checkExtraction({
     documentSha256: invoice.documentSha256, primaryReadId: invoice.primaryReadId,
-    candidate: invoice.extraction, corroboration: invoice.corroboration,
+    candidate: invoice.extraction, corroboration: invoice.corroboration, humanReview: invoice.humanReview,
   });
   const ex = check.extraction;
   const prior = context.priorInvoices.filter((p) => p.id !== invoice.id);
@@ -106,10 +107,10 @@ export function evaluateInvoice(rawInvoice: PolicyInvoice, rawContext: PolicyCon
       { documentType: invoice.documentType }, 'NOT_AN_INVOICE');
   }
 
-  record('EXTRACTION', check.status === 'CROSS_CHECKED' ? 'PASS' : 'ESCALATE',
-    check.status === 'CROSS_CHECKED'
-      ? 'Los cuatro campos críticos coinciden con la lectura separada del mismo documento.'
-      : 'La extracción necesita corrección o corroboración; no permite autorización automática ni una excepción genérica.',
+  record('EXTRACTION', check.status !== 'REVIEW_REQUIRED' ? 'PASS' : 'ESCALATE',
+    check.status === 'HUMAN_CONFIRMED' ? 'Una persona revisó el documento y confirmó sus datos. Se conserva la lectura original con sus observaciones.'
+      : check.status === 'CROSS_CHECKED' ? 'Los datos necesarios se pudieron comprobar en el documento.'
+        : 'Hay datos de la factura que necesitan confirmación antes de autorizarla.',
     { status: check.status, issues: check.issues.map((issue) => `${issue.code}:${issue.field ?? '*'}`).join(', ') },
     check.status === 'REVIEW_REQUIRED' ? 'INVALID_OR_MISSING_DATA' : undefined);
 

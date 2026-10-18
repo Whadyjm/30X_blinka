@@ -1,0 +1,95 @@
+{
+  "scope": "CONTROLLED_SINGLE_DOCUMENT_READER_CHECK_NOT_FINANCIAL_EVALUATION",
+  "sourceInvoiceId": "inv_0c4ba2f0-f239-4129-babe-febd3dd004dc",
+  "sourceSha256": "7a4538f283f08be1ffa175d163c2a8619f0716a06096843b008111d1b0e6fade",
+  "readerVersion": "labelled-v8:invoice-json-v6-roles-20261018:qwen-image-fields-v3-20261018",
+  "originalProblem": "Saved independent transcript contained values but labelled-v7 returned all critical fields null.",
+  "trialNotes": [
+    "First two structured-output attempts timed out with the previous 12-second limit.",
+    "Two later controlled calls completed with a 20-second limit. Roles differed in one call; no decision was changed.",
+    "The final call has no unavailable fields or cross-reader disagreements. A primary issuer-identity warning remains and is preserved."
+  ],
+  "primaryExtraction": {
+    "vendorName": "Orlando Juan Lobán",
+    "invoiceNumber": "2024-0001",
+    "amountMinor": 153806,
+    "currency": "EUR",
+    "issuedAt": "2024-04-17",
+    "dueDate": "2024-05-17",
+    "servicePeriod": null,
+    "description": "Producto 1",
+    "extractionWarnings": [
+      "The seller/issuer identity is ambiguous: the document shows two parties, 'Orlando Juan Lobán' and 'Empresa de logística, S. L.', without an explicit supplier label; vendorName was taken from the left party, but the seller role is not clearly established."
+    ],
+    "evidence": [
+      {
+        "field": "vendorName",
+        "source": "page:1",
+        "quote": "Orlando Juan Lobán"
+      },
+      {
+        "field": "invoiceNumber",
+        "source": "page:1",
+        "quote": "Número de factura: 2024-0001"
+      },
+      {
+        "field": "issuedAt",
+        "source": "page:1",
+        "quote": "Fecha de factura: 17/04/2024"
+      },
+      {
+        "field": "dueDate",
+        "source": "page:1",
+        "quote": "Fecha de vencimiento: 17/05/2024"
+      },
+      {
+        "field": "amountMinor",
+        "source": "page:1",
+        "quote": "TOTAL: €1.538,06"
+      },
+      {
+        "field": "currency",
+        "source": "page:1",
+        "quote": "TOTAL: €1.538,06"
+      },
+      {
+        "field": "description",
+        "source": "page:1",
+        "quote": "Producto 1"
+      }
+    ]
+  },
+  "independentFields": {
+    "vendorName": "Orlando Juan Lobán",
+    "amountMinor": 153806,
+    "currency": "EUR",
+    "dueDate": "2024-05-17"
+  },
+  "independentDisagreements": [],
+  "independentUnavailable": [],
+  "independentIssues": [],
+  "timings": {
+    "totalMs": 6526,
+    "primaryMs": 4424,
+    "secondaryMs": 6526
+  },
+  "usage": {
+    "primary": {
+      "inputTokens": 3026,
+      "outputTokens": 339,
+      "reasoningTokens": 0,
+      "costUsd": 0.00033336
+    },
+    "independent": {
+      "inputTokens": 2205,
+      "outputTokens": 426,
+      "reasoningTokens": 0,
+      "costUsd": 0.00053097
+    }
+  },
+  "verificationLimits": [
+    "A single controlled document is not an accuracy or autonomy metric.",
+    "No spending rules were evaluated; no invoice, decision or reservation was written.",
+    "The warning about issuer identity remains pending explicit human confirmation."
+  ]
+}

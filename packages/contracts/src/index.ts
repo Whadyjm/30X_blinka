@@ -229,6 +229,10 @@ export const ReviewApprovalSchema = z.strictObject({
   expectedDecisionId: IdSchema,
   expectedPolicyVersionId: IdSchema,
 });
+export const ConfirmInvoiceReviewSchema = ReevaluateInvoiceSchema.extend({
+  confirm: z.literal(true),
+  comment: z.string().trim().min(1).max(1000),
+});
 
 export const MAX_INVOICE_BYTES = 5 * 1024 * 1024;
 export const CreateSkillConnectionSchema = z.strictObject({ name: NameSchema.max(80) });
@@ -379,14 +383,20 @@ const CorroboratingReadSchema = z.strictObject({
 export type ExtractionCheckIssue = {
   code: 'INVALID_EXTRACTION' | 'MISSING_CRITICAL_FIELD' | 'EXTRACTION_WARNING'
     | 'INVALID_SOURCE' | 'CORROBORATION_REQUIRED' | 'SOURCE_MISMATCH'
-    | 'SAME_READ' | 'FIELD_MISMATCH';
+    | 'SAME_READ' | 'FIELD_MISMATCH' | 'CORROBORATION_FIELD_UNAVAILABLE';
   field: typeof CriticalExtractionFields[number] | null;
 };
 export type ExtractionCheck = {
-  status: 'CROSS_CHECKED' | 'REVIEW_REQUIRED';
+  status: 'CROSS_CHECKED' | 'HUMAN_CONFIRMED' | 'REVIEW_REQUIRED';
   extraction: ExtractedInvoice | null;
   issues: ExtractionCheckIssue[];
 };
+
+// Server-owned attestation, loaded/created only by the authenticated review endpoint.
+export const HumanExtractionReviewSchema = z.strictObject({
+  id: IdSchema, reviewerId: IdSchema, documentSha256: z.hash('sha256'), primaryReadId: IdSchema,
+  extraction: ExtractedInvoiceSchema,
+});
 
 /**
  * Backend-only inputs: IDs, hash and corroboration must come from the document adapters,
@@ -397,6 +407,7 @@ export function checkExtraction(input: {
   primaryReadId: string;
   candidate: unknown;
   corroboration: unknown;
+  humanReview?: unknown;
 }): ExtractionCheck {
   const parsed = ExtractedInvoiceSchema.safeParse(input.candidate);
   if (!parsed.success) {
@@ -407,11 +418,20 @@ export function checkExtraction(input: {
   for (const field of CriticalExtractionFields) {
     if (extraction[field] === null) issues.push({ code: 'MISSING_CRITICAL_FIELD', field });
   }
-  if (extraction.extractionWarnings.length > 0) issues.push({ code: 'EXTRACTION_WARNING', field: null });
   const primaryReadId = IdSchema.safeParse(input.primaryReadId);
   if (!z.hash('sha256').safeParse(input.documentSha256).success || !primaryReadId.success) {
     issues.push({ code: 'INVALID_SOURCE', field: null });
   }
+  if (input.humanReview !== undefined) {
+    const human = HumanExtractionReviewSchema.safeParse(input.humanReview);
+    if (human.success && human.data.documentSha256 === input.documentSha256
+      && human.data.primaryReadId === input.primaryReadId
+      && JSON.stringify(human.data.extraction) === JSON.stringify(extraction)) {
+      return { status: issues.length ? 'REVIEW_REQUIRED' : 'HUMAN_CONFIRMED', extraction, issues };
+    }
+    issues.push({ code: 'INVALID_SOURCE', field: null });
+  }
+  if (extraction.extractionWarnings.length > 0) issues.push({ code: 'EXTRACTION_WARNING', field: null });
   const corroboration = CorroboratingReadSchema.safeParse(input.corroboration);
   if (!corroboration.success) {
     issues.push({ code: 'CORROBORATION_REQUIRED', field: null });
@@ -422,7 +442,9 @@ export function checkExtraction(input: {
     for (const field of CriticalExtractionFields) {
       const normalize = (value: string | number | null) => typeof value === 'string' && field === 'vendorName'
         ? value.normalize('NFC').trim().replace(/\s+/g, ' ').toLowerCase() : value;
-      if (source.fields[field] === null || normalize(extraction[field]) !== normalize(source.fields[field])) {
+      if (source.fields[field] === null) {
+        issues.push({ code: 'CORROBORATION_FIELD_UNAVAILABLE', field });
+      } else if (extraction[field] !== null && normalize(extraction[field]) !== normalize(source.fields[field])) {
         issues.push({ code: 'FIELD_MISMATCH', field });
       }
     }

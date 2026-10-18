@@ -595,6 +595,9 @@ export const mockApi: OliApi = {
   async rereadInvoice() {
     throw new ApiError({ status: 503, code: 'SERVICE_UNAVAILABLE', message: 'New document readings require the live API.' });
   },
+  async confirmInvoiceReview() {
+    throw new Error('La revisión manual requiere el servidor para registrar la confirmación y comprobar las reglas.');
+  },
   async reevaluateInvoice(id, input) {
     await lag(); const d = auth(); requireOwner(d);
     const inv = d.invoices.find(i => i.id === id);

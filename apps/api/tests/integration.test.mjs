@@ -10,6 +10,96 @@ import { audit, clearGuard, guard, id, now, originCheck, periodKey, stmt } from 
 import { evaluationReport, evaluationSummary } from '../worker/evaluation.js';
 
 const origin = 'https://oli.invalid';
+
+test('manual confirmation resolves reading uncertainty, preserves the original and reserves once', async t => {
+  const { api, env, DB, upload, read, ledger } = await setup(t);
+  const invoice = await upload();
+  const result = await processInvoice(env, 'org_demo', invoice.id,
+    read(extraction({ extractionWarnings: ['INDEPENDENT_READ_UNAVAILABLE:vendorName'] }), { corroboration: null }));
+  assert.equal(result.data.latestDecision.action, 'ESCALATE');
+  assert.equal(result.data.approvalRequest, null);
+  const before = await DB.prepare('SELECT extracted_json FROM invoices WHERE id=?').bind(invoice.id).first('extracted_json');
+  const data = { confirm: true, comment: 'Revisé el documento original y confirmo sus datos.',
+    expectedDecisionId: result.data.latestDecision.id, expectedPolicyVersionId: result.data.latestDecision.policyVersionId };
+  const key = crypto.randomUUID();
+  const approved = await api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', data, key });
+  assert.equal(approved.status, 200, JSON.stringify(approved));
+  assert.equal(approved.data.latestDecision.action, 'APPROVE');
+  assert.deepEqual(approved.data.latestDecision.actor, { kind: 'HUMAN', userId: 'user_demo_owner' });
+  assert.equal(approved.data.latestDecision.trace.find(s => s.rule === 'EXTRACTION').evidence.status, 'HUMAN_CONFIRMED');
+  assert.equal(approved.data.decisions.length, 2);
+  assert.equal(await DB.prepare('SELECT extracted_json FROM invoices WHERE id=?').bind(invoice.id).first('extracted_json'), before);
+  assert.equal(await DB.prepare('SELECT count(*) n FROM invoice_manual_reviews').first('n'), 1);
+  const after = await ledger();
+  assert.equal(after.reserved, 20000); assert.equal(after.reservations, 1);
+  const replay = await api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', data, key });
+  assert.equal(replay.status, 200); assert.deepEqual(replay.data, approved.data);
+  assert.deepEqual(await ledger(), after);
+  const stale = await api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', data, key: crypto.randomUUID() });
+  assert.equal(stale.status, 409); assert.deepEqual(await ledger(), after);
+  await assert.rejects(DB.prepare("UPDATE invoice_manual_reviews SET comment='changed'").run(), /REVIEW_HISTORY_IMMUTABLE/);
+  await assert.rejects(DB.prepare('DELETE FROM invoice_manual_reviews').run(), /REVIEW_HISTORY_IMMUTABLE/);
+});
+
+test('manual confirmation keeps hard limits and unknown vendor protections', async t => {
+  for (const [name, changes, expectedReason] of [
+    ['hard limit', { amountMinor: 200000 }, 'AMOUNT_ABOVE_HARD_LIMIT'],
+    ['unknown vendor', { vendorName: 'Proveedor no registrado' }, 'UNKNOWN_VENDOR'],
+  ]) await t.test(name, async t => {
+    const { api, env, upload, read, ledger } = await setup(t);
+    const invoice = await upload();
+    const result = await processInvoice(env, 'org_demo', invoice.id, read(extraction({ ...changes, extractionWarnings: ['Needs checking'] }), { corroboration: null }));
+    const response = await api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', key: crypto.randomUUID(), data: {
+      confirm: true, comment: 'Datos comprobados por mí', expectedDecisionId: result.data.latestDecision.id,
+      expectedPolicyVersionId: result.data.latestDecision.policyVersionId,
+    } });
+    assert.equal(response.status, 200, JSON.stringify(response));
+    assert.equal(response.data.latestDecision.action, 'BLOCK');
+    assert.ok(response.data.latestDecision.reasons.includes(expectedReason));
+    assert.equal((await ledger()).reservations, 0);
+  });
+});
+
+test('manual approval requires explicit confirmation, current context and complete invoice data', async t => {
+  const { api, env, upload, read, ledger } = await setup(t);
+  const invoice = await upload();
+  const result = await processInvoice(env, 'org_demo', invoice.id, read(extraction({ vendorName: null }), { corroboration: null }));
+  const input = { confirm: true, comment: 'Confirmado', expectedDecisionId: result.data.latestDecision.id, expectedPolicyVersionId: result.data.latestDecision.policyVersionId };
+  const before = await ledger();
+  for (const [data, status] of [[{ ...input, confirm: false }, 400], [{ ...input, vendorName: 'Injected' }, 400],
+    [{ ...input, expectedPolicyVersionId: 'outdated' }, 409], [{ ...input, expectedDecisionId: 'outdated' }, 409], [input, 409]]) {
+    const response = await api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', key: crypto.randomUUID(), data });
+    assert.equal(response.status, status, JSON.stringify(response));
+    assert.deepEqual(await ledger(), before);
+  }
+});
+
+test('concurrent manual confirmations cannot double reserve or override duplicates and budget', async t => {
+  const { api, env, DB, upload, read, ledger } = await setup(t);
+  const confirm = (invoice, decision) => api(`/invoices/${invoice.id}/confirm-review`, { method: 'POST', key: crypto.randomUUID(), data: {
+    confirm: true, comment: 'Confirmé el documento', expectedDecisionId: decision.id, expectedPolicyVersionId: decision.policyVersionId,
+  } });
+  const first = await upload();
+  const firstRead = await processInvoice(env, 'org_demo', first.id, read(extraction(), { corroboration: null }));
+  const race = await Promise.all([confirm(first, firstRead.data.latestDecision), confirm(first, firstRead.data.latestDecision)]);
+  assert.deepEqual(race.map(r => r.status).sort(), [200, 409]);
+  assert.equal((await ledger()).reservations, 1);
+  const duplicate = await upload({ file: { name: 'duplicate.pdf' } });
+  const duplicateRead = await processInvoice(env, 'org_demo', duplicate.id, read(extraction(), { corroboration: null }));
+  const blockedDuplicate = await confirm(duplicate, duplicateRead.data.latestDecision);
+  assert.equal(blockedDuplicate.status, 200);
+  assert.equal(blockedDuplicate.data.latestDecision.action, 'BLOCK');
+  assert.ok(blockedDuplicate.data.latestDecision.reasons.includes('DUPLICATE_INVOICE'));
+  await DB.prepare('UPDATE budget_periods SET limit_minor=reserved_minor+1000').run();
+  const noBudget = await upload({ file: { name: 'budget.pdf', bytes: new TextEncoder().encode('%PDF-1.4\nAnother synthetic invoice') } });
+  const budgetRead = await processInvoice(env, 'org_demo', noBudget.id,
+    read(extraction({ invoiceNumber: 'DEMO-BUDGET', servicePeriod: '2026-11' }), { corroboration: null }));
+  const blockedBudget = await confirm(noBudget, budgetRead.data.latestDecision);
+  assert.equal(blockedBudget.status, 200, JSON.stringify(blockedBudget));
+  assert.equal(blockedBudget.data.latestDecision.action, 'BLOCK');
+  assert.ok(blockedBudget.data.latestDecision.reasons.includes('BUDGET_EXCEEDED'));
+  assert.equal((await ledger()).reservations, 1);
+});
 const pdf = new TextEncoder().encode('%PDF-1.4\nsynthetic integration fixture, provider is mocked');
 const extraction = (overrides = {}) => ({ vendorName: 'Demo Cloud Hosting (ficticio)', invoiceNumber: 'DEMO-001',
   amountMinor: 20000, currency: 'USD', issuedAt: '2026-10-01', dueDate: '2026-10-31', servicePeriod: '2026-10',

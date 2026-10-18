@@ -236,3 +236,18 @@ test('una corroboración incompleta o de origen inválido no habilita evaluació
   // @ts-expect-error También comprobar metadatos inválidos al cruzar una frontera runtime.
   assert.equal(checkExtraction({ ...extractionInput, primaryReadId: null }).status, 'REVIEW_REQUIRED');
 });
+
+test('a human confirmation is distinct from automatic corroboration and is bound to the exact read', () => {
+  const candidate = { ...extractionCandidate, extractionWarnings: ['Reading needs clarification'] };
+  const humanReview = { id: 'review_test', reviewerId: 'reviewer_test', documentSha256: extractionInput.documentSha256,
+    primaryReadId: extractionInput.primaryReadId, extraction: candidate };
+  assert.equal(checkExtraction({ ...extractionInput, candidate, corroboration: null }).status, 'REVIEW_REQUIRED');
+  assert.equal(checkExtraction({ ...extractionInput, candidate, corroboration: null, humanReview }).status, 'HUMAN_CONFIRMED');
+  for (const change of [{ documentSha256: 'b'.repeat(64) }, { primaryReadId: 'another_read' }, { reviewerId: '' },
+    { extraction: { ...candidate, amountMinor: 1 } }]) {
+    assert.equal(checkExtraction({ ...extractionInput, candidate, corroboration: null, humanReview: { ...humanReview, ...change } }).status, 'REVIEW_REQUIRED');
+  }
+  const unavailable = checkExtraction({ ...extractionInput, corroboration: { ...corroboratingRead, fields: { ...corroboratingRead.fields, vendorName: null } } });
+  assert.ok(unavailable.issues.some(i => i.code === 'CORROBORATION_FIELD_UNAVAILABLE' && i.field === 'vendorName'));
+  assert.equal(unavailable.issues.some(i => i.code === 'FIELD_MISMATCH'), false);
+});

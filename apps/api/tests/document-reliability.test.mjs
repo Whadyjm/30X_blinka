@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { checkExtraction } from '@oli/contracts';
 import { EXTRACTION_CONFIG_VERSION, IMAGE_OCR_MODEL } from '@oli/extraction';
-import { corroboratePdfText, parseMoneyMinor, parsePdfText, readDocument, READER_VERSION } from '../worker/document.js';
+import { corroboratePdfText, parseMoneyMinor, parsePdfText, parseImageRead, readDocument, READER_VERSION } from '../worker/document.js';
 
 const hash = 'a'.repeat(64);
 const bytes = new TextEncoder().encode('%PDF-1.4\nsynthetic document; provider calls mocked');
@@ -22,9 +22,15 @@ const envFor = source => ({ OPENROUTER_API_KEY: 'test-only', AI: { toMarkdown: a
 const checked = result => checkExtraction({ documentSha256: hash, primaryReadId: result.primaryReadId,
   candidate: result.extraction, corroboration: result.corroboration });
 const pngBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
-const ocrWire = (source = text(), issues = []) => Response.json({ model: IMAGE_OCR_MODEL,
-  choices: [{ finish_reason: 'stop', message: { content: source + issues.map(issue => `\n[${issue}]`).join('') } }],
-  usage: { prompt_tokens: 2000, completion_tokens: 500, cost: 0.000535 } });
+const ocrWire = (source = text(), issues = []) => {
+  const { fields: parsed } = parsePdfText(source);
+  const { amountMinor, ...raw } = parsed;
+  const transcript = source + issues.map(issue => `\n[${issue}]`).join('');
+  return Response.json({ model: IMAGE_OCR_MODEL,
+    choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ text: transcript,
+      fields: { ...raw, total: source.match(/TOTAL A COBRAR\n([^\n]+)/)?.[1] ?? null, agreementReference: 'agr_demo_one' }, issues }) } }],
+    usage: { prompt_tokens: 2000, completion_tokens: 500, cost: 0.000535 } });
+};
 
 test('company PDF conversions retain glued labels, totals and notes without guessing missing currency', () => {
   const root = new URL('../../../', import.meta.url);
@@ -100,7 +106,7 @@ test('Qwen disagreements, unreadable markers and reported uncertainty prevent im
     source = text({ [field]: changed });
     const result = await read();
     assert.equal(checked(result).status, 'REVIEW_REQUIRED', field);
-    assert.ok(result.extraction.extractionWarnings.some(warning => warning.startsWith('INDEPENDENT_READ_MISMATCH:')));
+    assert.ok(result.extraction.extractionWarnings.some(warning => /^INDEPENDENT_READ_(MISMATCH|UNAVAILABLE):/.test(warning)));
   }
   for (const problem of ['marker', 'issue']) {
     source = problem === 'marker' ? text() + '\n[ILLEGIBLE]' : text();
@@ -120,7 +126,10 @@ test('image secondary transport failure preserves primary checkpoint; retry call
   });
   const options = { artifacts, checkpoint: async (kind, artifact) => { artifacts[kind] = artifact; } };
   const read = () => readDocument({ OPENROUTER_API_KEY: 'test-only', IMAGE_OCR_MODE: 'ENABLED' }, { mimeType: 'image/png' }, pngBytes, hash, options);
-  await assert.rejects(read(), error => error.diagnostic.stage === 'IMAGE_OCR');
+  const incomplete = await read();
+  assert.equal(checked(incomplete).status, 'REVIEW_REQUIRED');
+  assert.deepEqual(incomplete.extraction.vendorName, fields.vendorName);
+  assert.equal(incomplete.provenance.corroborationError, 'INDEPENDENT_READ_UNAVAILABLE');
   assert.ok(artifacts.PRIMARY); assert.equal(artifacts.SECONDARY, undefined);
   fail = false;
   assert.equal(checked(await read()).status, 'CROSS_CHECKED');
@@ -286,7 +295,8 @@ test('number and Unicode text normalization compare equivalent facts; one missin
   const matching = await readDocument(envFor(text({ issuedAt: null, servicePeriod: null })), pdf, bytes, hash);
   assert.deepEqual(matching.provenance.independentDisagreements, []);
   const missing = await readDocument(envFor(text({ issuedAt: null, servicePeriod: null, description: null })), pdf, bytes, hash);
-  assert.deepEqual(missing.provenance.independentDisagreements, ['description']);
+  assert.deepEqual(missing.provenance.independentDisagreements, []);
+  assert.deepEqual(missing.provenance.independentUnavailable, ['description']);
   assert.equal(checked(missing).status, 'REVIEW_REQUIRED');
 });
 
@@ -348,11 +358,14 @@ test('secondary transport failures retry with cached primary; absent AI and imag
   const artifacts = {};
   const env = envFor('é'.repeat(70000));
   const options = { checkpoint: async (kind, artifact) => { artifacts[kind] = artifact; } };
-  await assert.rejects(readDocument(env, pdf, bytes, hash, options), error => error.code === 'INDEPENDENT_READ_UNAVAILABLE'
-    && error.diagnostic.issueCodes[0] === 'PDF_TEXT_UNAVAILABLE');
+  const unavailable = await readDocument(env, pdf, bytes, hash, options);
+  assert.equal(checked(unavailable).status, 'REVIEW_REQUIRED');
+  assert.equal(unavailable.provenance.corroborationError, 'PDF_TEXT_UNAVAILABLE');
   assert.ok(artifacts.PRIMARY); assert.equal(artifacts.SECONDARY, undefined);
   env.AI.toMarkdown = async () => { throw new Error('synthetic transport error'); };
-  await assert.rejects(readDocument(env, pdf, bytes, hash, { ...options, artifacts }), error => error.code === 'INDEPENDENT_READ_UNAVAILABLE');
+  const failed = await readDocument(env, pdf, bytes, hash, { ...options, artifacts });
+  assert.equal(checked(failed).status, 'REVIEW_REQUIRED');
+  assert.equal(failed.extraction.amountMinor, fields.amountMinor);
   assert.equal(artifacts.SECONDARY, undefined);
   assert.equal(calls, 1, 'successful primary must not repeat for secondary transport retry');
   env.AI.toMarkdown = async () => ({ format: 'markdown', data: text() });
@@ -374,8 +387,34 @@ test('secondary timeout is bounded and leaves no failed artifact cached', async 
   t.mock.method(globalThis, 'setTimeout', (callback, delay, ...args) => originalTimeout(callback, delay === 15000 ? 1 : delay, ...args));
   const artifacts = {};
   const env = envFor(text()); env.AI.toMarkdown = () => new Promise(() => {});
-  await assert.rejects(readDocument(env, pdf, bytes, hash, { checkpoint: async (kind, value) => { artifacts[kind] = value; } }),
-    error => error.code === 'INDEPENDENT_READ_UNAVAILABLE' && error.diagnostic.issueCodes[0] === 'PDF_TEXT_TIMEOUT');
+  const result = await readDocument(env, pdf, bytes, hash, { checkpoint: async (kind, value) => { artifacts[kind] = value; } });
+  assert.equal(checked(result).status, 'REVIEW_REQUIRED');
+  assert.equal(result.provenance.corroborationError, 'PDF_TEXT_TIMEOUT');
   assert.ok(artifacts.PRIMARY);
   assert.equal(artifacts.SECONDARY, undefined);
+});
+
+test('Spanish invoice labels, European totals and unambiguous dates are interpreted without a template whitelist', () => {
+  const source = 'Emisor: Estudio Azul\nNúmero de factura: 2024-0001\nFecha de factura: 17/04/2024\nFecha de vencimiento: 17/05/2024\nTOTAL: €1.538,06';
+  const result = parsePdfText(source);
+  assert.equal(result.fields.vendorName, 'Estudio Azul');
+  assert.equal(result.fields.invoiceNumber, '2024-0001');
+  assert.equal(result.fields.issuedAt, '2024-04-17');
+  assert.equal(result.fields.dueDate, '2024-05-17');
+  assert.equal(result.fields.currency, 'EUR');
+  assert.equal(result.fields.amountMinor, 153806);
+  assert.equal(parsePdfText(source.replace('17/05/2024', '03/04/2024')).fields.dueDate, null);
+});
+
+test('image interpretation uses independent roles and literal values, not required label spellings or primary guesses', () => {
+  const text = 'Factura\nEstudio Azul\nCliente: Demo\nNúmero de factura: 2024-0001\nFecha de factura: 17/04/2024\nFecha de vencimiento: 17/05/2024\nProducto 1\nTOTAL: €1.538,06';
+  const raw = { vendorName: 'Estudio Azul', invoiceNumber: '2024-0001', total: '€1.538,06', currency: 'EUR',
+    issuedAt: '17/04/2024', dueDate: '17/05/2024', servicePeriod: null, description: 'Producto 1', agreementReference: null };
+  const result = parseImageRead({ text, fields: raw, issues: [] });
+  assert.deepEqual(result.fields, { vendorName: 'Estudio Azul', invoiceNumber: '2024-0001', amountMinor: 153806, currency: 'EUR',
+    issuedAt: '2024-04-17', dueDate: '2024-05-17', servicePeriod: null, description: 'Producto 1' });
+  assert.equal(parseImageRead({ text, fields: { ...raw, vendorName: 'Invented company' }, issues: [] }).fields.vendorName, null);
+  assert.equal(parseImageRead({ text, fields: raw, issues: ['AMBIGUOUS_VENDOR'] }).fields.vendorName, null);
+  assert.equal(parseImageRead({ text: text + '\nTOTAL: €2.000,00', fields: raw, issues: [] }).fields.amountMinor, null);
+  assert.equal(parseImageRead({ text: text.replace('€1.538,06', '$1.538,06'), fields: { ...raw, currency: 'USD', total: '$1.538,06' }, issues: [] }).fields.currency, null);
 });

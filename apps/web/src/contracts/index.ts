@@ -71,6 +71,7 @@ export const ExtractedInvoiceSchema = z.object({
   issuedAt: z.string().nullable(),
   dueDate: z.string().nullable(),
   description: z.string().nullable(),
+  servicePeriod: z.string().nullable().optional(),
   extractionWarnings: z.array(z.string()).default([]),
   evidence: z
     .array(z.object({ field: z.string(), source: z.string(), quote: z.string().optional() }))

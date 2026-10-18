@@ -5,6 +5,45 @@ El objetivo es resolver correctamente facturas y **no aprobar fuera de las regla
 La extracción de documentos puede equivocarse; la arquitectura debe detectar incertidumbre
 y permitir revisión/corrección antes de que se autorice algo con datos no corroborados.
 
+## Actualización: revisión humana explícita y formatos reales (2026-10-18)
+
+Oscar autorizó una confirmación humana explícita de facturas en revisión. El botón **APROBAR FACTURA** abre un
+modal con advertencia, datos actuales del documento y una casilla de confirmación inicialmente desmarcada.
+No se aprueba nada al abrir/cerrar el modal. El servidor identifica al revisor autenticado, exige la decisión y
+política vigentes, conserva la extracción original y registra una atestación append-only separada. La
+migración `0013_invoice_manual_reviews.sql` protege ese registro y acota la resolución de identidad de la factura.
+
+`checkExtraction()` distingue `HUMAN_CONFIRMED` de `CROSS_CHECKED`: una persona puede confirmar los datos
+existentes y aceptar las observaciones, pero esa atestación no se presenta como OCR ni habilita autonomía.
+El navegador no envía una extracción ni un `verified: true`; el servidor vincula la revisión al hash, lectura,
+usuario y extracción exactos. Datos críticos ausentes siguen requiriendo corrección. El tipo de documento debe
+ser INVOICE. El motor vuelve a comprobar proveedores, acuerdos, fechas, duplicados, moneda, límites y presupuesto.
+Solo una excepción de monto ya permitida por la política puede resolverse junto con esta autorización humana.
+La reserva sigue exclusivamente en los triggers D1. No se altera una decisión histórica ni se ejecutan pagos.
+Esta autorización explícita sustituye la prohibición anterior de confirmar manualmente incertidumbre de lectura;
+la prohibición de **autoaprobar** incertidumbre permanece.
+
+Para imágenes, Qwen sigue viendo únicamente los bytes originales en una llamada separada, sin el candidato ni
+reglas de gasto. Ahora devuelve transcripción literal y campos identificados por su significado en el documento,
+sin exigir etiquetas de nuestra plantilla. El servidor exige valores literales presentes en esa transcripción y
+normaliza importes con BigInt, euros explícitos y fechas inequívocas. Un dato presente pero distinto se registra
+como MISMATCH; un dato no interpretado como UNAVAILABLE. Ninguno de esos estados se convierte en autoaprobación.
+Los roles emisor/cliente siguen siendo distintos: encontrar un nombre no acredita que sea quien cobra.
+
+El parser de PDF `labelled-v8` reconoce Emisor/Vendedor/Facturado por, Número de factura, Fecha de factura,
+Fecha de emisión y Fecha de vencimiento; admite € y fechas locales solo si el orden día/mes es inequívoco.
+`03/04/2026` sin formato explícito sigue siendo incierta. El protocolo Qwen es `qwen-image-fields-v3-20261018`
+y su límite pasa de 12 a 20 segundos; la medición inicial del protocolo estructurado tuvo dos timeouts a 12 s.
+La versión nueva invalida cachés anteriores. JSON válido y citas del modelo siguen sin demostrar exactitud.
+
+Si el apoyo OCR/conversión falla pero el lector principal obtuvo datos, se conservan esos datos y se produce
+revisión, con el fallo en procedencia y sin autoautorizar. El usuario puede confirmar los datos o pedir una nueva
+lectura; no necesita volver a subir el mismo archivo. No se guarda un artefacto secundario fallido como exitoso.
+La interfaz explica la duda de negocio sin hablar de lectores; arquitectura, errores originales y evidencia van a Logs.
+
+Los apartados fechados 2026-10-17 siguientes documentan la implementación anterior. Para el comportamiento
+actual de revisión humana, protocolo de imágenes y manejo de fallos secundarios, prevalece esta actualización.
+
 ## Estado de la implementación (2026-10-17)
 
 El Worker usa Mistral OCR vía OpenRouter para el candidato PDF y conversión de texto independiente

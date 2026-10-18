@@ -1,10 +1,10 @@
 import { AlertCircle, Ban, CheckCircle2, Clock, Info, ShieldCheck } from 'lucide-react';
-import type { PolicyDecision, TraceStep } from '@/contracts';
+import type { ExtractedInvoice, PolicyDecision, TraceStep } from '@/contracts';
 import { reasonInfo } from '@/contracts/reasons';
 import { t } from '@/i18n';
 import { cn } from '@/lib/cn';
-import { formatDateTime } from '@/lib/dates';
-import { buildTrace, parseEvidenceFacts } from '@/lib/trace';
+import { buildTrace } from '@/lib/trace';
+import { extractionExplanation } from '@/lib/extraction-explanation';
 
 interface StepTheme {
   dotClass: string;
@@ -43,9 +43,9 @@ const OUTCOME_THEME: Record<TraceStep['result'], StepTheme> = {
 /**
  * Intuitive Decision Trace (§4.4 / §9.5):
  * Visual step-by-step timeline with dots connecting each check.
- * Strictly no raw JSON dumps — evidence is parsed into clean, human-readable facts.
+ * Reading uncertainty is explained here; original evidence remains in Logs.
  */
-export function DecisionTrace({ decision }: { decision: PolicyDecision }) {
+export function DecisionTrace({ decision, extracted }: { decision: PolicyDecision; extracted?: ExtractedInvoice | null }) {
   const steps = buildTrace(decision);
 
   if (steps.length === 0) {
@@ -55,6 +55,8 @@ export function DecisionTrace({ decision }: { decision: PolicyDecision }) {
   const passedCount = steps.filter((s) => s.result === 'PASS').length;
   const warnCount = steps.filter((s) => s.result === 'WARN').length;
   const failCount = steps.filter((s) => s.result === 'FAIL').length;
+  const stoppedAtReading = decision.trace?.some(step => step.rule === 'EXTRACTION' && step.result !== 'PASS')
+    && decision.trace.every(step => ['DOCUMENT_TYPE', 'EXTRACTION', 'DUPLICATE_HASH'].includes(step.rule));
 
   return (
     <div className="p-5 sm:p-6" aria-label={t('Decision trace')}>
@@ -104,7 +106,7 @@ export function DecisionTrace({ decision }: { decision: PolicyDecision }) {
                       ? 'bg-slate-400'
                       : 'bg-slate-300'
               )}
-              title={`${s.rule}: ${t(OUTCOME_THEME[s.result].label)}`}
+              title={`${reasonInfo(s.rule).label}: ${t(OUTCOME_THEME[s.result].label)}`}
             />
           ))}
         </div>
@@ -123,151 +125,53 @@ export function DecisionTrace({ decision }: { decision: PolicyDecision }) {
             <TimelineStep
               key={`${step.rule}-${idx}`}
               step={step}
-              index={idx + 1}
-              isLast={idx === steps.length - 1}
-              currency={decision.facts.currency}
-              fallbackVersion={decision.policyVersion}
-              fallbackAt={decision.checkedAt}
+              extracted={extracted}
             />
           ))}
         </ol>
       </div>
+      {stoppedAtReading && <p className="mt-5 max-w-prose text-sm leading-relaxed text-slate-700">
+        {t('The review stopped at the document reading. Vendor authorization, amount limits and budget have not been checked yet.')}
+      </p>}
     </div>
   );
 }
 
-function TimelineStep({
-  step,
-  index,
-  currency,
-  fallbackVersion,
-  fallbackAt,
-}: {
-  step: TraceStep;
-  index: number;
-  isLast?: boolean;
-  currency?: string;
-  fallbackVersion?: unknown;
-  fallbackAt?: string;
-}) {
+function TimelineStep({ step, extracted }: { step: TraceStep; extracted?: ExtractedInvoice | null }) {
   const info = reasonInfo(step.rule);
   const theme = OUTCOME_THEME[step.result];
   const StepIcon = theme.icon;
-  const version = step.policyVersion ?? fallbackVersion;
-  const at = step.checkedAt ?? fallbackAt;
-
-  // Extract facts without raw JSON
-  const evidenceFacts = parseEvidenceFacts(step.evidence, currency);
-
-  // Check if comparison details exist
-  const hasComparison = Boolean(step.field || step.expected || (step.observed && step.expected));
+  const isReading = step.rule === 'EXTRACTION';
+  const messages = isReading
+    ? step.result === 'PASS'
+      ? [t(step.evidence?.includes('HUMAN_CONFIRMED')
+        ? 'A person reviewed the original and confirmed these invoice details.'
+        : 'I checked the vendor, total, currency and due date. The invoice must also meet your spending rules.')]
+      : extractionExplanation(extracted, step)
+    : [step.observed || info.rule];
 
   return (
-    <li className="relative group">
-      {/* Prominent timeline dot */}
+    <li className="relative">
       <div
-        className={cn(
-          'absolute -left-[27px] sm:-left-[31px] top-1.5 z-10 flex size-7 sm:size-8 items-center justify-center rounded-full shadow-sm ring-4 ring-paper transition-transform group-hover:scale-105',
-          theme.dotClass
-        )}
+        className={cn('absolute -left-[27px] sm:-left-[31px] top-1.5 flex size-7 sm:size-8 items-center justify-center rounded-full ring-4 ring-paper', theme.dotClass)}
         aria-hidden
       >
         <StepIcon className="size-4" />
       </div>
-
-      {/* Step card container */}
-      <div className="rounded-xl border border-hairline bg-paper p-4 sm:p-5 transition-colors hover:border-slate-300">
-        {/* Header: Title, index and outcome badge */}
+      <div className="border-b border-hairline pb-5">
         <div className="flex flex-wrap items-start justify-between gap-2.5">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-normal text-slate-400">#{index}</span>
-              <h4 className="text-[15px] leading-snug text-ink">{info.label}</h4>
-            </div>
-            <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">{info.rule}</p>
-          </div>
-
-          <span
-            className={cn(
-              'inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs',
-              theme.badgeClass
-            )}
-          >
+          <h4 className="min-w-0 flex-1 text-[15px] leading-snug text-ink">
+            {isReading ? t('Checking the invoice details') : info.label}
+          </h4>
+          <span className={cn('inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-xs', theme.badgeClass)}>
             <StepIcon className="size-3.5" aria-hidden />
             {t(theme.label)}
           </span>
         </div>
-
-        {/* Plain language explanation from the engine */}
-        {step.observed && (
-          <p className="mt-3 text-sm leading-relaxed text-slate-800">
-            {step.observed}
-          </p>
-        )}
-
-        {/* Structured comparison box */}
-        {hasComparison && (
-          <div className="mt-3.5 rounded-lg border border-hairline bg-bone/40 p-3">
-            <dl className="grid gap-3 sm:grid-cols-3 text-xs">
-              {step.field && (
-                <div>
-                  <dt className="text-slate-500">{t('Checked')}</dt>
-                  <dd className="mt-0.5 font-normal text-ink">{step.field}</dd>
-                </div>
-              )}
-              {step.observed && (
-                <div>
-                  <dt className="text-slate-500">{t('Found')}</dt>
-                  <dd className="mt-0.5 font-normal text-data text-ink break-words">
-                    {step.observed}
-                  </dd>
-                </div>
-              )}
-              {step.expected && (
-                <div>
-                  <dt className="text-slate-500">{t('Rule')}</dt>
-                  <dd className="mt-0.5 font-normal text-data text-ink">{step.expected}</dd>
-                </div>
-              )}
-            </dl>
-          </div>
-        )}
-
-        {/* Evidence facts formatted as clean badges (NO JSON DUMP) */}
-        {evidenceFacts.length > 0 && (
-          <div className="mt-3.5 flex flex-wrap items-center gap-1.5 pt-2 border-t border-hairline/60">
-            <span className="text-[11px] text-slate-400 mr-1">{t('Facts')}:</span>
-            {evidenceFacts.map((fact, fIdx) => (
-              <span
-                key={fIdx}
-                className="inline-flex items-center gap-1 rounded-md bg-bone px-2.5 py-0.5 text-xs text-slate-700 ring-1 ring-inset ring-hairline"
-              >
-                <span className="text-slate-500">{fact.label}:</span>
-                <span className="text-ink font-normal">{fact.value}</span>
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Step footer metadata */}
-        <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2 border-t border-hairline pt-2.5 text-[11px] text-slate-400">
-          <div className="flex items-center gap-2">
-            <span>
-              {version != null && version !== ''
-                ? t('Policy v{n}', { n: String(version) })
-                : t('Policy version n/a')}
-            </span>
-            {at && (
-              <>
-                <span>·</span>
-                <span>{formatDateTime(at)}</span>
-              </>
-            )}
-          </div>
-          {!['DOCUMENT_TYPE', 'NOT_AN_INVOICE', 'DOCUMENT_TYPE_UNCERTAIN'].includes(step.rule) && (
-            <span className="font-mono text-[10px] text-slate-400">
-              {step.rule}
-            </span>
+        <div className="mt-3 max-w-prose space-y-2 text-sm leading-relaxed text-slate-700">
+          {messages.map((message, i) => <p key={i}>{message}</p>)}
+          {!isReading && step.expected && (
+            <p className="text-slate-600">{t('What is needed: {requirement}', { requirement: step.expected })}</p>
           )}
         </div>
       </div>

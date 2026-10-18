@@ -1005,3 +1005,21 @@ y resultados son append-only; no guardan prompts ni respuestas. Las llamadas de
 producto futuras deben usar `meteredFetch` o `recordAiCall` con la organización
 resuelta en el servidor. Los scripts de evaluación conservan su ejecución sin
 escrituras sobre los datos compartidos.
+
+### Confirmación humana de datos y autorización
+
+`POST /api/v1/invoices/:id/confirm-review` requiere sesión OWNER o APPROVER, CSRF e `Idempotency-Key`.
+El cuerpo estricto contiene `expectedDecisionId`, `expectedPolicyVersionId`, `confirm: true` y `comment` (1–1000 caracteres).
+No recibe campos de extracción, identidades de proveedor ni resultados OCR del navegador.
+
+El usuario confirma los datos existentes que acaba de revisar en el documento original. El servidor conserva la lectura
+original, registra una atestación append-only en `invoice_manual_reviews` y vuelve a evaluar las reglas vigentes.
+Esta confirmación puede resolver incertidumbre de lectura; no anula duplicados, proveedor prohibido/desconocido,
+diferencias de acuerdo, fechas inválidas, moneda incompatible, techo absoluto ni presupuesto insuficiente.
+Si solo queda una excepción de monto permitida por la política, la misma confirmación humana puede autorizarla.
+
+Devuelve `{ data: InvoiceDetail }`. `latestDecision.action` indica el resultado real: puede seguir siendo `BLOCK` o
+`ESCALATE` si otra regla impide autorizar. Solo `APPROVE` confirma una autorización y activa la reserva atómica D1.
+La decisión identifica al actor humano y vincula el registro de revisión; nunca ejecuta una transferencia.
+Una decisión/política obsoleta devuelve 409; datos críticos incompletos o un documento no identificado como factura
+no pueden confirmarse por este endpoint. Reintentar una respuesta perdida conserva la misma clave de idempotencia.

@@ -3,7 +3,7 @@ import { AiUsageSchema } from '@oli/contracts';
 import {
   InvoiceTrashEventSchema, SetInvoiceTrashSchema, ActivateMandateSchema, AgreementSchema, ApiErrorSchema, ApprovalRequestSchema, BudgetPeriodSchema,
   CreateAgreementSchema, CreateVendorSchema, EvaluationSummarySchema, InvoiceDetailSchema, InvoiceSchema, VendorSchema,
-  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema,
+  MandateDraftSchema, PaginationSchema, PolicyVersionSchema, ReviewApprovalSchema, ReevaluateInvoiceSchema, ConfirmInvoiceReviewSchema,
   SaveMandateDraftSchema, SessionSchema, TelegramIntegrationSchema, TelegramLinkSchema,
   EmailIntegrationSchema, InboxSchema, ChatMessageInputSchema, ChatReplySchema, ChatHistorySchema,
   ChatConversationsSchema, ChatActionSchema, ChatActionResultSchema, ConfirmChatActionSchema, ChatCardSchema,
@@ -210,6 +210,10 @@ export function createHttpApi(opts: HttpApiOptions): OliApi {
     async reevaluateInvoice(id, input) {
       const path = `/invoices/${encodeURIComponent(id)}/reevaluate`;
       return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ReevaluateInvoiceSchema.parse(input))).data);
+    },
+    async confirmInvoiceReview(id, input) {
+      const path = `/invoices/${encodeURIComponent(id)}/confirm-review`;
+      return detailView(parse(path, envelope(InvoiceDetailSchema), await command(path, ConfirmInvoiceReviewSchema.parse(input))).data);
     },
     invoiceFileUrl: invoice => invoice.fileUrl ?? `${opts.base}/invoices/${encodeURIComponent(invoice.id)}/file`,
     async listApprovals() {

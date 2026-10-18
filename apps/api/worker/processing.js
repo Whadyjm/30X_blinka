@@ -57,7 +57,8 @@ export function decisionStatements(db, orgId, evaluation, storedRead, actorId = 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, d.id, orgId, d.invoiceId, d.action, d.policyVersionId,
     d.action === 'APPROVE' ? evaluation.budgetPeriodId : null, JSON.stringify(d.reasons),
     JSON.stringify({ decision: d, extractionCheck: { documentSha256: storedRead.documentSha256,
-      primaryReadId: storedRead.primaryReadId, corroboration: storedRead.corroboration }, provenance: storedRead.provenance }),
+      primaryReadId: storedRead.primaryReadId, corroboration: storedRead.corroboration,
+      humanReview: storedRead.humanReview ?? null }, provenance: storedRead.provenance }),
     d.humanExplanation, Number(d.needsHumanApproval), d.actor.kind, d.actor.userId, d.checkedAt),
   audit(db, orgId, actorId, 'INVOICE_DECIDED', d.invoiceId, { decisionId: d.id, action: d.action, reasons: d.reasons }, d.checkedAt)];
   if (d.needsHumanApproval) sql.push(stmt(db, `INSERT INTO approval_requests
@@ -69,7 +70,7 @@ export function decisionStatements(db, orgId, evaluation, storedRead, actorId = 
 export function evaluateStored(read, state) {
   return evaluateInvoice({ id: state.invoice.id, documentSha256: state.invoice.file_sha256,
     primaryReadId: read.primaryReadId, extraction: read.extraction, corroboration: read.corroboration,
-    documentType: read.documentType ?? 'UNKNOWN',
+    documentType: read.documentType ?? 'UNKNOWN', humanReview: read.humanReview,
     agreementReference: read.agreementReference ?? null }, state.context);
 }
 
