@@ -1,0 +1,21 @@
+{
+  "startedAtUtc": "2026-10-18T02:16:42.343362+00:00",
+  "durationSeconds": 3.909,
+  "workingDirectory": "packages/extraction",
+  "command": [
+    "node",
+    "--experimental-strip-types",
+    "--test",
+    "tests/image-ocr.test.ts",
+    "tests/openrouter.test.ts"
+  ],
+  "exitCode": 0,
+  "nodeVersion": "v26.10.0",
+  "scope": "Local adapter tests with simulated OpenRouter responses; not OCR accuracy or a live provider availability measurement.",
+  "result": "PASS (process exit code 0)",
+  "resultDetail": "Only process success was captured; per-test counts were not retained by this reporter parser. No per-test total is claimed.",
+  "testFileSha256": {
+    "packages/extraction/tests/image-ocr.test.ts": "5caf703a5628078b501f9dcbf7b7c75cc7fcc496dea4c1479c350af73573d566",
+    "packages/extraction/tests/openrouter.test.ts": "8a24be5b4ca70e5836f1cfc6c87493930198fc93e54403ee43a6b849ab8dcfac"
+  }
+}

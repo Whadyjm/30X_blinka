@@ -1,0 +1,95 @@
+{
+  "reportDate": "2026-10-17",
+  "timezone": "America/Caracas",
+  "reviewStartedAtUtc": "2026-10-18T02:16:42.251955+00:00",
+  "gitHead": "f44415c6dcfa7d3a3fc18d5110619cbb1ea15d66",
+  "scope": "Local source review and local controlled-failure tests; not an induced production outage, uptime SLA or disaster recovery drill.",
+  "sourceSha256": {
+    "apps/api/wrangler.jsonc": "b6cecab8b5da2d4a41513c5540673d1d1be1f4b8cfa724741eb6e261cc4eeb25",
+    "apps/api/worker/index.js": "3656013c8bf2131f0b694d96f973cf20ea784c8b2e0abb1eb0b5ba158ace4a12",
+    "apps/api/worker/invoices.js": "183c60a89020850904dc417a6695ea17e92170317bfbb19d0452e3abb7638ede",
+    "apps/api/worker/processing.js": "13137002b01c161b37065a744b11e0377a64f5f8d7626915e176841051f251c1",
+    "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+    "apps/api/worker/document.js": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
+    "apps/api/worker/chat.js": "7a4fb7018f400ed204cc8ca0a7aa69bfc2d8cce190f0035bfa2ccdf3dd1e21af",
+    "apps/api/worker/email.js": "3729638384d48577ec9dc43fd08ca0d0e5d4a478da57f9dc6684286853946cd8",
+    "apps/api/worker/telegram.js": "cd1dfd044e4f64ac1e02b43cd7c0a24f16e543da691ade4db9419b3ac710b1e2",
+    "apps/api/worker/telegram-chat.js": "b09aeb9c66cea9546227aec9c1255727f6e0bc86fe7bb784d1f376960a88b074",
+    "apps/api/worker/reevaluation.js": "d8692b77f7517cab1d2242d56b1bfbc32c8001dd1d3711177f1d78de3b0b238a",
+    "packages/extraction/src/openrouter.ts": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc",
+    "packages/database/migrations/0001_initial.sql": "daa548b944cf6a1efcc5ce22297771c86473ec0e31bd64db8521692f7bfa0980",
+    "packages/database/migrations/0005_invoice_jobs.sql": "7ea4e51237371745e7c4138c3682ad337865b10d9054526310069c562e95b05a",
+    "apps/api/worker/reread.js": "ad43e18e14e44a488139ef992de55ebc0f00dcd16a5710fef0d48c1f5f0de054"
+  },
+  "testReports": [
+    "api-tests-20261017.json",
+    "extraction-tests-20261017.json"
+  ],
+  "findings": [
+    {
+      "id": "ROB-01",
+      "finding": "All application LLM paths share OpenRouter; no direct second gateway configured.",
+      "source": "packages/extraction/src/openrouter.ts; apps/api/worker/chat.js"
+    },
+    {
+      "id": "ROB-02",
+      "finding": "No application-level model fallback for chat or secondary Qwen OCR.",
+      "source": "apps/api/worker/chat.js; packages/extraction/src/openrouter.ts"
+    },
+    {
+      "id": "ROB-03",
+      "finding": "Terminal DEAD jobs are not reopened by scheduler or process retry; separate recovery workflow required.",
+      "source": "apps/api/worker/jobs.js; apps/api/worker/reread.js"
+    },
+    {
+      "id": "ROB-04",
+      "finding": "Cron recovers invoice jobs and emails, not telegram_events. Only invoice transport has configured DLQ.",
+      "source": "apps/api/worker/index.js; apps/api/wrangler.jsonc"
+    },
+    {
+      "id": "ROB-05",
+      "finding": "Email receipts can be rescheduled indefinitely after transient notification failure; no global retry budget in email_messages.",
+      "source": "apps/api/worker/email.js"
+    },
+    {
+      "id": "ROB-06",
+      "finding": "R2 write and D1 commit are not atomic together; deletion compensation requires reconciliation under ambiguous D1 commit.",
+      "source": "apps/api/worker/invoices.js; apps/api/worker/email.js"
+    },
+    {
+      "id": "ROB-07",
+      "finding": "External Telegram delivery can succeed before its progress commits to D1; duplicate notification window remains.",
+      "source": "apps/api/worker/telegram.js; apps/api/worker/email.js"
+    },
+    {
+      "id": "ROB-08",
+      "finding": "Health probes API and D1 SELECT 1, not models, R2, queues or full processing.",
+      "source": "apps/api/worker/index.js"
+    }
+  ],
+  "verificationResults": [
+    {
+      "file": "api-tests-20261017.json",
+      "exitCode": 0,
+      "durationSeconds": 161.175,
+      "testFiles": 14
+    },
+    {
+      "file": "extraction-tests-20261017.json",
+      "exitCode": 0,
+      "durationSeconds": 3.909,
+      "testFiles": 2
+    }
+  ],
+  "reviewCompletedAtUtc": "2026-10-18T02:20:37.001814+00:00",
+  "sourceFilesUnchangedDuringReview": true,
+  "officialReferences": [
+    "https://developers.cloudflare.com/queues/reference/delivery-guarantees/",
+    "https://developers.cloudflare.com/queues/configuration/dead-letter-queues/",
+    "https://developers.cloudflare.com/queues/configuration/batching-retries/",
+    "https://developers.cloudflare.com/d1/worker-api/d1-database/",
+    "https://developers.cloudflare.com/d1/reference/time-travel/",
+    "https://openrouter.ai/docs/guides/routing/provider-selection",
+    "https://developers.cloudflare.com/workers/versions-and-deployments/rollbacks/"
+  ]
+}
