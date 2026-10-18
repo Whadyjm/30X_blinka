@@ -1,0 +1,770 @@
+{
+  "reportDate": "2026-10-17",
+  "timezone": "America/Caracas",
+  "capturedAtUtc": "2026-10-18T02:10:26.984092+00:00",
+  "billingStatus": "Estimate; no provider invoice or account-wide usage reconciliation obtained.",
+  "modelCatalogSource": "https://openrouter.ai/api/v1/models",
+  "modelPricingUnit": "USD per token, copied as strings from public catalog; endpoint/provider prices may differ.",
+  "models": [
+    {
+      "id": "deepseek/deepseek-v4.1-flash",
+      "name": "DeepSeek: DeepSeek V4.1 Flash",
+      "pricing": {
+        "prompt": "0.000000072",
+        "completion": "0.000000144",
+        "input_cache_read": "0.0000000016"
+      }
+    },
+    {
+      "id": "z-ai/glm-5.3-flash",
+      "name": "Z.ai: GLM 5.3 Flash",
+      "pricing": {
+        "prompt": "0.000000048",
+        "completion": "0.0000002",
+        "input_cache_read": "0.000000006"
+      }
+    },
+    {
+      "id": "minimax/minimax-m3",
+      "name": "MiniMax: MiniMax M3",
+      "pricing": {
+        "prompt": "0.0000003",
+        "completion": "0.0000012",
+        "input_cache_read": "0.00000006"
+      }
+    },
+    {
+      "id": "google/gemini-3.8-flash",
+      "name": "Google: Gemini 3.8 Flash",
+      "pricing": {
+        "prompt": "0.000000825",
+        "completion": "0.000004125",
+        "image": "0.000000825",
+        "audio": "0.000000825",
+        "input_audio_cache": "0.0000000825",
+        "web_search": "0.014",
+        "internal_reasoning": "0.000004125",
+        "input_cache_read": "0.0000000825",
+        "input_cache_write": "0.0000000416666666666667"
+      }
+    },
+    {
+      "id": "google/gemini-3.7-flash",
+      "name": "Google: Gemini 3.7 Flash",
+      "pricing": {
+        "prompt": "0.00000075",
+        "completion": "0.00000375",
+        "image": "0.00000075",
+        "audio": "0.00000075",
+        "input_audio_cache": "0.000000075",
+        "web_search": "0.014",
+        "internal_reasoning": "0.00000375",
+        "input_cache_read": "0.000000075",
+        "input_cache_write": "0.0000000416666666666667"
+      }
+    },
+    {
+      "id": "google/gemini-3.1-flash-lite",
+      "name": "Google: Gemini 3.1 Flash Lite",
+      "pricing": {
+        "prompt": "0.00000025",
+        "completion": "0.0000015",
+        "image": "0.00000025",
+        "audio": "0.0000005",
+        "input_audio_cache": "0.00000005",
+        "web_search": "0.014",
+        "internal_reasoning": "0.0000015",
+        "input_cache_read": "0.000000025",
+        "input_cache_write": "0.0000000833333333333333"
+      }
+    },
+    {
+      "id": "qwen/qwen3.8-flash",
+      "name": "Qwen: Qwen3.8 Flash",
+      "pricing": {
+        "prompt": "0.00000015",
+        "completion": "0.00000047",
+        "input_cache_read": "0.000000016"
+      }
+    }
+  ],
+  "observedSource": "docs/evaluations/candidate-ronda-live-2026-10-17T23-57-09-830Z.json",
+  "observedSourceSha256": "4351b8a9f884cacca4f556cb53c78ea8000d4a1da201f6655375734b9206307d",
+  "observedRunStartedAt": "2026-10-17T23:57:12.653Z",
+  "observedRunFinishedAt": "2026-10-18T00:01:23.453Z",
+  "observedMethod": "Only attempts[].usage, once per fresh read; exclude cached kinds, never sum provenance.usage again. Excludes targetedP0, chat, Cloudflare, credit purchase fees and unreported charges.",
+  "observedSummary": {
+    "pdf": {
+      "freshDocuments": 10,
+      "reportedCostUsd": 0.0205425,
+      "meanUsd": 0.00205425,
+      "minUsd": 0.001878,
+      "maxUsd": 0.00210675
+    },
+    "image": {
+      "freshDocuments": 9,
+      "reportedCostUsd": 0.0070226,
+      "meanUsd": 0.0007802888888888889,
+      "minUsd": 0.000696166,
+      "maxUsd": 0.00087613
+    }
+  },
+  "observedFreshReportedCalls": 28,
+  "observedFreshReportedCostUsd": 0.0275651,
+  "observedCases": [
+    {
+      "caseId": "001",
+      "mimeType": "application/pdf",
+      "bytes": 1166,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.002088
+    },
+    {
+      "caseId": "002",
+      "mimeType": "image/png",
+      "bytes": 54173,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.0008261099999999999
+    },
+    {
+      "caseId": "003",
+      "mimeType": "application/pdf",
+      "bytes": 1167,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.002043
+    },
+    {
+      "caseId": "004",
+      "mimeType": "image/jpeg",
+      "bytes": 100958,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.00074327
+    },
+    {
+      "caseId": "005",
+      "mimeType": "application/pdf",
+      "bytes": 1204,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.00209925
+    },
+    {
+      "caseId": "006",
+      "mimeType": "image/png",
+      "bytes": 54398,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.0007767659999999999
+    },
+    {
+      "caseId": "007",
+      "mimeType": "application/pdf",
+      "bytes": 1163,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.002088
+    },
+    {
+      "caseId": "008",
+      "mimeType": "image/jpeg",
+      "bytes": 110511,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.000787096
+    },
+    {
+      "caseId": "009",
+      "mimeType": "application/pdf",
+      "bytes": 1172,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.002088
+    },
+    {
+      "caseId": "010",
+      "mimeType": "image/png",
+      "bytes": 54995,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.0007986860000000001
+    },
+    {
+      "caseId": "011",
+      "mimeType": "application/pdf",
+      "bytes": 1166,
+      "cachedKinds": [
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "freshReportedCalls": 0,
+      "freshReportedCostUsd": 0.0
+    },
+    {
+      "caseId": "012",
+      "mimeType": "image/png",
+      "bytes": 54914,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.000696166
+    },
+    {
+      "caseId": "013",
+      "mimeType": "application/pdf",
+      "bytes": 1164,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.0020805
+    },
+    {
+      "caseId": "014",
+      "mimeType": "image/jpeg",
+      "bytes": 98588,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.0007770559999999999
+    },
+    {
+      "caseId": "015",
+      "mimeType": "application/pdf",
+      "bytes": 1164,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.00210675
+    },
+    {
+      "caseId": "016",
+      "mimeType": "application/pdf",
+      "bytes": 1169,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.00206175
+    },
+    {
+      "caseId": "017",
+      "mimeType": "image/png",
+      "bytes": 53196,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.00074132
+    },
+    {
+      "caseId": "018",
+      "mimeType": "image/jpeg",
+      "bytes": 107655,
+      "cachedKinds": [],
+      "freshReportedCalls": 2,
+      "freshReportedCostUsd": 0.00087613
+    },
+    {
+      "caseId": "019",
+      "mimeType": "application/pdf",
+      "bytes": 1150,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.00200925
+    },
+    {
+      "caseId": "020",
+      "mimeType": "application/pdf",
+      "bytes": 1146,
+      "cachedKinds": [],
+      "freshReportedCalls": 1,
+      "freshReportedCostUsd": 0.001878
+    }
+  ],
+  "observedCalls": [
+    {
+      "caseId": "001",
+      "kind": "PRIMARY",
+      "readId": "3386d4f0-0de0-471e-b785-c3353d747423",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 312,
+        "reasoningTokens": 0,
+        "costUsd": 0.002088
+      }
+    },
+    {
+      "caseId": "002",
+      "kind": "PRIMARY",
+      "readId": "40a2358f-eaff-4584-9045-8c9745b8e782",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 405,
+        "reasoningTokens": 0,
+        "costUsd": 0.00042835
+      }
+    },
+    {
+      "caseId": "002",
+      "kind": "SECONDARY",
+      "readId": "606ead03-46a1-49b2-813f-511cce3126c2",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 103,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039776
+      }
+    },
+    {
+      "caseId": "003",
+      "kind": "PRIMARY",
+      "readId": "5a35de01-1d9d-49e8-ab46-bbe9c74a8bbc",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 300,
+        "reasoningTokens": 0,
+        "costUsd": 0.002043
+      }
+    },
+    {
+      "caseId": "004",
+      "kind": "PRIMARY",
+      "readId": "75444508-66b6-456a-81f2-5cea32cbabb1",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 279,
+        "reasoningTokens": 0,
+        "costUsd": 0.00034645
+      }
+    },
+    {
+      "caseId": "004",
+      "kind": "SECONDARY",
+      "readId": "fac0729b-94d4-4294-a0b4-ccc18a8c094b",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 101,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039682
+      }
+    },
+    {
+      "caseId": "005",
+      "kind": "PRIMARY",
+      "readId": "0ade6787-6f9f-4d71-a074-1dad117c6ee3",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 315,
+        "reasoningTokens": 0,
+        "costUsd": 0.00209925
+      }
+    },
+    {
+      "caseId": "006",
+      "kind": "PRIMARY",
+      "readId": "b8e338e7-6391-4656-a2c6-b260014ee387",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 403,
+        "reasoningTokens": 0,
+        "costUsd": 0.000379946
+      }
+    },
+    {
+      "caseId": "006",
+      "kind": "SECONDARY",
+      "readId": "f127ef65-292f-4487-b604-d59cf9478d93",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 101,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039682
+      }
+    },
+    {
+      "caseId": "007",
+      "kind": "PRIMARY",
+      "readId": "cb03d4bd-1756-4bbc-aea9-45d2c01ae32d",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 312,
+        "reasoningTokens": 0,
+        "costUsd": 0.002088
+      }
+    },
+    {
+      "caseId": "008",
+      "kind": "PRIMARY",
+      "readId": "467d5d49-b461-42a5-888a-085d11c6c107",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 404,
+        "reasoningTokens": 0,
+        "costUsd": 0.000380596
+      }
+    },
+    {
+      "caseId": "008",
+      "kind": "SECONDARY",
+      "readId": "9888b3cf-20dd-4de7-aa93-faf15e5ef124",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2381,
+        "outputTokens": 105,
+        "reasoningTokens": 0,
+        "costUsd": 0.0004065
+      }
+    },
+    {
+      "caseId": "009",
+      "kind": "PRIMARY",
+      "readId": "2a0b659c-30d8-480e-8f58-c1af18aeaf63",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 312,
+        "reasoningTokens": 0,
+        "costUsd": 0.002088
+      }
+    },
+    {
+      "caseId": "010",
+      "kind": "PRIMARY",
+      "readId": "7fcb22ab-e78e-4327-a4ca-187dc29523f2",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 436,
+        "reasoningTokens": 0,
+        "costUsd": 0.000401396
+      }
+    },
+    {
+      "caseId": "010",
+      "kind": "SECONDARY",
+      "readId": "54580430-c823-4de6-a0e1-aae2749c6414",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 102,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039729
+      }
+    },
+    {
+      "caseId": "012",
+      "kind": "PRIMARY",
+      "readId": "7eeaec5f-9b3b-4a55-b6cb-666b9873d9cb",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 279,
+        "reasoningTokens": 0,
+        "costUsd": 0.000299346
+      }
+    },
+    {
+      "caseId": "012",
+      "kind": "SECONDARY",
+      "readId": "6091883c-65cc-4eee-8f1f-a7104a08aa1e",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 101,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039682
+      }
+    },
+    {
+      "caseId": "013",
+      "kind": "PRIMARY",
+      "readId": "13abc522-582f-4936-9671-f8bc22f5188b",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 310,
+        "reasoningTokens": 0,
+        "costUsd": 0.0020805
+      }
+    },
+    {
+      "caseId": "014",
+      "kind": "PRIMARY",
+      "readId": "1707904d-e941-4c6f-a749-ce2dfc1d11d5",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 402,
+        "reasoningTokens": 0,
+        "costUsd": 0.000379296
+      }
+    },
+    {
+      "caseId": "014",
+      "kind": "SECONDARY",
+      "readId": "512e8afa-6d1a-441d-a516-25d6591d1956",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 103,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039776
+      }
+    },
+    {
+      "caseId": "015",
+      "kind": "PRIMARY",
+      "readId": "d2185a61-224f-4ae0-84cf-fa24b2c3efe9",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 317,
+        "reasoningTokens": 0,
+        "costUsd": 0.00210675
+      }
+    },
+    {
+      "caseId": "016",
+      "kind": "PRIMARY",
+      "readId": "544b74fa-cb7f-43e9-9af3-7a5bc35cfb0d",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 305,
+        "reasoningTokens": 0,
+        "costUsd": 0.00206175
+      }
+    },
+    {
+      "caseId": "017",
+      "kind": "PRIMARY",
+      "readId": "50f77c41-e6b1-4192-bb62-203dcc6a2b29",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 276,
+        "reasoningTokens": 0,
+        "costUsd": 0.0003445
+      }
+    },
+    {
+      "caseId": "017",
+      "kind": "SECONDARY",
+      "readId": "cca8672a-345a-4333-83f0-fcdcad92a8d3",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 101,
+        "reasoningTokens": 0,
+        "costUsd": 0.00039682
+      }
+    },
+    {
+      "caseId": "018",
+      "kind": "PRIMARY",
+      "readId": "694e5fd7-35be-48fd-b417-959d35fe788a",
+      "attemptIndex": 0,
+      "model": "deepseek/deepseek-v4.1-flash",
+      "provider": "Wafer",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1651,
+        "outputTokens": 474,
+        "reasoningTokens": 0,
+        "costUsd": 0.0004732
+      }
+    },
+    {
+      "caseId": "018",
+      "kind": "SECONDARY",
+      "readId": "0f10f8df-ab58-4926-b435-86d4c1a793b5",
+      "attemptIndex": 0,
+      "model": "qwen/qwen3.8-flash",
+      "provider": "Alibaba",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 2329,
+        "outputTokens": 114,
+        "reasoningTokens": 0,
+        "costUsd": 0.00040293
+      }
+    },
+    {
+      "caseId": "019",
+      "kind": "PRIMARY",
+      "readId": "6c2b7888-9aee-4650-a25c-ba2b5eba833d",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 291,
+        "reasoningTokens": 0,
+        "costUsd": 0.00200925
+      }
+    },
+    {
+      "caseId": "020",
+      "kind": "PRIMARY",
+      "readId": "e98c1c07-4899-4ce4-83e3-710a34971388",
+      "attemptIndex": 0,
+      "model": "google/gemini-3.8-flash",
+      "provider": "Google AI Studio",
+      "outcome": "SUCCESS",
+      "usage": {
+        "inputTokens": 1224,
+        "outputTokens": 256,
+        "reasoningTokens": 0,
+        "costUsd": 0.001878
+      }
+    }
+  ],
+  "sourceCodeSha256": {
+    "apps/api/wrangler.jsonc": "b6cecab8b5da2d4a41513c5540673d1d1be1f4b8cfa724741eb6e261cc4eeb25",
+    "apps/api/worker/chat.js": "7a4fb7018f400ed204cc8ca0a7aa69bfc2d8cce190f0035bfa2ccdf3dd1e21af",
+    "apps/api/worker/document.js": "f3a195b3dce2a7c9e3f1d5ff87760746f65cf7fea8a67442c041b32792b57b5f",
+    "apps/api/worker/jobs.js": "3b7e067c6fe9d1b74b82bdd81ca0bdf0a20db1d7932d794cbaa79ba71bfdf0e3",
+    "apps/api/worker/auth.js": "3fdae89265638270e0d1a87d55dafa866ac911ee1bda328c201528b92af548c7",
+    "packages/extraction/src/openrouter.ts": "70ad75d4c612e840f60b0acaeedd23aa5e4ac869bd6fe179c7ff88c615c63ffc"
+  },
+  "projection": {
+    "currency": "USD",
+    "paidBaseMonthly": 5,
+    "pdfUnitBudgetUsd": 0.003,
+    "imageUnitBudgetUsd": 0.0015,
+    "chatTurnUnitBudgetUsd": 0.004,
+    "pdfShare": 0.5,
+    "imageShare": 0.5,
+    "usageContingencyMultiplier": 1.3,
+    "creditPurchaseFeeMultiplier": 1.055,
+    "chatAssumption": {
+      "totalInputTokensAcrossRounds": 8000,
+      "totalOutputTokensAcrossRounds": 1000,
+      "referenceInputUsdPerMillion": 0.3,
+      "referenceOutputUsdPerMillion": 1.2,
+      "calculatedUsd": 0.0036
+    },
+    "formula": "5 + (PDF*0.003 + IMAGE*0.0015 + CHAT_TURNS*0.004)*1.30*1.055 + infrastructure_overages",
+    "scenarios": [
+      {
+        "monthlyDocuments": 100,
+        "monthlyChatTurns": 100,
+        "aiBudgetIncludingContingencyAndFeeUsd": 0.8571875,
+        "paidBasePlusAiUsdExcludingOverages": 5.8571875
+      },
+      {
+        "monthlyDocuments": 1000,
+        "monthlyChatTurns": 1000,
+        "aiBudgetIncludingContingencyAndFeeUsd": 8.571875,
+        "paidBasePlusAiUsdExcludingOverages": 13.571875
+      },
+      {
+        "monthlyDocuments": 10000,
+        "monthlyChatTurns": 10000,
+        "aiBudgetIncludingContingencyAndFeeUsd": 85.71875,
+        "paidBasePlusAiUsdExcludingOverages": 90.71875
+      },
+      {
+        "monthlyDocuments": 100000,
+        "monthlyChatTurns": 100000,
+        "aiBudgetIncludingContingencyAndFeeUsd": 857.1875,
+        "paidBasePlusAiUsdExcludingOverages": 862.1875
+      },
+      {
+        "monthlyDocuments": 1000000,
+        "monthlyChatTurns": 1000000,
+        "aiBudgetIncludingContingencyAndFeeUsd": 8571.875,
+        "paidBasePlusAiUsdExcludingOverages": 8576.875
+      }
+    ]
+  },
+  "healthCheck": {
+    "checkedAtUtc": "2026-10-18T02:12:35.976965+00:00",
+    "url": "https://oli30x.ultramare.dev/api/health",
+    "status": 200,
+    "response": {
+      "ok": true,
+      "service": "oli-api"
+    },
+    "scope": "API and D1 SELECT 1 only; not model availability, frontend or end-to-end processing."
+  }
+}
